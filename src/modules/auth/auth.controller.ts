@@ -9,7 +9,7 @@ import {
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService, LoginPayload, RegisterPayload } from './';
-import { UsersService } from './../user';
+import { UsersService } from '../public/user';
 
 @Controller('api/auth')
 @ApiTags('authentication')
