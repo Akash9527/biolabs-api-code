@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService, LoginPayload, RegisterPayload } from './';
-import { UsersService } from '../public/user';
+import { AuthService, LoginPayload, RegisterPayload } from '.';
+import { UsersService } from '../user';
 
 @Controller('api/auth')
 @ApiTags('authentication')
