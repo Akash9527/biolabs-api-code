@@ -17,7 +17,7 @@ export class AuthService {
   ) {}
 
   async createToken(user: User) {
-    let tenant: {tenantEmail:"shivraj.singh@newvisionsoftware.in"};
+    let tenant= {tenantEmail:"shivraj.singh@newvisionsoftware.in"};
     this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Test")
     return {
       expiresIn: this.configService.get('JWT_EXPIRATION_TIME'),
