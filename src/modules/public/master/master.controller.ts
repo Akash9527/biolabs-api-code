@@ -20,21 +20,21 @@ export class MasterController {
   @Get('sites')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getSites(@Param() params:MasterPayload): Promise<any> {
+  async getSites(@Request() params:MasterPayload): Promise<any> {
     return this.masterService.getSites(params);
   }
   
   @Get('roles')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getRoles(@Param() params:MasterPayload): Promise<any> {
+  async getRoles(@Request() params:MasterPayload): Promise<any> {
     return this.masterService.getRoles(params);
   }
   
   @Get('category')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getCategories(@Param() params:MasterPayload): Promise<any> {
+  async getCategories(@Request() params:MasterPayload): Promise<any> {
     return this.masterService.getCategories(params);
   }
   
