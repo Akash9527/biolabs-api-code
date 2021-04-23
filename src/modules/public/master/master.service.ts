@@ -48,6 +48,7 @@ export class MasterService {
         }
       }
     }
+    console.info("where",search, skip,take, payload);
     return await this.siteRepository.find({
       select: ["id", "name"],
       where: search,

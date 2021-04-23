@@ -1,6 +1,7 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
+import { MasterPayload } from '../master/master.payload';
 
 import { User, UserFillableFields } from './user.entity';
 
@@ -33,5 +34,32 @@ export class UsersService {
     }
 
     return await this.userRepository.save(this.userRepository.create(payload));
+  }
+  
+  async getUsers(payload:MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if(payload.q && payload.q != ""){
+      search = [{ name: Like("%"+payload.q+"%") },{status:'1'}]
+    } else{
+      search = [{status:'1'}]
+    }
+    if(payload.pagination){
+      skip = { skip: 0 }
+      take = { take: 10 }
+      if(payload.limit){
+        take = { take: payload.limit };
+        if(payload.page){
+          skip = { skip: payload.page*payload.limit }
+        }
+      }
+    }
+    
+    return await this.userRepository.find({
+      where: search,
+      skip,
+      take
+    });
   }
 }
