@@ -61,6 +61,20 @@ export class UsersService {
     }
   }
 
+  
+  async softDeleteUser(payload) {
+    const user = await this.get(payload.id);
+
+    if (user) {
+      user.status = "99";
+      return await this.userRepository.save(user);
+    } else{
+      throw new NotAcceptableException(
+        'User with provided id not available.',
+      );
+    }
+  }
+
   async getUsers(payload:MasterPayload) {
     let search;
     let skip;
