@@ -16,11 +16,11 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255 })
-  firstName: string;
+  @Column({  })
+  role: number;
 
   @Column({ length: 255 })
-  lastName: string;
+  site_id: string;
 
   @Column({ length: 255 })
   email: string;
@@ -43,7 +43,7 @@ export class User {
 
 export class UserFillableFields {
   email: string;
-  firstName: string;
-  lastName: string;
   password: string;
+  role: number;
+  site_id:string;
 }

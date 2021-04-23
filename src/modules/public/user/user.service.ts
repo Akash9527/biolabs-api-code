@@ -36,6 +36,18 @@ export class UsersService {
     return await this.userRepository.save(this.userRepository.create(payload));
   }
   
+  async addUser(payload: UserFillableFields) {
+    const user = await this.getByEmail(payload.email);
+
+    if (user) {
+      throw new NotAcceptableException(
+        'User with provided email already created.',
+      );
+    }
+
+    return await this.userRepository.save(this.userRepository.create(payload));
+  }
+  
   async getUsers(payload:MasterPayload) {
     let search;
     let skip;
