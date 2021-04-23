@@ -21,16 +21,34 @@ export class AddUserPayload {
   @ApiProperty({
     required: true,
   })
-  site_id: string;
+  site_id: number[];
 
   @ApiProperty({
     required: true,
   })
-  @IsNotEmpty()
-  @MinLength(5)
+  firstName: string;
+
+  @ApiProperty({
+    required: true,
+  })
+  lastName: string;
+
+  @ApiProperty({
+    required: true,
+  })
+  title: string;
+
+  @ApiProperty({
+    required: true,
+  })
+  phoneNumber: string;
+
+  @ApiProperty({
+    required: false,
+  })
   password: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: false })
   @SameAs('password')
   passwordConfirmation: string;
 }

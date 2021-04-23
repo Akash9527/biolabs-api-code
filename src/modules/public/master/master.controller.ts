@@ -11,7 +11,7 @@ import { MasterService, MasterPayload } from '.';
 
 
 @Controller('api/master')
-@ApiTags('master')
+@ApiTags('Master')
 export class MasterController {
   constructor(
     private readonly masterService: MasterService

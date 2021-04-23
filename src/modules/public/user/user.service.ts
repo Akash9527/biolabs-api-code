@@ -1,15 +1,23 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
-import { MasterPayload } from '../master/master.payload';
+import { ListUserPayload } from './list-user.payload';
 
 import { User, UserFillableFields } from './user.entity';
+import { UserToken } from './user-token.entity';
+import { Mail } from '../../../utils/Mail';
+import { EMAIL } from '../../../constants/email';
 
 @Injectable()
 export class UsersService {
   constructor(
+    private readonly jwtService: JwtService,
+    private readonly mail: Mail,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(UserToken)
+    private readonly userTokenRepository: Repository<UserToken>,
   ) {}
 
   async get(id: number) {
@@ -45,7 +53,17 @@ export class UsersService {
       );
     }
 
-    return await this.userRepository.save(this.userRepository.create(payload));
+    const newUser = await this.userRepository.create(payload);
+    const savedUser = await this.userRepository.save(newUser);
+    let token = this.jwtService.sign({ id: savedUser.id });
+
+    const tokenData = {user_id: savedUser.id, token: token};
+    await this.userTokenRepository.save(this.userTokenRepository.create(tokenData));
+    
+    let tenant= {tenantEmail:"shivraj.singh@newvisionsoftware.in"};
+    //this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Test")
+
+    return savedUser;
   }
   
   async updateUser(payload) {
@@ -75,13 +93,17 @@ export class UsersService {
     }
   }
 
-  async getUsers(payload:MasterPayload) {
+  async getUsers(payload:ListUserPayload) {
     let search;
     let skip;
     let take;
+    if(payload.role || payload.role == 0){
+      search = [{ role: payload.role },{status:'1'}]
+    }
     if(payload.q && payload.q != ""){
       search = [{ name: Like("%"+payload.q+"%") },{status:'1'}]
-    } else{
+    } 
+    else{
       search = [{status:'1'}]
     }
     if(payload.pagination){
@@ -100,5 +122,16 @@ export class UsersService {
       skip,
       take
     });
+  }
+
+  async getUserById(id){
+    const user = await this.get(id);
+    if(user){
+      return user;
+    } else{
+      throw new NotAcceptableException(
+        'User with provided id not available.',
+      );
+    }
   }
 }

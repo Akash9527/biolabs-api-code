@@ -19,11 +19,23 @@ export class User {
   @Column({  })
   role: number;
 
-  @Column({ length: 255 })
-  site_id: string;
+  @Column("int", { array: true })
+  site_id: number[];
 
   @Column({ length: 255 })
   email: string;
+
+  @Column({ length: 255 })
+  firstName: string;
+
+  @Column({ length: 255 })
+  lastName: string;
+
+  @Column({ length: 255 })
+  title: string;
+
+  @Column({ length: 255 })
+  phoneNumber: string;
 
   @Column({ length: 255, enum:['-1','0','1','99'], default:'1' })
   status: status_enum;
@@ -32,6 +44,7 @@ export class User {
     name: 'password',
     length: 255,
     transformer: new PasswordTransformer(),
+    nullable:true
   })
   password: string;
 
@@ -45,5 +58,9 @@ export class UserFillableFields {
   email: string;
   password: string;
   role: number;
-  site_id:string;
+  site_id:number[];
+  firstName:string;
+  lastName:string;
+  title:string;
+  phoneNumber:string;
 }

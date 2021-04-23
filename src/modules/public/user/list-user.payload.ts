@@ -1,19 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class MasterPayload {
+export class ListUserPayload {
   @ApiProperty({
     required: false,
   })
   q: string;
+
+  @ApiProperty({
+    required: false,
+  })
+  role: number;
+
   @ApiProperty({
     required: false,
   })
   pagination: boolean;
+
   @ApiProperty({
     required: false,
   })
   page: number;
-  
+
   @ApiProperty({
     required: false,
   })
@@ -28,4 +35,9 @@ export class MasterPayload {
     required: false,
   })
   sortFiled: string;
+
+  @ApiProperty({
+    required: false,
+  })
+  sortOrder: string;
 }

@@ -6,7 +6,7 @@ import {
     Post,
     Body,
     Patch,
-    Delete,
+    Delete
 } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -15,9 +15,10 @@ import { MasterPayload } from '../master/master.payload';
 import { AddUserPayload } from './add-user.payload';
 import { UpdateUserPayload } from './update-user.payload';
 import { DeleteUserPayload } from './delete-user.payload';
+import { ListUserPayload } from './list-user.payload';
   
   @Controller('api/user')
-  @ApiTags('user')
+  @ApiTags('User')
   export class UserController {
     constructor(
         private readonly userService: UsersService,
@@ -46,7 +47,7 @@ import { DeleteUserPayload } from './delete-user.payload';
     
     @ApiBearerAuth()
     @UseGuards(AuthGuard())
-    @Delete('user')
+    @Delete()
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     async softDeleteUser(@Body() payload:DeleteUserPayload): Promise<any> {
@@ -57,12 +58,20 @@ import { DeleteUserPayload } from './delete-user.payload';
 
     @ApiBearerAuth()
     @UseGuards(AuthGuard())
-    @Get('users')
+    @Get()
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async getSites(@Param() params:MasterPayload): Promise<any> {
+    async getSites(@Param() params:ListUserPayload): Promise<any> {
       return this.userService.getUsers(params);
     }
     
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard())
+    @Get(':id')
+    @ApiResponse({ status: 200, description: 'Successful Response' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    async getUserById(@Param('id') id:number): Promise<any> {
+      return this.userService.getUserById(id);
+    }
   }
   

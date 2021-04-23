@@ -12,7 +12,7 @@ import { AuthService, LoginPayload, RegisterPayload } from '.';
 import { UsersService } from '../user';
 
 @Controller('api/auth')
-@ApiTags('authentication')
+@ApiTags('Authentication')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
