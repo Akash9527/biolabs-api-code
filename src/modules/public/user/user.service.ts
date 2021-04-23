@@ -159,7 +159,12 @@ export class UsersService {
       console.log("tokenData",tokenData)
       const user = await this.get(tokenData.user_id);
       if(user.status=="1" || user.status=="0"){
-        return user;
+        user.password = payload.password;
+        user.status = "1";
+        const newUser = await this.userRepository.save(user);
+        tokenData.status = "99";
+        this.userTokenRepository.save(tokenData);
+        return newUser;
       }
       else{
         throw new NotAcceptableException(
