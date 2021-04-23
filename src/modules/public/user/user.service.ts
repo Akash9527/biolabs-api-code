@@ -40,7 +40,6 @@ export class UsersService {
         'User with provided email already created.',
       );
     }
-
     return await this.userRepository.save(this.userRepository.create(payload));
   }
   
@@ -52,16 +51,12 @@ export class UsersService {
         'User with provided email already created.',
       );
     }
-
     const newUser = await this.userRepository.create(payload);
     const savedUser = await this.userRepository.save(newUser);
-    let token = this.jwtService.sign({ id: savedUser.id, time: new Date().getTime() });
 
-    const tokenData = {user_id: savedUser.id, token: token};
-    await this.userTokenRepository.save(this.userTokenRepository.create(tokenData));
-    
-    let tenant= {tenantEmail:"shivraj.singh@newvisionsoftware.in"};
-    //this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Test")
+    await this.generateToken(savedUser);
+    // let tenant= {tenantEmail:"shivraj.singh@newvisionsoftware.in"};
+    // this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Test")
 
     return savedUser;
   }
@@ -174,6 +169,29 @@ export class UsersService {
     } else{
       throw new NotAcceptableException(
         'Token is invalid.',
+      );
+    }
+  }
+  
+  async generateToken(user){
+    let token = this.jwtService.sign({ id: user.id, time: new Date().getTime() });
+    console.log("token==>",token);
+    const tokenData = {user_id: user.id, token: token};
+    const tokenChk = await this.userTokenRepository.find({where: [{user_id:user.id},{status:"1"}]});
+    if(tokenChk){
+      await this.userTokenRepository.update({user_id:user.id},{status:"99"});
+    }
+    return await this.userTokenRepository.save(this.userTokenRepository.create(tokenData));
+  }
+
+  async forgotPassword(payload: UserFillableFields) {
+    const user = await this.getByEmail(payload.email);
+    if (user) {
+      await this.generateToken(user);
+      return true;
+    } else{
+      throw new NotAcceptableException(
+        'User with provided email already created.',
       );
     }
   }

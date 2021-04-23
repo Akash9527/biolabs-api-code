@@ -14,6 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService, LoginPayload, RegisterPayload } from '.';
 import { UsersService } from '../user';
 import { PasswordPayload } from './password.payload';
+import { ForgotPasswordPayload } from './forgot-password.payload';
 
 @Controller('api/auth')
 @ApiTags('Authentication')
@@ -37,7 +38,10 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async register(@Body() payload: RegisterPayload): Promise<any> {
-    const user = await this.userService.create(payload);
+    type status_enum = '-1' | '0' | '1' | '99'; 
+    const status:status_enum = "1";
+    const pal = {...payload, status:status};
+    const user = await this.userService.create(pal);
     return await this.authService.createToken(user);
   }
   
@@ -55,6 +59,14 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async verifyLink(@Param('token') token:string ): Promise<any> {
     return await this.authService.validateToken(token);
+  }
+  
+  @Post('forgot-password')
+  @ApiResponse({ status: 201, description: 'Successful Registration' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async forgotPassword(@Body() payload:ForgotPasswordPayload ): Promise<any> {
+    return await this.authService.forgotPassword(payload);
   }
 
   @ApiBearerAuth()

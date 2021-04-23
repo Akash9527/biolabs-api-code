@@ -30,7 +30,10 @@ import { ListUserPayload } from './list-user.payload';
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     async addUser(@Body() payload:AddUserPayload): Promise<any> {
-        const user = await this.userService.addUser(payload);
+      type status_enum = '-1' | '0' | '1' | '99'; 
+      const status:status_enum = "0";
+      const pal = {...payload, status:status};
+        const user = await this.userService.addUser(pal);
         return user;
     }
     

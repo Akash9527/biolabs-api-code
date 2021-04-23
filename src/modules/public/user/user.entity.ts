@@ -45,7 +45,7 @@ export class User {
   @Column({ length: 255 })
   phoneNumber: string;
 
-  @Column({ length: 255, enum:['-1','0','1','99'], default:'1' })
+  @Column({ length: 255, enum:['-1','0','1','99'], default:'0' })
   status: status_enum;
 
   @Column({
@@ -71,4 +71,5 @@ export class UserFillableFields {
   lastName:string;
   title:string;
   phoneNumber:string;
+  status:status_enum;
 }
