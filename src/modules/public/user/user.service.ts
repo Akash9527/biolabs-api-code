@@ -48,6 +48,19 @@ export class UsersService {
     return await this.userRepository.save(this.userRepository.create(payload));
   }
   
+  async updateUser(payload) {
+    const user = await this.get(payload.id);
+
+    if (user) {
+      user.site_id = payload.site_id;
+      return await this.userRepository.save(user);
+    } else{
+      throw new NotAcceptableException(
+        'User with provided id not available.',
+      );
+    }
+  }
+
   async getUsers(payload:MasterPayload) {
     let search;
     let skip;
