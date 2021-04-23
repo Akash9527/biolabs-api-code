@@ -28,4 +28,8 @@ export class AuthService {
     }
     return user;
   }
+
+  async validateToken(token){
+    return this.userService.validateToken(token);
+  }
 }

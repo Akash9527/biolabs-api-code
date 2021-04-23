@@ -6,7 +6,15 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { PasswordTransformer } from './password.transformer';
-
+/**
+ * -1 = De-active
+ * 0 = Pending/Default/
+ * 1 = Active
+ * 96 = 
+ * 97 = 
+ * 98 = 
+ * 99 = Soft delete (Deleted by admin)
+ */
 type status_enum = '-1' | '0' | '1' | '99';
 
 @Entity({

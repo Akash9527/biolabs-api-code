@@ -55,7 +55,7 @@ export class UsersService {
 
     const newUser = await this.userRepository.create(payload);
     const savedUser = await this.userRepository.save(newUser);
-    let token = this.jwtService.sign({ id: savedUser.id });
+    let token = this.jwtService.sign({ id: savedUser.id, time: new Date().getTime() });
 
     const tokenData = {user_id: savedUser.id, token: token};
     await this.userTokenRepository.save(this.userTokenRepository.create(tokenData));
@@ -79,7 +79,6 @@ export class UsersService {
     }
   }
 
-  
   async softDeleteUser(payload) {
     const user = await this.get(payload.id);
 
@@ -131,6 +130,45 @@ export class UsersService {
     } else{
       throw new NotAcceptableException(
         'User with provided id not available.',
+      );
+    }
+  }
+
+  async validateToken(token:string){
+    const tokenData = await this.userTokenRepository.findOne({where: [{token:token},{status:1}]});
+    if(tokenData){
+      console.log("tokenData",tokenData)
+      const user = await this.get(tokenData.user_id);
+      if(user.status=="1" || user.status=="0")
+        return user;
+      else{
+        throw new NotAcceptableException(
+          'Token is invalid.',
+        );
+      }
+    } else{
+      throw new NotAcceptableException(
+        'Token is invalid.',
+      );
+    }
+  }
+
+  async setNewPassword(payload){
+    const tokenData = await this.userTokenRepository.findOne({where: [{token:payload.token},{status:1}]});
+    if(tokenData){
+      console.log("tokenData",tokenData)
+      const user = await this.get(tokenData.user_id);
+      if(user.status=="1" || user.status=="0"){
+        return user;
+      }
+      else{
+        throw new NotAcceptableException(
+          'Token is invalid.',
+        );
+      }
+    } else{
+      throw new NotAcceptableException(
+        'Token is invalid.',
       );
     }
   }
