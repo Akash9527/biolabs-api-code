@@ -23,6 +23,7 @@ import { UserModule } from 'modules/public/user';
           database: configService.get('DB_DATABASE'),
           entities: [__dirname + './../**/**.entity{.ts,.js}'],
           synchronize: configService.get('DB_SYNC') === 'true',
+          ssl: configService.get('DB_SSL') === 'true'
         } as TypeOrmModuleAsyncOptions;
       },
     }),
