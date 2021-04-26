@@ -63,9 +63,12 @@ export class UsersService {
   
   async updateUser(payload) {
     const user = await this.get(payload.id);
-
     if (user) {
       user.site_id = payload.site_id;
+      user.firstName = payload.firstName;
+      user.lastName = payload.lastName;
+      user.title = payload.title;
+      user.phoneNumber = payload.phoneNumber;
       return await this.userRepository.save(user);
     } else{
       throw new NotAcceptableException(
@@ -74,8 +77,8 @@ export class UsersService {
     }
   }
 
-  async softDeleteUser(payload) {
-    const user = await this.get(payload.id);
+  async softDeleteUser(id) {
+    const user = await this.get(id);
 
     if (user) {
       user.status = "99";

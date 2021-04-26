@@ -7,7 +7,8 @@ import {
     Body,
     Patch,
     Delete,
-    Query
+    Query,
+    Put
 } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -40,7 +41,7 @@ import { ListUserPayload } from './list-user.payload';
     
     @ApiBearerAuth()
     @UseGuards(AuthGuard())
-    @Patch()
+    @Put()
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     async updateUser(@Body() payload:UpdateUserPayload): Promise<any> {
@@ -51,11 +52,11 @@ import { ListUserPayload } from './list-user.payload';
     
     @ApiBearerAuth()
     @UseGuards(AuthGuard())
-    @Delete()
+    @Delete(':id')
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async softDeleteUser(@Body() payload:DeleteUserPayload): Promise<any> {
-        const user = await this.userService.softDeleteUser(payload);
+    async softDeleteUser(@Param('id') id:number): Promise<any> {
+        const user = await this.userService.softDeleteUser(id);
         return user;
 
     }
