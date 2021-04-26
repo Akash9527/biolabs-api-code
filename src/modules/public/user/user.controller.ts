@@ -6,7 +6,8 @@ import {
     Post,
     Body,
     Patch,
-    Delete
+    Delete,
+    Query
 } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -64,7 +65,7 @@ import { ListUserPayload } from './list-user.payload';
     @Get()
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async getSites(@Param() params:ListUserPayload): Promise<any> {
+    async getSites(@Query() params:ListUserPayload): Promise<any> {
       return this.userService.getUsers(params);
     }
     

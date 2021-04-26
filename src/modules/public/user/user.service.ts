@@ -91,15 +91,14 @@ export class UsersService {
     let search;
     let skip;
     let take;
-    if(payload.role || payload.role == 0){
-      search = [{ role: payload.role },{status:'1'}]
+    let _search = {};
+    if(payload.role || payload.role == 0) {
+      _search = {..._search, ...{role: payload.role}};
     }
     if(payload.q && payload.q != ""){
-      search = [{ name: Like("%"+payload.q+"%") },{status:'1'}]
+      _search = {..._search, ...{name: Like("%"+payload.q+"%")}};
     } 
-    else{
-      search = [{status:'1'}]
-    }
+    search = [{..._search, status:'1'},{..._search, status:'0'}]
     if(payload.pagination){
       skip = { skip: 0 }
       take = { take: 10 }
@@ -110,7 +109,6 @@ export class UsersService {
         }
       }
     }
-    
     return await this.userRepository.find({
       where: search,
       skip,
