@@ -53,10 +53,13 @@ export class UsersService {
     }
     const newUser = await this.userRepository.create(payload);
     const savedUser = await this.userRepository.save(newUser);
-
-    await this.generateToken(savedUser);
-    // let tenant= {tenantEmail:"shivraj.singh@newvisionsoftware.in"};
-    // this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Test")
+    const userInformation = await this.generateToken(savedUser);
+    const userInfo = {
+      token:userInformation.token,
+      userName:savedUser.firstName
+    }
+     let tenant= {tenantEmail:payload.email};
+    this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Test",userInfo)
 
     return savedUser;
   }
