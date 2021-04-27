@@ -1,0 +1,56 @@
+{
+    "roles": [
+        {
+            "superadmin": 1
+        },
+        {
+            "siteadmin": 2
+        },
+        {
+            "sponsor": 3
+        },
+        {
+            "resident": 4
+        }
+    ],
+    "sites": [
+        {
+            "Boston - Tufts Launchpad": 1
+        },
+        {
+            "Cambridge - Ipsen Innovation Center": 2
+        },
+        {
+            "New York - NYU Langone": 3
+        },
+        {
+            "North Carolina - Durham": 4
+        },
+        {
+            "Los Angeles - The Lundquist Institute": 5
+        },
+        {
+            "Princeton - Princeton Innovation Center BioLabs": 6
+        },
+        {
+            "Philadelphia - BioLabs at CIC": 7
+        },
+        {
+            "San Diego - Campus Point and Towne Center": 8
+        },
+        {
+            "North Texas - BioLabs at Pegasus Park": 9
+        }
+    ],
+    "superadmin": {
+        "email": "superadmin@biolabs.io",
+        "role": 1,
+        "site_id": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        "firstName": "admin",
+        "lastName": "user",
+        "title": "Super",
+        "phoneNumber": "",
+        "password": "biolabs",
+        "status": "1"
+    }
+}

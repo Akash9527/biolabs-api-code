@@ -8,35 +8,32 @@ import { ConfigService } from '../../config';
 import { User, UsersService } from '../user';
 import { LoginPayload } from './login.payload';
 
+const appRoot = require('app-root-path');
+const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly userService: UsersService,
+    private readonly userService: UsersService
   ) {}
 
   async onApplicationBootstrap() {
     //TODO: move the things to property file
     // used to create super admin
+    await this.createSuperAdmin();
+  }
+
+  /**
+   * @description: Creates the default super admin with all site access
+   */
+  private async createSuperAdmin() {
     const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
     if (superAdmin) {
       console.info('superAdmin already exist.');
     } else {
-      type status_enum = '-1' | '0' | '1' | '99';
-      const status: status_enum = '1';
-      let superAdminPayload = {
-        'email': 'superadmin@biolabs.io',
-        'role': 1,
-        'site_id': [1, 2, 3, 4],
-        'firstName': 'admin',
-        'lastName': 'user',
-        'title': 'Super',
-        'phoneNumber': '',
-        'password': 'biolabs',
-        'status': status
-      }
-      await this.userService.create(superAdminPayload);
+      await this.userService.create(migrationData['superadmin']);
     }
   }
 
