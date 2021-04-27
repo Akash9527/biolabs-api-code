@@ -131,7 +131,7 @@ export class UsersService {
   }
 
   async validateToken(token:string){
-    const tokenData = await this.userTokenRepository.findOne({where: [{token:token},{status:1}]});
+    const tokenData = await this.userTokenRepository.findOne({where: [{token:token, status:1}]});
     if(tokenData){
       console.log("tokenData",tokenData)
       const user = await this.get(tokenData.user_id);
@@ -150,7 +150,7 @@ export class UsersService {
   }
 
   async setNewPassword(payload){
-    const tokenData = await this.userTokenRepository.findOne({where: [{token:payload.token},{status:1}]});
+    const tokenData = await this.userTokenRepository.findOne({where: [{token:payload.token, status:1}]});
     if(tokenData){
       console.log("tokenData",tokenData)
       const user = await this.get(tokenData.user_id);
@@ -178,7 +178,7 @@ export class UsersService {
     let token = this.jwtService.sign({ id: user.id, time: new Date().getTime() });
     console.log("token==>",token);
     const tokenData = {user_id: user.id, token: token};
-    const tokenChk = await this.userTokenRepository.find({where: [{user_id:user.id},{status:"1"}]});
+    const tokenChk = await this.userTokenRepository.find({where: [{user_id:user.id, status:"1"}]});
     if(tokenChk){
       await this.userTokenRepository.update({user_id:user.id},{status:"99"});
     }

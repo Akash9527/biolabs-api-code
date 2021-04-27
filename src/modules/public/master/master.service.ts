@@ -38,7 +38,7 @@ export class MasterService {
     let skip;
     let take;
     if(payload.q && payload.q != ""){
-      search = [{ name: Like("%"+payload.q+"%") },{status:'1'}]
+      search = [{ name: Like("%"+payload.q+"%"), status:'1'}]
     } else{
       search = [{status:'1'}]
     }
@@ -64,7 +64,7 @@ export class MasterService {
   async createSites() {
     const sites  = this.getSites(new MasterPayload());
     let resp = {};
-    sites.then(async data=> {
+    return await sites.then(async data=> {
       const _sites = migrationData['sites'];
       for (const _site of _sites) {
         if (!data.find(r=> r.name == _site.name)) {
@@ -94,7 +94,7 @@ export class MasterService {
     let skip;
     let take;
     if(payload.q && payload.q != ""){
-      search = [{ name: Like("%"+payload.q+"%") },{status:'1'}]
+      search = [{ name: Like("%"+payload.q+"%"), status:'1'}]
     } else{
       search = [{status:'1'}]
     }
@@ -119,7 +119,7 @@ export class MasterService {
   async createRoles() {
     const roles  = this.getRoles(new MasterPayload());
     let resp = {};
-    roles.then(async data=> {
+    return await roles.then(async data=> {
       const _roles = migrationData['roles'];
       for (const _role of _roles) {
         if (!data.find(r=> r.name == _role.name)) {
@@ -148,7 +148,7 @@ export class MasterService {
     let skip;
     let take;
     if(payload.q && payload.q != ""){
-      search = [{ name: Like("%"+payload.q+"%") },{status:'1'}]
+      search = [{ name: Like("%"+payload.q+"%"), status:'1'}]
     } else{
       search = [{status:'1'}]
     }
