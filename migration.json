@@ -1,45 +1,58 @@
 {
     "roles": [
         {
-            "superadmin": 1
+            "name":"superadmin",
+            "id":1
         },
         {
-            "siteadmin": 2
+            "name":"siteadmin",
+            "id":2
         },
         {
-            "sponsor": 3
+            "name":"sponsor",
+            "id":3
         },
         {
-            "resident": 4
+            "name":"resident",
+            "id":4
         }
     ],
     "sites": [
         {
-            "Boston - Tufts Launchpad": 1
+            "name":"Boston - Tufts Launchpad",
+            "id":1
         },
         {
-            "Cambridge - Ipsen Innovation Center": 2
+            "name":"Cambridge - Ipsen Innovation Center",
+            "id": 2
         },
         {
-            "New York - NYU Langone": 3
+            "name":"New York - NYU Langone",
+            "id": 3
         },
         {
-            "North Carolina - Durham": 4
+            "name":"North Carolina - Durham",
+            "id": 4
         },
         {
-            "Los Angeles - The Lundquist Institute": 5
+            "name":"Los Angeles - The Lundquist Institute",
+            "id": 5
         },
         {
-            "Princeton - Princeton Innovation Center BioLabs": 6
+            "name":"Princeton - Princeton Innovation Center BioLabs",
+            "id": 6
         },
         {
-            "Philadelphia - BioLabs at CIC": 7
+            "name":"Philadelphia - BioLabs at CIC",
+            "id": 7
         },
         {
-            "San Diego - Campus Point and Towne Center": 8
+            "name":"San Diego - Campus Point and Towne Center",
+            "id": 8
         },
         {
-            "North Texas - BioLabs at Pegasus Park": 9
+            "name":"North Texas - BioLabs at Pegasus Park",
+            "id": 9
         }
     ],
     "superadmin": {

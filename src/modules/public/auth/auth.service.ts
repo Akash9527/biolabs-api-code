@@ -7,6 +7,7 @@ import { Hash } from '../../../utils/Hash';
 import { ConfigService } from '../../config';
 import { User, UsersService } from '../user';
 import { LoginPayload } from './login.payload';
+import { MasterService } from '../master';
 
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
@@ -16,12 +17,15 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly userService: UsersService
+    private readonly userService: UsersService,
+    private readonly masterService: MasterService
   ) {}
 
   async onApplicationBootstrap() {
     //TODO: move the things to property file
     // used to create super admin
+    await this.masterService.createRoles();
+    await this.masterService.createSites();
     await this.createSuperAdmin();
   }
 
@@ -30,9 +34,8 @@ export class AuthService {
    */
   private async createSuperAdmin() {
     const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
-    if (superAdmin) {
-      console.info('superAdmin already exist.');
-    } else {
+    if (!superAdmin) {
+      console.log("Creating Super Admin");
       await this.userService.create(migrationData['superadmin']);
     }
   }

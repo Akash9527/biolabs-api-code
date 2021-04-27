@@ -9,6 +9,10 @@ import { Modality } from './modality.entity';
 import { Role } from './role.entity';
 import { Site } from './site.entity';
 import { TechnologyStage } from './technology-stage.entity';
+const appRoot = require('app-root-path');
+const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
+type status_enum = '-1' | '0' | '1' | '99';
+
 
 @Injectable()
 export class MasterService {
@@ -57,6 +61,34 @@ export class MasterService {
     });
   }
 
+  async createSites() {
+    const sites  = this.getSites(new MasterPayload());
+    let resp = {};
+    sites.then(async data=> {
+      const _sites = migrationData['sites'];
+      for (const _site of _sites) {
+        if (!data.find(r=> r.name == _site.name)) {
+          resp[_site.name] = await this.createSite(_site.name, _site.id);
+        }
+        if (_site.name == _site[_site.length - 1]) {
+          return resp;
+        }
+      }
+    }, error=>{
+      console.log(error);
+    })
+  }
+
+  async createSite(name, id) {
+    const status:status_enum = '1';
+    const payload = {
+      id, name, status
+    }
+    console.log("Adding Site: ", name);
+    return await this.siteRepository.save(this.siteRepository.create(payload));
+  }
+
+
   async getRoles(payload:MasterPayload) {
     let search;
     let skip;
@@ -82,6 +114,33 @@ export class MasterService {
       skip,
       take
     });
+  }
+
+  async createRoles() {
+    const roles  = this.getRoles(new MasterPayload());
+    let resp = {};
+    roles.then(async data=> {
+      const _roles = migrationData['roles'];
+      for (const _role of _roles) {
+        if (!data.find(r=> r.name == _role.name)) {
+          resp[_role.name] = await this.createRole(_role.name, _role.id);
+        }
+        if (_role.name == _roles[_roles.length - 1]) {
+          return resp;
+        }
+      }
+    }, error=>{
+      console.log(error);
+    });
+  }
+
+  async createRole(name, id) {
+    const status:status_enum = '1';
+    const payload = {
+      id, name, status
+    }
+    console.log("Adding Role: ", name);
+    return await this.roleRepository.save(this.roleRepository.create(payload));
   }
   
   async getCategories(payload:MasterPayload) {
