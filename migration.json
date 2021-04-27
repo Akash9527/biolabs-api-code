@@ -17,7 +17,7 @@
             "id":4
         }
     ],
-    "sites": [
+    "sites_ful": [
         {
             "name":"Boston - Tufts Launchpad",
             "id":1
@@ -53,6 +53,16 @@
         {
             "name":"North Texas - BioLabs at Pegasus Park",
             "id": 9
+        }
+    ],
+    "sites": [
+        {
+            "name":"Tufts",
+            "id":1
+        },
+        {
+            "name":"Ipsen",
+            "id": 2
         }
     ],
     "superadmin": {
