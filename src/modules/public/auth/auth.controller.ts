@@ -45,7 +45,7 @@ export class AuthController {
     return await this.authService.createToken(user);
   }
   
-  @Patch('set-password')
+  @Put('set-password')
   @ApiResponse({ status: 201, description: 'Successful Registration' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
