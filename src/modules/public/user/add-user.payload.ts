@@ -34,12 +34,14 @@ export class AddUserPayload {
   lastName: string;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    nullable:true
   })
   title: string;
 
   @ApiProperty({
-    required: true,
+    required: false,
+    nullable:true
   })
   phoneNumber: string;
 
