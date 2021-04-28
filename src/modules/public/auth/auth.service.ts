@@ -73,7 +73,7 @@ export class AuthService {
   async validateToken(token) {
     return this.userService.validateToken(token);
   }
-  async forgotPassword(payload) {
-    return this.userService.forgotPassword(payload);
+  async forgotPassword(payload, req) {
+    return this.userService.forgotPassword(payload, req);
   }
 }

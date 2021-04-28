@@ -8,7 +8,8 @@ import {
     Patch,
     Delete,
     Query,
-    Put
+    Put,
+    Req
 } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,6 +19,7 @@ import { AddUserPayload } from './add-user.payload';
 import { UpdateUserPayload } from './update-user.payload';
 import { DeleteUserPayload } from './delete-user.payload';
 import { ListUserPayload } from './list-user.payload';
+import { Request } from 'express';
   
   @Controller('api/user')
   @ApiTags('User')
@@ -31,11 +33,12 @@ import { ListUserPayload } from './list-user.payload';
     @Post()
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async addUser(@Body() payload:AddUserPayload): Promise<any> {
+    async addUser(@Body() payload: AddUserPayload, @Req() req: Request): Promise<any> {
+      console.log('req === >', req.headers['origin']);
       type status_enum = '-1' | '0' | '1' | '99'; 
       const status:status_enum = "0";
       const pal = {...payload, status:status};
-        const user = await this.userService.addUser(pal);
+        const user = await this.userService.addUser(pal, req);
         return user;
     }
     
