@@ -355,7 +355,7 @@ export class Mail {
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
                                                                            <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
-                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${userInfo.userName},<br><br>Your account has been created and is ready for your use. Click below button to set your password and get going.</p>
+                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${userInfo.userName},<br><br>Welcome to your BioLabs Connect<br><br>Your account has been created and is ready for your use. Click below button to set your password and get going.</p>
                                                                            </td>
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
@@ -378,11 +378,6 @@ export class Mail {
                                                                         <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
                                                                         <p href="" class="es-button msohide" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:14px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Or click on:  <a href="${userInfo.origin + EMAIL.EMAIL_CONFIRM_URL + userInfo.token}" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:11px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:20px;color:#167efb;word-break: break-all;">${userInfo.origin + EMAIL.EMAIL_CONFIRM_URL + userInfo.token}</a> </p>
                                                                      </td>
-                                                                        </tr>
-                                                                        <tr style="border-collapse:collapse">
-                                                                           <td align="center" bgcolor="#fff">
-                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000"><br><span style="font-size:14px;line-height:21px"></span>If you didn't request this, you can safely ignore this email.<br></p>
-                                                                           </td>
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
                                                                            <td align="center" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
