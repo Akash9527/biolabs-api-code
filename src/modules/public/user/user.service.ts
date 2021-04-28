@@ -59,7 +59,7 @@ export class UsersService {
       userName:savedUser.firstName
     }
      let tenant= {tenantEmail:payload.email};
-    this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Test",userInfo)
+    this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Invite", userInfo)
 
     return savedUser;
   }
@@ -136,7 +136,7 @@ export class UsersService {
   async validateToken(token:string){
     const tokenData = await this.userTokenRepository.findOne({where: [{token:token, status:1}]});
     if(tokenData){
-      console.log("tokenData",tokenData)
+      //console.log("tokenData",tokenData)
       const user = await this.get(tokenData.user_id);
       if(user.status=="1" || user.status=="0")
         return user;
@@ -191,9 +191,15 @@ export class UsersService {
   async forgotPassword(payload: UserFillableFields) {
     const user = await this.getByEmail(payload.email);
     if (user) {
-      await this.generateToken(user);
+      const userInformation = await this.generateToken(user);
+      const userInfo = {
+        token: userInformation.token,
+        userName: user.firstName
+      }
+      let tenant = { tenantEmail: payload.email };
+      this.mail.sendEmail(tenant, EMAIL.SUBJECT_FORGOT_PASSWORD, "forgotMail", userInfo)
       return true;
-    } else{
+    } else {
       throw new NotAcceptableException(
         'User with provided email already created.',
       );
