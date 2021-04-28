@@ -6,5 +6,5 @@ export const EMAIL = {
     SUBJECT_WELCOME: "",
     CONTENT_TYPE:"HTML",
     CC_EMAIL_USER:"",
-    EMAIL_CONFIRM_URL:"http://localhost:4200/reset-password?token="
+    EMAIL_CONFIRM_URL:"/reset-password?token="
 }

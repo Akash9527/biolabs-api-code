@@ -7,7 +7,7 @@ import {
   Put,
   Patch,
   Param,
-  Request,
+  Req,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -15,6 +15,7 @@ import { AuthService, LoginPayload, RegisterPayload } from '.';
 import { UsersService } from '../user';
 import { PasswordPayload } from './password.payload';
 import { ForgotPasswordPayload } from './forgot-password.payload';
+import { Request } from 'express';
 
 @Controller('api/auth')
 @ApiTags('Authentication')
@@ -65,18 +66,18 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Successful Registration' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async forgotPassword(@Body() payload:ForgotPasswordPayload ): Promise<any> {
-    return await this.authService.forgotPassword(payload);
+  async forgotPassword(@Body() payload:ForgotPasswordPayload, @Req() req: Request ): Promise<any> {
+    return await this.authService.forgotPassword(payload, req);
   }
 
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard())
-  @Get('me')
-  @ApiResponse({ status: 200, description: 'Successful Response' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getLoggedInUser(@Request() request): Promise<any> {
-    return request.user;
-  }
+  // @ApiBearerAuth()
+  // @UseGuards(AuthGuard())
+  // @Get('me')
+  // @ApiResponse({ status: 200, description: 'Successful Response' })
+  // @ApiResponse({ status: 401, description: 'Unauthorized' })
+  // async getLoggedInUser(@Request() request): Promise<any> {
+  //   return request.user;
+  // }
 
 
 }

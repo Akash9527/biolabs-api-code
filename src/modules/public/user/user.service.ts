@@ -8,6 +8,7 @@ import { User, UserFillableFields } from './user.entity';
 import { UserToken } from './user-token.entity';
 import { Mail } from '../../../utils/Mail';
 import { EMAIL } from '../../../constants/email';
+import { Request } from 'express';
 
 @Injectable()
 export class UsersService {
@@ -43,7 +44,7 @@ export class UsersService {
     return await this.userRepository.save(this.userRepository.create(payload));
   }
   
-  async addUser(payload: UserFillableFields) {
+  async addUser(payload: UserFillableFields, req: Request) {
     const user = await this.getByEmail(payload.email);
 
     if (user) {
@@ -56,10 +57,11 @@ export class UsersService {
     const userInformation = await this.generateToken(savedUser);
     const userInfo = {
       token:userInformation.token,
-      userName:savedUser.firstName
+      userName:savedUser.firstName,
+      origin: req.headers['origin']
     }
-     let tenant= {tenantEmail:payload.email};
-    this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Invite", userInfo)
+    let tenant = { tenantEmail: payload.email };
+    this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Invite", userInfo);
 
     return savedUser;
   }
@@ -188,13 +190,14 @@ export class UsersService {
     return await this.userTokenRepository.save(this.userTokenRepository.create(tokenData));
   }
 
-  async forgotPassword(payload: UserFillableFields) {
+  async forgotPassword(payload: UserFillableFields, req: Request) {
     const user = await this.getByEmail(payload.email);
     if (user) {
       const userInformation = await this.generateToken(user);
       const userInfo = {
         token: userInformation.token,
-        userName: user.firstName
+        userName: user.firstName,
+        origin: req.headers['origin']
       }
       let tenant = { tenantEmail: payload.email };
       this.mail.sendEmail(tenant, EMAIL.SUBJECT_FORGOT_PASSWORD, "forgotMail", userInfo)
