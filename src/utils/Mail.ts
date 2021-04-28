@@ -350,12 +350,12 @@ export class Mail {
                                                                      <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                                         <tr style="border-collapse:collapse">
                                                                            <td align="left" bgcolor="#fff" style="padding:0;Margin:0;padding-left:30px;padding-right:30px;padding-top:35px">
-                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:32px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:64px;color:#000000;border-bottom:1px solid #E6E4E2"><strong>Reset your Password</strong>&nbsp;</p>
+                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:32px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:64px;color:#000000;border-bottom:1px solid #E6E4E2"><strong>Verify your email address</strong>&nbsp;</p>
                                                                            </td>
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
                                                                            <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
-                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${userInfo.userName},<br><br>We've received your request to set a new password for your BioLabs Connect account. Click below button to reset your password.</p>
+                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${userInfo.userName},<br><br>Your account has been created and is ready for your use. Click below button to set your password and get going.</p>
                                                                            </td>
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
