@@ -49,10 +49,10 @@ export class Mail {
 
     private sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
       let userTxt = (tenant && tenant.role && tenant.role == 3) ? 'Insight' : 'Connect';
+      console.table({'userTxt >>>>>>>>>> ': userTxt});
         let data;
         if (content == "forgotMail") {
            console.table({'content 1': content});
-           console.table({'userTxt 1': userTxt});
             data = {
                 "message": {
                     "subject": subject,
@@ -422,7 +422,7 @@ export class Mail {
             }
         }
          console.log('tenant in mail.ts', tenant);
-         console.log('data', data);
+         // console.log('data', data);
 
        let authToken = token['token_type'] + " " + token['access_token'];
        axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
