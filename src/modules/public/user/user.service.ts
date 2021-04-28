@@ -200,7 +200,7 @@ export class UsersService {
         userName: user.firstName,
         origin: req.headers['origin']
       }
-      let tenant = { tenantEmail: payload.email };
+      let tenant = { tenantEmail: payload.email, role: payload.role };
       this.mail.sendEmail(tenant, EMAIL.SUBJECT_FORGOT_PASSWORD, "forgotMail", userInfo)
       return true;
     } else {
