@@ -50,6 +50,7 @@ export class Mail {
     private sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
         let data;
         if (content == "forgotMail") {
+           console.table({'content 1': content});
             data = {
                 "message": {
                     "subject": subject,
@@ -236,6 +237,7 @@ export class Mail {
                  });
            }
         } else if (content == "Invite") {
+         console.table({'content 2 ': content});
             data = {
                 "message": {
                     "subject": subject,
@@ -417,7 +419,8 @@ export class Mail {
                   });
             }
         }
-      console.log('tenant in mail.ts', tenant);
+         console.log('tenant in mail.ts', tenant);
+         console.log('data', data.lengh);
 
        let authToken = token['token_type'] + " " + token['access_token'];
        axios.defaults.headers.post['Content-Type'] =
