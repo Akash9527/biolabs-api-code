@@ -417,18 +417,20 @@ export class Mail {
                   });
             }
         }
-        let authToken = token['token_type'] + " " + token['access_token'];
-        axios.defaults.headers.post['Content-Type'] =
-            'application/x-www-form-urlencoded';
-        axios.defaults.headers.post['Authorization'] = authToken;
-        axios
-            .post(MICROSOFT_EMAIL_ENDPOINT_MAIL, data)
-            .then(response => {
-                console.log("Email has been Send", response.data);
-            })
-            .catch(error => {
-                console.log("Error while Sending Graph API email");
-            });
+      console.log('tenant in mail.ts', tenant);
+
+       let authToken = token['token_type'] + " " + token['access_token'];
+       axios.defaults.headers.post['Content-Type'] =
+          'application/x-www-form-urlencoded';
+       axios.defaults.headers.post['Authorization'] = authToken;
+       axios
+          .post(MICROSOFT_EMAIL_ENDPOINT_MAIL, data)
+          .then(response => {
+             console.log("Email has been Send", response.data);
+          })
+          .catch(error => {
+             console.log("Error while Sending Graph API email");
+          });
 
     }
     

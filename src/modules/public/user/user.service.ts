@@ -61,6 +61,7 @@ export class UsersService {
       origin: req.headers['origin']
     }
     let tenant = { tenantEmail: payload.email };
+    console.log('tenant in user service', tenant);
     this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Invite", userInfo);
 
     return savedUser;

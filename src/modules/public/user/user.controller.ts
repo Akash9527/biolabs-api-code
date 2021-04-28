@@ -34,7 +34,7 @@ import { Request } from 'express';
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     async addUser(@Body() payload: AddUserPayload, @Req() req: Request): Promise<any> {
-      console.log('req', req.headers['origin']);
+      console.log('req === >', req.headers['origin']);
       type status_enum = '-1' | '0' | '1' | '99'; 
       const status:status_enum = "0";
       const pal = {...payload, status:status};
