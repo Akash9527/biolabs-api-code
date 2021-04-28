@@ -355,9 +355,7 @@ export class Mail {
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
                                                                            <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
-                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${userInfo.userName},<br><br>
-                                                                              Your account has been created and is ready for your use. Click below button to set your password and get going.
-                                                                              </p>
+                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${userInfo.userName},<br><br>We've received your request to set a new password for your BioLabs Connect account. Click below button to reset your password.</p>
                                                                            </td>
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
@@ -371,12 +369,7 @@ export class Mail {
                                                                                  </v:roundrect>
                                                                               </a>
                                                                               <![endif]--> 
-                                                                              <!--[if !mso]><!-- --><span class="msohide es-button-border es-button-border-3" style="border-style:solid;border-color:#0f9792;background:#0f9792;border-width:1px;display:block;border-radius:3px;width:auto;mso-hide:all">
-                                                                              <a href="${userInfo.origin + EMAIL.EMAIL_CONFIRM_URL + userInfo.token}" class="es-button msohide" target="_blank" 
-                                                                              style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:16px;color:#FFFFFF;border-style:solid;border-color:#0f9792;border-width:15px 20px;display:block;background:#0f9792;border-radius:3px;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-hide:all">
-                                                                              Confirm your Email Address
-                                                                              </a>
-                                                                              </span> 
+                                                                              <!--[if !mso]><!-- --><span class="msohide es-button-border es-button-border-3" style="border-style:solid;border-color:#0f9792;background:#0f9792;border-width:1px;display:block;border-radius:3px;width:auto;mso-hide:all"><a href="${userInfo.origin + EMAIL.EMAIL_CONFIRM_URL + userInfo.token}" class="es-button msohide" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:16px;color:#FFFFFF;border-style:solid;border-color:#0f9792;border-width:15px 20px;display:block;background:#0f9792;border-radius:3px;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-hide:all">Reset your Password</a></span> 
                                                                               <!--<![endif]-->
                                                                            </td>
                                                                         </tr>
