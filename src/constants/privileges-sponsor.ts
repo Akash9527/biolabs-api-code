@@ -3,158 +3,104 @@ export const SPONSOR_ACCESSLEVELS = {
     type: "sponsor",
     name: "SPONSOR",
     action: false,
-    permissions: {
-        "Resident-Company": {
-            name: "Resident Company",
+    permissions:  {
+        "applications": {
+            name: "Applications",
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
+        },
+        "sponsor-view": {
+            name: "Sponsor View",
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
+        },
+        "application-form": {
+            name: "Application Form",
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
+        },
+        "user": {
+            name: "Manage Users",
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
+        },
+        "sites": {
+            name: "Sites",
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
+        },
+        "directory": {
+            name: "Directory",
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
+        },
+        "configurations": {
+            name: "Configurations",
             action: false,
             create: false,
             view: false,
             update: false,
             delete: false,
-            submenu: {
-                "All": {
-                    name: "All",
-                    create: false,
-                    view: false,
-                    update: false,
-                    delete: false,
-                    action: false
-                },
-                "Review": {
-                    name: "Review",
-                    create: false,
-                    view: false,
-                    update: false,
-                    delete: false,
-                    action: false
-                },
-                "Approved": {
-                    name: "Approved",
-                    create: false,
-                    view: false,
-                    update: false,
-                    delete: false,
-                    action: false
-                },
-                "Published": {
-                    name: "Published",
-                    create: false,
-                    view: false,
-                    update: false,
-                    delete: false,
-                    action: false
-                },
-              
-                "Reject": {
-                    name: "Reject",
-                    create: false,
-                    view: false,
-                    update: false,
-                    delete: false,
+            child: {
+                "application-form": {
+                    name: "Application Form",
                     action: false,
-                },
-                "Graduate": {
-                    name: "Graduate",
                     create: false,
                     view: false,
                     update: false,
-                    delete: false,
-                    action: false
+                    delete: false
+                },
+                "item-cost": {
+                    name: "Item Cost",
+                    action: false,
+                    create: false,
+                    view: false,
+                    update: false,
+                    delete: false
                 }
             }
         },
-        "Resident-Company-Page": {
-            name: "Resident Company Page",
-            create: false,
-            view: true,
-            update: false, //Edit
-            delete: false,
-            action: false// Approve, reject, comment
-        },
-        "User-Management": {
-            name: "User Management",
+        "profile": {
+            name: "My Profile",
+            action: false,
             create: false,
             view: false,
             update: false,
-            delete: false,
-            action: false,
-            submenu: {
-                "Admin": {
-                    name: "Admin",
-                    create: false,
-                    view: false,
-                    update: false,
-                    delete: false,
-                    action: false
-                },
-                "Sponsor": {
-                    name: "Sponsor",
-                    create: false,
-                    view: false,
-                    update: false,
-                    delete: false,
-                    action: false
-                },
-                "Resident": {
-                    name: "Resident",
-                    create: false,
-                    view: false,
-                    update: false,
-                    delete: false,
-                    action: false
-                }
-            }
+            delete: false
         },
-        "Site-Directory": {
-            name: "Site Directory",
-            create: false,
-            view: false,
-            update: false,
-            delete: false,
-            action: false,
-            submenu: {
-                "Members": {
-                    name: "Members",
-                    create: false,
-                    view: false,
-                    update: false,
-                    delete: false,
-                    action: false
-                },
-                "Site-Admins": {
-                    name: "Site Admins",
-                    create: false,
-                    view: false,
-                    update: false,
-                    delete: false,
-                    action: false
-                },
-                "Companies": {
-                    name: "Companies",
-                    create: false,
-                    view: false,
-                    update: false,
-                    delete: false,
-                    action: false
-                }
-            }
-        },
-        "Sponsor-Connect": {
-            name: "Sponsor-Connect",
+        "bioLabs-network": {
+            name: "BioLabs Network",
+            action: true,
             create: true,
             view: true,
             update: true,
-            delete: true,
-            action: true
+            delete: true
         },
-        "Resident-Company-Invoicing": {
-            name: "Resident Company Invoicing",
-            create: false,
-            view: false,
-            update: false,
-            delete: false,
-            action: false,
-            
+        "resident-companies": {
+            name: "Resident Companies",
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true
         }
     }
 };

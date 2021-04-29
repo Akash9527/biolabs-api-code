@@ -1,48 +1,48 @@
-export const SITE_ADMIN_ACCESSLEVELS = {
-    id:2,
-    type: "siteadmin",
-    name: "SITE ADMIN",
+export const RESIDENT_ACCESSLEVELS = {
+    id:4,
+    type: "resident",
+    name: "RESIDENT",
     action: true,
     permissions:  {
         "applications": {
             name: "Applications",
-            action: true,
-            create: true,
-            view: true,
-            update: true,
-            delete: true
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
         },
         "sponsor-view": {
             name: "Sponsor View",
-            action: true,
-            create: true,
-            view: true,
-            update: true,
-            delete: true
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
         },
         "application-form": {
             name: "Application Form",
-            action: true,
-            create: true,
-            view: true,
-            update: true,
-            delete: true
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
         },
         "user": {
             name: "Manage Users",
-            action: true,
-            create: true,
-            view: true,
-            update: true,
-            delete: true
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
         },
         "sites": {
             name: "Sites",
-            action: true,
-            create: true,
-            view: true,
-            update: true,
-            delete: true
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
         },
         "directory": {
             name: "Directory",
@@ -54,11 +54,11 @@ export const SITE_ADMIN_ACCESSLEVELS = {
         },
         "configurations": {
             name: "Configurations",
-            action: true,
-            create: true,
-            view: true,
-            update: true,
-            delete: true,
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false,
             child: {
                 "application-form": {
                     name: "Application Form",
@@ -70,11 +70,11 @@ export const SITE_ADMIN_ACCESSLEVELS = {
                 },
                 "item-cost": {
                     name: "Item Cost",
-                    action: true,
-                    create: true,
-                    view: true,
-                    update: true,
-                    delete: true
+                    action: false,
+                    create: false,
+                    view: false,
+                    update: false,
+                    delete: false
                 }
             }
         },
