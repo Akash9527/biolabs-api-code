@@ -1,0 +1,106 @@
+export const SUPER_ADMIN_ACCESSLEVELS = {
+    id:1,
+    type: "superadmin",
+    name: "SUPER ADMIN",
+    action: true,
+    permissions: {
+        "applications": {
+            name: "Applications",
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true
+        },
+        "sponsor-view": {
+            name: "Sponsor View",
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true
+        },
+        "application-form": {
+            name: "Application Form",
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true
+        },
+        "user": {
+            name: "Manage Users",
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true
+        },
+        "sites": {
+            name: "Sites",
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true
+        },
+        "directory": {
+            name: "Directory",
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true
+        },
+        "configurations": {
+            name: "Configurations",
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true,
+            child: {
+                "application-form": {
+                    name: "Application Form",
+                    action: true,
+                    create: true,
+                    view: true,
+                    update: true,
+                    delete: true
+                },
+                "item-cost": {
+                    name: "Item Cost",
+                    action: true,
+                    create: true,
+                    view: true,
+                    update: true,
+                    delete: true
+                }
+            }
+        },
+        "profile": {
+            name: "My Profile",
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true
+        },
+        "bioLabs-network": {
+            name: "BioLabs Network",
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
+        },
+        "resident-companies": {
+            name: "Resident Companies",
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
+        }
+    }
+};
