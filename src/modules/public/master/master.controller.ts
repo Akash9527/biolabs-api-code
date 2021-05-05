@@ -39,4 +39,32 @@ export class MasterController {
     return this.masterService.getCategories(params);
   }
   
+  @Get('biolabs-source')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getBiolabsSource(@Query() params:MasterPayload): Promise<any> {
+    return this.masterService.getBiolabsSource(params);
+  }
+  
+  @Get('fundings')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getFundings(@Query() params:MasterPayload): Promise<any> {
+    return this.masterService.getFundings(params);
+  }
+  
+  @Get('modality')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getModalities(@Query() params:MasterPayload): Promise<any> {
+    return this.masterService.getModalities(params);
+  }
+  
+  @Get('technology-stage')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getTechnologyStages(@Query() params:MasterPayload): Promise<any> {
+    return this.masterService.getTechnologyStages(params);
+  }
+  
 }
