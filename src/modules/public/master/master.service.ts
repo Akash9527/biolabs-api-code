@@ -169,4 +169,112 @@ export class MasterService {
       take
     });
   }
+  
+  async getBiolabsSource(payload:MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if(payload.q && payload.q != ""){
+      search = [{ name: Like("%"+payload.q+"%"), status:'1'}]
+    } else{
+      search = [{status:'1'}]
+    }
+    if(payload.pagination){
+      skip = { skip: 0 }
+      take = { take: 10 }
+      if(payload.limit){
+        take = { take: payload.limit };
+        if(payload.page){
+          skip = { skip: payload.page*payload.limit }
+        }
+      }
+    }
+    return await this.biolabsSourceRepository.find({
+      select: ["id", "name"],
+      where: search,
+      skip,
+      take
+    });
+  }
+  
+  async getFundings(payload:MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if(payload.q && payload.q != ""){
+      search = [{ name: Like("%"+payload.q+"%"), status:'1'}]
+    } else{
+      search = [{status:'1'}]
+    }
+    if(payload.pagination){
+      skip = { skip: 0 }
+      take = { take: 10 }
+      if(payload.limit){
+        take = { take: payload.limit };
+        if(payload.page){
+          skip = { skip: payload.page*payload.limit }
+        }
+      }
+    }
+    return await this.fundingRepository.find({
+      select: ["id", "name"],
+      where: search,
+      skip,
+      take
+    });
+  }
+  
+  async getModalities(payload:MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if(payload.q && payload.q != ""){
+      search = [{ name: Like("%"+payload.q+"%"), status:'1'}]
+    } else{
+      search = [{status:'1'}]
+    }
+    if(payload.pagination){
+      skip = { skip: 0 }
+      take = { take: 10 }
+      if(payload.limit){
+        take = { take: payload.limit };
+        if(payload.page){
+          skip = { skip: payload.page*payload.limit }
+        }
+      }
+    }
+    return await this.modalityRepository.find({
+      select: ["id", "name"],
+      where: search,
+      skip,
+      take
+    });
+  }
+  
+  async getTechnologyStages(payload:MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if(payload.q && payload.q != ""){
+      search = [{ name: Like("%"+payload.q+"%"), status:'1'}]
+    } else{
+      search = [{status:'1'}]
+    }
+    if(payload.pagination){
+      skip = { skip: 0 }
+      take = { take: 10 }
+      if(payload.limit){
+        take = { take: payload.limit };
+        if(payload.page){
+          skip = { skip: payload.page*payload.limit }
+        }
+      }
+    }
+    return await this.modalityRepository.find({
+      select: ["id", "name"],
+      where: search,
+      skip,
+      take
+    });
+  }
 }
