@@ -24,6 +24,9 @@ export class AuthService {
   async onApplicationBootstrap() {
     await this.masterService.createRoles();
     await this.masterService.createSites();
+    await this.masterService.createFundings();
+    await this.masterService.createModalities();
+    await this.masterService.createBiolabsSources();
     await this.createSuperAdmin();
   }
 
