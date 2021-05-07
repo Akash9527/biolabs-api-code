@@ -75,10 +75,10 @@ export class UsersService {
       user.lastName = payload.lastName;
       user.title = payload.title;
       user.phoneNumber = payload.phoneNumber;
-      if(payload.password && (payload.password !=="" || payload.password!= null)){
-        user.phoneNumber = payload.password;
+      if(payload.password && (payload.password !=="" && payload.password != null)){
+        user.password = payload.password;
       }
-      return await this.userRepository.save(user);
+      return await this.userRepository.save(this.userRepository.create(user));
     } else{
       throw new NotAcceptableException(
         'User with provided id not available.',
