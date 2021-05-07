@@ -93,10 +93,10 @@ export class ResidentCompany {
   expect12MonthsUtilizeLab: number;
 
   @Column("int", { array: true })
-  industry: number[];
+  industry: string[];
 
   @Column("int", { array: true })
-  modality: number[];
+  modality: string[];
 
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
   status: status_enum;
@@ -127,7 +127,7 @@ export class ResidentCompanyFillableFields {
   empExpect12Months: number;
   utilizeLab: number;
   expect12MonthsUtilizeLab: number;
-  industry: number[];
-  modality: number[];
+  industry: string[];
+  modality: string[];
   status: status_enum;
 }

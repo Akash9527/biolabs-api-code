@@ -144,13 +144,13 @@ export class AddResidentCompanyPayload {
     required: false,
     nullable: true
   })
-  industry: number[];
+  industry: string[];
 
   @ApiProperty({
     required: false,
     nullable: true
   })
-  modality: number[];
+  modality: string[];
 
   // @ApiProperty({
   //   required: false,
