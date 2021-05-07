@@ -42,7 +42,7 @@ export class ResidentCompany {
   otherBiolabsSources: string;
 
   @Column({ nullable: true })
-  technology: number;
+  technology: string;
 
   @Column({ nullable: true })
   rAndDPath: string;
@@ -110,7 +110,7 @@ export class ResidentCompanyFillableFields {
   site: number[];
   biolabsSources: number;
   otherBiolabsSources: string;
-  technology: number;
+  technology: string;
   rAndDPath: string;
   startDate: number;
   foundedDate: number;

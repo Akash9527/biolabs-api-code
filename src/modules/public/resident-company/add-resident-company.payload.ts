@@ -42,7 +42,7 @@ export class AddResidentCompanyPayload {
     required: false,
     nullable: true
   })
-  technology: number;
+  technology: string;
 
   @ApiProperty({
     required: false,
