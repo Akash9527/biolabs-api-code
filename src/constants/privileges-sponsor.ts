@@ -13,12 +13,12 @@ export const SPONSOR_ACCESSLEVELS = {
             delete: false
         },
         "sponsor-view": {
-            name: "Sponsor View",
-            action: false,
-            create: false,
-            view: false,
-            update: false,
-            delete: false
+            name: "BioLabs Network",
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true
         },
         "application-form": {
             name: "Application Form",
@@ -85,14 +85,6 @@ export const SPONSOR_ACCESSLEVELS = {
             view: false,
             update: false,
             delete: false
-        },
-        "bioLabs-network": {
-            name: "BioLabs Network",
-            action: true,
-            create: true,
-            view: true,
-            update: true,
-            delete: true
         },
         "resident-companies": {
             name: "Resident Companies",

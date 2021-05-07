@@ -7,6 +7,7 @@ import { AuthModule } from 'modules/public/auth';
 import { CommonModule } from 'modules/common';
 import { MasterModule } from 'modules/public/master';
 import { UserModule } from 'modules/public/user';
+import { ResidentCompanyModule } from 'modules/public/resident-company'
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { UserModule } from 'modules/public/user';
     CommonModule,
     MasterModule,
     UserModule,
+    ResidentCompanyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

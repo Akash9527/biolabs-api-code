@@ -86,21 +86,13 @@ export const SUPER_ADMIN_ACCESSLEVELS = {
             update: true,
             delete: true
         },
-        "bioLabs-network": {
-            name: "BioLabs Network",
-            action: false,
-            create: false,
-            view: false,
-            update: false,
-            delete: false
-        },
         "resident-companies": {
             name: "Resident Companies",
-            action: false,
-            create: false,
-            view: false,
-            update: false,
-            delete: false
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true
         }
     }
 };

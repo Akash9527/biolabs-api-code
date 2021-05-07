@@ -13,7 +13,7 @@ export const RESIDENT_ACCESSLEVELS = {
             delete: false
         },
         "sponsor-view": {
-            name: "Sponsor View",
+            name: "BioLabs Network",
             action: false,
             create: false,
             view: false,
@@ -85,14 +85,6 @@ export const RESIDENT_ACCESSLEVELS = {
             view: true,
             update: true,
             delete: true
-        },
-        "bioLabs-network": {
-            name: "BioLabs Network",
-            action: false,
-            create: false,
-            view: false,
-            update: false,
-            delete: false
         },
         "resident-companies": {
             name: "Resident Companies",
