@@ -169,7 +169,7 @@ export class MasterService {
       take
     });
   }
-  
+
   async getBiolabsSource(payload:MasterPayload) {
     let search;
     let skip;
@@ -197,6 +197,33 @@ export class MasterService {
     });
   }
   
+  async createBiolabsSources() {
+    const biolabsSources  = this.getFundings(new MasterPayload());
+    let resp = {};
+    return await biolabsSources.then(async data=> {
+      const _biolabsSources = migrationData['biolabsSources'];
+      for (const _biolabsSource of _biolabsSources) {
+        if (!data.find(r=> r.name == _biolabsSource.name)) {
+          resp[_biolabsSource.name] = await this.createBiolabsSource(_biolabsSource.name, _biolabsSource.id);
+        }
+        if (_biolabsSource.name == _biolabsSources[_biolabsSources.length - 1]) {
+          return resp;
+        }
+      }
+    }, error=>{
+      console.log(error);
+    });
+  }
+
+  async createBiolabsSource(name, id) {
+    const status:status_enum = '1';
+    const payload = {
+      id, name, status
+    }
+    console.log("Adding biolabs sources: ", name);
+    return await this.biolabsSourceRepository.save(this.biolabsSourceRepository.create(payload));
+  }
+
   async getFundings(payload:MasterPayload) {
     let search;
     let skip;
@@ -224,6 +251,33 @@ export class MasterService {
     });
   }
   
+  async createFundings() {
+    const fundings  = this.getFundings(new MasterPayload());
+    let resp = {};
+    return await fundings.then(async data=> {
+      const _fundings = migrationData['fundings'];
+      for (const _funding of _fundings) {
+        if (!data.find(r=> r.name == _funding.name)) {
+          resp[_funding.name] = await this.createFunding(_funding.name, _funding.id);
+        }
+        if (_funding.name == _fundings[_fundings.length - 1]) {
+          return resp;
+        }
+      }
+    }, error=>{
+      console.log(error);
+    });
+  }
+
+  async createFunding(name, id) {
+    const status:status_enum = '1';
+    const payload = {
+      id, name, status
+    }
+    console.log("Adding funding: ", name);
+    return await this.fundingRepository.save(this.fundingRepository.create(payload));
+  }
+
   async getModalities(payload:MasterPayload) {
     let search;
     let skip;
@@ -251,6 +305,33 @@ export class MasterService {
     });
   }
   
+  async createModalities() {
+    const modalities  = this.getModalities(new MasterPayload());
+    let resp = {};
+    return await modalities.then(async data=> {
+      const _modalities = migrationData['modalities'];
+      for (const _modalitie of _modalities) {
+        if (!data.find(r=> r.name == _modalitie.name)) {
+          resp[_modalitie.name] = await this.createModality(_modalitie.name, _modalitie.id);
+        }
+        if (_modalitie.name == _modalities[_modalities.length - 1]) {
+          return resp;
+        }
+      }
+    }, error=>{
+      console.log(error);
+    });
+  }
+
+  async createModality(name, id) {
+    const status:status_enum = '1';
+    const payload = {
+      id, name, status
+    }
+    console.log("Adding modality: ", name);
+    return await this.modalityRepository.save(this.modalityRepository.create(payload));
+  }
+
   async getTechnologyStages(payload:MasterPayload) {
     let search;
     let skip;
@@ -270,11 +351,12 @@ export class MasterService {
         }
       }
     }
-    return await this.modalityRepository.find({
+    return await this.technologyStageRepository.find({
       select: ["id", "name"],
       where: search,
       skip,
       take
     });
   }
+
 }

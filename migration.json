@@ -65,6 +65,128 @@
             "id": 2
         }
     ],
+    "fundings": [
+        {
+            "name":"Grant funded",
+            "id": 1
+        },
+        {
+            "name":"Self-funded",
+            "id": 2
+        },
+        {
+            "name":"Angel Investors(including friends and family)",
+            "id":3
+        },
+        {
+            "name":"Seed-Funding",
+            "id": 4
+        },
+        {
+            "name":"VC Series A",
+            "id": 5
+        },
+        {
+            "name":"VC Series B or beyond",
+            "id": 6
+        },
+        {
+            "name":"Public Company",
+            "id": 7
+        },
+        {
+            "name":"Other(please elaborate)",
+            "id": 8
+        }
+    ],
+    "modalities": [
+        {
+            "name":"Antibody",
+            "id": 1
+        },
+        {
+            "name":"Antisense oligonucleotide/siRNA",
+            "id": 2
+        },
+        {
+            "name":"Cell therapy",
+            "id":3
+        },
+        {
+            "name":"Computational drug discovery",
+            "id": 4
+        },
+        {
+            "name":"Drug delivery",
+            "id": 5
+        },
+        {
+            "name":"Gene therapy",
+            "id": 6
+        },
+        {
+            "name":"Live microbiota",
+            "id": 7
+        },
+        {
+            "name":"mRNA",
+            "id": 8
+        },
+        {
+            "name":"Protein/peptide",
+            "id": 9
+        },
+        {
+            "name":"Radiopharmaceutical",
+            "id": 10
+        },
+        {
+            "name":"Small molecule",
+            "id": 11
+        },
+        {
+            "name":"Synthetic biology",
+            "id": 12
+        },
+        {
+            "name":"Tissue engineering",
+            "id": 13
+        },
+        {
+            "name":"Vaccine",
+            "id": 14
+        },
+        {
+            "name":"Biosynthetics",
+            "id": 15
+        },
+        {
+            "name":"Other (please elaborate)",
+            "id": 16
+        }
+    ],
+    "biolabsSources": [
+        {
+            "name":"Website",
+            "id": 1
+        },
+        {
+            "name":"Online search",
+            "id": 2
+        },
+        {
+            "name":"Event",
+            "id":3
+        },
+        {
+            "name":"Referral",
+            "id": 4
+        },
+        {
+            "name":"Other (please elaborate)",
+            "id": 5
+        }
+    ],
     "superadmin": {
         "email": "superadmin@biolabs.io",
         "role": 1,
