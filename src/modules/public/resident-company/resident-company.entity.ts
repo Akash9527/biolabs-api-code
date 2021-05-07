@@ -17,7 +17,7 @@ import {
 type status_enum = '-1' | '0' | '1' | '99';
 
 @Entity({
-  name: 'resident-companies',
+  name: 'resident_companies',
 })
 export class ResidentCompany {
   @PrimaryGeneratedColumn()
