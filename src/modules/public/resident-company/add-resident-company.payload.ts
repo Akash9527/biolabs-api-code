@@ -152,27 +152,27 @@ export class AddResidentCompanyPayload {
   })
   modality: number[];
 
-  @ApiProperty({
-    required: false,
-    nullable: true
-  })
-  advisoryMember:any[];
+  // @ApiProperty({
+  //   required: false,
+  //   nullable: true
+  // })
+  // advisoryMember:any[];
 
-  @ApiProperty({
-    required: false,
-    nullable: true
-  })
-  managementMember:any[];
+  // @ApiProperty({
+  //   required: false,
+  //   nullable: true
+  // })
+  // managementMember:any[];
 
-  @ApiProperty({
-    required: false,
-    nullable: true
-  })
-  technicalMember:any[];
+  // @ApiProperty({
+  //   required: false,
+  //   nullable: true
+  // })
+  // technicalMember:any[];
 
-  @ApiProperty({
-    required: false,
-    nullable: true
-  })
-  documents:any[];
+  // @ApiProperty({
+  //   required: false,
+  //   nullable: true
+  // })
+  // documents:any[];
 }
