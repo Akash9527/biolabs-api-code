@@ -11,6 +11,7 @@ import { ResidentCompanyManagement, ResidentCompanyManagementFillableFields } fr
 import { ResidentCompanyTechnical, ResidentCompanyTechnicalFillableFields } from './rc-technical.entity'
 
 import { Request } from 'express';
+import { ListResidentCompanyPayload } from './list-resident-company.payload';
 
 @Injectable()
 export class ResidentCompanyService {
@@ -80,9 +81,35 @@ export class ResidentCompanyService {
     }
     const newRc = await this.residentCompanyRepository.create(payload);
     const savedRc = await this.residentCompanyRepository.save(newRc);
-    if(savedRc){
-      
-    }
     return savedRc;
+  }
+  
+  async getResidentCompanies(payload:ListResidentCompanyPayload) {
+    let search;
+    let skip;
+    let take;
+    let _search = {};
+    if(payload.role || payload.role == 0) {
+      _search = {..._search, ...{role: payload.role}};
+    }
+    if(payload.q && payload.q != ""){
+      _search = {..._search, ...{name: Like("%"+payload.q+"%")}};
+    } 
+    search = [{..._search, status:'1'},{..._search, status:'0'}]
+    if(payload.pagination){
+      skip = { skip: 0 }
+      take = { take: 10 }
+      if(payload.limit){
+        take = { take: payload.limit };
+        if(payload.page){
+          skip = { skip: payload.page*payload.limit }
+        }
+      }
+    }
+    return await this.residentCompanyRepository.find({
+      where: search,
+      skip,
+      take
+    });
   }
 }
