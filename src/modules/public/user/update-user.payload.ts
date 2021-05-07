@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { SameAs } from 'modules/common/validator/same-as.validator';
 
 export class UpdateUserPayload {
 
@@ -28,6 +29,15 @@ export class UpdateUserPayload {
     required: true,
   })
   site_id: number[];
+  
+  @ApiProperty({
+    required: false,
+  })
+  password: string;
+
+  @ApiProperty({ required: false })
+  @SameAs('password')
+  passwordConfirmation: string;
 
   @ApiProperty({
     required: true,

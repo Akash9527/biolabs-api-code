@@ -75,6 +75,9 @@ export class UsersService {
       user.lastName = payload.lastName;
       user.title = payload.title;
       user.phoneNumber = payload.phoneNumber;
+      if(payload.password && (payload.password !=="" || payload.password!= null)){
+        user.phoneNumber = payload.password;
+      }
       return await this.userRepository.save(user);
     } else{
       throw new NotAcceptableException(
