@@ -12,12 +12,12 @@ const {
 } = process.env;
 
 module.exports = {
-    type: DB_TYPE,
-    host: DB_HOST,
-    port: DB_PORT,
-    username: DB_USERNAME,
-    password: DB_PASSWORD,
-    database: DB_DATABASE,
+    type: `${process.env.POSTGRESQL_DB_TYPE}`,
+    host: `${process.env.POSTGRESQL_DB_HOST}`,
+    port: `${process.env.POSTGRESQL_DB_PORT}`,
+    username: `${process.env.POSTGRESQL_DB_USERNAME}`,
+    password: `${process.env.POSTGRESQL_DB_PASSWORD}`,
+    database: `${process.env.POSTGRESQL_DB_NAME}`,
     migrations: [__dirname + '/src/migrations/*{.ts,.js}'],
     entities: [__dirname + '/src/modules/public/**/*.entity.{ts,js}'],
 };

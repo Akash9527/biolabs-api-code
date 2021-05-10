@@ -18,11 +18,11 @@ import { MasterModule } from '../master';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         return {
-          secret: configService.get('JWT_SECRET_KEY'),
+          secret: `${process.env.JWT_SECRET_KEY}`,
           signOptions: {
-            ...(configService.get('JWT_EXPIRATION_TIME')
+            ...(`${process.env.JWT_EXPIRATION_TIME}`
               ? {
-                  expiresIn: Number(configService.get('JWT_EXPIRATION_TIME')),
+                  expiresIn: Number(`${process.env.JWT_EXPIRATION_TIME}`),
                 }
               : {}),
           },

@@ -16,15 +16,14 @@ import { ResidentCompanyModule } from 'modules/public/resident-company'
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
-          type: configService.get('DB_TYPE'),
-          host: configService.get('DB_HOST'),
-          port: configService.get('DB_PORT'),
-          username: configService.get('DB_USERNAME'),
-          password: configService.get('DB_PASSWORD'),
-          database: configService.get('DB_DATABASE'),
+          type: `${process.env.POSTGRESQL_DB_TYPE}`,
+          host: `${process.env.POSTGRESQL_DB_HOST}`,
+          port: `${process.env.POSTGRESQL_DB_PORT}`,
+          username: `${process.env.POSTGRESQL_DB_USERNAME}`,
+          password: `${process.env.POSTGRESQL_DB_PASSWORD}`,
+          database: `${process.env.POSTGRESQL_DB_NAME}`,         
           entities: [__dirname + './../**/**.entity{.ts,.js}'],
-          synchronize: configService.get('DB_SYNC') === 'true',
-          ssl: configService.get('DB_SSL') === 'true'
+          synchronize: 'true'
         } as TypeOrmModuleAsyncOptions;
       },
     }),
