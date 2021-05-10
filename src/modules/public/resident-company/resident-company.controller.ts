@@ -44,4 +44,13 @@ export class ResidentCompanyController {
   async getResidentCompanies(@Query() params:any): Promise<any> {
     return this.residentCompanyService.getResidentCompanies(params);
   }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get(':id')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getResidentCompany(@Param('id') id:number): Promise<any> {
+    return this.residentCompanyService.getResidentCompany(id);
+  }
 }

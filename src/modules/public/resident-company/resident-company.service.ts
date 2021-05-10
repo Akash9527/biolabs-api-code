@@ -1,7 +1,7 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
 
 import { ResidentCompany } from './resident-company.entity';
@@ -9,6 +9,13 @@ import { ResidentCompanyAdvisory, ResidentCompanyAdvisoryFillableFields } from '
 import { ResidentCompanyDocuments, ResidentCompanyDocumentsFillableFields } from './rc-documents.entity'
 import { ResidentCompanyManagement, ResidentCompanyManagementFillableFields } from './rc-management.entity'
 import { ResidentCompanyTechnical, ResidentCompanyTechnicalFillableFields } from './rc-technical.entity'
+
+import { Site } from '../master/site.entity';
+import { Category } from '../master/category.entity';
+import { Funding } from '../master/funding.entity';
+import { BiolabsSource } from '../master/biolabs-source.entity';
+import { Modality } from '../master/modality.entity';
+import { TechnologyStage } from '../master/technology-stage.entity';
 
 import { Request } from 'express';
 import { ListResidentCompanyPayload } from './list-resident-company.payload';
@@ -26,6 +33,18 @@ export class ResidentCompanyService {
     private readonly residentCompanyManagementRepository: Repository<ResidentCompanyManagement>,
     @InjectRepository(ResidentCompanyTechnical)
     private readonly residentCompanyTechnicalRepository: Repository<ResidentCompanyTechnical>,
+    @InjectRepository(Site)
+    private readonly siteRepository: Repository<Site>,
+    @InjectRepository(BiolabsSource)
+    private readonly biolabsSourceRepository: Repository<BiolabsSource>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Funding)
+    private readonly fundingRepository: Repository<Funding>,
+    @InjectRepository(Modality)
+    private readonly modalityRepository: Repository<Modality>,
+    @InjectRepository(TechnologyStage)
+    private readonly technologyStageRepository: Repository<TechnologyStage>,
   ) { }
 
   async get(id: number) {
@@ -93,7 +112,7 @@ export class ResidentCompanyService {
       _search = {..._search, ...{role: payload.role}};
     }
     if(payload.q && payload.q != ""){
-      _search = {..._search, ...{name: Like("%"+payload.q+"%")}};
+      _search = {..._search, ...{companyName: Like("%"+payload.q+"%")}};
     } 
     search = [{..._search, status:'1'},{..._search, status:'0'}]
     if(payload.pagination){
@@ -111,5 +130,69 @@ export class ResidentCompanyService {
       skip,
       take
     });
+  }
+
+  async getRcSites(ids){
+    return await this.siteRepository.find({
+      select: ["id", "name"],
+      where: {id:In(ids)},
+    });
+  }
+
+  async getRcCategories(ids){
+    return await this.categoryRepository.find({
+      select: ["id", "name"],
+      where: {id:In(ids)},
+    });
+  }
+
+  async getRcFundings(ids){
+    return await this.fundingRepository.findOne({
+      select: ["id", "name"],
+      where: {id:ids},
+    });
+  }
+
+  async getRcTechnologyStages(ids){
+    return await this.technologyStageRepository.findOne({
+      select: ["id", "name"],
+      where: {id:ids},
+    });
+  }
+
+  async getRcBiolabsSources(ids){
+    return await this.biolabsSourceRepository.findOne({
+      select: ["id", "name"],
+      where: {id:ids},
+    });
+  }
+
+  /* async getRcModalities(ids){
+    return await this.modalityRepository.find({
+      select: ["id", "name"],
+      where: {id:In(ids)},
+    });
+  } */
+
+  async getRcModalities(ids){
+    return await this.modalityRepository.find({
+      select: ["id", "name"],
+      where: {id:In(ids)},
+    });
+  }
+
+  async getResidentCompany(id) {
+    const residentCompany:any = await this.residentCompanyRepository.findOne({
+      where: {id:id}
+    });
+    residentCompany.sites = await this.getRcSites(residentCompany.site);
+    residentCompany.categories = await this.getRcCategories(residentCompany.industry);
+    residentCompany.modalities = await this.getRcModalities(residentCompany.modality);
+    residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);
+    residentCompany.companyStages = await this.getRcTechnologyStages(residentCompany.companyStage);
+    residentCompany.biolabsSources = await this.getRcBiolabsSources(residentCompany.biolabsSources);
+    
+    // console.log(residentCompany);
+    return residentCompany;
   }
 }
