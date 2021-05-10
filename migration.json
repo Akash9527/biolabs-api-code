@@ -91,8 +91,8 @@
             "id": 7
         },
         {
-            "name": "Other(please elaborate)",
-            "id": 8
+            "name": "Other",
+            "id": 9999
         }
     ],
     "modalities": [{
@@ -156,8 +156,8 @@
             "id": 15
         },
         {
-            "name": "Other (please elaborate)",
-            "id": 16
+            "name": "Other",
+            "id": 9999
         }
     ],
     "biolabsSources": [{
@@ -177,8 +177,8 @@
             "id": 4
         },
         {
-            "name": "Other (please elaborate)",
-            "id": 5
+            "name": "Other",
+            "id": 9999
         }
     ],
     "categories": [{
@@ -228,7 +228,7 @@
                             "id": 10
                         },
                         {
-                            "name": "Other (Cardiovascular & Metabolism)",
+                            "name": "Other",
                             "id": 11
                         }
                     ]
@@ -309,7 +309,7 @@
                             "id": 18
                         },
                         {
-                            "name": "Other (Oncology)",
+                            "name": "Other",
                             "id": 19
                         }
                     ]
@@ -354,7 +354,7 @@
                             "id": 9
                         },
                         {
-                            "name": "Other (Neuroscience)",
+                            "name": "Other",
                             "id": 10
                         }
                     ]
@@ -403,7 +403,7 @@
                             "id": 10
                         },
                         {
-                            "name": "Other (Infectious Disease)",
+                            "name": "Other",
                             "id": 11
                         }
                     ]
@@ -452,7 +452,7 @@
                             "id": 10
                         },
                         {
-                            "name": "Other (Immunology and Inflammation)",
+                            "name": "Other",
                             "id": 11
                         }
                     ]
@@ -489,7 +489,7 @@
                             "id": 7
                         },
                         {
-                            "name": "Other (Vaccines)",
+                            "name": "Other",
                             "id": 8
                         }
                     ]
@@ -542,13 +542,13 @@
                             "id": 11
                         },
                         {
-                            "name": "Other (Ophthalmology)",
+                            "name": "Other",
                             "id": 12
                         }
                     ]
                 },
                 {
-                    "name": "Other (Pharmaceuticals)",
+                    "name": "Other",
                     "id": 7
                 }
             ]
@@ -573,7 +573,7 @@
                     "id": 4
                 },
                 {
-                    "name": "Other (Medical Devices)",
+                    "name": "Other",
                     "id": 5
                 }
             ]
@@ -605,7 +605,7 @@
                     "id": 2
                 },
                 {
-                    "name": "Other (Consumer)",
+                    "name": "Other",
                     "id": 3
                 }
             ]
