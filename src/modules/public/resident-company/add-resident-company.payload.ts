@@ -42,7 +42,7 @@ export class AddResidentCompanyPayload {
     required: false,
     nullable: true
   })
-  technology: number;
+  technology: string;
 
   @ApiProperty({
     required: false,
@@ -144,35 +144,35 @@ export class AddResidentCompanyPayload {
     required: false,
     nullable: true
   })
-  industry: number[];
+  industry: string[];
 
   @ApiProperty({
     required: false,
     nullable: true
   })
-  modality: number[];
+  modality: string[];
 
-  @ApiProperty({
-    required: false,
-    nullable: true
-  })
-  advisoryMember:any[];
+  // @ApiProperty({
+  //   required: false,
+  //   nullable: true
+  // })
+  // advisoryMember:any[];
 
-  @ApiProperty({
-    required: false,
-    nullable: true
-  })
-  managementMember:any[];
+  // @ApiProperty({
+  //   required: false,
+  //   nullable: true
+  // })
+  // managementMember:any[];
 
-  @ApiProperty({
-    required: false,
-    nullable: true
-  })
-  technicalMember:any[];
+  // @ApiProperty({
+  //   required: false,
+  //   nullable: true
+  // })
+  // technicalMember:any[];
 
-  @ApiProperty({
-    required: false,
-    nullable: true
-  })
-  documents:any[];
+  // @ApiProperty({
+  //   required: false,
+  //   nullable: true
+  // })
+  // documents:any[];
 }

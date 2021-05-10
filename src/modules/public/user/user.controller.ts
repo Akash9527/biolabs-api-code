@@ -69,7 +69,7 @@ import { Request } from 'express';
     @Get()
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async getSites(@Query() params:ListUserPayload): Promise<any> {
+    async getUsers(@Query() params:ListUserPayload): Promise<any> {
       return this.userService.getUsers(params);
     }
     

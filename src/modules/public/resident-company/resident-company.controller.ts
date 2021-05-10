@@ -24,8 +24,6 @@ export class ResidentCompanyController {
     private readonly residentCompanyService: ResidentCompanyService,
   ) { }
 
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard())
   @Post()
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -38,4 +36,12 @@ export class ResidentCompanyController {
     return user;
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get()
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getResidentCompanies(@Query() params:any): Promise<any> {
+    return this.residentCompanyService.getResidentCompanies(params);
+  }
 }
