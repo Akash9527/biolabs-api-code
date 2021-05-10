@@ -67,4 +67,11 @@ export class MasterController {
     return this.masterService.getTechnologyStages(params);
   }
   
+  @Get('industries')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getIndustries(@Query() params:MasterPayload): Promise<any> {
+    return this.masterService.getIndustries(params);
+  }
+  
 }

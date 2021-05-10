@@ -15,6 +15,9 @@ export class Category {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ })
+  parent_id: number;
+
   @Column({ length: 255 })
   name: string;
 

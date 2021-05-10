@@ -162,12 +162,27 @@ export class MasterService {
         }
       }
     }
-    return await this.categoryRepository.find({
-      select: ["id", "name"],
+    const categories:any[] = await this.categoryRepository.find({
+      select: ["id", "name", "parent_id"],
       where: search,
       skip,
       take
     });
+    // Create root for top-level node(s)
+    const root = [];
+
+    categories.forEach(category => {
+      // No parentId means top level
+      if (!category.parent_id) return root.push(category);
+      
+      // Insert node as child of parent in flat array
+      const parentIndex = categories.findIndex(el => el.id === category.parent_id);
+      if (!categories[parentIndex].children) {
+        return categories[parentIndex].children = [category];
+      }
+      categories[parentIndex].children.push(category);
+    });
+    return categories;
   }
 
   async getBiolabsSource(payload:MasterPayload) {
@@ -359,4 +374,31 @@ export class MasterService {
     });
   }
 
+
+  async getIndustries(payload:MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if(payload.q && payload.q != ""){
+      search = [{ name: Like("%"+payload.q+"%"), status:'1'}]
+    } else{
+      search = [{status:'1'}]
+    }
+    if(payload.pagination){
+      skip = { skip: 0 }
+      take = { take: 10 }
+      if(payload.limit){
+        take = { take: payload.limit };
+        if(payload.page){
+          skip = { skip: payload.page*payload.limit }
+        }
+      }
+    }
+    return await this.technologyStageRepository.find({
+      select: ["id", "name"],
+      where: search,
+      skip,
+      take
+    });
+  }
 }
