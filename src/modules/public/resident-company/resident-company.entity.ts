@@ -4,7 +4,14 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+// import { Site } from '../master/site.entity';
+// import { Category } from '../master/category.entity';
+// import { Funding } from '../master/funding.entity';
+// import { BiolabsSource } from '../master/biolabs-source.entity';
+// import { Modality } from '../master/modality.entity';
+// import { TechnologyStage } from '../master/technology-stage.entity';
 /**
  * -1 = De-active
  * 0 = Pending/Default/
@@ -32,7 +39,7 @@ export class ResidentCompany {
   @Column({ length: 255 })
   companyName: string;
 
-  @Column("int", { array: true })
+  @Column("int", { array: true, nullable: true })
   site: number[];
 
   @Column({ nullable: true })

@@ -52,7 +52,7 @@ export class MasterService {
         }
       }
     }
-    console.info("where",search, skip,take, payload);
+    
     return await this.siteRepository.find({
       select: ["id", "name"],
       where: search,
@@ -169,7 +169,7 @@ export class MasterService {
       take
     });
     // Create root for top-level node(s)
-    const root = [];
+    const root:any[] = [];
 
     categories.forEach(category => {
       // No parentId means top level
@@ -179,10 +179,11 @@ export class MasterService {
       const parentIndex = categories.findIndex(el => el.id === category.parent_id);
       if (!categories[parentIndex].children) {
         return categories[parentIndex].children = [category];
-      }
+      } 
       categories[parentIndex].children.push(category);
+
     });
-    return categories;
+    return root;
   }
 
   async getBiolabsSource(payload:MasterPayload) {
