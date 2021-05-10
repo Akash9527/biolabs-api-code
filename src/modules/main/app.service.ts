@@ -6,6 +6,6 @@ export class AppService {
   constructor(private config: ConfigService) {}
 
   root(): string {
-    return `${process.env.APP_URL}`;
+    return process.env.APP_URL;
   }
 }

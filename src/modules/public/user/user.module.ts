@@ -20,11 +20,11 @@ import { UserToken } from './user-token.entity';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         return {
-          secret: `${process.env.JWT_SECRET_KEY}`,
+          secret: process.env.JWT_SECRET_KEY,
           signOptions: {
-            ...(`${process.env.JWT_EXPIRATION_TIME}`
+            ...(process.env.JWT_EXPIRATION_TIME
               ? {
-                  expiresIn: Number(`${process.env.JWT_EXPIRATION_TIME}`),
+                  expiresIn: Number(process.env.JWT_EXPIRATION_TIME),
                 }
               : {}),
           },

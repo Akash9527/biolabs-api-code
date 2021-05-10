@@ -13,6 +13,6 @@ export class ConfigService {
   }
 
   isEnv(env: string) {
-    return `${process.env.APP_ENV}`;
+    return process.env.APP_ENV;
   }
 }
