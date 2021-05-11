@@ -23,7 +23,8 @@ import { ResidentCompanyModule } from 'modules/public/resident-company'
           password: process.env.POSTGRESQLCONNSTR_DB_PASSWORD,
           database: process.env.POSTGRESQLCONNSTR_DB_NAME,
           entities: [__dirname + './../**/**.entity{.ts,.js}'],
-          synchronize: 'true'
+          synchronize: process.env.POSTGRESQLCONNSTR_DB_SYNC,
+          ssl :  process.env.POSTGRESQLCONNSTR_DB_SSL, 
         } as TypeOrmModuleAsyncOptions;
       },
     }),
