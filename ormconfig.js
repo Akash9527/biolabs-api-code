@@ -4,7 +4,7 @@ module.exports = {
     port: process.env.POSTGRESQLCONNSTR_DB_PORT,
     username: process.env.POSTGRESQLCONNSTR_DB_USERNAME,
     password: process.env.POSTGRESQLCONNSTR_DB_PASSWORD,
-    database: process.env.POSTGRESQLCONNSTR_DB_NAME,
+    database: process.env.POSTGRESQLCONNSTR_DB_DATABASE,
     migrations: [__dirname + '/src/migrations/*{.ts,.js}'],
     entities: [__dirname + '/src/modules/public/**/*.entity.{ts,js}'],
 };
