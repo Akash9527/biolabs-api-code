@@ -8,6 +8,7 @@ import { ConfigService } from '../../config';
 import { User, UsersService } from '../user';
 import { LoginPayload } from './login.payload';
 import { MasterService } from '../master';
+import { RESIDENT_ACCESSLEVELS } from 'constants/privileges-resident';
 
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
@@ -52,6 +53,9 @@ export class AuthService {
         break;
       case 3:
         permissions = SPONSOR_ACCESSLEVELS;
+        break;
+      case 4:
+        permissions = RESIDENT_ACCESSLEVELS;
         break;
       default:
         break;
