@@ -28,11 +28,11 @@ import { PassportModule } from '@nestjs/passport';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         return {
-          secret: configService.get('JWT_SECRET_KEY'),
+          secret: configService.get('APPSETTING_JWT_SECRET_KEY'),
           signOptions: {
-            ...(configService.get('JWT_EXPIRATION_TIME')
+            ...(configService.get('APPSETTING_JWT_EXPIRATION_TIME')
               ? {
-                  expiresIn: Number(configService.get('JWT_EXPIRATION_TIME')),
+                  expiresIn: Number(configService.get('APPSETTING_JWT_EXPIRATION_TIME')),
                 }
               : {}),
           },
