@@ -10,6 +10,6 @@ export class AppController {
 
   @Get()
   root(): string {
-    return "Hello";
+    return process.env;
   }
 }
