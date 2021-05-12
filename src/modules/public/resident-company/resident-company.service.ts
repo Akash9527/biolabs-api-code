@@ -19,6 +19,7 @@ import { TechnologyStage } from '../master/technology-stage.entity';
 
 import { Request } from 'express';
 import { ListResidentCompanyPayload } from './list-resident-company.payload';
+import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 
 @Injectable()
 export class ResidentCompanyService {
@@ -102,26 +103,35 @@ export class ResidentCompanyService {
     const savedRc = await this.residentCompanyRepository.save(newRc);
     return savedRc;
   }
-  
-  async getResidentCompanies(payload:ListResidentCompanyPayload) {
+
+  async getResidentCompanies(payload: ListResidentCompanyPayload) {
     let search;
     let skip;
     let take;
     let _search = {};
-    if(payload.role || payload.role == 0) {
-      _search = {..._search, ...{role: payload.role}};
+    if (payload.role || payload.role == 0) {
+      _search = { ..._search, ...{ role: payload.role } };
     }
-    if(payload.q && payload.q != ""){
-      _search = {..._search, ...{companyName: Like("%"+payload.q+"%")}};
-    } 
-    search = [{..._search, status:'1'},{..._search, status:'0'}]
-    if(payload.pagination){
+    if (payload.q && payload.q != "") {
+      _search = { ..._search, ...{ companyName: Like("%" + payload.q + "%") } };
+    }
+    if (payload.company_status && payload.company_status.length > 0) {
+      _search = { ..._search, ...{ company_status: In(payload.company_status) } };
+    }
+    if (typeof payload.company_visibility !== 'undefined') {
+      _search = { ..._search, ...{ company_visibility: payload.company_visibility } };
+    }
+    if (typeof payload.company_onboarding_status !== 'undefined') {
+      _search = { ..._search, ...{ company_onboarding_status: payload.company_onboarding_status } };
+    }
+    search = [{ ..._search, status: { $in: ['1', '0'] } }]
+    if (payload.pagination) {
       skip = { skip: 0 }
       take = { take: 10 }
-      if(payload.limit){
+      if (payload.limit) {
         take = { take: payload.limit };
-        if(payload.page){
-          skip = { skip: payload.page*payload.limit }
+        if (payload.page) {
+          skip = { skip: payload.page * payload.limit }
         }
       }
     }
@@ -132,38 +142,38 @@ export class ResidentCompanyService {
     });
   }
 
-  async getRcSites(ids){
+  async getRcSites(ids) {
     return await this.siteRepository.find({
       select: ["id", "name"],
-      where: {id:In(ids)},
+      where: { id: In(ids) },
     });
   }
 
-  async getRcCategories(ids){
+  async getRcCategories(ids) {
     return await this.categoryRepository.find({
       select: ["id", "name"],
-      where: {id:In(ids)},
+      where: { id: In(ids) },
     });
   }
 
-  async getRcFundings(ids){
+  async getRcFundings(ids) {
     return await this.fundingRepository.findOne({
       select: ["id", "name"],
-      where: {id:ids},
+      where: { id: ids },
     });
   }
 
-  async getRcTechnologyStages(ids){
+  async getRcTechnologyStages(ids) {
     return await this.technologyStageRepository.findOne({
       select: ["id", "name"],
-      where: {id:ids},
+      where: { id: ids },
     });
   }
 
-  async getRcBiolabsSources(ids){
+  async getRcBiolabsSources(ids) {
     return await this.biolabsSourceRepository.findOne({
       select: ["id", "name"],
-      where: {id:ids},
+      where: { id: ids },
     });
   }
 
@@ -174,25 +184,46 @@ export class ResidentCompanyService {
     });
   } */
 
-  async getRcModalities(ids){
+  async getRcModalities(ids) {
     return await this.modalityRepository.find({
       select: ["id", "name"],
-      where: {id:In(ids)},
+      where: { id: In(ids) },
     });
   }
 
   async getResidentCompany(id) {
-    const residentCompany:any = await this.residentCompanyRepository.findOne({
-      where: {id:id}
+    const residentCompany: any = await this.residentCompanyRepository.findOne({
+      where: { id: id }
     });
-    residentCompany.sites = await this.getRcSites(residentCompany.site);
-    residentCompany.categories = await this.getRcCategories(residentCompany.industry);
-    residentCompany.modalities = await this.getRcModalities(residentCompany.modality);
-    residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);
-    residentCompany.companyStages = await this.getRcTechnologyStages(residentCompany.companyStage);
-    residentCompany.biolabsSources = await this.getRcBiolabsSources(residentCompany.biolabsSources);
-    
-    // console.log(residentCompany);
-    return residentCompany;
+    if (residentCompany) {
+      residentCompany.sites = await this.getRcSites(residentCompany.site);
+      residentCompany.categories = await this.getRcCategories(residentCompany.industry);
+      residentCompany.modalities = await this.getRcModalities(residentCompany.modality);
+      residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);
+      residentCompany.companyStages = await this.getRcTechnologyStages(residentCompany.companyStage);
+      residentCompany.biolabsSources = await this.getRcBiolabsSources(residentCompany.biolabsSources);
+      return residentCompany;
+    } else {
+      throw new NotAcceptableException(
+        'Company with provided id not available.',
+      );
+    }
+  }
+
+  async updateResidentCompanyStatus(payload: UpdateResidentCompanyStatusPayload) {
+    const residentCompany: any = await this.residentCompanyRepository.findOne({
+      where: { id: payload.company_id }
+    });
+    if (residentCompany) {
+      residentCompany.company_status = payload.company_status;
+      residentCompany.company_visibility = payload.company_visibility;
+      residentCompany.company_onboarding_status = payload.company_onboarding_status;
+      this.residentCompanyRepository.update(residentCompany.id, residentCompany);
+      return residentCompany;
+    } else {
+      throw new NotAcceptableException(
+        'Company with provided id not available.',
+      );
+    }
   }
 }
