@@ -16,6 +16,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ResidentCompanyService } from '.';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
 import { Request } from 'express';
+import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 
 @Controller('api/resident-company')
 @ApiTags('Resident Company')
@@ -41,7 +42,7 @@ export class ResidentCompanyController {
   @Get()
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getResidentCompanies(@Query() params:any): Promise<any> {
+  async getResidentCompanies(@Query() params: any): Promise<any> {
     return this.residentCompanyService.getResidentCompanies(params);
   }
 
@@ -50,7 +51,16 @@ export class ResidentCompanyController {
   @Get(':id')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getResidentCompany(@Param('id') id:number): Promise<any> {
+  async getResidentCompany(@Param('id') id: number): Promise<any> {
     return this.residentCompanyService.getResidentCompany(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Put('/update-status')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateResidentCompanyStatus(@Body() payload: UpdateResidentCompanyStatusPayload): Promise<any> {
+    return this.residentCompanyService.updateResidentCompanyStatus(payload);
   }
 }
