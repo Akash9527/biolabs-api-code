@@ -31,13 +31,13 @@ export class ResidentCompany {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 510 })
+  @Column({ length: 510, nullable: true })
   email: string;
 
-  @Column({ length: 510 })
+  @Column({ length: 510, nullable: true })
   name: string;
 
-  @Column({ length: 510 })
+  @Column({ length: 510, nullable: true })
   companyName: string;
 
   @Column("int", { array: true, nullable: true })
@@ -118,7 +118,7 @@ export class ResidentCompany {
   @Column({ default: false })
   companyOnboardingStatus: boolean;
 
-  @Column({ length: 510, default: null })
+  @Column({ length: 510, default: null, nullable: true })
   elevatorPitch: string;
 
   @Column({ default: null })
@@ -136,7 +136,7 @@ export class ResidentCompany {
   @Column({ default: null })
   patentsFiledGranted: boolean;
 
-  @Column({ length: 510, default: null })
+  @Column({ length: 510, default: null, nullable: true })
   patentsFiledGrantedDetails: string;
 
   @Column({ default: null })
@@ -145,13 +145,13 @@ export class ResidentCompany {
   @Column({ default: null })
   academiaPartnerships: boolean;
 
-  @Column({ length: 510, default: null })
+  @Column({ length: 510, default: null, nullable: true })
   academiaPartnershipDetails: string;
 
   @Column({ default: null })
   industryPartnerships: boolean;
 
-  @Column({ length: 510, default: null })
+  @Column({ length: 510, default: null, nullable: true })
   industryPartnershipsDetails: string;
 
   @Column({ default: null })
@@ -160,7 +160,7 @@ export class ResidentCompany {
   @Column({ default: null })
   shareYourProfile: boolean;
 
-  @Column({ length: 510, default: null })
+  @Column({ length: 510, default: null, nullable: true })
   equipmentOnsite: string;
 }
 
