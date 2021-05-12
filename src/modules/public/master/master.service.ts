@@ -220,10 +220,10 @@ export class MasterService {
   async saveCategory(name, id, parent_id) {
     const status: status_enum = '1';
     const payload = { id:id, name:name, parent_id:parent_id, status:status }
-    const checkDuplicateCategory = this.categoryRepository.find(
+    const checkDuplicateCategory = await this.categoryRepository.find(
       { where: { name: name, parent_id: parent_id } }
     );
-    if (checkDuplicateCategory) {
+    if (checkDuplicateCategory && checkDuplicateCategory.length>0) {
       // console.log("payload",payload);
       return false;
     } else {
