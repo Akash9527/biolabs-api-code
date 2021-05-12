@@ -124,7 +124,7 @@ export class ResidentCompanyService {
     if (typeof payload.company_onboarding_status !== 'undefined') {
       _search = { ..._search, ...{ company_onboarding_status: payload.company_onboarding_status } };
     }
-    search = [{ ..._search, status: { $in: ['1', '0'] } }]
+    search = [{ ..._search, status: In(['1', '0']) }]
     if (payload.pagination) {
       skip = { skip: 0 }
       take = { take: 10 }
