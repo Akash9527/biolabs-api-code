@@ -118,6 +118,48 @@ export class ResidentCompany {
   @Column({ default: false })
   company_onboarding_status: boolean;
 
+  @Column({ length: 255, default: null })
+  elevator_pitch:string;
+
+  @Column({ default: null })
+  logo_on_wall: boolean;
+
+  @Column({ default: null })
+  logo_on_licensed_space: boolean;
+
+  @Column({ default: null })
+  bioLabs_assistance_needed: boolean;
+
+  @Column({ default: null })
+  technology_papers_ublished : boolean;
+
+  @Column({ default: null })
+  patents_filed_granted:boolean;
+
+  @Column({ length: 255, default: null })
+  patents_filed_granted_details:string;
+
+  @Column({ default: null })
+  founders_business_industry_before:boolean;
+
+  @Column({ default: null })
+  academia_partnerships:boolean;
+
+  @Column({ length: 255, default: null })
+  academia_partnership_details:string;
+
+  @Column({ default: null })
+  industry_partnerships:boolean;
+
+  @Column({ length: 255, default: null })
+  industry_partnerships_details:string;
+
+  @Column({ default: null })
+  newsletters:boolean;
+
+  @Column({ default: null })
+  share_your_profile:boolean;
+
 }
 
 export class ResidentCompanyFillableFields {
@@ -150,4 +192,18 @@ export class ResidentCompanyFillableFields {
   company_status:company_status;
   company_visibility:boolean;
   company_onboarding_status: boolean;
+  elevator_pitch:string;
+  logo_on_wall: boolean;
+  logo_on_licensed_space: boolean;
+  bioLabs_assistance_needed: boolean;
+  technology_papers_ublished : boolean;
+  patents_filed_granted:boolean;
+  patents_filed_granted_details:string;
+  founders_business_industry_before:boolean;
+  academia_partnerships:boolean;
+  academia_partnership_details:string;
+  industry_partnerships:boolean;
+  industry_partnerships_details:string;
+  newsletters:boolean;
+  share_your_profile:boolean;
 }
