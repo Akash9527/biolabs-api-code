@@ -1,7 +1,7 @@
 import { Controller, Get, Header, Post, Query, Res, UploadedFile, UseInterceptors, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
-import { ApiResponse, ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { ApiResponse, ApiTags, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
 export const ApiFile = (fileName: string = 'myfile'): MethodDecorator => (
@@ -41,6 +41,7 @@ export class FileController {
 
   @Get('read-image')
   @Header('Content-Type','image/webp')
+  @ApiQuery({ name: 'filename', type: String })
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async readImage(@Res() res,@Query('filename') filename){
@@ -51,6 +52,7 @@ export class FileController {
   @Get('download-image')
   @Header('Content-Type','image/webp')
   @Header('Content-Disposition', 'attachment; filename=test.webp')
+  @ApiQuery({ name: 'filename', type: String })
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async downloadImage(@Res() res,@Query('filename') filename){
@@ -59,6 +61,7 @@ export class FileController {
   }
 
   @Get('delete-image')
+  @ApiQuery({ name: 'filename', type: String })
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async delete(@Query('filename') filename){
