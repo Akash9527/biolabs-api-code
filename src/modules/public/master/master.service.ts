@@ -214,7 +214,7 @@ export class MasterService {
   }
   
   async createBiolabsSources() {
-    const biolabsSources  = this.getFundings(new MasterPayload());
+    const biolabsSources  = this.getBiolabsSource(new MasterPayload());
     let resp = {};
     return await biolabsSources.then(async data=> {
       const _biolabsSources = migrationData['biolabsSources'];
