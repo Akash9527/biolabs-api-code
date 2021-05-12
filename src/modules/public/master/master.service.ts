@@ -420,6 +420,32 @@ export class MasterService {
     });
   }
 
+  async createTechnologyStages() {
+    const technologyStages = this.getTechnologyStages(new MasterPayload());
+    let resp = {};
+    return await technologyStages.then(async data => {
+      const _technologyStages = migrationData['companyStages'];
+      for (const _technologyStage of _technologyStages) {
+        if (!data.find(r => r.name == _technologyStage.name)) {
+          resp[_technologyStage.name] = await this.createTechnologyStage(_technologyStage.name, _technologyStage.id);
+        }
+        if (_technologyStage.name == _technologyStages[_technologyStages.length - 1]) {
+          return resp;
+        }
+      }
+    }, error => {
+      console.log(error);
+    });
+  }
+
+  async createTechnologyStage(name, id) {
+    const status: status_enum = '1';
+    const payload = {
+      id, name, status
+    }
+    return await this.technologyStageRepository.save(this.technologyStageRepository.create(payload));
+  }
+
   async getCompanyStatus() {
     return COMPANY_STATUS;
   }
