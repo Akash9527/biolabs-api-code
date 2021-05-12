@@ -181,6 +181,35 @@
             "id": 9999
         }
     ],
+    "companyStages": [{
+            "name": "Discovery/R&D",
+            "id": 1
+        },
+        {
+            "name": "Proof-of-principal/Validation",
+            "id": 2
+        },
+        {
+            "name": "Pre-clinical",
+            "id": 3
+        },
+        {
+            "name": "Clinical",
+            "id": 4
+        },
+        {
+            "name": "Manufacturing",
+            "id": 5
+        },
+        {
+            "name": "Public",
+            "id": 6
+        },
+        {
+            "name": "Other",
+            "id": 9999
+        }
+    ],
     "categories": [{
             "name": "Therapeutics (Biopharma)",
             "id": 1,

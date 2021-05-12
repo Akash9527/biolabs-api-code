@@ -102,4 +102,14 @@ export class MasterController {
     return this.masterService.getTechnologyStages(params);
   }
 
+  /**
+   * Description: This method is used to list the company status.
+   * @description This method is used to list the company status.
+   */
+   @Get('company-status')
+   @ApiResponse({ status: 200, description: 'Successful Response' })
+   @ApiResponse({ status: 401, description: 'Unauthorized' })
+   async getCompanyStatus(): Promise<any> {
+     return this.masterService.getCompanyStatus();
+   }
 }

@@ -9,6 +9,7 @@ import { Modality } from './modality.entity';
 import { Role } from './role.entity';
 import { Site } from './site.entity';
 import { TechnologyStage } from './technology-stage.entity';
+import { COMPANY_STATUS } from 'constants/company-status';
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
 type status_enum = '-1' | '0' | '1' | '99';
@@ -223,10 +224,10 @@ export class MasterService {
       { where: { name: name, parent_id: parent_id } }
     );
     if (checkDuplicateCategory) {
-      console.log("payload",payload);
-      return await this.categoryRepository.save(payload);
-    } else {
+      // console.log("payload",payload);
       return false;
+    } else {
+      return await this.categoryRepository.save(payload);
     }
   }
 
@@ -417,5 +418,35 @@ export class MasterService {
       skip,
       take
     });
+  }
+
+  async createTechnologyStages() {
+    const technologyStages = this.getTechnologyStages(new MasterPayload());
+    let resp = {};
+    return await technologyStages.then(async data => {
+      const _technologyStages = migrationData['companyStages'];
+      for (const _technologyStage of _technologyStages) {
+        if (!data.find(r => r.name == _technologyStage.name)) {
+          resp[_technologyStage.name] = await this.createTechnologyStage(_technologyStage.name, _technologyStage.id);
+        }
+        if (_technologyStage.name == _technologyStages[_technologyStages.length - 1]) {
+          return resp;
+        }
+      }
+    }, error => {
+      console.log(error);
+    });
+  }
+
+  async createTechnologyStage(name, id) {
+    const status: status_enum = '1';
+    const payload = {
+      id, name, status
+    }
+    return await this.technologyStageRepository.save(this.technologyStageRepository.create(payload));
+  }
+
+  async getCompanyStatus() {
+    return COMPANY_STATUS;
   }
 }
