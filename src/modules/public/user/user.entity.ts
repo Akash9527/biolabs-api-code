@@ -27,7 +27,7 @@ export class User {
   @Column({  })
   role: number;
 
-  @Column("int", { array: true })
+  @Column("int", { array: true, nullable:true })
   site_id: number[];
 
   @Column({ length: 255 })
