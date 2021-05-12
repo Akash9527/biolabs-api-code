@@ -110,56 +110,58 @@ export class ResidentCompany {
   status: status_enum;
 
   @Column({ length: 255, enum: ['0', '1', '2', '3', '4', '5'], default: '0' })
-  company_status: company_status;
+  companyStatus: company_status;
 
   @Column({ default: false })
-  company_visibility: boolean;
+  companyVisibility: boolean;
 
   @Column({ default: false })
-  company_onboarding_status: boolean;
+  companyOnboardingStatus: boolean;
 
   @Column({ length: 255, default: null })
-  elevator_pitch:string;
+  elevatorPitch: string;
 
   @Column({ default: null })
-  logo_on_wall: boolean;
+  logoOnWall: boolean;
 
   @Column({ default: null })
-  logo_on_licensed_space: boolean;
+  logoOnLicensedSpace: boolean;
 
   @Column({ default: null })
-  bioLabs_assistance_needed: boolean;
+  bioLabsAssistanceNeeded: boolean;
 
   @Column({ default: null })
-  technology_papers_ublished : boolean;
+  technologyPapersPublished: boolean;
 
   @Column({ default: null })
-  patents_filed_granted:boolean;
+  patentsFiledGranted: boolean;
 
   @Column({ length: 255, default: null })
-  patents_filed_granted_details:string;
+  patentsFiledGrantedDetails: string;
 
   @Column({ default: null })
-  founders_business_industry_before:boolean;
+  foundersBusinessIndustryBefore: boolean;
 
   @Column({ default: null })
-  academia_partnerships:boolean;
+  academiaPartnerships: boolean;
 
   @Column({ length: 255, default: null })
-  academia_partnership_details:string;
+  academiaPartnershipDetails: string;
 
   @Column({ default: null })
-  industry_partnerships:boolean;
+  industryPartnerships: boolean;
 
   @Column({ length: 255, default: null })
-  industry_partnerships_details:string;
+  industryPartnershipsDetails: string;
 
   @Column({ default: null })
-  newsletters:boolean;
+  newsletters: boolean;
 
   @Column({ default: null })
-  share_your_profile:boolean;
+  shareYourProfile: boolean;
 
+  @Column({ length: 255, default: null })
+  equipmentOnsite: string;
 }
 
 export class ResidentCompanyFillableFields {
@@ -189,21 +191,22 @@ export class ResidentCompanyFillableFields {
   industry: string[];
   modality: string[];
   status: status_enum;
-  company_status:company_status;
-  company_visibility:boolean;
-  company_onboarding_status: boolean;
-  elevator_pitch:string;
-  logo_on_wall: boolean;
-  logo_on_licensed_space: boolean;
-  bioLabs_assistance_needed: boolean;
-  technology_papers_ublished : boolean;
-  patents_filed_granted:boolean;
-  patents_filed_granted_details:string;
-  founders_business_industry_before:boolean;
-  academia_partnerships:boolean;
-  academia_partnership_details:string;
-  industry_partnerships:boolean;
-  industry_partnerships_details:string;
-  newsletters:boolean;
-  share_your_profile:boolean;
+  companyStatus: company_status;
+  companyVisibility: boolean;
+  companyOnboardingStatus: boolean;
+  elevatorPitch: string;
+  logoOnWall: boolean;
+  logoOnLicensedSpace: boolean;
+  bioLabsAssistanceNeeded: boolean;
+  technologyPapersPublished: boolean;
+  patentsFiledGranted: boolean;
+  patentsFiledGrantedDetails: string;
+  foundersBusinessIndustryBefore: boolean;
+  academiaPartnerships: boolean;
+  academiaPartnershipDetails: string;
+  industryPartnerships: boolean;
+  industryPartnershipsDetails: string;
+  newsletters: boolean;
+  shareYourProfile: boolean;
+  equipmentOnsite: string;
 }

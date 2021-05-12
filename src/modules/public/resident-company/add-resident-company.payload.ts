@@ -152,6 +152,11 @@ export class AddResidentCompanyPayload {
   })
   modality: string[];
 
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  equipmentOnsite:string;
   // @ApiProperty({
   //   required: false,
   //   nullable: true
