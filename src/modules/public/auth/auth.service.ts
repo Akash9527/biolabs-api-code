@@ -22,6 +22,10 @@ export class AuthService {
     private readonly masterService: MasterService
   ) { }
 
+  /**
+   * Description: This method will call on appliaction boot up to generate the master data.
+   * @description This method will call on appliaction boot up to generate the master data.
+   */
   async onApplicationBootstrap() {
     await this.masterService.createRoles();
     await this.masterService.createSites();
@@ -34,7 +38,9 @@ export class AuthService {
   }
 
   /**
-   * @description: Creates the default super admin with all site access
+   * Description: This method creates the default super admin with all site access.
+   * @description This method creates the default super admin with all site access.
+   * @return user object with token info
    */
   private async createSuperAdmin() {
     const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
@@ -44,6 +50,12 @@ export class AuthService {
     }
   }
 
+  /**
+   * Description: This method is used to generate the token for the logged in user.
+   * @description This method is used to generate the token for the logged in user.
+   * @param user object of User
+   * @return user object with token info
+   */
   async createToken(user: User) {
     let permissions = {};
     switch (user.role) {
@@ -71,7 +83,13 @@ export class AuthService {
     };
   }
 
-async validateUser(payload: LoginPayload): Promise<any> {
+  /**
+   * Description: This method is used to validate the user.
+   * @description This method is used to validate the user.
+   * @param payload object of LoginPayload
+   * @return user object
+   */
+  async validateUser(payload: LoginPayload): Promise<any> {
     const user = await this.userService.getByEmail(payload.email);
     if (!user || user.status != '1' || user.password == null || !Hash.compare(payload.password, user.password)) {
       throw new UnauthorizedException('Invalid credentials!');
@@ -79,9 +97,23 @@ async validateUser(payload: LoginPayload): Promise<any> {
     return user;
   }
 
+  /**
+   * Description: This method is used to validate the user token.
+   * @description This method is used to validate the user token.
+   * @param token string
+   * @return user object
+   */
   async validateToken(token) {
     return this.userService.validateToken(token);
   }
+  
+  /**
+   * Description: This method is used to generate the token for the user to reset the password.
+   * @description This method is used to generate the token for the user to reset the password.
+   * @param payload object of user info for reset passsword
+   * @param req object of Request
+   * @return user object
+   */
   async forgotPassword(payload, req) {
     return this.userService.forgotPassword(payload, req);
   }
