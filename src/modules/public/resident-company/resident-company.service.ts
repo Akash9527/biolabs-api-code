@@ -115,14 +115,14 @@ export class ResidentCompanyService {
     if (payload.q && payload.q != "") {
       _search = { ..._search, ...{ companyName: Like("%" + payload.q + "%") } };
     }
-    if (payload.company_status && payload.company_status.length > 0) {
-      _search = { ..._search, ...{ company_status: In(payload.company_status) } };
+    if (payload.companyStatus && payload.companyStatus.length > 0) {
+      _search = { ..._search, ...{ companyStatus: In(payload.companyStatus) } };
     }
-    if (typeof payload.company_visibility !== 'undefined') {
-      _search = { ..._search, ...{ company_visibility: payload.company_visibility } };
+    if (typeof payload.companyVisibility !== 'undefined') {
+      _search = { ..._search, ...{ companyVisibility: payload.companyVisibility } };
     }
-    if (typeof payload.company_onboarding_status !== 'undefined') {
-      _search = { ..._search, ...{ company_onboarding_status: payload.company_onboarding_status } };
+    if (typeof payload.companyOnboardingStatus !== 'undefined') {
+      _search = { ..._search, ...{ companyOnboardingStatus: payload.companyOnboardingStatus } };
     }
     search = [{ ..._search, status: In(['1', '0']) }]
     if (payload.pagination) {
@@ -215,12 +215,12 @@ export class ResidentCompanyService {
 
   async updateResidentCompanyStatus(payload: UpdateResidentCompanyStatusPayload) {
     const residentCompany: any = await this.residentCompanyRepository.findOne({
-      where: { id: payload.company_id }
+      where: { id: payload.companyId }
     });
     if (residentCompany) {
-      residentCompany.company_status = payload.company_status;
-      residentCompany.company_visibility = payload.company_visibility;
-      residentCompany.company_onboarding_status = payload.company_onboarding_status;
+      residentCompany.companyStatus = payload.companyStatus;
+      residentCompany.companyVisibility = payload.companyVisibility;
+      residentCompany.companyOnboardingStatus = payload.companyOnboardingStatus;
       this.residentCompanyRepository.update(residentCompany.id, residentCompany);
       return residentCompany;
     } else {

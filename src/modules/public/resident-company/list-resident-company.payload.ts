@@ -31,17 +31,17 @@ export class ListResidentCompanyPayload {
   @ApiProperty({
     required: false,
   })
-  company_status: company_status[];
+  companyStatus: company_status[];
 
   @ApiProperty({
     required: false,
   })
-  company_visibility: boolean;
+  companyVisibility: boolean;
 
   @ApiProperty({
     required: false,
   })
-  company_onboarding_status: boolean;
+  companyOnboardingStatus: boolean;
 
   @ApiProperty({
     required: false,
