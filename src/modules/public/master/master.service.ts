@@ -9,6 +9,7 @@ import { Modality } from './modality.entity';
 import { Role } from './role.entity';
 import { Site } from './site.entity';
 import { TechnologyStage } from './technology-stage.entity';
+import { COMPANY_STATUS } from 'constants/company-status';
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
 type status_enum = '-1' | '0' | '1' | '99';
@@ -223,10 +224,10 @@ export class MasterService {
       { where: { name: name, parent_id: parent_id } }
     );
     if (checkDuplicateCategory) {
-      console.log("payload",payload);
-      return await this.categoryRepository.save(payload);
-    } else {
+      // console.log("payload",payload);
       return false;
+    } else {
+      return await this.categoryRepository.save(payload);
     }
   }
 
@@ -417,5 +418,9 @@ export class MasterService {
       skip,
       take
     });
+  }
+
+  async getCompanyStatus() {
+    return COMPANY_STATUS;
   }
 }
