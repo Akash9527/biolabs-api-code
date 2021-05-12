@@ -202,6 +202,9 @@ export class ResidentCompanyService {
       residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);
       residentCompany.companyStages = await this.getRcTechnologyStages(residentCompany.companyStage);
       residentCompany.biolabsSources = await this.getRcBiolabsSources(residentCompany.biolabsSources);
+      residentCompany.companyMembers = [];
+      residentCompany.companyAdvisors = [];
+      residentCompany.companyTechnicalTeams = [];
       return residentCompany;
     } else {
       throw new NotAcceptableException(
