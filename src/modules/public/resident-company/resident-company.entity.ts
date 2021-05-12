@@ -22,6 +22,7 @@ import {
  * 99 = Soft delete (Deleted by admin)
  */
 type status_enum = '-1' | '0' | '1' | '99';
+type company_status = '0' | '1' | '2' | '3' | '4' | '5';
 
 @Entity({
   name: 'resident_companies',
@@ -108,6 +109,15 @@ export class ResidentCompany {
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
   status: status_enum;
 
+  @Column({ length: 255, enum: ['0', '1', '2', '3', '4', '5'], default: '0' })
+  company_status: company_status;
+
+  @Column({ default: false })
+  company_visibility: boolean;
+
+  @Column({ default: false })
+  company_onboarding_status: boolean;
+
 }
 
 export class ResidentCompanyFillableFields {
@@ -137,4 +147,7 @@ export class ResidentCompanyFillableFields {
   industry: string[];
   modality: string[];
   status: status_enum;
+  company_status:company_status;
+  company_visibility:boolean;
+  company_onboarding_status: boolean;
 }
