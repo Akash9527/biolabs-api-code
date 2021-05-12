@@ -31,13 +31,13 @@ export class ResidentCompany {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255 })
+  @Column({ length: 510 })
   email: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 510 })
   name: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 510 })
   companyName: string;
 
   @Column("int", { array: true, nullable: true })
@@ -46,7 +46,7 @@ export class ResidentCompany {
   @Column({ nullable: true })
   biolabsSources: number;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   otherBiolabsSources: string;
 
   @Column({ nullable: true })
@@ -64,28 +64,28 @@ export class ResidentCompany {
   @Column({ nullable: true })
   companyStage: number;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   otherCompanyStage: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   funding: string;
 
   @Column({ nullable: true })
   fundingSource: number;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   otherFundingSource: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   intellectualProperty: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   otherIntellectualProperty: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   isAffiliated: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   affiliatedInstitution: string;
 
   @Column({ nullable: true })
@@ -118,7 +118,7 @@ export class ResidentCompany {
   @Column({ default: false })
   companyOnboardingStatus: boolean;
 
-  @Column({ length: 255, default: null })
+  @Column({ length: 510, default: null })
   elevatorPitch: string;
 
   @Column({ default: null })
@@ -136,7 +136,7 @@ export class ResidentCompany {
   @Column({ default: null })
   patentsFiledGranted: boolean;
 
-  @Column({ length: 255, default: null })
+  @Column({ length: 510, default: null })
   patentsFiledGrantedDetails: string;
 
   @Column({ default: null })
@@ -145,13 +145,13 @@ export class ResidentCompany {
   @Column({ default: null })
   academiaPartnerships: boolean;
 
-  @Column({ length: 255, default: null })
+  @Column({ length: 510, default: null })
   academiaPartnershipDetails: string;
 
   @Column({ default: null })
   industryPartnerships: boolean;
 
-  @Column({ length: 255, default: null })
+  @Column({ length: 510, default: null })
   industryPartnershipsDetails: string;
 
   @Column({ default: null })
@@ -160,7 +160,7 @@ export class ResidentCompany {
   @Column({ default: null })
   shareYourProfile: boolean;
 
-  @Column({ length: 255, default: null })
+  @Column({ length: 510, default: null })
   equipmentOnsite: string;
 }
 
