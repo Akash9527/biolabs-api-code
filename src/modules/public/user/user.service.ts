@@ -81,7 +81,8 @@ export class UsersService {
         delete user.password;
       }
       await this.userRepository.update(user.id, user);
-      delete user.password;
+      if(user.password)
+        delete user.password;
       return user;
     } else{
       throw new NotAcceptableException(
