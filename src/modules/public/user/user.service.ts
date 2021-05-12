@@ -70,7 +70,6 @@ export class UsersService {
   async updateUser(payload) {
     const user = await this.get(payload.id);
     if (user) {
-      user.site_id = payload.site_id;
       user.firstName = payload.firstName;
       user.lastName = payload.lastName;
       user.title = payload.title;
