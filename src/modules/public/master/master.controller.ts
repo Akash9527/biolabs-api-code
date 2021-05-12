@@ -102,16 +102,4 @@ export class MasterController {
     return this.masterService.getTechnologyStages(params);
   }
 
-  /**
-   * Description: This method is used to list the industries by get method.
-   * @description This method is used to list the industries by get method.
-   * @param payload it is a request query expects the payload of type MasterPayload.
-   */
-  @Get('industries')
-  @ApiResponse({ status: 200, description: 'Successful Response' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getIndustries(@Query() params: MasterPayload): Promise<any> {
-    return this.masterService.getIndustries(params);
-  }
-
 }

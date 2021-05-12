@@ -12,7 +12,7 @@ type status_enum = '-1' | '0' | '1' | '99';
   name: 'modalities',
 })
 export class Modality {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('rowid')
   id: number;
 
   @Column({ length: 255 })

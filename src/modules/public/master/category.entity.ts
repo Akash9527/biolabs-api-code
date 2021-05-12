@@ -12,7 +12,7 @@ type status_enum = '-1' | '0' | '1' | '99';
   name: 'categories',
 })
 export class Category {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('rowid')
   id: number;
 
   @Column({ })
@@ -27,6 +27,7 @@ export class Category {
 }
 
 export class CategoryFillableFields {
+  id:number;
   name: string;
   status: status_enum;
 }

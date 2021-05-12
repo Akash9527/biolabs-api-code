@@ -28,6 +28,7 @@ export class AuthService {
     await this.masterService.createFundings();
     await this.masterService.createModalities();
     await this.masterService.createBiolabsSources();
+    await this.masterService.createCategories()
     await this.createSuperAdmin();
   }
 
