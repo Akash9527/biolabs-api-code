@@ -171,7 +171,7 @@ export class ResidentCompanyService {
       _search = { ..._search, ...{ companyName: Like("%" + payload.q + "%") } };
     }
     if (payload.companyStatus && payload.companyStatus.length > 0) {
-      _search = { ..._search, ...{ companyStatus: In(payload.companyStatus) } };
+      _search = { ..._search, ...{ companyStatus: payload.companyStatus } };
     }
     if (typeof payload.companyVisibility !== 'undefined') {
       _search = { ..._search, ...{ companyVisibility: payload.companyVisibility } };
