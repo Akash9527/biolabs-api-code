@@ -317,6 +317,8 @@ export class ResidentCompanyService {
       residentCompany.companyStatus = payload.companyStatus;
       residentCompany.companyVisibility = payload.companyVisibility;
       residentCompany.companyOnboardingStatus = payload.companyOnboardingStatus;
+      if(Number(residentCompany.companyStatus) !== 1) 
+        residentCompany.companyVisibility= false;
       this.residentCompanyRepository.update(residentCompany.id, residentCompany);
       return residentCompany;
     } else {
