@@ -192,6 +192,7 @@ export class ResidentCompanyService {
     }
     return await this.residentCompanyRepository.find({
       where: search,
+      order:{id:"DESC"},
       skip,
       take
     });
