@@ -31,7 +31,7 @@ export class ListResidentCompanyPayload {
   @ApiProperty({
     required: false,
   })
-  companyStatus: company_status[];
+  companyStatus: company_status;
 
   @ApiProperty({
     required: false,
