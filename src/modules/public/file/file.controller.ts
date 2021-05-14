@@ -1,10 +1,7 @@
-import { Controller, Get, Header, Post, Query, Body, Res, UploadedFile, UseInterceptors, UseGuards } from '@nestjs/common';
+import { Controller, Get, Header, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileService } from './file.service';
-import { ApiResponse, ApiTags, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
-import { UploadPayload } from './upload-file.payload';
-import { createParamDecorator } from '@nestjs/swagger/dist/decorators/helpers';
 
 export const ApiFile = (fileName: string = 'myfile'): MethodDecorator => (
   target: any,
@@ -46,10 +43,11 @@ export class FileController {
   @Get('read-image')
   @Header('Content-Type','image/webp')
   @ApiQuery({ name: 'filename', type: String })
+  @ApiQuery({ name: 'userType', required: true, type: 'string'})
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async readImage(@Res() res,@Query('filename') filename){
-    const file = await this.fileService.getfileStream(filename);
+  async readImage(@Res() res,@Query('filename') filename, @Query('userType') userType){
+    const file = await this.fileService.getfileStream(filename, userType);
     return file.pipe(res);
   }
 
@@ -57,19 +55,21 @@ export class FileController {
   @Header('Content-Type','image/webp')
   @Header('Content-Disposition', 'attachment; filename=test.webp')
   @ApiQuery({ name: 'filename', type: String })
+  @ApiQuery({ name: 'userType', required: true, type: 'string'})
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async downloadImage(@Res() res,@Query('filename') filename){
-    const file = await this.fileService.getfileStream(filename);
+  async downloadImage(@Res() res,@Query('filename') filename, @Query('userType') userType){
+    const file = await this.fileService.getfileStream(filename, userType);
     return file.pipe(res);
   }
 
   @Get('delete-image')
   @ApiQuery({ name: 'filename', type: String })
+  @ApiQuery({ name: 'userType', required: true, type: 'string'})
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async delete(@Query('filename') filename){
-    await this.fileService.delete(filename);
+  async delete(@Query('filename') filename, @Query('userType') userType){
+    await this.fileService.delete(filename, userType);
     return "deleted";
   }
 }
