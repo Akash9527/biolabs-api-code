@@ -1,8 +1,10 @@
-import { Controller, Get, Header, Post, Query, Res, UploadedFile, UseInterceptors, UseGuards } from '@nestjs/common';
+import { Controller, Get, Header, Post, Query, Body, Res, UploadedFile, UseInterceptors, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
 import { ApiResponse, ApiTags, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { UploadPayload } from './upload-file.payload';
+import { createParamDecorator } from '@nestjs/swagger/dist/decorators/helpers';
 
 export const ApiFile = (fileName: string = 'myfile'): MethodDecorator => (
   target: any,
@@ -21,21 +23,23 @@ export const ApiFile = (fileName: string = 'myfile'): MethodDecorator => (
     },
   })(target, propertyKey, descriptor);
 };
-
 @Controller('api/file')
 @ApiTags('File')
 export class FileController {
-  constructor(private readonly appService: FileService) {}
+  constructor(private readonly fileService: FileService) {}
 
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('myfile'))
   @ApiConsumes('multipart/form-data')
   @ApiFile()
+  @ApiQuery({ name: 'userId', required: true, type: 'number'})
+  @ApiQuery({ name: 'userType', required: true, type: 'string'})
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async upload(@UploadedFile() file: Express.Multer.File):Promise<string>{
-    await this.appService.upload(file);
+  async upload(@Query() payload:{userId:number, userType:string}, @UploadedFile() file: Express.Multer.File):Promise<string>{
+    console.log("payload",payload);
+    await this.fileService.upload(file, payload);
     return "uploaded";
   }
 
@@ -45,7 +49,7 @@ export class FileController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async readImage(@Res() res,@Query('filename') filename){
-    const file = await this.appService.getfileStream(filename);
+    const file = await this.fileService.getfileStream(filename);
     return file.pipe(res);
   }
 
@@ -56,7 +60,7 @@ export class FileController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async downloadImage(@Res() res,@Query('filename') filename){
-    const file = await this.appService.getfileStream(filename);
+    const file = await this.fileService.getfileStream(filename);
     return file.pipe(res);
   }
 
@@ -65,7 +69,7 @@ export class FileController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async delete(@Query('filename') filename){
-    await this.appService.delete(filename);
+    await this.fileService.delete(filename);
     return "deleted";
   }
 }

@@ -1,12 +1,17 @@
 import { BlobServiceClient, BlockBlobClient } from '@azure/storage-blob';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotAcceptableException } from '@nestjs/common';
+import { UsersService } from '../user/user.service';
 
 
 @Injectable()
 export class FileService {
+
+  constructor(
+    private readonly userService: UsersService,
+  ) { }
+
   azureConnection = "DefaultEndpointsProtocol=https;AccountName=biolabsblob;AccountKey=LTpDkmuPGUHnlD/qInEwxV80bWglNPcHHgaP7cvywEnibJLA9DLyeM/lP5iq8i+QZjiy0smerZBNW35UWnDbdg==;EndpointSuffix=core.windows.net";
-  containerName = "pictures";
-  
+  containerName = "user";
 
   getBlobClient(imageName:string):BlockBlobClient{
     const blobClientService = BlobServiceClient.fromConnectionString(this.azureConnection);
@@ -15,9 +20,27 @@ export class FileService {
     return blobClient;
   }
 
-  async upload(file:Express.Multer.File){
-    const blobClient = this.getBlobClient(file.originalname);
-    await blobClient.uploadData(file.buffer);
+  async upload(file:Express.Multer.File, payload:any){
+    const userId = payload.userId;
+    this.containerName = payload.userType;
+    if(file){
+      const fileName = userId +"-"+ new Date().getTime() +"-"+ file.originalname;
+      const blobClient = this.getBlobClient(fileName);
+      try{
+        const uploaded = await blobClient.uploadData(file.buffer);
+        console.log("uploaded", uploaded);
+        const userResp = await this.userService.updateUserProfilePic({id: userId, imageUrl: fileName});
+        return uploaded;  
+      } catch (error) {
+        throw new BadRequestException(
+          error.message
+        );
+      }
+    } else {
+      throw new NotAcceptableException(
+        'File is invalid.',
+      );
+    }
   }
 
   async getfileStream(fileName: string){

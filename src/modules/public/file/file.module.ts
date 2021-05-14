@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '../../config';
 import { FileController } from './file.controller';
 import { FileService } from './file.service';
 import { PassportModule } from '@nestjs/passport';
+import { UserModule } from '../user';
+import { Mail } from 'utils/Mail';
 
 @Module({
   imports: [
+    UserModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),],
   controllers: [FileController],
   providers: [FileService],
