@@ -6,8 +6,7 @@ import { FileService } from './file.service';
 
 @Module({
   imports: [
-    UserModule,
-    ConfigModule
+    UserModule
   ],
   controllers: [FileController],
   providers: [FileService],

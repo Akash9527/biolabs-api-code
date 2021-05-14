@@ -1,17 +1,15 @@
 import { BlobServiceClient, BlockBlobClient } from '@azure/storage-blob';
 import { BadRequestException, Injectable, NotAcceptableException } from '@nestjs/common';
-import { ConfigService } from '../../config';
 import { UsersService } from '../user/user.service';
 
 @Injectable()
 export class FileService {
 
   constructor(
-    private readonly userService: UsersService,
-    private readonly configService: ConfigService,
+    private readonly userService: UsersService
   ) { }
 
-  azureConnection = this.configService.get('AZURE_STORAGE_CONNECTION');
+  azureConnection = process.env.APPSETTING_AZURE_STORAGE_CONNECTION;
 
   getBlobClient(imageName:string, containerName: string):BlockBlobClient{
     const blobClientService = BlobServiceClient.fromConnectionString(this.azureConnection);
