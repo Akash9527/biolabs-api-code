@@ -1,31 +1,30 @@
 import { BlobServiceClient, BlockBlobClient } from '@azure/storage-blob';
 import { BadRequestException, Injectable, NotAcceptableException } from '@nestjs/common';
+import { ConfigService } from '../../config';
 import { UsersService } from '../user/user.service';
-
 
 @Injectable()
 export class FileService {
 
   constructor(
     private readonly userService: UsersService,
+    private readonly configService: ConfigService,
   ) { }
 
-  azureConnection = "DefaultEndpointsProtocol=https;AccountName=biolabsblob;AccountKey=LTpDkmuPGUHnlD/qInEwxV80bWglNPcHHgaP7cvywEnibJLA9DLyeM/lP5iq8i+QZjiy0smerZBNW35UWnDbdg==;EndpointSuffix=core.windows.net";
-  containerName = "user";
+  azureConnection = this.configService.get('APPSETTING_AZURE_STORAGE_CONNECTION');
 
-  getBlobClient(imageName:string):BlockBlobClient{
+  getBlobClient(imageName:string, containerName: string):BlockBlobClient{
     const blobClientService = BlobServiceClient.fromConnectionString(this.azureConnection);
-    const containerClient = blobClientService.getContainerClient(this.containerName);
+    const containerClient = blobClientService.getContainerClient(containerName);
     const blobClient = containerClient.getBlockBlobClient(imageName);
     return blobClient;
   }
 
   async upload(file:Express.Multer.File, payload:any){
     const userId = payload.userId;
-    this.containerName = payload.userType;
     if(file){
       const fileName = userId +"-"+ new Date().getTime() +"-"+ file.originalname;
-      const blobClient = this.getBlobClient(fileName);
+      const blobClient = this.getBlobClient(fileName, payload.userType);
       try{
         const uploaded = await blobClient.uploadData(file.buffer);
         console.log("uploaded", uploaded);
@@ -43,14 +42,21 @@ export class FileService {
     }
   }
 
-  async getfileStream(fileName: string){
-    const blobClient = this.getBlobClient(fileName);
-    var blobDownloaded = await blobClient.download();
-    return blobDownloaded.readableStreamBody;
+  async getfileStream(fileName: string, userType: string){
+    try{
+      const blobClient = this.getBlobClient(fileName, userType);
+      var blobDownloaded = await blobClient.download();
+      return blobDownloaded.readableStreamBody;
+    } catch (error) {
+      console.log("error: "+error.message);
+      throw new BadRequestException(
+        error.message
+      );
+    }
   }
 
-  async delete(filename: string){
-    const blobClient = this.getBlobClient(filename);
+  async delete(filename: string, containerName: string){
+    const blobClient = this.getBlobClient(filename, containerName);
     await blobClient.deleteIfExists();
   }
 }
