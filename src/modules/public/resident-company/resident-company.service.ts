@@ -171,7 +171,7 @@ export class ResidentCompanyService {
       _search = { ..._search, ...{ companyName: Like("%" + payload.q + "%") } };
     }
     if (payload.companyStatus && payload.companyStatus.length > 0) {
-      _search = { ..._search, ...{ companyStatus: In(payload.companyStatus) } };
+      _search = { ..._search, ...{ companyStatus: payload.companyStatus } };
     }
     if (typeof payload.companyVisibility !== 'undefined') {
       _search = { ..._search, ...{ companyVisibility: payload.companyVisibility } };
@@ -192,6 +192,7 @@ export class ResidentCompanyService {
     }
     return await this.residentCompanyRepository.find({
       where: search,
+      order:{id:"DESC"},
       skip,
       take
     });
@@ -317,6 +318,8 @@ export class ResidentCompanyService {
       residentCompany.companyStatus = payload.companyStatus;
       residentCompany.companyVisibility = payload.companyVisibility;
       residentCompany.companyOnboardingStatus = payload.companyOnboardingStatus;
+      if(Number(residentCompany.companyStatus) !== 1) 
+        residentCompany.companyVisibility= false;
       this.residentCompanyRepository.update(residentCompany.id, residentCompany);
       return residentCompany;
     } else {
