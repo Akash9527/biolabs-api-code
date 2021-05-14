@@ -11,7 +11,7 @@ export class FileService {
     private readonly configService: ConfigService,
   ) { }
 
-  azureConnection = this.configService.get('AZURE_STORAGE_CONNECTION');
+  azureConnection = this.configService.get('APPSETTING_AZURE_STORAGE_CONNECTION');
 
   getBlobClient(imageName:string, containerName: string):BlockBlobClient{
     const blobClientService = BlobServiceClient.fromConnectionString(this.azureConnection);

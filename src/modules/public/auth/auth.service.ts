@@ -76,7 +76,7 @@ export class AuthService {
     }
 
     return {
-      expiresIn: this.configService.get('JWT_EXPIRATION_TIME'),
+      expiresIn: process.env.APPSETTING_JWT_EXPIRATION_TIME,
       accessToken: this.jwtService.sign({ id: user.id }),
       permissions: permissions,
       user,
