@@ -31,13 +31,13 @@ export class ResidentCompany {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255 })
+  @Column({ length: 510, nullable: true })
   email: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 510, nullable: true })
   name: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 510, nullable: true })
   companyName: string;
 
   @Column("int", { array: true, nullable: true })
@@ -46,7 +46,7 @@ export class ResidentCompany {
   @Column({ nullable: true })
   biolabsSources: number;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   otherBiolabsSources: string;
 
   @Column({ nullable: true })
@@ -64,28 +64,28 @@ export class ResidentCompany {
   @Column({ nullable: true })
   companyStage: number;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   otherCompanyStage: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   funding: string;
 
   @Column({ nullable: true })
   fundingSource: number;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   otherFundingSource: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   intellectualProperty: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   otherIntellectualProperty: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   isAffiliated: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 510, nullable: true })
   affiliatedInstitution: string;
 
   @Column({ nullable: true })
@@ -110,14 +110,58 @@ export class ResidentCompany {
   status: status_enum;
 
   @Column({ length: 255, enum: ['0', '1', '2', '3', '4', '5'], default: '0' })
-  company_status: company_status;
+  companyStatus: company_status;
 
   @Column({ default: false })
-  company_visibility: boolean;
+  companyVisibility: boolean;
 
   @Column({ default: false })
-  company_onboarding_status: boolean;
+  companyOnboardingStatus: boolean;
 
+  @Column({ length: 510, default: null, nullable: true })
+  elevatorPitch: string;
+
+  @Column({ default: null })
+  logoOnWall: boolean;
+
+  @Column({ default: null })
+  logoOnLicensedSpace: boolean;
+
+  @Column({ default: null })
+  bioLabsAssistanceNeeded: boolean;
+
+  @Column({ default: null })
+  technologyPapersPublished: boolean;
+
+  @Column({ default: null })
+  patentsFiledGranted: boolean;
+
+  @Column({ length: 510, default: null, nullable: true })
+  patentsFiledGrantedDetails: string;
+
+  @Column({ default: null })
+  foundersBusinessIndustryBefore: boolean;
+
+  @Column({ default: null })
+  academiaPartnerships: boolean;
+
+  @Column({ length: 510, default: null, nullable: true })
+  academiaPartnershipDetails: string;
+
+  @Column({ default: null })
+  industryPartnerships: boolean;
+
+  @Column({ length: 510, default: null, nullable: true })
+  industryPartnershipsDetails: string;
+
+  @Column({ default: null })
+  newsletters: boolean;
+
+  @Column({ default: null })
+  shareYourProfile: boolean;
+
+  @Column({ length: 510, default: null, nullable: true })
+  equipmentOnsite: string;
 }
 
 export class ResidentCompanyFillableFields {
@@ -147,7 +191,22 @@ export class ResidentCompanyFillableFields {
   industry: string[];
   modality: string[];
   status: status_enum;
-  company_status:company_status;
-  company_visibility:boolean;
-  company_onboarding_status: boolean;
+  companyStatus: company_status;
+  companyVisibility: boolean;
+  companyOnboardingStatus: boolean;
+  elevatorPitch: string;
+  logoOnWall: boolean;
+  logoOnLicensedSpace: boolean;
+  bioLabsAssistanceNeeded: boolean;
+  technologyPapersPublished: boolean;
+  patentsFiledGranted: boolean;
+  patentsFiledGrantedDetails: string;
+  foundersBusinessIndustryBefore: boolean;
+  academiaPartnerships: boolean;
+  academiaPartnershipDetails: string;
+  industryPartnerships: boolean;
+  industryPartnershipsDetails: string;
+  newsletters: boolean;
+  shareYourProfile: boolean;
+  equipmentOnsite: string;
 }

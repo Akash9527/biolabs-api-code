@@ -90,7 +90,7 @@ export const RESIDENT_ACCESSLEVELS = {
             name: "Resident Companies",
             action: false,
             create: false,
-            view: false,
+            view: true,
             update: false,
             delete: false
         }
