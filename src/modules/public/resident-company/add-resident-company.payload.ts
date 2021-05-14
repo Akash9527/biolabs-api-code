@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsNumber, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, Max, MaxLength, Min, MinLength } from 'class-validator';
 import { Unique } from 'modules/common';
 import { ResidentCompany } from './resident-company.entity';
 
@@ -14,11 +14,13 @@ export class AddResidentCompanyPayload {
   @ApiProperty({
     required: true,
   })
+  @MaxLength(100)
   name: string;
 
   @ApiProperty({
     required: true,
   })
+  @MaxLength(500)
   companyName: string;
 
   @ApiProperty({
@@ -36,6 +38,7 @@ export class AddResidentCompanyPayload {
     required: false,
     nullable: true
   })
+  @MaxLength(100)
   otherBiolabsSources: string;
 
   @ApiProperty({
@@ -152,6 +155,11 @@ export class AddResidentCompanyPayload {
   })
   modality: string[];
 
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  equipmentOnsite:string;
   // @ApiProperty({
   //   required: false,
   //   nullable: true

@@ -89,7 +89,6 @@ export class MasterService {
     return await this.siteRepository.save(this.siteRepository.create(payload));
   }
 
-
   async getRoles(payload: MasterPayload) {
     let search;
     let skip;
@@ -166,6 +165,7 @@ export class MasterService {
     const categories: any[] = await this.categoryRepository.find({
       select: ["id", "name", "parent_id"],
       where: search,
+      order: { id: "ASC" },
       skip,
       take
     });
@@ -219,11 +219,11 @@ export class MasterService {
 
   async saveCategory(name, id, parent_id) {
     const status: status_enum = '1';
-    const payload = { id:id, name:name, parent_id:parent_id, status:status }
-    const checkDuplicateCategory = this.categoryRepository.find(
+    const payload = { id: id, name: name, parent_id: parent_id, status: status }
+    const checkDuplicateCategory = await this.categoryRepository.find(
       { where: { name: name, parent_id: parent_id } }
     );
-    if (checkDuplicateCategory) {
+    if (checkDuplicateCategory && checkDuplicateCategory.length > 0) {
       // console.log("payload",payload);
       return false;
     } else {

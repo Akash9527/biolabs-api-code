@@ -48,10 +48,22 @@ export class ResidentCompanyService {
     private readonly technologyStageRepository: Repository<TechnologyStage>,
   ) { }
 
+  /**
+   * Description: This method will get the resident company by id.
+   * @description This method will get the resident company by id.
+   * @param id number resident company id
+   * @return resident company object
+   */
   async get(id: number) {
     return this.residentCompanyRepository.findOne(id);
   }
 
+  /**
+   * Description: This method will get the resident company by email.
+   * @description This method will get the resident company by email.
+   * @param email string resident company email
+   * @return resident company object
+   */
   async getByEmail(email: string) {
     return await this.residentCompanyRepository
       .createQueryBuilder('resident-companies')
@@ -60,6 +72,12 @@ export class ResidentCompanyService {
       .getOne();
   }
 
+  /**
+   * Description: This method will create the new resident companies.
+   * @description This method will create the new resident companies.
+   * @param payload object of AddResidentCompanyPayload.
+   * @return resident companies object
+   */
   async create(payload: AddResidentCompanyPayload) {
     const rc = await this.getByEmail(payload.email);
 
@@ -71,26 +89,57 @@ export class ResidentCompanyService {
     return await this.residentCompanyRepository.save(this.residentCompanyRepository.create(payload));
   }
 
+  /**
+   * Description: This method will create the new resident companies advisor.
+   * @description This method will create the new resident companies advisor.
+   * @param payload object of ResidentCompanyAdvisoryFillableFields.
+   * @return resident companies advisor object
+   */
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
     const savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
     return savedRcAdvisor;
   }
 
+  /**
+   * Description: This method will create the new resident companies document.
+   * @description This method will create the new resident companies document.
+   * @param payload object of ResidentCompanyDocumentsFillableFields.
+   * @return resident companies document object
+   */
   async addResidentCompanyDocument(payload: ResidentCompanyDocumentsFillableFields) {
     const savedRcDocument = await this.residentCompanyDocumentsRepository.save(this.residentCompanyDocumentsRepository.create(payload));
     return savedRcDocument;
   }
 
+  /**
+   * Description: This method will create the new resident companies management.
+   * @description This method will create the new resident companies management.
+   * @param payload object of ResidentCompanyManagementFillableFields.
+   * @return resident companies management object
+   */
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
     const savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
     return savedRcManagement;
   }
 
+  /**
+   * Description: This method will create the new resident companies technical.
+   * @description This method will create the new resident companies technical.
+   * @param payload object of ResidentCompanyTechnicalFillableFields.
+   * @return resident companies technical object
+   */
   async addResidentCompanyTechnical(payload: ResidentCompanyTechnicalFillableFields) {
     const savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
     return savedRcTechnical;
   }
 
+  /**
+   * Description: This method will create the new resident companies.
+   * @description This method will create the new resident companies.
+   * @param payload object of AddResidentCompanyPayload.
+   * @param req object of Request.
+   * @return resident companies object
+   */
   async addResidentCompany(payload: AddResidentCompanyPayload, req: Request) {
     const rc = await this.getByEmail(payload.email);
 
@@ -104,6 +153,12 @@ export class ResidentCompanyService {
     return savedRc;
   }
 
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
   async getResidentCompanies(payload: ListResidentCompanyPayload) {
     let search;
     let skip;
@@ -115,16 +170,16 @@ export class ResidentCompanyService {
     if (payload.q && payload.q != "") {
       _search = { ..._search, ...{ companyName: Like("%" + payload.q + "%") } };
     }
-    if (payload.company_status && payload.company_status.length > 0) {
-      _search = { ..._search, ...{ company_status: In(payload.company_status) } };
+    if (payload.companyStatus && payload.companyStatus.length > 0) {
+      _search = { ..._search, ...{ companyStatus: payload.companyStatus } };
     }
-    if (typeof payload.company_visibility !== 'undefined') {
-      _search = { ..._search, ...{ company_visibility: payload.company_visibility } };
+    if (typeof payload.companyVisibility !== 'undefined') {
+      _search = { ..._search, ...{ companyVisibility: payload.companyVisibility } };
     }
-    if (typeof payload.company_onboarding_status !== 'undefined') {
-      _search = { ..._search, ...{ company_onboarding_status: payload.company_onboarding_status } };
+    if (typeof payload.companyOnboardingStatus !== 'undefined') {
+      _search = { ..._search, ...{ companyOnboardingStatus: payload.companyOnboardingStatus } };
     }
-    search = [{ ..._search, status: { $in: ['1', '0'] } }]
+    search = [{ ..._search, status: In(['1', '0']) }]
     if (payload.pagination) {
       skip = { skip: 0 }
       take = { take: 10 }
@@ -137,11 +192,18 @@ export class ResidentCompanyService {
     }
     return await this.residentCompanyRepository.find({
       where: search,
+      order:{id:"DESC"},
       skip,
       take
     });
   }
 
+  /**
+   * Description: This method will return the sites list.
+   * @description This method will return the sites list.
+   * @param ids number[]
+   * @return array of sites object
+   */
   async getRcSites(ids) {
     return await this.siteRepository.find({
       select: ["id", "name"],
@@ -149,6 +211,12 @@ export class ResidentCompanyService {
     });
   }
 
+  /**
+   * Description: This method will return the categories list.
+   * @description This method will return the categories list.
+   * @param ids number[]
+   * @return array of categories object
+   */
   async getRcCategories(ids) {
     return await this.categoryRepository.find({
       select: ["id", "name"],
@@ -156,6 +224,12 @@ export class ResidentCompanyService {
     });
   }
 
+  /**
+   * Description: This method will return the fundings list.
+   * @description This method will return the fundings list.
+   * @param ids number[]
+   * @return array of fundings object
+   */
   async getRcFundings(ids) {
     return await this.fundingRepository.findOne({
       select: ["id", "name"],
@@ -163,6 +237,12 @@ export class ResidentCompanyService {
     });
   }
 
+  /**
+   * Description: This method will return the technology stages list.
+   * @description This method will return the technology stages list.
+   * @param ids number[]
+   * @return array of technology stages object
+   */
   async getRcTechnologyStages(ids) {
     return await this.technologyStageRepository.findOne({
       select: ["id", "name"],
@@ -170,6 +250,12 @@ export class ResidentCompanyService {
     });
   }
 
+  /**
+   * Description: This method will return the biolabs sources list.
+   * @description This method will return the biolabs sources list.
+   * @param ids number[]
+   * @return array of biolabs sources object
+   */
   async getRcBiolabsSources(ids) {
     return await this.biolabsSourceRepository.findOne({
       select: ["id", "name"],
@@ -177,13 +263,12 @@ export class ResidentCompanyService {
     });
   }
 
-  /* async getRcModalities(ids){
-    return await this.modalityRepository.find({
-      select: ["id", "name"],
-      where: {id:In(ids)},
-    });
-  } */
-
+  /**
+   * Description: This method will return the modalities list.
+   * @description This method will return the modalities list.
+   * @param ids number[]
+   * @return array of modalities object
+   */
   async getRcModalities(ids) {
     return await this.modalityRepository.find({
       select: ["id", "name"],
@@ -191,6 +276,12 @@ export class ResidentCompanyService {
     });
   }
 
+  /**
+   * Description: This method will get the resident company.
+   * @description This method will get the resident company.
+   * @param id number resident company id
+   * @return resident company object
+   */
   async getResidentCompany(id) {
     const residentCompany: any = await this.residentCompanyRepository.findOne({
       where: { id: id }
@@ -202,6 +293,9 @@ export class ResidentCompanyService {
       residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);
       residentCompany.companyStages = await this.getRcTechnologyStages(residentCompany.companyStage);
       residentCompany.biolabsSources = await this.getRcBiolabsSources(residentCompany.biolabsSources);
+      residentCompany.companyMembers = [];
+      residentCompany.companyAdvisors = [];
+      residentCompany.companyTechnicalTeams = [];
       return residentCompany;
     } else {
       throw new NotAcceptableException(
@@ -210,14 +304,22 @@ export class ResidentCompanyService {
     }
   }
 
+  /**
+   * Description: This method will update the resident company status.
+   * @description This method will update the resident company status.
+   * @param payload object of type UpdateResidentCompanyStatusPayload
+   * @return resident company object
+   */
   async updateResidentCompanyStatus(payload: UpdateResidentCompanyStatusPayload) {
     const residentCompany: any = await this.residentCompanyRepository.findOne({
-      where: { id: payload.company_id }
+      where: { id: payload.companyId }
     });
     if (residentCompany) {
-      residentCompany.company_status = payload.company_status;
-      residentCompany.company_visibility = payload.company_visibility;
-      residentCompany.company_onboarding_status = payload.company_onboarding_status;
+      residentCompany.companyStatus = payload.companyStatus;
+      residentCompany.companyVisibility = payload.companyVisibility;
+      residentCompany.companyOnboardingStatus = payload.companyOnboardingStatus;
+      if(Number(residentCompany.companyStatus) !== 1) 
+        residentCompany.companyVisibility= false;
       this.residentCompanyRepository.update(residentCompany.id, residentCompany);
       return residentCompany;
     } else {

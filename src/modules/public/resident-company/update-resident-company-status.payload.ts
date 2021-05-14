@@ -6,21 +6,21 @@ export class UpdateResidentCompanyStatusPayload {
   @ApiProperty({
     required: true,
   })
-  company_id: number;
+  companyId: number;
 
   @ApiProperty({
     required: false,
   })
-  company_status: company_status[];
+  companyStatus: company_status;
 
   @ApiProperty({
     required: false,
   })
-  company_visibility: boolean;
+  companyVisibility: boolean;
 
   @ApiProperty({
     required: false,
   })
-  company_onboarding_status: boolean;
+  companyOnboardingStatus: boolean;
 
 }
