@@ -122,6 +122,26 @@ export class UsersService {
   }
 
   /**
+   * Description: This method is used to update the user profile pic.
+   * @description This method is used to update the user profile pic.
+   * @param payload object of user information with imageUrl
+   * @return user object
+   */
+   async updateUserProfilePic(payload) {
+    const user = await this.get(payload.id);
+    if (user) {
+      delete user.password;
+      user.imageUrl = payload.imageUrl;
+      await this.userRepository.update(user.id, user);
+      return user;
+    } else {
+      throw new NotAcceptableException(
+        'User with provided id not available.',
+      );
+    }
+  }
+
+  /**
    * Description: This method is used to soft delete the user.
    * @description This method is used to soft delete the user.
    * @param id number of user id
