@@ -10,6 +10,6 @@ export class AppController {
 
   @Get()
   root(): any {
-    return process.env;
+    return "Hello from Biolabs";
   }
 }
