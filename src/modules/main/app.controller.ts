@@ -8,6 +8,10 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+    /**
+     * Description: This method will return the home page response.
+     * @description This method will return the home page response.
+     */
   @Get()
   root(): any {
     return "Hello from Biolabs";

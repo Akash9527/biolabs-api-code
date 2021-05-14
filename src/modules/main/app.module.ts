@@ -8,6 +8,7 @@ import { CommonModule } from 'modules/common';
 import { MasterModule } from 'modules/public/master';
 import { UserModule } from 'modules/public/user';
 import { ResidentCompanyModule } from 'modules/public/resident-company'
+import { FileModule } from 'modules/public/file';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ResidentCompanyModule } from 'modules/public/resident-company'
     CommonModule,
     MasterModule,
     UserModule,
+    FileModule,
     ResidentCompanyModule,
   ],
   controllers: [AppController],

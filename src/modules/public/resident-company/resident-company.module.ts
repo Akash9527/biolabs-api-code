@@ -8,6 +8,13 @@ import { ResidentCompanyDocuments } from './rc-documents.entity'
 import { ResidentCompanyManagement } from './rc-management.entity'
 import { ResidentCompanyTechnical } from './rc-technical.entity'
 
+import { Site } from '../master/site.entity';
+import { Category } from '../master/category.entity';
+import { Funding } from '../master/funding.entity';
+import { BiolabsSource } from '../master/biolabs-source.entity';
+import { Modality } from '../master/modality.entity';
+import { TechnologyStage } from '../master/technology-stage.entity';
+
 import { ResidentCompanyService } from './resident-company.service';
 import { ResidentCompanyController } from './resident-company.controller';
 import { PassportModule } from '@nestjs/passport';
@@ -20,6 +27,7 @@ import { PassportModule } from '@nestjs/passport';
       , ResidentCompanyDocuments
       , ResidentCompanyManagement
       , ResidentCompanyTechnical
+      , BiolabsSource, Category, Funding, Modality, Site, TechnologyStage
     ]),
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),

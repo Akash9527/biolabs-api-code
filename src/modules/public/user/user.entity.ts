@@ -24,10 +24,10 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({  })
+  @Column({})
   role: number;
 
-  @Column("int", { array: true })
+  @Column("int", { array: true, nullable: true })
   site_id: number[];
 
   @Column({ length: 255 })
@@ -39,20 +39,23 @@ export class User {
   @Column({ length: 255 })
   lastName: string;
 
-  @Column({ length: 255 , nullable:true})
+  @Column({ length: 255, nullable: true })
   title: string;
 
-  @Column({ length: 255, nullable:true })
+  @Column({ length: 255, nullable: true })
   phoneNumber: string;
 
-  @Column({ length: 255, enum:['-1','0','1','99'], default:'0' })
+  @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
   status: status_enum;
+
+  @Column({ length: 100, nullable: true })
+  imageUrl: string;
 
   @Column({
     name: 'password',
     length: 255,
     transformer: new PasswordTransformer(),
-    nullable:true
+    nullable: true
   })
   password: string;
 
@@ -66,10 +69,11 @@ export class UserFillableFields {
   email: string;
   password: string;
   role: number;
-  site_id:number[];
-  firstName:string;
-  lastName:string;
-  title:string;
-  phoneNumber:string;
-  status:status_enum;
+  site_id: number[];
+  firstName: string;
+  lastName: string;
+  title: string;
+  phoneNumber: string;
+  status: status_enum;
+  imageUrl: string;
 }

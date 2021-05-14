@@ -181,448 +181,468 @@
             "id": 9999
         }
     ],
+    "companyStages": [{
+            "name": "Discovery/R&D",
+            "id": 1
+        },
+        {
+            "name": "Proof-of-principal/Validation",
+            "id": 2
+        },
+        {
+            "name": "Pre-clinical",
+            "id": 3
+        },
+        {
+            "name": "Clinical",
+            "id": 4
+        },
+        {
+            "name": "Manufacturing",
+            "id": 5
+        },
+        {
+            "name": "Public",
+            "id": 6
+        },
+        {
+            "name": "Other",
+            "id": 9999
+        }
+    ],
     "categories": [{
             "name": "Therapeutics (Biopharma)",
             "id": 1,
             "subcategories": [{
                     "name": "Cardiovascular & Metabolism",
-                    "id": 1,
+                    "id": 2,
                     "subcategories": [{
                             "name": "Diabetes and related disorders",
-                            "id": 1
-                        },
-                        {
-                            "name": "Chronic Kidney Disease (CKD)",
-                            "id": 2
-                        },
-                        {
-                            "name": "Cardiovascular Disease (CVD)",
                             "id": 3
                         },
                         {
-                            "name": "NAFLD, NASH, or cirrhosis",
+                            "name": "Chronic Kidney Disease (CKD)",
                             "id": 4
                         },
                         {
-                            "name": "Obesity",
+                            "name": "Cardiovascular Disease (CVD)",
                             "id": 5
                         },
                         {
-                            "name": "Cachexia",
+                            "name": "NAFLD, NASH, or cirrhosis",
                             "id": 6
                         },
                         {
-                            "name": "Atherosclerosis and vascular diseases",
+                            "name": "Obesity",
                             "id": 7
                         },
                         {
-                            "name": "Dyslipidemia",
+                            "name": "Cachexia",
                             "id": 8
                         },
                         {
-                            "name": "Cardiac arrhythmias and associated disorders",
+                            "name": "Atherosclerosis and vascular diseases",
                             "id": 9
                         },
                         {
-                            "name": "Pulmonary hypertension",
+                            "name": "Dyslipidemia",
                             "id": 10
                         },
                         {
-                            "name": "Other",
+                            "name": "Cardiac arrhythmias and associated disorders",
                             "id": 11
+                        },
+                        {
+                            "name": "Pulmonary hypertension",
+                            "id": 12
+                        },
+                        {
+                            "name": "Other",
+                            "id": 29999
                         }
                     ]
                 },
                 {
                     "name": "Oncology",
-                    "id": 2,
+                    "id": 13,
                     "subcategories": [{
                             "name": "Hematological malignancies",
-                            "id": 1
-                        },
-                        {
-                            "name": "Chronic lymphocytic leukemia (CLL)",
-                            "id": 2
-                        },
-                        {
-                            "name": "Mantle cell lymphoma (MCL)",
-                            "id": 3
-                        },
-                        {
-                            "name": "Prostate cancer",
-                            "id": 4
-                        },
-                        {
-                            "name": "Lung Cancer",
-                            "id": 5
-                        },
-                        {
-                            "name": "Pancreatic cancer",
-                            "id": 6
-                        },
-                        {
-                            "name": "GI stromal tumors",
-                            "id": 7
-                        },
-                        {
-                            "name": "Breast cancer",
-                            "id": 8
-                        },
-                        {
-                            "name": "Renal cell carcinoma",
-                            "id": 9
-                        },
-                        {
-                            "name": "Kidney cancer",
-                            "id": 10
-                        },
-                        {
-                            "name": "Ovarian cancer",
-                            "id": 11
-                        },
-                        {
-                            "name": "Bladder cancer",
-                            "id": 12
-                        },
-                        {
-                            "name": "Liver cancer",
-                            "id": 13
-                        },
-                        {
-                            "name": "Melanoma",
                             "id": 14
                         },
                         {
-                            "name": "Bone metastasis",
+                            "name": "Chronic lymphocytic leukemia (CLL)",
                             "id": 15
                         },
                         {
-                            "name": "SEGA tumors",
+                            "name": "Mantle cell lymphoma (MCL)",
                             "id": 16
                         },
                         {
-                            "name": "Neuroendocrine tumors",
+                            "name": "Prostate cancer",
                             "id": 17
                         },
                         {
-                            "name": "Glioblastoma",
+                            "name": "Lung Cancer",
                             "id": 18
                         },
                         {
-                            "name": "Other",
+                            "name": "Pancreatic cancer",
                             "id": 19
+                        },
+                        {
+                            "name": "GI stromal tumors",
+                            "id": 20
+                        },
+                        {
+                            "name": "Breast cancer",
+                            "id": 21
+                        },
+                        {
+                            "name": "Renal cell carcinoma",
+                            "id": 22
+                        },
+                        {
+                            "name": "Kidney cancer",
+                            "id": 23
+                        },
+                        {
+                            "name": "Ovarian cancer",
+                            "id": 24
+                        },
+                        {
+                            "name": "Bladder cancer",
+                            "id": 25
+                        },
+                        {
+                            "name": "Liver cancer",
+                            "id": 26
+                        },
+                        {
+                            "name": "Melanoma",
+                            "id": 27
+                        },
+                        {
+                            "name": "Bone metastasis",
+                            "id": 28
+                        },
+                        {
+                            "name": "SEGA tumors",
+                            "id": 29
+                        },
+                        {
+                            "name": "Neuroendocrine tumors",
+                            "id": 30
+                        },
+                        {
+                            "name": "Glioblastoma",
+                            "id": 31
+                        },
+                        {
+                            "name": "Other",
+                            "id": 139999
                         }
                     ]
                 },
                 {
                     "name": "Neuroscience",
-                    "id": 3,
+                    "id": 32,
                     "subcategories": [{
                             "name": "Schizophrenia",
-                            "id": 1
+                            "id": 33
                         },
                         {
                             "name": "Major Depressive Disorder (MDD)",
-                            "id": 2
+                            "id": 34
                         },
                         {
                             "name": "Alzheimer’s Disease",
-                            "id": 3
+                            "id": 35
                         },
                         {
                             "name": "Spinal muscular atrophy",
-                            "id": 4
+                            "id": 36
                         },
                         {
                             "name": "Huntington’s disease",
-                            "id": 5
+                            "id": 37
                         },
                         {
                             "name": "Autism or Autism Spectrum Disorder",
-                            "id": 6
+                            "id": 38
                         },
                         {
                             "name": "Parkinson’s disease",
-                            "id": 7
+                            "id": 39
                         },
                         {
                             "name": "Down syndrome",
-                            "id": 8
+                            "id": 40
                         },
                         {
                             "name": "Multiple sclerosis",
-                            "id": 9
+                            "id": 41
                         },
                         {
                             "name": "Other",
-                            "id": 10
+                            "id": 329999
                         }
                     ]
                 },
                 {
                     "name": "Infectious Diseases",
-                    "id": 4,
+                    "id": 42,
                     "subcategories": [{
                             "name": "HIV",
-                            "id": 1
+                            "id": 43
                         },
                         {
                             "name": "Tuberculosis (TB)",
-                            "id": 2
+                            "id": 44
                         },
                         {
                             "name": "Respiratory Syncytial Virus (RSV)",
-                            "id": 3
+                            "id": 45
                         },
                         {
                             "name": "Hepatitis B",
-                            "id": 4
+                            "id": 46
                         },
                         {
                             "name": "Global health crisis pathogens Ebola, Zika, Dengue, SARS-COV2",
-                            "id": 5
+                            "id": 47
                         },
                         {
                             "name": "Malaria",
-                            "id": 6
+                            "id": 48
                         },
                         {
                             "name": "Multi-drug Resistant Bacteria",
-                            "id": 7
+                            "id": 49
                         },
                         {
                             "name": "Influenza",
-                            "id": 8
+                            "id": 50
                         },
                         {
                             "name": "Cryptosporidiosis",
-                            "id": 9
+                            "id": 51
                         },
                         {
                             "name": "Kinetoplastid diseases",
-                            "id": 10
+                            "id": 52
                         },
                         {
                             "name": "Other",
-                            "id": 11
+                            "id": 429999
                         }
                     ]
                 },
                 {
                     "name": "Immunology and Inflammation",
-                    "id": 5,
+                    "id": 53,
                     "subcategories": [{
                             "name": "Rheumatoid arthritis",
-                            "id": 1
+                            "id": 54
                         },
                         {
                             "name": "Psoriatic arthritis",
-                            "id": 2
+                            "id": 55
                         },
                         {
                             "name": "Lupus",
-                            "id": 3
+                            "id": 56
                         },
                         {
                             "name": "Ulcerative colitis",
-                            "id": 4
+                            "id": 57
                         },
                         {
                             "name": "Crohn’s disease",
-                            "id": 5
+                            "id": 58
                         },
                         {
                             "name": "NAFLD, NASH, or cirrhosis",
-                            "id": 6
+                            "id": 59
                         },
                         {
                             "name": "Atopic dermatitis",
-                            "id": 7
+                            "id": 60
                         },
                         {
                             "name": "Psoriasis",
-                            "id": 8
+                            "id": 61
                         },
                         {
                             "name": "Vitiligo",
-                            "id": 9
+                            "id": 62
                         },
                         {
                             "name": "Alopecia areata",
-                            "id": 10
+                            "id": 63
                         },
                         {
                             "name": "Other",
-                            "id": 11
+                            "id": 539999
                         }
                     ]
                 },
                 {
                     "name": "Vaccines",
-                    "id": 6,
+                    "id": 64,
                     "subcategories": [{
                             "name": "Pneumococcal disease",
-                            "id": 1
+                            "id": 65
                         },
                         {
                             "name": "Meningococcal disease",
-                            "id": 2
+                            "id": 66
                         },
                         {
                             "name": "Influenza",
-                            "id": 3
+                            "id": 67
                         },
                         {
                             "name": "Coronavirus",
-                            "id": 4
+                            "id": 68
                         },
                         {
                             "name": "Dengue",
-                            "id": 5
+                            "id": 69
                         },
                         {
                             "name": "Cancer",
-                            "id": 6
+                            "id": 70
                         },
                         {
                             "name": "Group B streptococcus",
-                            "id": 7
+                            "id": 71
                         },
                         {
                             "name": "Other",
-                            "id": 8
+                            "id": 649999
                         }
                     ]
                 },
                 {
                     "name": "Ophthalmology",
-                    "id": 6,
+                    "id": 72,
                     "subcategories": [{
                             "name": "Retinal vein occlusion (RVO)",
-                            "id": 1
+                            "id": 73
                         },
                         {
                             "name": "Age-related macular degeneration (AMD)",
-                            "id": 2
+                            "id": 74
                         },
                         {
                             "name": "Diabetic eye disease",
-                            "id": 3
+                            "id": 75
                         },
                         {
                             "name": "Cataracts",
-                            "id": 4
+                            "id": 76
                         },
                         {
                             "name": "Conjunctivitis",
-                            "id": 5
+                            "id": 77
                         },
                         {
                             "name": "Dry Eye Disease",
-                            "id": 6
+                            "id": 78
                         },
                         {
                             "name": "Glaucoma",
-                            "id": 7
+                            "id": 79
                         },
                         {
                             "name": "Macular Edema",
-                            "id": 8
+                            "id": 80
                         },
                         {
                             "name": "Myopia",
-                            "id": 9
+                            "id": 81
                         },
                         {
                             "name": "Ocular disease",
-                            "id": 10
+                            "id": 82
                         },
                         {
                             "name": "Retinal Diseases",
-                            "id": 11
+                            "id": 83
                         },
                         {
                             "name": "Other",
-                            "id": 12
+                            "id": 729999
                         }
                     ]
-                },
-                {
-                    "name": "Other",
-                    "id": 7
                 }
             ]
         },
         {
             "name": "Medical Devices",
-            "id": 2,
+            "id": 84,
             "subcategories": [{
                     "name": "Surgery",
-                    "id": 1
+                    "id": 85
                 },
                 {
                     "name": "Vision Care",
-                    "id": 2
+                    "id": 86
                 },
                 {
                     "name": "Orthopedics",
-                    "id": 3
+                    "id": 87
                 },
                 {
                     "name": "Cardiovascular & Specialty Solutions",
-                    "id": 4
+                    "id": 88
                 },
                 {
                     "name": "Other",
-                    "id": 5
+                    "id": 849999
                 }
             ]
         },
         {
             "name": "Diagnostics/Biomarkers",
-            "id": 3,
+            "id": 89,
             "subcategories": []
         },
         {
             "name": "Lab/Research Tools",
-            "id": 4,
+            "id": 90,
             "subcategories": []
         },
         {
             "name": "Consumer Product",
-            "id": 5,
-            "subcategories": []
-        },
-        {
-            "name": "Consumer Product",
-            "id": 6,
+            "id": 91,
             "subcategories": [{
                     "name": "Skin Health",
-                    "id": 1
+                    "id": 92
                 },
                 {
                     "name": "Self Care",
-                    "id": 2
+                    "id": 93
                 },
                 {
                     "name": "Other",
-                    "id": 3
+                    "id": 919999
                 }
             ]
         },
         {
             "name": "Digital Health",
-            "id": 7,
+            "id": 94,
             "subcategories": []
         },
         {
             "name": "Agriculture",
-            "id": 8,
+            "id": 95,
             "subcategories": []
         },
         {
             "name": "Veterinary Medicine",
-            "id": 9,
+            "id": 96,
             "subcategories": []
         }
     ],
