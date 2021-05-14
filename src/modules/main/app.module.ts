@@ -17,15 +17,15 @@ import { FileModule } from 'modules/public/file';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
-          type: configService.get('DB_TYPE'),
-          host: configService.get('DB_HOST'),
-          port: configService.get('DB_PORT'),
-          username: configService.get('DB_USERNAME'),
-          password: configService.get('DB_PASSWORD'),
-          database: configService.get('DB_DATABASE'),
+          type: process.env.POSTGRESQLCONNSTR_DB_TYPE,
+          host: process.env.POSTGRESQLCONNSTR_DB_HOST,
+          port: process.env.POSTGRESQLCONNSTR_DB_PORT,
+          username: process.env.POSTGRESQLCONNSTR_DB_USERNAME,
+          password: process.env.POSTGRESQLCONNSTR_DB_PASSWORD,
+          database: process.env.POSTGRESQLCONNSTR_DB_DATABASE,
           entities: [__dirname + './../**/**.entity{.ts,.js}'],
-          synchronize: configService.get('DB_SYNC') === 'true',
-          ssl: configService.get('DB_SSL') === 'true'
+          synchronize: process.env.POSTGRESQLCONNSTR_DB_SYNC,
+          ssl :  process.env.POSTGRESQLCONNSTR_DB_SSL, 
         } as TypeOrmModuleAsyncOptions;
       },
     }),

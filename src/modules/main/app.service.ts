@@ -6,6 +6,6 @@ export class AppService {
   constructor(private config: ConfigService) {}
 
   root(): string {
-    return this.config.get('APP_URL');
+    return process.env.APPSETTING_APP_URL;
   }
 }
