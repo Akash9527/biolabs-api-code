@@ -114,8 +114,8 @@ export class MasterController {
    }
 
   /**
-   * Description: This method is used to list the company status.
-   * @description This method is used to list the company status.
+   * Description: This method is used to list the user type.
+   * @description This method is used to list the user type.
    */
   @Get('user-types')
   @ApiResponse({ status: 200, description: 'Successful Response' })
