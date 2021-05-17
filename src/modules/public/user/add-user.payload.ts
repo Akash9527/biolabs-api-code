@@ -21,6 +21,17 @@ export class AddUserPayload {
   @ApiProperty({
     required: true,
   })
+  @IsNumber()
+  companyId: number;
+
+  @ApiProperty({
+    required: true,
+  })
+  userType: string;
+
+  @ApiProperty({
+    required: true,
+  })
   site_id: number[];
 
   @ApiProperty({
