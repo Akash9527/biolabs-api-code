@@ -34,10 +34,9 @@ export class FileController {
   @ApiQuery({ name: 'userType', required: true, type: 'string'})
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async upload(@Query() payload:{userId:number, userType:string}, @UploadedFile() file: Express.Multer.File):Promise<string>{
+  async upload(@Query() payload:{userId:number, userType:string}, @UploadedFile() file: Express.Multer.File):Promise<object>{
     console.log("payload",payload);
-    await this.fileService.upload(file, payload);
-    return "uploaded";
+    return await this.fileService.upload(file, payload);
   }
 
   @Get('read-image')
