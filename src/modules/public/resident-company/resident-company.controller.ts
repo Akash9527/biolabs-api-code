@@ -5,8 +5,6 @@ import {
   Param,
   Post,
   Body,
-  Patch,
-  Delete,
   Query,
   Put,
   Req
@@ -38,7 +36,7 @@ export class ResidentCompanyController {
     type status_enum = '-1' | '0' | '1' | '99';
     const status: status_enum = "0";
     const pal = { ...payload, status: status };
-    const user = await this.residentCompanyService.addResidentCompany(pal, req);
+    const user = await this.residentCompanyService.addResidentCompany(pal);
     return user;
   }
 

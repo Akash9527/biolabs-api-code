@@ -5,7 +5,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { PasswordTransformer } from './password.transformer';
 
 type status_enum = '-1' | '0' | '1' | '99';
 
@@ -24,6 +23,12 @@ export class UserToken {
 
   @Column({ length: 255, enum:['-1','0','1','99'], default:'1' })
   status: status_enum;
+  
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt: number;
+
+  @UpdateDateColumn({ type: "timestamp" })
+  updatedAt: number;
 }
 
 export class UserTokenFillableFields {

@@ -24,6 +24,11 @@ export class Category {
   @Column({ length: 255, enum:['-1','0','1','99'] })
   status: status_enum;
 
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt: number;
+
+  @UpdateDateColumn({ type: "timestamp" })
+  updatedAt: number;
 }
 
 export class CategoryFillableFields {

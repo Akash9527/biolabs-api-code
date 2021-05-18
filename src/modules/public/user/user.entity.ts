@@ -62,11 +62,17 @@ export class User {
     nullable: true
   })
   password: string;
-
+  
   toJSON() {
-    const { password, ...self } = this;
+    const { ...self } = this;
     return self;
   }
+
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt: number;
+
+  @UpdateDateColumn({ type: "timestamp" })
+  updatedAt: number;
 }
 
 export class UserFillableFields {

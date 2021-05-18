@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileService } from './file.service';
 
-export const ApiFile = (fileName: string = 'myfile'): MethodDecorator => (
+export const ApiFile = (fileName = 'myfile'): MethodDecorator => (
   target: any,
   propertyKey: string,
   descriptor: PropertyDescriptor,

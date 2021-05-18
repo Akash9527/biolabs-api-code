@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsNumber, MinLength } from 'class-validator';
+import { IsEmail, IsNumber } from 'class-validator';
 import { Unique } from 'modules/common';
 import { SameAs } from 'modules/common/validator/same-as.validator';
 import { User } from 'modules/public/user';

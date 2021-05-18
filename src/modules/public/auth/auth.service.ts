@@ -56,7 +56,7 @@ export class AuthService {
    * @param user object of User
    * @return user object with token info
    */
-  async createToken(user: User) {
+  createToken(user: User) {
     let permissions = {};
     switch (user.role) {
       case 1:
