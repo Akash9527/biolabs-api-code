@@ -7,11 +7,11 @@ const qs = require('qs');
 dotenv.config();
 
 const {
-    MICROSOFT_EMAIL_APP_ID,
-    MICROSOFT_EMAIL_APP_SECERET,
-    MICROSOFT_EMAIL_ENDPOINT_TOKEN,
-    MICROSOFT_EMAIL_ENDPOINT_MAIL,
-    MICROSOFT_EMAIL_GRAPH_SCOPE,
+    APPSETTING_MICROSOFT_EMAIL_APP_ID,
+    APPSETTING_MICROSOFT_EMAIL_APP_SECERET,
+    APPSETTING_MICROSOFT_EMAIL_ENDPOINT_TOKEN,
+    APPSETTING_MICROSOFT_EMAIL_ENDPOINT_MAIL,
+    APPSETTING_MICROSOFT_EMAIL_GRAPH_SCOPE,
 } = process.env;
 
 export class Mail {
@@ -22,14 +22,14 @@ export class Mail {
      */
     async getGrapAPIToken() {
         var data = qs.stringify({
-            'client_id': MICROSOFT_EMAIL_APP_ID,
-            'scope': MICROSOFT_EMAIL_GRAPH_SCOPE,
-            'client_secret': MICROSOFT_EMAIL_APP_SECERET,
+            'client_id': process.env.APPSETTING_MICROSOFT_EMAIL_APP_ID,
+            'scope': process.env.APPSETTING_MICROSOFT_EMAIL_GRAPH_SCOPE,
+            'client_secret': process.env.APPSETTING_MICROSOFT_EMAIL_APP_SECERET,
             'grant_type': 'client_credentials'
         });
         var config = {
             method: 'post',
-            url: MICROSOFT_EMAIL_ENDPOINT_TOKEN,
+            url: process.env.APPSETTING_MICROSOFT_EMAIL_ENDPOINT_TOKEN,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Cookie': 'x-ms-gateway-slice=estsfd; stsservicecookie=estsfd; fpc=Atq01SXesc5AnxuS4qWIT5HOk_SAAQAAAF9QE9gOAAAA'
@@ -427,7 +427,7 @@ export class Mail {
        let authToken = token['token_type'] + " " + token['access_token'];
        axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
        axios.defaults.headers.post['Authorization'] = authToken;
-       axios.post(MICROSOFT_EMAIL_ENDPOINT_MAIL, data)
+       axios.post(process.env.APPSETTING_MICROSOFT_EMAIL_ENDPOINT_MAIL, data)
           .then(response => {
              console.log("Email has been Send", response.data);
           })

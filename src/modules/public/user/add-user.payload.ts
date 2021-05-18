@@ -35,6 +35,12 @@ export class AddUserPayload {
 
   @ApiProperty({
     required: false,
+    nullable: true
+  })
+  imageUrl: string;
+
+  @ApiProperty({
+    required: false,
     nullable:true
   })
   title: string;

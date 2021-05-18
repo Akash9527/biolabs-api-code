@@ -48,6 +48,9 @@ export class User {
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
   status: status_enum;
 
+  @Column({ length: 100, nullable: true })
+  imageUrl: string;
+
   @Column({
     name: 'password',
     length: 255,
@@ -78,4 +81,5 @@ export class UserFillableFields {
   title: string;
   phoneNumber: string;
   status: status_enum;
+  imageUrl: string;
 }

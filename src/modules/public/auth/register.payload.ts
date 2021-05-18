@@ -44,6 +44,12 @@ export class RegisterPayload {
   phoneNumber: string;
   
   @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  imageUrl: string;
+
+  @ApiProperty({
     required: true,
   })
   @IsNotEmpty()

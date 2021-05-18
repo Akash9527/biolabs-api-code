@@ -12,7 +12,7 @@ export class AppController {
      * @description This method will return the home page response.
      */
   @Get()
-  root():  any {
-    return process.env;
+  root(): any {
+    return "Hello from Biolabs";
   }
 }

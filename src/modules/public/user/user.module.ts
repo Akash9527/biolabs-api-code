@@ -20,11 +20,11 @@ import { UserToken } from './user-token.entity';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
         return {
-          secret: configService.get('JWT_SECRET_KEY'),
+          secret: process.env.APPSETTING_JWT_SECRET_KEY,
           signOptions: {
-            ...(configService.get('JWT_EXPIRATION_TIME')
+            ...(process.env.APPSETTING_JWT_EXPIRATION_TIME
               ? {
-                  expiresIn: Number(configService.get('JWT_EXPIRATION_TIME')),
+                  expiresIn: Number(process.env.APPSETTING_JWT_EXPIRATION_TIME),
                 }
               : {}),
           },
