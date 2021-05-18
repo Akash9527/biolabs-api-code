@@ -58,9 +58,9 @@ export class User {
     nullable: true
   })
   password: string;
-
+  
   toJSON() {
-    const { password, ...self } = this;
+    const { ...self } = this;
     return self;
   }
 

@@ -15,7 +15,7 @@ import { FileModule } from 'modules/public/file';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
+      useFactory: () => {
         return {
           type: process.env.POSTGRESQLCONNSTR_DB_TYPE,
           host: process.env.POSTGRESQLCONNSTR_DB_HOST,
@@ -25,7 +25,7 @@ import { FileModule } from 'modules/public/file';
           database: process.env.POSTGRESQLCONNSTR_DB_DATABASE,
           entities: [__dirname + './../**/**.entity{.ts,.js}'],
           synchronize: process.env.POSTGRESQLCONNSTR_DB_SYNC,
-          ssl :  process.env.POSTGRESQLCONNSTR_DB_SSL, 
+          ssl : (process.env.POSTGRESQLCONNSTR_DB_SSL == 'true'), 
         } as TypeOrmModuleAsyncOptions;
       },
     }),

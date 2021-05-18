@@ -16,7 +16,7 @@ import { MasterModule } from '../master';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
+      useFactory: () => {
         return {
           secret: process.env.APPSETTING_JWT_SECRET_KEY,
           signOptions: {
