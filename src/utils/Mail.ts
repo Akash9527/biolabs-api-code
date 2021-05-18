@@ -432,7 +432,7 @@ export class Mail {
              console.log("Email has been Send", response.data);
           })
           .catch(error => {
-             console.log("Error while Sending Graph API email");
+             console.log("Error while Sending Graph API email", error);
           });
 
     }

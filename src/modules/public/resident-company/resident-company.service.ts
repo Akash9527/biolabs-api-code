@@ -1,5 +1,4 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Like, Repository } from 'typeorm';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
@@ -17,7 +16,6 @@ import { BiolabsSource } from '../master/biolabs-source.entity';
 import { Modality } from '../master/modality.entity';
 import { TechnologyStage } from '../master/technology-stage.entity';
 
-import { Request } from 'express';
 import { ListResidentCompanyPayload } from './list-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 
@@ -140,7 +138,7 @@ export class ResidentCompanyService {
    * @param req object of Request.
    * @return resident companies object
    */
-  async addResidentCompany(payload: AddResidentCompanyPayload, req: Request) {
+  async addResidentCompany(payload: AddResidentCompanyPayload) {
     const rc = await this.getByEmail(payload.email);
 
     if (rc) {

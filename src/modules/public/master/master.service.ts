@@ -1,4 +1,4 @@
-import { Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { MasterPayload } from './master.payload';
@@ -446,7 +446,7 @@ export class MasterService {
     return await this.technologyStageRepository.save(this.technologyStageRepository.create(payload));
   }
 
-  async getCompanyStatus() {
+  getCompanyStatus() {
     return COMPANY_STATUS;
   }
 }

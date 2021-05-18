@@ -2,15 +2,12 @@ import {
   Controller,
   Body,
   Post,
-  UseGuards,
   Get,
   Put,
-  Patch,
   Param,
   Req,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService, LoginPayload, RegisterPayload } from '.';
 import { UsersService } from '../user';
 import { PasswordPayload } from './password.payload';

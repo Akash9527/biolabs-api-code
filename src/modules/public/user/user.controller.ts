@@ -5,7 +5,6 @@ import {
   Param,
   Post,
   Body,
-  Patch,
   Delete,
   Query,
   Put,
@@ -14,10 +13,8 @@ import {
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from '.';
-import { MasterPayload } from '../master/master.payload';
 import { AddUserPayload } from './add-user.payload';
 import { UpdateUserPayload } from './update-user.payload';
-import { DeleteUserPayload } from './delete-user.payload';
 import { ListUserPayload } from './list-user.payload';
 import { Request } from 'express';
 
