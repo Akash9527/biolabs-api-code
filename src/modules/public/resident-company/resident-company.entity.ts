@@ -4,7 +4,6 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
 // import { Site } from '../master/site.entity';
 // import { Category } from '../master/category.entity';
@@ -162,6 +161,12 @@ export class ResidentCompany {
 
   @Column({ length: 510, default: null, nullable: true })
   equipmentOnsite: string;
+  
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt: number;
+
+  @UpdateDateColumn({ type: "timestamp" })
+  updatedAt: number;
 }
 
 export class ResidentCompanyFillableFields {

@@ -60,6 +60,12 @@ export class User {
     const { password, ...self } = this;
     return self;
   }
+
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt: number;
+
+  @UpdateDateColumn({ type: "timestamp" })
+  updatedAt: number;
 }
 
 export class UserFillableFields {

@@ -38,6 +38,11 @@ export class ResidentCompanyAdvisory {
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
   status: status_enum;
 
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt: number;
+
+  @UpdateDateColumn({ type: "timestamp" })
+  updatedAt: number;
 }
 
 export class ResidentCompanyAdvisoryFillableFields {
