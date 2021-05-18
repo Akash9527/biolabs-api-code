@@ -23,7 +23,7 @@ export class MasterController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getSites(@Query() params: MasterPayload): Promise<any> {
-    return this.masterService.getSites(params);
+    return await this.masterService.getSites(params);
   }
 
   /**
