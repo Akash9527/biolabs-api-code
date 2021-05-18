@@ -451,7 +451,7 @@ export class MasterService {
     return COMPANY_STATUS;
   }
 
-  async getUserTypes() {
+  getUserTypes() {
     return USER_TYPE;
   }
 
