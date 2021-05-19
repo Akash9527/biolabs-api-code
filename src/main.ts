@@ -12,6 +12,6 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalPipes(new TrimStringsPipe(), new ValidationPipe());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
-  await app.listen(process.env.APPSETTING_PORT);
+  await app.listen(process.env.APPSETTING_PORT || 3000);
 }
 bootstrap();

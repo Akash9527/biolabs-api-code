@@ -26,8 +26,8 @@ export class FileService {
       try{
         const uploaded = await blobClient.uploadData(file.buffer);
         console.log("uploaded", uploaded);
-        const userResp = await this.userService.updateUserProfilePic({id: userId, imageUrl: fileName});
-        return uploaded;  
+        await this.userService.updateUserProfilePic({id: userId, imageUrl: fileName});
+        return { upload: uploaded, fileName: fileName };
       } catch (error) {
         throw new BadRequestException(
           error.message

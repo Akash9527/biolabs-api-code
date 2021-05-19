@@ -1,13 +1,9 @@
 import {
   Controller,
-  UseGuards,
   Get,
-  Request,
-  Param,
   Query
 } from '@nestjs/common';
-import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MasterService, MasterPayload } from '.';
 
 
@@ -110,6 +106,18 @@ export class MasterController {
    @ApiResponse({ status: 200, description: 'Successful Response' })
    @ApiResponse({ status: 401, description: 'Unauthorized' })
    async getCompanyStatus(): Promise<any> {
-     return this.masterService.getCompanyStatus();
+     return await this.masterService.getCompanyStatus();
    }
+
+  /**
+   * Description: This method is used to list the user type.
+   * @description This method is used to list the user type.
+   */
+  @Get('user-types')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getUserTypes(): Promise<any> {
+    return await this.masterService.getUserTypes();
+  }
+
 }

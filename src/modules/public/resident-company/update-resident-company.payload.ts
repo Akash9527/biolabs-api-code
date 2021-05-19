@@ -3,12 +3,19 @@ import { IsEmail, IsNotEmpty, IsNumber, IsOptional, Max, MaxLength, Min, MinLeng
 import { Unique } from 'modules/common';
 import { ResidentCompany } from './resident-company.entity';
 
-export class AddResidentCompanyPayload {
+type company_status = '0' | '1' | '2' | '3' | '4' | '5';
+
+export class UpdateResidentCompanyPayload {
+  @ApiProperty({
+    required: true,
+  })
+  @IsNumber()
+  id: number;
+  
   @ApiProperty({
     required: true,
   })
   @IsEmail()
-  @Unique([ResidentCompany])
   email: string;
 
   @ApiProperty({
@@ -178,27 +185,4 @@ export class AddResidentCompanyPayload {
     nullable: true
   })
   equipmentOnsite:string;
-  // @ApiProperty({
-  //   required: false,
-  //   nullable: true
-  // })
-  // advisoryMember:any[];
-
-  // @ApiProperty({
-  //   required: false,
-  //   nullable: true
-  // })
-  // managementMember:any[];
-
-  // @ApiProperty({
-  //   required: false,
-  //   nullable: true
-  // })
-  // technicalMember:any[];
-
-  // @ApiProperty({
-  //   required: false,
-  //   nullable: true
-  // })
-  // documents:any[];
 }

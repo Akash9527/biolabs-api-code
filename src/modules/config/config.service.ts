@@ -12,7 +12,7 @@ export class ConfigService {
     return this.envConfig[key];
   }
 
-  isEnv(env: string) {
+  isEnv() {
     return process.env.APPSETTING_APP_ENV;
   }
 }

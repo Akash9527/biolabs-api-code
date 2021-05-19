@@ -575,6 +575,21 @@
                             "id": 729999
                         }
                     ]
+                },
+                {
+                    "name": "Rare diseases",
+                    "id": 98,
+                    "subcategories": []
+                },
+                {
+                    "name": "Genetic diseases",
+                    "id": 99,
+                    "subcategories": []
+                },
+                {
+                    "name": "Other",
+                    "id": 19999,
+                    "subcategories": []
                 }
             ]
         },
@@ -643,6 +658,11 @@
         {
             "name": "Veterinary Medicine",
             "id": 96,
+            "subcategories": []
+        },
+        {
+            "name": "Advanced materials",
+            "id": 97,
             "subcategories": []
         }
     ],

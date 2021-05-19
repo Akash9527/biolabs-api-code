@@ -18,11 +18,13 @@ import { TechnologyStage } from '../master/technology-stage.entity';
 import { ResidentCompanyService } from './resident-company.service';
 import { ResidentCompanyController } from './resident-company.controller';
 import { PassportModule } from '@nestjs/passport';
+import { ResidentCompanyHistory } from './resident-company-history.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       ResidentCompany
+      , ResidentCompanyHistory
       , ResidentCompanyAdvisory
       , ResidentCompanyDocuments
       , ResidentCompanyManagement
@@ -34,7 +36,7 @@ import { PassportModule } from '@nestjs/passport';
     
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
+      useFactory: () => {
         return {
           secret: process.env.APPSETTING_JWT_SECRET_KEY,
           signOptions: {

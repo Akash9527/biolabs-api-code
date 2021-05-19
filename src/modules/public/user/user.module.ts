@@ -18,7 +18,7 @@ import { UserToken } from './user-token.entity';
     
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
+      useFactory: () => {
         return {
           secret: process.env.APPSETTING_JWT_SECRET_KEY,
           signOptions: {

@@ -6,14 +6,6 @@ const qs = require('qs');
 
 dotenv.config();
 
-const {
-    APPSETTING_MICROSOFT_EMAIL_APP_ID,
-    APPSETTING_MICROSOFT_EMAIL_APP_SECERET,
-    APPSETTING_MICROSOFT_EMAIL_ENDPOINT_TOKEN,
-    APPSETTING_MICROSOFT_EMAIL_ENDPOINT_MAIL,
-    APPSETTING_MICROSOFT_EMAIL_GRAPH_SCOPE,
-} = process.env;
-
 export class Mail {
 
     /**
@@ -432,7 +424,7 @@ export class Mail {
              console.log("Email has been Send", response.data);
           })
           .catch(error => {
-             console.log("Error while Sending Graph API email");
+             console.log("Error while Sending Graph API email", error);
           });
 
     }

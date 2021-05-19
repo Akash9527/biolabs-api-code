@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileService } from './file.service';
 
-export const ApiFile = (fileName: string = 'myfile'): MethodDecorator => (
+export const ApiFile = (fileName = 'myfile'): MethodDecorator => (
   target: any,
   propertyKey: string,
   descriptor: PropertyDescriptor,
@@ -34,10 +34,9 @@ export class FileController {
   @ApiQuery({ name: 'userType', required: true, type: 'string'})
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async upload(@Query() payload:{userId:number, userType:string}, @UploadedFile() file: Express.Multer.File):Promise<string>{
+  async upload(@Query() payload:{userId:number, userType:string}, @UploadedFile() file: Express.Multer.File):Promise<object>{
     console.log("payload",payload);
-    await this.fileService.upload(file, payload);
-    return "uploaded";
+    return await this.fileService.upload(file, payload);
   }
 
   @Get('read-image')

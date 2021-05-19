@@ -1,4 +1,4 @@
-import { Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { MasterPayload } from './master.payload';
@@ -9,7 +9,8 @@ import { Modality } from './modality.entity';
 import { Role } from './role.entity';
 import { Site } from './site.entity';
 import { TechnologyStage } from './technology-stage.entity';
-import { COMPANY_STATUS } from 'constants/company-status';
+import { COMPANY_STATUS } from '../../../constants/company-status';
+import { USER_TYPE } from '../../../constants/user-type';
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
 type status_enum = '-1' | '0' | '1' | '99';
@@ -446,7 +447,12 @@ export class MasterService {
     return await this.technologyStageRepository.save(this.technologyStageRepository.create(payload));
   }
 
-  async getCompanyStatus() {
+  getCompanyStatus() {
     return COMPANY_STATUS;
   }
+
+  getUserTypes() {
+    return USER_TYPE;
+  }
+
 }

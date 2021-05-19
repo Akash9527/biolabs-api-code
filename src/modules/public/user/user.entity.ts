@@ -16,6 +16,7 @@ import { PasswordTransformer } from './password.transformer';
  * 99 = Soft delete (Deleted by admin)
  */
 type status_enum = '-1' | '0' | '1' | '99';
+type user_type = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
 
 @Entity({
   name: 'users',
@@ -51,6 +52,9 @@ export class User {
   @Column({ length: 100, nullable: true })
   imageUrl: string;
 
+  @Column({ length: 255, enum: ['0', '1', '2', '3', '4', '5', '6', '7'], default: '0' })
+  userType: user_type;
+
   @Column({
     name: 'password',
     length: 255,
@@ -58,11 +62,17 @@ export class User {
     nullable: true
   })
   password: string;
-
+  
   toJSON() {
-    const { password, ...self } = this;
+    const { ...self } = this;
     return self;
   }
+
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt: number;
+
+  @UpdateDateColumn({ type: "timestamp" })
+  updatedAt: number;
 }
 
 export class UserFillableFields {
