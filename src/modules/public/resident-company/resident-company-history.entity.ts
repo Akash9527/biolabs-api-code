@@ -24,11 +24,14 @@ type status_enum = '-1' | '0' | '1' | '99';
 type company_status = '0' | '1' | '2' | '3' | '4' | '5';
 
 @Entity({
-  name: 'resident_companies',
+  name: 'resident_company_history',
 })
-export class ResidentCompany {
+export class ResidentCompanyHistory {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column("int", { default: null, nullable: true })
+  comnpanyId: number;
 
   @Column({ length: 510, nullable: true })
   email: string;
@@ -105,7 +108,7 @@ export class ResidentCompany {
   @Column("int", { array: true })
   industry: string[];
   
-  @Column("json", {default: null})
+  @Column("json",{default: null})
   otherIndustries: any;
 
   @Column("int", { array: true })
@@ -181,7 +184,7 @@ export class ResidentCompany {
   updatedAt: number;
 }
 
-export class ResidentCompanyFillableFields {
+export class ResidentCompanyHistoryFillableFields {
   email: string;
   name: string;
   companyName: string;

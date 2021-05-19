@@ -18,11 +18,13 @@ import { TechnologyStage } from '../master/technology-stage.entity';
 import { ResidentCompanyService } from './resident-company.service';
 import { ResidentCompanyController } from './resident-company.controller';
 import { PassportModule } from '@nestjs/passport';
+import { ResidentCompanyHistory } from './resident-company-history.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       ResidentCompany
+      , ResidentCompanyHistory
       , ResidentCompanyAdvisory
       , ResidentCompanyDocuments
       , ResidentCompanyManagement
