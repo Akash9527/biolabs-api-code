@@ -15,6 +15,7 @@ import { ResidentCompanyService } from '.';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
 import { Request } from 'express';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
+import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
 
 @Controller('api/resident-company')
 @ApiTags('Resident Company')
@@ -81,4 +82,18 @@ export class ResidentCompanyController {
   async updateResidentCompanyStatus(@Body() payload: UpdateResidentCompanyStatusPayload): Promise<any> {
     return this.residentCompanyService.updateResidentCompanyStatus(payload);
   }
+  
+  /**
+   * Description: This method is used to upadte a resident company status.
+   * @description This method is used to update a resident company status.
+   * @param payload it is a request body contains payload of type UpdateResidentCompanyStatusPayload.
+   */
+   @ApiBearerAuth()
+   @UseGuards(AuthGuard())
+   @Put()
+   @ApiResponse({ status: 200, description: 'Successful Response' })
+   @ApiResponse({ status: 401, description: 'Unauthorized' })
+   async updateResidentCompany(@Body() payload: UpdateResidentCompanyPayload): Promise<any> {
+     return this.residentCompanyService.updateResidentCompany(payload);
+   }
 }

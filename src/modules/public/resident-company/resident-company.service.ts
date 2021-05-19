@@ -1,6 +1,6 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Like, Repository } from 'typeorm';
+import { In, Like, Not, Repository } from 'typeorm';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
 
 import { ResidentCompany } from './resident-company.entity';
@@ -18,12 +18,16 @@ import { TechnologyStage } from '../master/technology-stage.entity';
 
 import { ListResidentCompanyPayload } from './list-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
+import { ResidentCompanyHistory } from './resident-company-history.entity';
+import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
 
 @Injectable()
 export class ResidentCompanyService {
   constructor(
     @InjectRepository(ResidentCompany)
     private readonly residentCompanyRepository: Repository<ResidentCompany>,
+    @InjectRepository(ResidentCompanyHistory)
+    private readonly residentCompanyHistoryRepository: Repository<ResidentCompanyHistory>,
     @InjectRepository(ResidentCompanyAdvisory)
     private readonly residentCompanyAdvisoryRepository: Repository<ResidentCompanyAdvisory>,
     @InjectRepository(ResidentCompanyDocuments)
@@ -148,6 +152,12 @@ export class ResidentCompanyService {
     }
     const newRc = await this.residentCompanyRepository.create(payload);
     const savedRc = await this.residentCompanyRepository.save(newRc);
+    if(savedRc.id){
+      const historyData:any = JSON.parse(JSON.stringify(savedRc));
+      historyData.companyId = historyData.id;
+      delete historyData.id;
+      await this.residentCompanyHistoryRepository.save(historyData);
+    }
     return savedRc;
   }
 
@@ -231,7 +241,7 @@ export class ResidentCompanyService {
   async getRcFundings(ids) {
     return await this.fundingRepository.findOne({
       select: ["id", "name"],
-      where: { id: ids },
+      where: { id: In(ids) },
     });
   }
 
@@ -320,6 +330,39 @@ export class ResidentCompanyService {
         residentCompany.companyVisibility= false;
       this.residentCompanyRepository.update(residentCompany.id, residentCompany);
       return residentCompany;
+    } else {
+      throw new NotAcceptableException(
+        'Company with provided id not available.',
+      );
+    }
+  }
+  
+  /**
+   * Description: This method will update the resident company info.
+   * @description This method will update the resident company info.
+   * @param payload object of type UpdateResidentCompanyPayload
+   * @return resident company object
+   */
+   async updateResidentCompany(payload: UpdateResidentCompanyPayload) {
+    const residentCompany: any = await this.residentCompanyRepository.findOne({
+      where: { id: payload.id }
+    });
+    const residentCompanyEmailChk: any = await this.residentCompanyRepository.findOne({
+      where: { id: Not(payload.id), email: payload.email }
+    });
+    if(residentCompanyEmailChk){
+      throw new NotAcceptableException(
+        'User with provided email already existed.',
+      );
+    }
+    if (residentCompany) {
+      
+      this.residentCompanyRepository.update(residentCompany.id, this.residentCompanyRepository.create(payload));
+      const historyData:any = JSON.parse(JSON.stringify(payload));
+      historyData.companyId = historyData.id;
+      delete historyData.id;
+      await this.residentCompanyHistoryRepository.save(historyData);
+      return await this.getResidentCompany(residentCompany.id);
     } else {
       throw new NotAcceptableException(
         'Company with provided id not available.',
