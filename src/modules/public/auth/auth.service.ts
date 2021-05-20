@@ -9,6 +9,7 @@ import { User, UsersService } from '../user';
 import { LoginPayload } from './login.payload';
 import { MasterService } from '../master';
 import { RESIDENT_ACCESSLEVELS } from 'constants/privileges-resident';
+import { ResidentCompanyService } from '../resident-company/resident-company.service';
 
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
@@ -19,7 +20,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly userService: UsersService,
-    private readonly masterService: MasterService
+    private readonly masterService: MasterService,
+    private readonly residentCompanyService: ResidentCompanyService,
   ) { }
 
   /**
@@ -90,9 +92,14 @@ export class AuthService {
    * @return user object
    */
   async validateUser(payload: LoginPayload): Promise<any> {
-    const user = await this.userService.getByEmail(payload.email);
+    const user:any = await this.userService.getByEmail(payload.email);
     if (!user || user.status != '1' || user.password == null || !Hash.compare(payload.password, user.password)) {
       throw new UnauthorizedException('Invalid credentials!');
+    }
+    if(user.companyId){
+      const company = await this.residentCompanyService.getResidentCompany(user.companyId);
+      if(company)
+        user.company = company;
     }
     return user;
   }
