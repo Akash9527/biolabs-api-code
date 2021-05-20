@@ -103,6 +103,23 @@ export class ResidentCompanyService {
   }
 
   /**
+   * Description: This method will create the new resident companies advisors.
+   * @description This method will create the new resident companies advisors.
+   * @param companyMember array of companyMember.
+   * @param id number of Company id.
+   */
+  async residentCompanyAdvisors(companyMembers: [], id: number) {
+    if (companyMembers.length > 0) {
+      for (let i = 0; i < companyMembers.length; i++) {
+        let companyMember: any = companyMembers[i];
+        companyMember.companyId = id;
+        const savedRcManagement = await this.addResidentCompanyAdvisor(companyMember);
+        return savedRcManagement;
+      }
+    }
+  }
+
+  /**
    * Description: This method will create the new resident companies document.
    * @description This method will create the new resident companies document.
    * @param payload object of ResidentCompanyDocumentsFillableFields.
@@ -125,6 +142,23 @@ export class ResidentCompanyService {
   }
 
   /**
+   * Description: This method will create the new resident companies managements.
+   * @description This method will create the new resident companies managements.
+   * @param companyMember array of companyMember.
+   * @param id number of Company id.
+   */
+  async residentCompanyManagements(companyMembers: [], id: number) {
+    if (companyMembers.length > 0) {
+      for (let i = 0; i < companyMembers.length; i++) {
+        let companyMember: any = companyMembers[i];
+        companyMember.companyId = id;
+        const savedRcManagement = await this.addResidentCompanyManagement(companyMember);
+        return savedRcManagement;
+      }
+    }
+  }
+
+  /**
    * Description: This method will create the new resident companies technical.
    * @description This method will create the new resident companies technical.
    * @param payload object of ResidentCompanyTechnicalFillableFields.
@@ -133,6 +167,23 @@ export class ResidentCompanyService {
   async addResidentCompanyTechnical(payload: ResidentCompanyTechnicalFillableFields) {
     const savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
     return savedRcTechnical;
+  }
+
+  /**
+   * Description: This method will create the new resident companies technicals.
+   * @description This method will create the new resident companies technicals.
+   * @param companyMember array of companyMember.
+   * @param id number of Company id.
+   */
+   async residentCompanyTechnicals(companyMembers: [], id: number) {
+    if (companyMembers.length > 0) {
+      for (let i = 0; i < companyMembers.length; i++) {
+        let companyMember: any = companyMembers[i];
+        companyMember.companyId = id;
+        const savedRcManagement = await this.addResidentCompanyTechnical(companyMember);
+        return savedRcManagement;
+      }
+    }
   }
 
   /**
@@ -152,8 +203,8 @@ export class ResidentCompanyService {
     }
     const newRc = await this.residentCompanyRepository.create(payload);
     const savedRc = await this.residentCompanyRepository.save(newRc);
-    if(savedRc.id){
-      const historyData:any = JSON.parse(JSON.stringify(savedRc));
+    if (savedRc.id) {
+      const historyData: any = JSON.parse(JSON.stringify(savedRc));
       historyData.companyId = historyData.id;
       delete historyData.id;
       await this.residentCompanyHistoryRepository.save(historyData);
@@ -200,7 +251,7 @@ export class ResidentCompanyService {
     }
     return await this.residentCompanyRepository.find({
       where: search,
-      order:{id:"DESC"},
+      order: { id: "DESC" },
       skip,
       take
     });
@@ -326,8 +377,8 @@ export class ResidentCompanyService {
       residentCompany.companyStatus = payload.companyStatus;
       residentCompany.companyVisibility = payload.companyVisibility;
       residentCompany.companyOnboardingStatus = payload.companyOnboardingStatus;
-      if(Number(residentCompany.companyStatus) !== 1) 
-        residentCompany.companyVisibility= false;
+      if (Number(residentCompany.companyStatus) !== 1)
+        residentCompany.companyVisibility = false;
       this.residentCompanyRepository.update(residentCompany.id, residentCompany);
       return residentCompany;
     } else {
@@ -336,34 +387,44 @@ export class ResidentCompanyService {
       );
     }
   }
-  
+
   /**
    * Description: This method will update the resident company info.
    * @description This method will update the resident company info.
    * @param payload object of type UpdateResidentCompanyPayload
    * @return resident company object
    */
-   async updateResidentCompany(payload: UpdateResidentCompanyPayload) {
+  async updateResidentCompany(payload: UpdateResidentCompanyPayload) {
     const residentCompany: any = await this.residentCompanyRepository.findOne({
       where: { id: payload.id }
     });
-    const companyMembers = JSON.parse(JSON.stringify(payload.companyMembers));
-    const companyAdvisors = JSON.parse(JSON.stringify(payload.companyAdvisors));
-    const companyTechnicalTeams = JSON.parse(JSON.stringify(payload.companyTechnicalTeams));
+
     const residentCompanyEmailChk: any = await this.residentCompanyRepository.findOne({
       where: { id: Not(payload.id), email: payload.email }
     });
-    if(residentCompanyEmailChk){
+    if (residentCompanyEmailChk) {
       throw new NotAcceptableException(
         'User with provided email already existed.',
       );
     }
     if (residentCompany) {
-      
-      this.residentCompanyRepository.update(residentCompany.id, this.residentCompanyRepository.create(payload));
-      const historyData:any = JSON.parse(JSON.stringify(payload));
+      const companyMembers: any = JSON.parse(JSON.stringify(payload.companyMembers));
+      const companyAdvisors: any = JSON.parse(JSON.stringify(payload.companyAdvisors));
+      const companyTechnicalTeams: any = JSON.parse(JSON.stringify(payload.companyTechnicalTeams));
+
+      delete payload.companyMembers;
+      delete payload.companyAdvisors;
+      delete payload.companyTechnicalTeams;
+
+      await this.residentCompanyRepository.update(residentCompany.id, this.residentCompanyRepository.create(payload));
+      await this.residentCompanyManagements(companyMembers, residentCompany.id);
+      await this.residentCompanyAdvisors(companyAdvisors, residentCompany.id);
+      await this.residentCompanyTechnicals(companyTechnicalTeams, residentCompany.id);
+
+      const historyData: any = JSON.parse(JSON.stringify(payload));
       historyData.companyId = historyData.id;
       delete historyData.id;
+
       await this.residentCompanyHistoryRepository.save(historyData);
       return await this.getResidentCompany(residentCompany.id);
     } else {

@@ -24,7 +24,7 @@ export class ResidentCompanyTechnical {
   id: number;
 
   @Column({})
-  company_id: number;
+  companyId: number;
 
   @Column({ length: 255 })
   name: string;
@@ -67,7 +67,7 @@ export class ResidentCompanyTechnical {
 }
 
 export class ResidentCompanyTechnicalFillableFields {
-  company_id: number;
+  companyId: number;
   name: string;
   title: string;
   email: string;
