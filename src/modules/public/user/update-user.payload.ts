@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { SameAs } from 'modules/common/validator/same-as.validator';
-import { IsEmail, IsNumber, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
 type user_type = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
 

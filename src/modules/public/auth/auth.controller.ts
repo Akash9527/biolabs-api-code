@@ -8,7 +8,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthService, LoginPayload, RegisterPayload } from '.';
+import { AuthService, LoginPayload } from '.';
 import { UsersService } from '../user';
 import { PasswordPayload } from './password.payload';
 import { ForgotPasswordPayload } from './forgot-password.payload';
