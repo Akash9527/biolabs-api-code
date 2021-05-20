@@ -106,6 +106,7 @@ export class UsersService {
       user.title = payload.title;
       user.phoneNumber = payload.phoneNumber;
       user.companyId = payload.companyId;
+      user.userType = payload.userType;
       if (payload.password && (payload.password !== "" && payload.password != null)) {
         user.password = payload.password;
       } else {
