@@ -37,23 +37,6 @@ export class AuthController {
   }
 
   /**
-   * Description: This method is used to register a user.
-   * @description This method is used to register a user.
-   * @param payload it is a request body expects the payload of type RegisterPayload.
-   */
-  @Post('register')
-  @ApiResponse({ status: 201, description: 'Successful Registration' })
-  @ApiResponse({ status: 400, description: 'Bad Request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async register(@Body() payload: RegisterPayload): Promise<any> {
-    type status_enum = '-1' | '0' | '1' | '99';
-    const status: status_enum = "1";
-    const pal = { ...payload, status: status };
-    const user = await this.userService.create(pal);
-    return await this.authService.createToken(user);
-  }
-
-  /**
    * Description: This method is used to set new password for a user.
    * @description This method is used to set new password for a user.
    * @param payload it is a request body expects the payload of type PasswordPayload.
