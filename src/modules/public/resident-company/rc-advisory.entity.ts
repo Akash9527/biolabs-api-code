@@ -24,10 +24,10 @@ export class ResidentCompanyAdvisory {
   id: number;
 
   @Column({})
-  company_id: number;
+  companyId: number;
 
   @Column({ length: 255 })
-  full_name: string;
+  name: string;
 
   @Column({ length: 255 })
   title: string;
@@ -46,8 +46,8 @@ export class ResidentCompanyAdvisory {
 }
 
 export class ResidentCompanyAdvisoryFillableFields {
-  company_id: number;
-  full_name: string;
+  companyId: number;
+  name: string;
   title: string;
   organization: string;
   status: status_enum;

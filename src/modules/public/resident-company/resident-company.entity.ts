@@ -138,11 +138,14 @@ export class ResidentCompany {
   @Column({ default: null })
   logoOnLicensedSpace: boolean;
 
-  @Column({ default: null })
-  bioLabsAssistanceNeeded: boolean;
+  @Column({ length: 500, default: null })
+  bioLabsAssistanceNeeded: string;
 
   @Column({ default: null })
   technologyPapersPublished: boolean;
+
+  @Column({ length: 100, default: null })
+  technologyPapersPublishedLink:string;
 
   @Column({ default: null })
   patentsFiledGranted: boolean;
@@ -173,6 +176,9 @@ export class ResidentCompany {
 
   @Column({ length: 510, default: null, nullable: true })
   equipmentOnsite: string;
+
+  @Column({ length: 510, default: null, nullable: true })
+  website: string;
   
   @CreateDateColumn({ type: "timestamp" })
   createdAt: number;
@@ -191,7 +197,8 @@ export class ResidentCompanyFillableFields {
   technology: string;
   rAndDPath: string;
   startDate: number;
-  foundedDate: number;
+  companySize: number;
+  foundedPlace: string;
   companyStage: number;
   otherCompanyStage: string;
   funding: string;
@@ -217,8 +224,9 @@ export class ResidentCompanyFillableFields {
   elevatorPitch: string;
   logoOnWall: boolean;
   logoOnLicensedSpace: boolean;
-  bioLabsAssistanceNeeded: boolean;
+  bioLabsAssistanceNeeded: string;
   technologyPapersPublished: boolean;
+  technologyPapersPublishedLink: string;
   patentsFiledGranted: boolean;
   patentsFiledGrantedDetails: string;
   foundersBusinessIndustryBefore: boolean;
@@ -229,5 +237,5 @@ export class ResidentCompanyFillableFields {
   newsletters: boolean;
   shareYourProfile: boolean;
   equipmentOnsite: string;
-  companySize: number;
+  website: string;
 }
