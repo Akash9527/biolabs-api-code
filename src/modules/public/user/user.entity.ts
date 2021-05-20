@@ -31,6 +31,9 @@ export class User {
   @Column("int", { array: true, nullable: true })
   site_id: number[];
 
+  @Column("int", { nullable: true })
+  companyId: number;
+
   @Column({ length: 255 })
   email: string;
 
@@ -62,7 +65,7 @@ export class User {
     nullable: true
   })
   password: string;
-  
+
   toJSON() {
     const { ...self } = this;
     return self;
@@ -80,10 +83,12 @@ export class UserFillableFields {
   password: string;
   role: number;
   site_id: number[];
+  companyId: number;
   firstName: string;
   lastName: string;
   title: string;
   phoneNumber: string;
   status: status_enum;
+  userType: user_type;
   imageUrl: string;
 }
