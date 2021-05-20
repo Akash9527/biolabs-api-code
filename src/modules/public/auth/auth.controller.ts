@@ -8,7 +8,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthService, LoginPayload, RegisterPayload } from '.';
+import { AuthService, LoginPayload } from '.';
 import { UsersService } from '../user';
 import { PasswordPayload } from './password.payload';
 import { ForgotPasswordPayload } from './forgot-password.payload';
@@ -33,23 +33,6 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async login(@Body() payload: LoginPayload): Promise<any> {
     const user = await this.authService.validateUser(payload);
-    return await this.authService.createToken(user);
-  }
-
-  /**
-   * Description: This method is used to register a user.
-   * @description This method is used to register a user.
-   * @param payload it is a request body expects the payload of type RegisterPayload.
-   */
-  @Post('register')
-  @ApiResponse({ status: 201, description: 'Successful Registration' })
-  @ApiResponse({ status: 400, description: 'Bad Request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async register(@Body() payload: RegisterPayload): Promise<any> {
-    type status_enum = '-1' | '0' | '1' | '99';
-    const status: status_enum = "1";
-    const pal = { ...payload, status: status };
-    const user = await this.userService.create(pal);
     return await this.authService.createToken(user);
   }
 

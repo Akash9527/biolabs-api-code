@@ -1,3 +1,4 @@
+import { ResidentCompanyModule } from './../resident-company/resident-company.module';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,6 +15,7 @@ import { UserToken } from './user-token.entity';
   imports: [
     TypeOrmModule.forFeature([User, UserToken]),
     ConfigModule,
+    ResidentCompanyModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     
     JwtModule.registerAsync({

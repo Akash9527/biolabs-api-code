@@ -9,11 +9,13 @@ import { UserToken } from './user-token.entity';
 import { Mail } from '../../../utils/Mail';
 import { EMAIL } from '../../../constants/email';
 import { Request } from 'express';
+import { ResidentCompanyService } from '../resident-company/resident-company.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly jwtService: JwtService,
+    private readonly residentCompanyService: ResidentCompanyService,
     private readonly mail: Mail,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -105,6 +107,8 @@ export class UsersService {
       user.lastName = payload.lastName;
       user.title = payload.title;
       user.phoneNumber = payload.phoneNumber;
+      user.companyId = payload.companyId;
+      user.userType = payload.userType;
       if (payload.password && (payload.password !== "" && payload.password != null)) {
         user.password = payload.password;
       } else {
@@ -202,8 +206,13 @@ export class UsersService {
    * @return user object
    */
   async getUserById(id) {
-    const user = await this.get(id);
+    const user:any = await this.get(id);
     if (user) {
+      if(user.companyId){
+        const company = await this.residentCompanyService.getResidentCompany(user.companyId);
+        if(company)
+          user.company = company;
+      }
       return user;
     } else {
       throw new NotAcceptableException(

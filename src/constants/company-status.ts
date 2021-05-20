@@ -1,7 +1,7 @@
-export const COMPANY_STATUS = {
-    0: "Applied",
-    1: "Accepted",
-    2: "On Hold",
-    3: "Rejected",
-    4: "Graduated"
-}
+export const COMPANY_STATUS = [
+    { id: 0, name: "Applied" },
+    { id: 1, name: "Accepted" },
+    { id: 2, name: "On Hold" },
+    { id: 3, name: "Rejected" },
+    { id: 4, name: "Graduated" },
+];

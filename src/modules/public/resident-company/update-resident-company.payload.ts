@@ -70,6 +70,11 @@ export class UpdateResidentCompanyPayload {
     required: false,
     nullable: true
   })
+  companySize: number;
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
   foundedPlace: string;
 
   @ApiProperty({
@@ -185,4 +190,118 @@ export class UpdateResidentCompanyPayload {
     nullable: true
   })
   equipmentOnsite:string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  elevatorPitch: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  logoOnWall: boolean;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  logoOnLicensedSpace: boolean;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  bioLabsAssistanceNeeded: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  technologyPapersPublished: boolean;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  technologyPapersPublishedLink:string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  patentsFiledGranted: boolean;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  patentsFiledGrantedDetails: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  foundersBusinessIndustryBefore: boolean;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  academiaPartnerships: boolean;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  academiaPartnershipDetails: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  industryPartnerships: boolean;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  industryPartnershipsDetails: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  newsletters: boolean;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  shareYourProfile: boolean;
+  
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  website: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  companyMembers: [];
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  companyAdvisors: [];
+
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  companyTechnicalTeams: [];
 }
