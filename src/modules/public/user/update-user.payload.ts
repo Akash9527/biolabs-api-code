@@ -1,7 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { SameAs } from 'modules/common/validator/same-as.validator';
 
+type user_type = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
+
 export class UpdateUserPayload {
+
+  @ApiProperty({
+    required: true,
+  })
+  userType: user_type;
 
   @ApiProperty({
     required: true,

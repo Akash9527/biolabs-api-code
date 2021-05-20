@@ -1,10 +1,10 @@
-export const USER_TYPE = {
-    0: "Employee",
-    1: "Scientist",
-    2: "Lab Technician",
-    3: "Academic Advisor",
-    4: "Investor",
-    5: "Executive",
-    6: "Sponsor",
-    7: "Founder"
-}
+export const USER_TYPE = [
+    { id: 0, name: "Employee" },
+    { id: 1, name: "Scientist" },
+    { id: 2, name: "Lab Technician" },
+    { id: 3, name: "Academic Advisor" },
+    { id: 4, name: "Investor" },
+    { id: 5, name: "Executive" },
+    { id: 6, name: "EmploySponsoree" },
+    { id: 7, name: "Founder" }
+];
