@@ -336,6 +336,42 @@ export class ResidentCompanyService {
   }
 
   /**
+   * Description: This method will return the management members list.
+   * @description This method will return the management members list.
+   * @param ids number[]
+   * @return array of biolabs sources object
+   */
+   async getRcMembers(id) {
+    return await this.residentCompanyManagementRepository.findOne({
+      where: { companyId: id },
+    });
+  }
+
+  /**
+   * Description: This method will return the advisors members list.
+   * @description This method will return the advisors members list.
+   * @param ids number[]
+   * @return array of biolabs sources object
+   */
+   async getRcAdvisors(id) {
+    return await this.residentCompanyAdvisoryRepository.findOne({
+      where: { companyId: id },
+    });
+  }
+
+  /**
+   * Description: This method will return the technical teams members list.
+   * @description This method will return the technical teams members list.
+   * @param ids number[]
+   * @return array of biolabs sources object
+   */
+   async getRcTechnicalTeams(id) {
+    return await this.residentCompanyTechnicalRepository.findOne({
+      where: { companyId: id },
+    });
+  }
+
+  /**
    * Description: This method will get the resident company.
    * @description This method will get the resident company.
    * @param id number resident company id
@@ -352,9 +388,9 @@ export class ResidentCompanyService {
       residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);
       residentCompany.companyStages = await this.getRcTechnologyStages(residentCompany.companyStage);
       residentCompany.biolabsSources = await this.getRcBiolabsSources(residentCompany.biolabsSources);
-      residentCompany.companyMembers = [];
-      residentCompany.companyAdvisors = [];
-      residentCompany.companyTechnicalTeams = [];
+      residentCompany.companyMembers = await this.getRcMembers(residentCompany.id);
+      residentCompany.companyAdvisors = await this.getRcAdvisors(residentCompany.id);
+      residentCompany.companyTechnicalTeams = await this.getRcTechnicalTeams(residentCompany.id);
       return residentCompany;
     } else {
       throw new NotAcceptableException(
