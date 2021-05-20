@@ -175,7 +175,7 @@ export class ResidentCompanyService {
    * @param companyMember array of companyMember.
    * @param id number of Company id.
    */
-   async residentCompanyTechnicals(companyMembers: [], id: number) {
+  async residentCompanyTechnicals(companyMembers: [], id: number) {
     if (companyMembers.length > 0) {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
@@ -264,10 +264,13 @@ export class ResidentCompanyService {
    * @return array of sites object
    */
   async getRcSites(ids) {
-    return await this.siteRepository.find({
-      select: ["id", "name"],
-      where: { id: In(ids) },
-    });
+    if (ids && ids.length > 0) {
+      return await this.siteRepository.find({
+        select: ["id", "name"],
+        where: { id: In(ids) },
+      });
+    }
+    return [];
   }
 
   /**
@@ -277,10 +280,13 @@ export class ResidentCompanyService {
    * @return array of categories object
    */
   async getRcCategories(ids) {
-    return await this.categoryRepository.find({
-      select: ["id", "name"],
-      where: { id: In(ids) },
-    });
+    if (ids && ids.length > 0) {
+      return await this.categoryRepository.find({
+        select: ["id", "name"],
+        where: { id: In(ids) },
+      });
+    }
+    return [];
   }
 
   /**
@@ -290,10 +296,13 @@ export class ResidentCompanyService {
    * @return array of fundings object
    */
   async getRcFundings(ids) {
-    return await this.fundingRepository.findOne({
-      select: ["id", "name"],
-      where: { id: In(ids) },
-    });
+    if (ids && ids.length > 0) {
+      return await this.fundingRepository.findOne({
+        select: ["id", "name"],
+        where: { id: In(ids) },
+      });
+    }
+    return [];
   }
 
   /**
@@ -303,10 +312,13 @@ export class ResidentCompanyService {
    * @return array of technology stages object
    */
   async getRcTechnologyStages(ids) {
-    return await this.technologyStageRepository.findOne({
-      select: ["id", "name"],
-      where: { id: ids },
-    });
+    if (ids) {
+      return await this.technologyStageRepository.findOne({
+        select: ["id", "name"],
+        where: { id: ids },
+      });
+    }
+    return {};
   }
 
   /**
@@ -316,10 +328,13 @@ export class ResidentCompanyService {
    * @return array of biolabs sources object
    */
   async getRcBiolabsSources(ids) {
-    return await this.biolabsSourceRepository.findOne({
-      select: ["id", "name"],
-      where: { id: ids },
-    });
+    if (ids) {
+      return await this.biolabsSourceRepository.findOne({
+        select: ["id", "name"],
+        where: { id: ids },
+      });
+    }
+    return {};
   }
 
   /**
@@ -329,10 +344,13 @@ export class ResidentCompanyService {
    * @return array of modalities object
    */
   async getRcModalities(ids) {
-    return await this.modalityRepository.find({
-      select: ["id", "name"],
-      where: { id: In(ids) },
-    });
+    if (ids) {
+      return await this.modalityRepository.find({
+        select: ["id", "name"],
+        where: { id: In(ids) },
+      });
+    }
+    return [];
   }
 
   /**
@@ -341,10 +359,13 @@ export class ResidentCompanyService {
    * @param ids number[]
    * @return array of biolabs sources object
    */
-   async getRcMembers(id) {
-    return await this.residentCompanyManagementRepository.findOne({
-      where: { companyId: id },
-    });
+  async getRcMembers(id) {
+    if (id) {
+      return await this.residentCompanyManagementRepository.findOne({
+        where: { companyId: id },
+      });
+    }
+    return {}
   }
 
   /**
@@ -353,10 +374,13 @@ export class ResidentCompanyService {
    * @param ids number[]
    * @return array of biolabs sources object
    */
-   async getRcAdvisors(id) {
-    return await this.residentCompanyAdvisoryRepository.findOne({
-      where: { companyId: id },
-    });
+  async getRcAdvisors(id) {
+    if (id) {
+      return await this.residentCompanyAdvisoryRepository.findOne({
+        where: { companyId: id },
+      });
+    }
+    return {}
   }
 
   /**
@@ -365,10 +389,13 @@ export class ResidentCompanyService {
    * @param ids number[]
    * @return array of biolabs sources object
    */
-   async getRcTechnicalTeams(id) {
-    return await this.residentCompanyTechnicalRepository.findOne({
-      where: { companyId: id },
-    });
+  async getRcTechnicalTeams(id) {
+    if (id) {
+      return await this.residentCompanyTechnicalRepository.findOne({
+        where: { companyId: id },
+      });
+    }
+    return {};
   }
 
   /**
@@ -378,7 +405,7 @@ export class ResidentCompanyService {
    * @return resident company object
    */
   async getResidentCompany(id) {
-    if(id==null){
+    if (id == null) {
       return {};
     }
     const residentCompany: any = await this.residentCompanyRepository.findOne({
