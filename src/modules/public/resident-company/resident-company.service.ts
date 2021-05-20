@@ -347,6 +347,9 @@ export class ResidentCompanyService {
     const residentCompany: any = await this.residentCompanyRepository.findOne({
       where: { id: payload.id }
     });
+    const companyMembers = JSON.parse(JSON.stringify(payload.companyMembers));
+    const companyAdvisors = JSON.parse(JSON.stringify(payload.companyAdvisors));
+    const companyTechnicalTeams = JSON.parse(JSON.stringify(payload.companyTechnicalTeams));
     const residentCompanyEmailChk: any = await this.residentCompanyRepository.findOne({
       where: { id: Not(payload.id), email: payload.email }
     });

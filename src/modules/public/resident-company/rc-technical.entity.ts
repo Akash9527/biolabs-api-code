@@ -27,13 +27,34 @@ export class ResidentCompanyTechnical {
   company_id: number;
 
   @Column({ length: 255 })
-  full_name: string;
+  name: string;
 
   @Column({ length: 255 })
   title: string;
 
   @Column({ length: 255 })
+  email: string;
+
+  @Column({ length: 20 })
+  phone: string;
+
+  @Column({ length: 20 })
+  linkedinLink: string;
+
+  @Column({ length: 255 })
   publications: string;
+
+  @Column({ default: false })
+  joiningAsMember: boolean;
+
+  @Column({ length: 255 })
+  mainExecutivePOC: string;
+
+  @Column({ length: 255 })
+  laboratoryExecutivePOC: string;
+
+  @Column({ length: 255 })
+  invoicingExecutivePOC: string;
 
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
   status: status_enum;
@@ -47,8 +68,15 @@ export class ResidentCompanyTechnical {
 
 export class ResidentCompanyTechnicalFillableFields {
   company_id: number;
-  full_name: string;
+  name: string;
   title: string;
+  email: string;
+  phone: string;
+  linkedinLink: string;
   publications: string;
+  joiningAsMember: boolean;
+  mainExecutivePOC: string;
+  laboratoryExecutivePOC: string;
+  invoicingExecutivePOC: string;
   status: status_enum;
 }
