@@ -378,6 +378,9 @@ export class ResidentCompanyService {
    * @return resident company object
    */
   async getResidentCompany(id) {
+    if(id==null){
+      return {};
+    }
     const residentCompany: any = await this.residentCompanyRepository.findOne({
       where: { id: id }
     });
