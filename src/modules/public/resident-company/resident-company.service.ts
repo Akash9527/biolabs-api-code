@@ -297,7 +297,7 @@ export class ResidentCompanyService {
    */
   async getRcFundings(ids) {
     if (ids && ids.length > 0) {
-      return await this.fundingRepository.findOne({
+      return await this.fundingRepository.find({
         select: ["id", "name"],
         where: { id: In(ids) },
       });
