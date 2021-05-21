@@ -17,7 +17,7 @@ import { UserToken } from './user-token.entity';
     ConfigModule,
     ResidentCompanyModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    
+
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: () => {
@@ -26,8 +26,8 @@ import { UserToken } from './user-token.entity';
           signOptions: {
             ...(process.env.APPSETTING_JWT_EXPIRATION_TIME
               ? {
-                  expiresIn: Number(process.env.APPSETTING_JWT_EXPIRATION_TIME),
-                }
+                expiresIn: Number(process.env.APPSETTING_JWT_EXPIRATION_TIME),
+              }
               : {}),
           },
         };
@@ -39,4 +39,4 @@ import { UserToken } from './user-token.entity';
   exports: [UsersService],
   providers: [UsersService, JwtStrategy, Mail],
 })
-export class UserModule {}
+export class UserModule { }

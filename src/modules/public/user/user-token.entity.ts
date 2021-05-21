@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 type status_enum = '-1' | '0' | '1' | '99';
 
@@ -15,15 +9,15 @@ export class UserToken {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({  })
+  @Column({})
   user_id: number;
 
   @Column({ length: 255 })
   token: string;
 
-  @Column({ length: 255, enum:['-1','0','1','99'], default:'1' })
+  @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '1' })
   status: status_enum;
-  
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt: number;
 
@@ -33,6 +27,6 @@ export class UserToken {
 
 export class UserTokenFillableFields {
   token: number;
-  user_id:string;
-  status:string;
+  user_id: string;
+  status: string;
 }

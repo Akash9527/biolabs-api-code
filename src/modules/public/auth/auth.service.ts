@@ -21,7 +21,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly userService: UsersService,
     private readonly masterService: MasterService,
-    private readonly residentCompanyService: ResidentCompanyService,
+    private readonly residentCompanyService: ResidentCompanyService
   ) { }
 
   /**
@@ -92,13 +92,13 @@ export class AuthService {
    * @return user object
    */
   async validateUser(payload: LoginPayload): Promise<any> {
-    const user:any = await this.userService.getByEmail(payload.email);
+    const user: any = await this.userService.getByEmail(payload.email);
     if (!user || user.status != '1' || user.password == null || !Hash.compare(payload.password, user.password)) {
       throw new UnauthorizedException('Invalid credentials!');
     }
-    if(user.companyId){
+    if (user.companyId) {
       const company = await this.residentCompanyService.getResidentCompany(user.companyId);
-      if(company)
+      if (company)
         user.company = company;
     }
     return user;
@@ -113,7 +113,7 @@ export class AuthService {
   async validateToken(token) {
     return this.userService.validateToken(token);
   }
-  
+
   /**
    * Description: This method is used to generate the token for the user to reset the password.
    * @description This method is used to generate the token for the user to reset the password.

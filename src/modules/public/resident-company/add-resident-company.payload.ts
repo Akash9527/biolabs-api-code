@@ -30,175 +30,152 @@ export class AddResidentCompanyPayload {
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   biolabsSources: number;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   @MaxLength(100)
   otherBiolabsSources: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   technology: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   rAndDPath: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   startDate: number;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   foundedPlace: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   companyStage: number;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   otherCompanyStage: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   funding: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   fundingSource: number[];
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   otherFundingSource: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   intellectualProperty: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   otherIntellectualProperty: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   isAffiliated: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   affiliatedInstitution: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   noOfFullEmp: number;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   empExpect12Months: number;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   utilizeLab: number;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   expect12MonthsUtilizeLab: number;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   industry: string[];
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   otherIndustries: any;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   modality: string[];
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   otherModality: object;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
-  preferredMoveIn:number;
+  preferredMoveIn: number;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
-  equipmentOnsite:string;
-  // @ApiProperty({
-  //   required: false,
-  //   nullable: true
-  // })
-  // advisoryMember:any[];
-
-  // @ApiProperty({
-  //   required: false,
-  //   nullable: true
-  // })
-  // managementMember:any[];
-
-  // @ApiProperty({
-  //   required: false,
-  //   nullable: true
-  // })
-  // technicalMember:any[];
-
-  // @ApiProperty({
-  //   required: false,
-  //   nullable: true
-  // })
-  // documents:any[];
+  equipmentOnsite: string;
 }

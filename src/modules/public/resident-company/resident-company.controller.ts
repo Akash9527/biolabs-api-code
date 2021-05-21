@@ -1,14 +1,4 @@
-import {
-  Controller,
-  UseGuards,
-  Get,
-  Param,
-  Post,
-  Body,
-  Query,
-  Put,
-  Req
-} from '@nestjs/common';
+import { Controller, UseGuards, Get, Param, Post, Body, Query, Put, Req } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ResidentCompanyService } from '.';
@@ -21,7 +11,7 @@ import { UpdateResidentCompanyPayload } from './update-resident-company.payload'
 @ApiTags('Resident Company')
 export class ResidentCompanyController {
   constructor(
-    private readonly residentCompanyService: ResidentCompanyService,
+    private readonly residentCompanyService: ResidentCompanyService
   ) { }
 
   /**
@@ -32,10 +22,13 @@ export class ResidentCompanyController {
   @Post()
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async addResidentCompany(@Body() payload: AddResidentCompanyPayload, @Req() req: Request): Promise<any> {
+  async addResidentCompany(
+    @Body() payload: AddResidentCompanyPayload,
+    @Req() req: Request,
+  ): Promise<any> {
     console.log('req === >', req.headers['origin']);
     type status_enum = '-1' | '0' | '1' | '99';
-    const status: status_enum = "0";
+    const status: status_enum = '0';
     const pal = { ...payload, status: status };
     const user = await this.residentCompanyService.addResidentCompany(pal);
     return user;
@@ -54,7 +47,7 @@ export class ResidentCompanyController {
   async getResidentCompanies(@Query() params: any): Promise<any> {
     return this.residentCompanyService.getResidentCompanies(params);
   }
-  
+
   /**
    * Description: This method is used to get a resident company information.
    * @description This method is used to get a resident company information.
@@ -79,21 +72,25 @@ export class ResidentCompanyController {
   @Put('/update-status')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async updateResidentCompanyStatus(@Body() payload: UpdateResidentCompanyStatusPayload): Promise<any> {
+  async updateResidentCompanyStatus(
+    @Body() payload: UpdateResidentCompanyStatusPayload,
+  ): Promise<any> {
     return this.residentCompanyService.updateResidentCompanyStatus(payload);
   }
-  
+
   /**
    * Description: This method is used to upadte a resident company status.
    * @description This method is used to update a resident company status.
    * @param payload it is a request body contains payload of type UpdateResidentCompanyStatusPayload.
    */
-   @ApiBearerAuth()
-   @UseGuards(AuthGuard())
-   @Put()
-   @ApiResponse({ status: 200, description: 'Successful Response' })
-   @ApiResponse({ status: 401, description: 'Unauthorized' })
-   async updateResidentCompany(@Body() payload: UpdateResidentCompanyPayload): Promise<any> {
-     return this.residentCompanyService.updateResidentCompany(payload);
-   }
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Put()
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateResidentCompany(
+    @Body() payload: UpdateResidentCompanyPayload,
+  ): Promise<any> {
+    return this.residentCompanyService.updateResidentCompany(payload);
+  }
 }
