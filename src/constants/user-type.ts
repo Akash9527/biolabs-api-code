@@ -5,6 +5,6 @@ export const USER_TYPE = [
     { id: 3, name: "Academic Advisor" },
     { id: 4, name: "Investor" },
     { id: 5, name: "Executive" },
-    { id: 6, name: "EmploySponsoree" },
+    { id: 6, name: "Sponsor" },
     { id: 7, name: "Founder" }
 ];
