@@ -22,11 +22,7 @@ export class ResidentCompanyController {
   @Post()
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async addResidentCompany(
-    @Body() payload: AddResidentCompanyPayload,
-    @Req() req: Request,
-  ): Promise<any> {
-    console.log('req === >', req.headers['origin']);
+  async addResidentCompany(@Body() payload: AddResidentCompanyPayload, @Req() req: Request): Promise<any> {
     type status_enum = '-1' | '0' | '1' | '99';
     const status: status_enum = '0';
     const pal = { ...payload, status: status };
@@ -72,9 +68,7 @@ export class ResidentCompanyController {
   @Put('/update-status')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async updateResidentCompanyStatus(
-    @Body() payload: UpdateResidentCompanyStatusPayload,
-  ): Promise<any> {
+  async updateResidentCompanyStatus(@Body() payload: UpdateResidentCompanyStatusPayload): Promise<any> {
     return this.residentCompanyService.updateResidentCompanyStatus(payload);
   }
 
@@ -88,9 +82,7 @@ export class ResidentCompanyController {
   @Put()
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async updateResidentCompany(
-    @Body() payload: UpdateResidentCompanyPayload,
-  ): Promise<any> {
+  async updateResidentCompany(@Body() payload: UpdateResidentCompanyPayload): Promise<any> {
     return this.residentCompanyService.updateResidentCompany(payload);
   }
 }

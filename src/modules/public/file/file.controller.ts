@@ -35,7 +35,6 @@ export class FileController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async upload(@Query() payload: { userId: number, userType: string }, @UploadedFile() file: Express.Multer.File): Promise<object> {
-    console.log("payload", payload);
     return await this.fileService.upload(file, payload);
   }
 

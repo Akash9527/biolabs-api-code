@@ -25,7 +25,6 @@ export class FileService {
       const blobClient = this.getBlobClient(fileName, payload.userType);
       try {
         const uploaded = await blobClient.uploadData(file.buffer);
-        console.log("uploaded", uploaded);
         await this.userService.updateUserProfilePic({ id: userId, imageUrl: fileName });
         return { upload: uploaded, fileName: fileName };
       } catch (error) {
@@ -46,7 +45,6 @@ export class FileService {
       const blobDownloaded = await blobClient.download();
       return blobDownloaded.readableStreamBody;
     } catch (error) {
-      console.log("error: " + error.message);
       throw new BadRequestException(
         error.message
       );

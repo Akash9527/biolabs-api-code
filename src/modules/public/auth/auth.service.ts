@@ -47,7 +47,6 @@ export class AuthService {
   private async createSuperAdmin() {
     const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
     if (!superAdmin) {
-      console.log("Creating Super Admin");
       await this.userService.create(migrationData['superadmin']);
     }
   }

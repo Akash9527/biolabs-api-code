@@ -88,7 +88,6 @@ export class UsersService {
       origin: req.headers['origin'],
     };
     let tenant = { tenantEmail: payload.email };
-    console.log('tenant in user service', tenant);
     this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, 'Invite', userInfo);
 
     return savedUser;
@@ -231,7 +230,6 @@ export class UsersService {
       where: [{ token: token, status: 1 }],
     });
     if (tokenData) {
-      //console.log("tokenData",tokenData)
       const user = await this.get(tokenData.user_id);
       if (user.status == '1' || user.status == '0') return user;
       else {
@@ -280,7 +278,6 @@ export class UsersService {
       id: user.id,
       time: new Date().getTime(),
     });
-    console.log('token==>', token);
     const tokenData = { user_id: user.id, token: token };
     const tokenChk = await this.userTokenRepository.find({
       where: [{ user_id: user.id, status: '1' }],

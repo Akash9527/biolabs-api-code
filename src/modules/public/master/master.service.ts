@@ -88,7 +88,8 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     })
   }
 
@@ -104,7 +105,6 @@ export class MasterService {
     const payload = {
       id, name, status
     }
-    console.log("Adding Site: ", name);
     return await this.siteRepository.save(this.siteRepository.create(payload));
   }
 
@@ -160,7 +160,8 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     });
   }
 
@@ -176,7 +177,6 @@ export class MasterService {
     const payload = {
       id, name, status
     }
-    console.log("Adding Role: ", name);
     return await this.roleRepository.save(this.roleRepository.create(payload));
   }
 
@@ -284,7 +284,6 @@ export class MasterService {
       { where: { name: name, parent_id: parent_id } }
     );
     if (checkDuplicateCategory && checkDuplicateCategory.length > 0) {
-      // console.log("payload",payload);
       return false;
     } else {
       return await this.categoryRepository.save(payload);
@@ -343,7 +342,8 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     });
   }
 
@@ -359,7 +359,6 @@ export class MasterService {
     const payload = {
       id, name, status
     }
-    console.log("Adding biolabs sources: ", name);
     return await this.biolabsSourceRepository.save(this.biolabsSourceRepository.create(payload));
   }
 
@@ -415,7 +414,8 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     });
   }
 
@@ -431,7 +431,6 @@ export class MasterService {
     const payload = {
       id, name, status
     }
-    console.log("Adding funding: ", name);
     return await this.fundingRepository.save(this.fundingRepository.create(payload));
   }
 
@@ -487,7 +486,8 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     });
   }
 
@@ -503,7 +503,6 @@ export class MasterService {
     const payload = {
       id, name, status
     }
-    console.log("Adding modality: ", name);
     return await this.modalityRepository.save(this.modalityRepository.create(payload));
   }
 
@@ -559,7 +558,8 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     });
   }
 

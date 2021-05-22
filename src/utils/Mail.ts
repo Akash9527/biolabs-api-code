@@ -6,57 +6,50 @@ const qs = require('qs');
 dotenv.config();
 
 export class Mail {
-  /**
-   * Description: This method will return the generated Access token for send mail
-   * @description This method will return the generated Access token for send mail
-   */
-  async getGrapAPIToken() {
-    const data = qs.stringify({
-      client_id: process.env.APPSETTING_MICROSOFT_EMAIL_APP_ID,
-      scope: process.env.APPSETTING_MICROSOFT_EMAIL_GRAPH_SCOPE,
-      client_secret: process.env.APPSETTING_MICROSOFT_EMAIL_APP_SECERET,
-      grant_type: 'client_credentials',
-    });
-    let config = {
-      method: 'post',
-      url: process.env.APPSETTING_MICROSOFT_EMAIL_ENDPOINT_TOKEN,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Cookie:
-          'x-ms-gateway-slice=estsfd; stsservicecookie=estsfd; fpc=Atq01SXesc5AnxuS4qWIT5HOk_SAAQAAAF9QE9gOAAAA',
-      },
-      data: data,
-    };
-
-    return await axios(config)
-      .then(function (response) {
-        console.log('test-->  ', JSON.stringify(response.data));
-        return response.data;
-      })
-      .catch(function (error) {
-        console.log(error);
+   /**
+    * Description: This method will return the generated Access token for send mail
+    * @description This method will return the generated Access token for send mail
+    */
+   async getGrapAPIToken() {
+      const data = qs.stringify({
+         client_id: process.env.APPSETTING_MICROSOFT_EMAIL_APP_ID,
+         scope: process.env.APPSETTING_MICROSOFT_EMAIL_GRAPH_SCOPE,
+         client_secret: process.env.APPSETTING_MICROSOFT_EMAIL_APP_SECERET,
+         grant_type: 'client_credentials',
       });
-  }
+      let config = {
+         method: 'post',
+         url: process.env.APPSETTING_MICROSOFT_EMAIL_ENDPOINT_TOKEN,
+         headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Cookie:
+               'x-ms-gateway-slice=estsfd; stsservicecookie=estsfd; fpc=Atq01SXesc5AnxuS4qWIT5HOk_SAAQAAAF9QE9gOAAAA',
+         },
+         data: data,
+      };
 
-  private sendEmailGraphAPI(
-    tenant: any,
-    token: any,
-    subject: string,
-    content: string,
-    userInfo: any,
-  ) {
-    let userTxt =
-      tenant && tenant.role && tenant.role == 3 ? 'Insight' : 'Connect';
-    console.table({ 'userTxt >>>>>>>>>> ': userTxt });
-    let data;
-    if (content == 'forgotMail') {
-      console.table({ 'content 1': content });
-      data = {
-        message: {
-          subject: subject,
-          body: {
-            contentType: EMAIL.CONTENT_TYPE,
-            content: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+      return await axios(config)
+         .then(function (response) {
+            return response.data;
+         })
+         .catch(function (error) {
+            if (error)
+              return;
+         });
+   }
+
+   private sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
+      let userTxt = tenant && tenant.role && tenant.role == 3 ? 'Insight' : 'Connect';
+
+      let data;
+      if (content == 'forgotMail') {
+         console.table({ 'content 1': content });
+         data = {
+            message: {
+               subject: subject,
+               body: {
+                  contentType: EMAIL.CONTENT_TYPE,
+                  content: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
                         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" style="width:100%;font-family:arial, 'helvetica neue', helvetica, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">
                            <head>
                               <meta charset="UTF-8">
@@ -166,9 +159,8 @@ export class Mail {
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
                                                                            <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
-                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${
-                                                                                userInfo.userName
-                                                                              },<br><br>We've received your request to set a new password for your BioLabs ${userTxt} account. Click below button to reset your password.</p>
+                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${userInfo.userName
+                     },<br><br>We've received your request to set a new password for your BioLabs ${userTxt} account. Click below button to reset your password.</p>
                                                                            </td>
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
@@ -182,24 +174,21 @@ export class Mail {
                                                                                  </v:roundrect>
                                                                               </a>
                                                                               <![endif]--> 
-                                                                              <!--[if !mso]><!-- --><span class="msohide es-button-border es-button-border-3" style="border-style:solid;border-color:#0f9792;background:#0f9792;border-width:1px;display:block;border-radius:3px;width:auto;mso-hide:all"><a href="${
-                                                                                userInfo.origin +
-                                                                                EMAIL.EMAIL_CONFIRM_URL +
-                                                                                userInfo.token
-                                                                              }" class="es-button msohide" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:16px;color:#FFFFFF;border-style:solid;border-color:#0f9792;border-width:15px 20px;display:block;background:#0f9792;border-radius:3px;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-hide:all">Reset your Password</a></span> 
+                                                                              <!--[if !mso]><!-- --><span class="msohide es-button-border es-button-border-3" style="border-style:solid;border-color:#0f9792;background:#0f9792;border-width:1px;display:block;border-radius:3px;width:auto;mso-hide:all"><a href="${userInfo.origin +
+                     EMAIL.EMAIL_CONFIRM_URL +
+                     userInfo.token
+                     }" class="es-button msohide" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:16px;color:#FFFFFF;border-style:solid;border-color:#0f9792;border-width:15px 20px;display:block;background:#0f9792;border-radius:3px;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-hide:all">Reset your Password</a></span> 
                                                                               <!--<![endif]-->
                                                                            </td>
                                                                         </tr>
                                                                         
                                                                         <tr style="border-collapse:collapse">
                                                                         <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
-                                                                        <p href="" class="es-button msohide" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:14px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Or click on:  <a href="${
-                                                                          userInfo.origin +
-                                                                          EMAIL.EMAIL_CONFIRM_URL +
-                                                                          userInfo.token
-                                                                        }" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:11px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:20px;color:#167efb;word-break: break-all;">${
-              userInfo.origin + EMAIL.EMAIL_CONFIRM_URL + userInfo.token
-            }</a> </p>
+                                                                        <p href="" class="es-button msohide" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:14px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Or click on:  <a href="${userInfo.origin +
+                     EMAIL.EMAIL_CONFIRM_URL +
+                     userInfo.token
+                     }" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:11px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:20px;color:#167efb;word-break: break-all;">${userInfo.origin + EMAIL.EMAIL_CONFIRM_URL + userInfo.token
+                     }</a> </p>
                                                                      </td>
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
@@ -228,34 +217,34 @@ export class Mail {
                               </div>
                            </body>
                         </html>`,
-          },
-          toRecipients: [
-            {
-              emailAddress: {
-                address: tenant.tenantEmail
-                  ? tenant.tenantEmail
-                  : tenant.officialEmail,
-              },
+               },
+               toRecipients: [
+                  {
+                     emailAddress: {
+                        address: tenant.tenantEmail
+                           ? tenant.tenantEmail
+                           : tenant.officialEmail,
+                     },
+                  },
+               ],
+               ccRecipients: [],
             },
-          ],
-          ccRecipients: [],
-        },
-      };
-      if (EMAIL.CC_EMAIL_USER) {
-        data.message.ccRecipients.push({
-          emailAddress: {
-            address: EMAIL.CC_EMAIL_USER,
-          },
-        });
-      }
-    } else if (content == 'Invite') {
-      console.table({ 'content 2 ': content });
-      data = {
-        message: {
-          subject: subject,
-          body: {
-            contentType: EMAIL.CONTENT_TYPE,
-            content: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+         };
+         if (EMAIL.CC_EMAIL_USER) {
+            data.message.ccRecipients.push({
+               emailAddress: {
+                  address: EMAIL.CC_EMAIL_USER,
+               },
+            });
+         }
+      } else if (content == 'Invite') {
+         console.table({ 'content 2 ': content });
+         data = {
+            message: {
+               subject: subject,
+               body: {
+                  contentType: EMAIL.CONTENT_TYPE,
+                  content: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
                         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" style="width:100%;font-family:arial, 'helvetica neue', helvetica, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">
                            <head>
                               <meta charset="UTF-8">
@@ -365,9 +354,8 @@ export class Mail {
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
                                                                            <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
-                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${
-                                                                                userInfo.userName
-                                                                              },<br><br>Welcome to your BioLabs Connect<br><br>Your account has been created and is ready for your use. Click below button to set your password and get going.</p>
+                                                                              <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${userInfo.userName
+                     },<br><br>Welcome to your BioLabs Connect<br><br>Your account has been created and is ready for your use. Click below button to set your password and get going.</p>
                                                                            </td>
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
@@ -381,24 +369,21 @@ export class Mail {
                                                                                  </v:roundrect>
                                                                               </a>
                                                                               <![endif]--> 
-                                                                              <!--[if !mso]><!-- --><span class="msohide es-button-border es-button-border-3" style="border-style:solid;border-color:#0f9792;background:#0f9792;border-width:1px;display:block;border-radius:3px;width:auto;mso-hide:all"><a href="${
-                                                                                userInfo.origin +
-                                                                                EMAIL.EMAIL_CONFIRM_URL +
-                                                                                userInfo.token
-                                                                              }" class="es-button msohide" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:16px;color:#FFFFFF;border-style:solid;border-color:#0f9792;border-width:15px 20px;display:block;background:#0f9792;border-radius:3px;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-hide:all">Set your Password</a></span> 
+                                                                              <!--[if !mso]><!-- --><span class="msohide es-button-border es-button-border-3" style="border-style:solid;border-color:#0f9792;background:#0f9792;border-width:1px;display:block;border-radius:3px;width:auto;mso-hide:all"><a href="${userInfo.origin +
+                     EMAIL.EMAIL_CONFIRM_URL +
+                     userInfo.token
+                     }" class="es-button msohide" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:16px;color:#FFFFFF;border-style:solid;border-color:#0f9792;border-width:15px 20px;display:block;background:#0f9792;border-radius:3px;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-hide:all">Set your Password</a></span> 
                                                                               <!--<![endif]-->
                                                                            </td>
                                                                         </tr>
                                                                         
                                                                         <tr style="border-collapse:collapse">
                                                                         <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
-                                                                        <p href="" class="es-button msohide" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:14px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Or click on:  <a href="${
-                                                                          userInfo.origin +
-                                                                          EMAIL.EMAIL_CONFIRM_URL +
-                                                                          userInfo.token
-                                                                        }" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:11px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:20px;color:#167efb;word-break: break-all;">${
-              userInfo.origin + EMAIL.EMAIL_CONFIRM_URL + userInfo.token
-            }</a> </p>
+                                                                        <p href="" class="es-button msohide" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:14px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Or click on:  <a href="${userInfo.origin +
+                     EMAIL.EMAIL_CONFIRM_URL +
+                     userInfo.token
+                     }" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:11px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:20px;color:#167efb;word-break: break-all;">${userInfo.origin + EMAIL.EMAIL_CONFIRM_URL + userInfo.token
+                     }</a> </p>
                                                                      </td>
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
@@ -422,58 +407,49 @@ export class Mail {
                               </div>
                            </body>
                         </html>`,
-          },
-          toRecipients: [
-            {
-              emailAddress: {
-                address: tenant.tenantEmail
-                  ? tenant.tenantEmail
-                  : tenant.officialEmail,
-              },
+               },
+               toRecipients: [
+                  {
+                     emailAddress: {
+                        address: tenant.tenantEmail
+                           ? tenant.tenantEmail
+                           : tenant.officialEmail,
+                     },
+                  },
+               ],
+               ccRecipients: [],
             },
-          ],
-          ccRecipients: [],
-        },
-      };
-      if (EMAIL.CC_EMAIL_USER) {
-        data.message.ccRecipients.push({
-          emailAddress: {
-            address: EMAIL.CC_EMAIL_USER,
-          },
-        });
+         };
+         if (EMAIL.CC_EMAIL_USER) {
+            data.message.ccRecipients.push({
+               emailAddress: {
+                  address: EMAIL.CC_EMAIL_USER,
+               },
+            });
+         }
       }
-    }
-    console.log('tenant in mail.ts', tenant);
-    // console.log('data', data);
 
-    let authToken = token['token_type'] + ' ' + token['access_token'];
-    axios.defaults.headers.post['Content-Type'] =
-      'application/x-www-form-urlencoded';
-    axios.defaults.headers.post['Authorization'] = authToken;
-    axios
-      .post(process.env.APPSETTING_MICROSOFT_EMAIL_ENDPOINT_MAIL, data)
-      .then((response) => {
-        console.log('Email has been Send', response.data);
-      })
-      .catch((error) => {
-        console.log('Error while Sending Graph API email', error);
-      });
-  }
+      let authToken = token['token_type'] + ' ' + token['access_token'];
+      axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+      axios.defaults.headers.post['Authorization'] = authToken;
+      axios.post(process.env.APPSETTING_MICROSOFT_EMAIL_ENDPOINT_MAIL, data)
+         .then((response) => {
+            return response.data;
+         })
+         .catch((error) => {
+            return error;
+         });
+   }
 
-  /**
-   * Description: This method will send mail
-   * @description This method will send mail
-   */
-  async sendEmail(
-    tenant: any,
-    subject: string,
-    content: string,
-    userInfo: any,
-  ) {
-    /** Graph API Token Generation implementation */
-    const tokenGraphAPI = await this.getGrapAPIToken();
+   /**
+    * Description: This method will send mail
+    * @description This method will send mail
+    */
+   async sendEmail(tenant: any, subject: string, content: string, userInfo: any) {
+      /** Graph API Token Generation implementation */
+      const tokenGraphAPI = await this.getGrapAPIToken();
 
-    /** Graph API Send Email implementation */
-    this.sendEmailGraphAPI(tenant, tokenGraphAPI, subject, content, userInfo);
-  }
+      /** Graph API Send Email implementation */
+      this.sendEmailGraphAPI(tenant, tokenGraphAPI, subject, content, userInfo);
+   }
 }
