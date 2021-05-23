@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, Matches, Max, MaxLength, Min, MinLength, ValidateIf } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, Matches, MaxLength, Min, MinLength, ValidateIf } from 'class-validator';
 
 export class UpdateResidentCompanyPayload {
   @ApiProperty({
