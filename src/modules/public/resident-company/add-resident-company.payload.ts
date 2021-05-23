@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, Matches, MaxLength, Min, MinLength, ValidateIf } from 'class-validator';
 import { Unique } from 'modules/common';
 import { ResidentCompany } from './resident-company.entity';
 
@@ -15,6 +15,7 @@ export class AddResidentCompanyPayload {
     required: true,
   })
   @MaxLength(100)
+  @Matches('^[a-zA-Z. ]+')
   name: string;
 
   @ApiProperty({
@@ -26,12 +27,14 @@ export class AddResidentCompanyPayload {
   @ApiProperty({
     required: true,
   })
+  @Min(1, { each: true })
   site: number[];
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @Min(1, { each: true })
   biolabsSources: number;
 
   @ApiProperty({
@@ -39,112 +42,138 @@ export class AddResidentCompanyPayload {
     nullable: true,
   })
   @MaxLength(100)
+  @IsOptional()
   otherBiolabsSources: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @MinLength(1)
+  @MaxLength(500)
   technology: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @MinLength(1)
+  @MaxLength(500)
   rAndDPath: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
   startDate: number;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @MinLength(1)
+  @MaxLength(100)
   foundedPlace: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @Min(1)
   companyStage: number;
 
   @ApiProperty({
     required: false,
     nullable: true,
   })
+  @ValidateIf(o => o.companyStage == '9999')
+  @IsNotEmpty()
+  @MaxLength(100)
   otherCompanyStage: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @IsNotEmpty()
+  @Min(0)
   funding: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @IsNotEmpty()
+  @Min(1, { each: true })
   fundingSource: number[];
 
   @ApiProperty({
     required: false,
     nullable: true,
   })
+  @ValidateIf(o => o.companyStage == '9999')
+  @IsNotEmpty()
+  @MaxLength(100)
   otherFundingSource: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @MaxLength(500)
   intellectualProperty: string;
 
   @ApiProperty({
     required: false,
     nullable: true,
   })
+  @MaxLength(100)
   otherIntellectualProperty: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @IsNotEmpty()
   isAffiliated: string;
 
   @ApiProperty({
     required: false,
     nullable: true,
   })
+  @MaxLength(250)
   affiliatedInstitution: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @Min(0)
   noOfFullEmp: number;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @Min(0)
   empExpect12Months: number;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @Min(0)
   utilizeLab: number;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @Min(0)
   expect12MonthsUtilizeLab: number;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
   industry: string[];
@@ -156,7 +185,7 @@ export class AddResidentCompanyPayload {
   otherIndustries: any;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
   modality: string[];
@@ -168,14 +197,16 @@ export class AddResidentCompanyPayload {
   otherModality: object;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @IsNotEmpty()
   preferredMoveIn: number;
 
   @ApiProperty({
-    required: false,
+    required: true,
     nullable: true,
   })
+  @MaxLength(500)
   equipmentOnsite: string;
 }
