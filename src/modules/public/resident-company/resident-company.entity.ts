@@ -169,6 +169,9 @@ export class ResidentCompany {
   @Column({ length: 510, default: null, nullable: true })
   website: string;
 
+  @Column({ length: 110, default: null, nullable: true })
+  foundersBusinessIndustryName:string;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt: number;
 
@@ -227,4 +230,5 @@ export class ResidentCompanyFillableFields {
   shareYourProfile: boolean;
   equipmentOnsite: string;
   website: string;
+  foundersBusinessIndustryName: string;
 }
