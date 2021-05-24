@@ -474,9 +474,9 @@ export class ResidentCompanyService {
       );
     }
     if (residentCompany) {
-      const companyMembers: any = JSON.parse(JSON.stringify(payload.companyMembers));
-      const companyAdvisors: any = JSON.parse(JSON.stringify(payload.companyAdvisors));
-      const companyTechnicalTeams: any = JSON.parse(JSON.stringify(payload.companyTechnicalTeams));
+      const companyMembers: any = (payload.companyMembers) ? JSON.parse(JSON.stringify(payload.companyMembers)) : [];
+      const companyAdvisors: any = (payload.companyAdvisors) ? JSON.parse(JSON.stringify(payload.companyAdvisors)) : [];
+      const companyTechnicalTeams: any = (payload.companyTechnicalTeams) ? JSON.parse(JSON.stringify(payload.companyTechnicalTeams)) : [];
 
       delete payload.companyMembers;
       delete payload.companyAdvisors;
