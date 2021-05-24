@@ -38,7 +38,7 @@ export class ResidentCompanyTechnical {
   @Column({ length: 255, nullable: true })
   publications: string;
 
-  @Column({ default: false })
+  @Column({ default: false, nullable: true })
   joiningAsMember: boolean;
 
   @Column({ length: 255, nullable: true })

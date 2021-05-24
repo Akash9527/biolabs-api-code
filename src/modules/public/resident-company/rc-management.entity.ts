@@ -41,7 +41,7 @@ export class ResidentCompanyManagement {
   @Column({ length: 255, nullable: true })
   academicAffiliation: string;
 
-  @Column({ default: false })
+  @Column({ default: false, nullable: true })
   joiningAsMember: boolean;
 
   @Column({ length: 255, nullable: true })
