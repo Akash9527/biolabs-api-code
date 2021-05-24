@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 // import { Site } from '../master/site.entity';
 // import { Category } from '../master/category.entity';
 // import { Funding } from '../master/funding.entity';
@@ -107,18 +101,18 @@ export class ResidentCompanyHistory {
 
   @Column("int", { array: true })
   industry: string[];
-  
-  @Column("json",{default: null})
+
+  @Column("json", { default: null })
   otherIndustries: any;
 
   @Column("int", { array: true })
   modality: string[];
-  
-  @Column("json",{default: null})
+
+  @Column("json", { default: null })
   otherModality: any;
 
-  @Column("int", { nullable: true, default:null })
-  preferredMoveIn:number;
+  @Column("int", { nullable: true, default: null })
+  preferredMoveIn: number;
 
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
   status: status_enum;
@@ -176,7 +170,7 @@ export class ResidentCompanyHistory {
 
   @Column({ length: 510, default: null, nullable: true })
   equipmentOnsite: string;
-  
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt: number;
 

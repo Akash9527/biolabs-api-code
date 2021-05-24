@@ -361,11 +361,11 @@ export class ResidentCompanyService {
    */
   async getRcMembers(id) {
     if (id) {
-      return await this.residentCompanyManagementRepository.findOne({
+      return await this.residentCompanyManagementRepository.find({
         where: { companyId: id },
       });
     }
-    return {}
+    return []
   }
 
   /**
@@ -376,11 +376,11 @@ export class ResidentCompanyService {
    */
   async getRcAdvisors(id) {
     if (id) {
-      return await this.residentCompanyAdvisoryRepository.findOne({
+      return await this.residentCompanyAdvisoryRepository.find({
         where: { companyId: id },
       });
     }
-    return {}
+    return []
   }
 
   /**
@@ -391,11 +391,11 @@ export class ResidentCompanyService {
    */
   async getRcTechnicalTeams(id) {
     if (id) {
-      return await this.residentCompanyTechnicalRepository.findOne({
+      return await this.residentCompanyTechnicalRepository.find({
         where: { companyId: id },
       });
     }
-    return {};
+    return [];
   }
 
   /**
@@ -474,9 +474,9 @@ export class ResidentCompanyService {
       );
     }
     if (residentCompany) {
-      const companyMembers: any = JSON.parse(JSON.stringify(payload.companyMembers));
-      const companyAdvisors: any = JSON.parse(JSON.stringify(payload.companyAdvisors));
-      const companyTechnicalTeams: any = JSON.parse(JSON.stringify(payload.companyTechnicalTeams));
+      const companyMembers: any = (payload.companyMembers) ? JSON.parse(JSON.stringify(payload.companyMembers)) : [];
+      const companyAdvisors: any = (payload.companyAdvisors) ? JSON.parse(JSON.stringify(payload.companyAdvisors)) : [];
+      const companyTechnicalTeams: any = (payload.companyTechnicalTeams) ? JSON.parse(JSON.stringify(payload.companyTechnicalTeams)) : [];
 
       delete payload.companyMembers;
       delete payload.companyAdvisors;

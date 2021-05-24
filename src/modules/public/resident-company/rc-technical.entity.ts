@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 /**
  * -1 = De-active
  * 0 = Pending/Default/
@@ -26,34 +20,34 @@ export class ResidentCompanyTechnical {
   @Column({})
   companyId: number;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   name: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   title: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   email: string;
 
-  @Column({ length: 20 })
+  @Column({ length: 20, nullable: true })
   phone: string;
 
-  @Column({ length: 20 })
+  @Column({ length: 20, nullable: true })
   linkedinLink: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   publications: string;
 
-  @Column({ default: false })
+  @Column({ default: false, nullable: true })
   joiningAsMember: boolean;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   mainExecutivePOC: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   laboratoryExecutivePOC: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   invoicingExecutivePOC: string;
 
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })

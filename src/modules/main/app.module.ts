@@ -25,7 +25,7 @@ import { FileModule } from 'modules/public/file';
           database: process.env.POSTGRESQLCONNSTR_DB_DATABASE,
           entities: [__dirname + './../**/**.entity{.ts,.js}'],
           synchronize: process.env.POSTGRESQLCONNSTR_DB_SYNC,
-          ssl : (process.env.POSTGRESQLCONNSTR_DB_SSL == 'true'), 
+          ssl: (process.env.POSTGRESQLCONNSTR_DB_SSL == 'true'),
         } as TypeOrmModuleAsyncOptions;
       },
     }),
@@ -40,4 +40,4 @@ import { FileModule } from 'modules/public/file';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

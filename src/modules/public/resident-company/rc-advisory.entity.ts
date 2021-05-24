@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 /**
  * -1 = De-active
  * 0 = Pending/Default/
@@ -26,13 +20,13 @@ export class ResidentCompanyAdvisory {
   @Column({})
   companyId: number;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   name: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   title: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   organization: string;
 
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
