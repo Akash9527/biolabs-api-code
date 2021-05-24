@@ -20,13 +20,13 @@ export class ResidentCompanyAdvisory {
   @Column({})
   companyId: number;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   name: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   title: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   organization: string;
 
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
