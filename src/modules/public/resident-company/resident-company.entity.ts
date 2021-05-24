@@ -67,8 +67,8 @@ export class ResidentCompany {
   @Column({ length: 510, nullable: true })
   otherFundingSource: string;
 
-  @Column({ length: 510, nullable: true })
-  intellectualProperty: string;
+  @Column({ nullable: true })
+  intellectualProperty: number;
 
   @Column({ length: 510, nullable: true })
   otherIntellectualProperty: string;
@@ -196,7 +196,7 @@ export class ResidentCompanyFillableFields {
   funding: string;
   fundingSource: number;
   otherFundingSource: string;
-  intellectualProperty: string;
+  intellectualProperty: number;
   otherIntellectualProperty: string;
   isAffiliated: string;
   affiliatedInstitution: string;

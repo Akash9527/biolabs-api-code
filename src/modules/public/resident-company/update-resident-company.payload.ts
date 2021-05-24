@@ -123,8 +123,9 @@ export class UpdateResidentCompanyPayload {
     required: true,
     nullable: true,
   })
-  @MaxLength(500)
-  intellectualProperty: string;
+  @IsNumber()
+  @IsOptional()
+  intellectualProperty: number;
 
   @ApiProperty({
     required: false,
@@ -268,14 +269,14 @@ export class UpdateResidentCompanyPayload {
     required: false,
     nullable: true,
   })
-  @MaxLength(500)
-  @IsOptional()
   patentsFiledGranted: boolean;
 
   @ApiProperty({
     required: false,
     nullable: true,
   })
+  @MaxLength(500)
+  @IsOptional()
   patentsFiledGrantedDetails: string;
 
   @ApiProperty({
