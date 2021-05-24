@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, Matches, MaxLength, Min, MinLength, ValidateIf } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, Matches, MaxLength, Min, MinLength, ValidateIf } from 'class-validator';
 import { Unique } from 'modules/common';
 import { ResidentCompany } from './resident-company.entity';
 
@@ -120,8 +120,9 @@ export class AddResidentCompanyPayload {
     required: true,
     nullable: true,
   })
-  @MaxLength(500)
-  intellectualProperty: string;
+  @IsNumber()
+  @IsOptional()
+  intellectualProperty: number;
 
   @ApiProperty({
     required: false,

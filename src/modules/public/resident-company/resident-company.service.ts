@@ -361,11 +361,11 @@ export class ResidentCompanyService {
    */
   async getRcMembers(id) {
     if (id) {
-      return await this.residentCompanyManagementRepository.findOne({
+      return await this.residentCompanyManagementRepository.find({
         where: { companyId: id },
       });
     }
-    return {}
+    return []
   }
 
   /**
@@ -376,11 +376,11 @@ export class ResidentCompanyService {
    */
   async getRcAdvisors(id) {
     if (id) {
-      return await this.residentCompanyAdvisoryRepository.findOne({
+      return await this.residentCompanyAdvisoryRepository.find({
         where: { companyId: id },
       });
     }
-    return {}
+    return []
   }
 
   /**
@@ -391,11 +391,11 @@ export class ResidentCompanyService {
    */
   async getRcTechnicalTeams(id) {
     if (id) {
-      return await this.residentCompanyTechnicalRepository.findOne({
+      return await this.residentCompanyTechnicalRepository.find({
         where: { companyId: id },
       });
     }
-    return {};
+    return [];
   }
 
   /**
