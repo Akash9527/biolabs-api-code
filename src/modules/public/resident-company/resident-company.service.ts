@@ -218,7 +218,45 @@ export class ResidentCompanyService {
    * @param payload object of ListResidentCompanyPayload
    * @return array of resident companies object
    */
-  async getResidentCompanies(payload: ListResidentCompanyPayload) {
+  async getResidentCompanies(payload: ListResidentCompanyPayload, siteIdArr: number[]) {
+    let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
+      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", {siteIdArr: siteIdArr});
+
+    if (payload.q && payload.q != '') {
+      rcQuery.andWhere("(resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
+    }
+    if (payload.companyStatus && payload.companyStatus.length > 0) {
+      rcQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: payload.companyStatus });
+    }
+    if (typeof payload.companyVisibility !== 'undefined') {
+      rcQuery.andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: payload.companyVisibility });
+    }
+    if (typeof payload.companyOnboardingStatus !== 'undefined') {
+      rcQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: payload.companyOnboardingStatus });
+    }
+    
+    if (payload.pagination) {
+      let skip = 0;
+      let take = 10;
+      if (payload.limit) {
+        take = payload.limit;
+        if (payload.page) {
+          skip = payload.page * payload.limit;
+        }
+      }
+      rcQuery.skip(skip).take(take)
+    }
+    return await rcQuery.getMany();
+  }
+
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
+  async getResidentCompaniesBkp(payload: ListResidentCompanyPayload) {
     let search;
     let skip;
     let take;

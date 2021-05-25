@@ -56,7 +56,8 @@ export class User {
     name: 'password',
     length: 255,
     transformer: new PasswordTransformer(),
-    nullable: true
+    nullable: true,
+    select: false
   })
   password: string;
 

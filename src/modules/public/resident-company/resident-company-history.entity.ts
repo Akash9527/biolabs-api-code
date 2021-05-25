@@ -81,8 +81,8 @@ export class ResidentCompanyHistory {
   @Column({ length: 510, nullable: true })
   otherIntellectualProperty: string;
 
-  @Column({ length: 510, nullable: true })
-  isAffiliated: string;
+  @Column({ nullable: true })
+  isAffiliated: boolean;
 
   @Column({ length: 510, nullable: true })
   affiliatedInstitution: string;
@@ -196,7 +196,7 @@ export class ResidentCompanyHistoryFillableFields {
   otherFundingSource: string;
   intellectualProperty: string;
   otherIntellectualProperty: string;
-  isAffiliated: string;
+  isAffiliated: boolean;
   affiliatedInstitution: string;
   noOfFullEmp: number;
   empExpect12Months: number;

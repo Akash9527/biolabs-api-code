@@ -136,7 +136,7 @@ export class AddResidentCompanyPayload {
     nullable: true,
   })
   @IsNotEmpty()
-  isAffiliated: string;
+  isAffiliated: boolean;
 
   @ApiProperty({
     required: false,

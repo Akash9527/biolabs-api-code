@@ -43,7 +43,6 @@ export class Mail {
 
       let data;
       if (content == 'forgotMail') {
-         console.table({ 'content 1': content });
          data = {
             message: {
                subject: subject,
@@ -238,7 +237,6 @@ export class Mail {
             });
          }
       } else if (content == 'Invite') {
-         console.table({ 'content 2 ': content });
          data = {
             message: {
                subject: subject,
