@@ -60,6 +60,28 @@ export class ResidentCompanyService {
     return this.residentCompanyRepository.findOne(id);
   }
 
+    /**
+   * Description: This method is used to update the resident company pitchdeck and logo.
+   * @description This method is used to update the  resident company pitchdeck and logo.
+   * @param payload object of user information with pitchdeckImgUrl or logoImgUrl
+   * @return resident company object
+   */
+     async updateResidentCompanyImg(payload) {
+      const resident = await this.get(payload.id);
+      if (resident) {
+        if(payload.imgType == 'logo') {
+          resident.logoImgUrl = payload.logoImgUrl;
+          await this.residentCompanyRepository.update(resident.logoImgUrl, resident);
+        }else if(payload.imgType == 'pitchdeck'){
+          resident.pitchdeckImgUrl = payload.pitchdeckImgUrl;
+          await this.residentCompanyRepository.update(resident.pitchdeckImgUrl, resident);
+        }
+        return resident;
+      } else {
+        throw new NotAcceptableException('resident company with provided id not available.');
+      }
+    }
+
   /**
    * Description: This method will get the resident company by email.
    * @description This method will get the resident company by email.

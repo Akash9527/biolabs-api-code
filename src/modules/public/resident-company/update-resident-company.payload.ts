@@ -358,4 +358,17 @@ export class UpdateResidentCompanyPayload {
   @MaxLength(100)
   @IsOptional()
   foundersBusinessIndustryName:string
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  pitchdeckImgUrl: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  logoImgUrl: string;
+
 }

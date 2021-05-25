@@ -1,12 +1,14 @@
 import { BlobServiceClient, BlockBlobClient } from '@azure/storage-blob';
 import { BadRequestException, Injectable, NotAcceptableException } from '@nestjs/common';
+import { ResidentCompanyService } from '../resident-company';
 import { UsersService } from '../user/user.service';
 
 @Injectable()
 export class FileService {
 
   constructor(
-    private readonly userService: UsersService
+    private readonly userService: UsersService,
+    private readonly residentCompanyService: ResidentCompanyService
   ) { }
 
   azureConnection = process.env.APPSETTING_AZURE_STORAGE_CONNECTION;
@@ -20,12 +22,19 @@ export class FileService {
 
   async upload(file: Express.Multer.File, payload: any) {
     const userId = payload.userId;
+    const companyId = payload.companyId;
+
     if (file) {
-      const fileName = userId + "-" + new Date().getTime() + "-" + file.originalname;
-      const blobClient = this.getBlobClient(fileName, payload.userType);
+      const fileName = ((userId) ? userId : companyId) + "-" + new Date().getTime() + "-" + file.originalname;
+      const blobClient = this.getBlobClient(fileName, payload.imgType);
       try {
         const uploaded = await blobClient.uploadData(file.buffer);
-        await this.userService.updateUserProfilePic({ id: userId, imageUrl: fileName });
+        if (payload.imgType == 'user')
+          await this.userService.updateUserProfilePic({ id: companyId, imageUrl: fileName });
+
+        if (payload.imgType == 'pitchdeck' || payload.imgType == 'logo')
+          await this.residentCompanyService.updateResidentCompanyImg({ id: companyId, imageUrl: fileName });
+
         return { upload: uploaded, fileName: fileName };
       } catch (error) {
         throw new BadRequestException(
@@ -39,9 +48,9 @@ export class FileService {
     }
   }
 
-  async getfileStream(fileName: string, userType: string) {
+  async getfileStream(fileName: string, imgType: string) {
     try {
-      const blobClient = this.getBlobClient(fileName, userType);
+      const blobClient = this.getBlobClient(fileName, imgType);
       const blobDownloaded = await blobClient.download();
       return blobDownloaded.readableStreamBody;
     } catch (error) {

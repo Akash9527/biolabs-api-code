@@ -57,4 +57,17 @@ export class ListResidentCompanyPayload {
     required: false,
   })
   sortOrder: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  pitchdeckImgUrl: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  logoImgUrl: string;
+
 }

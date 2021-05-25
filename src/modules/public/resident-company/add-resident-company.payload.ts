@@ -210,4 +210,17 @@ export class AddResidentCompanyPayload {
   })
   @MaxLength(500)
   equipmentOnsite: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  pitchdeckImgUrl: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  logoImgUrl: string;
+
 }
