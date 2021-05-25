@@ -79,7 +79,11 @@ export class UserController {
     description: 'Selected site ids array',
   })
   async getUsers(@Query() params: ListUserPayload, @Request() req): Promise<any> {
-    const siteIdArr: number[] = req.headers['x-site-id'] ? req.headers['x-site-id'] : req.user.site_id;
+    let siteIdArr = req.user.site_id;
+    siteIdArr = ('string' === typeof siteIdArr) ? siteIdArr.split(",") : siteIdArr;
+    if (req.headers['x-site-id']) {
+      siteIdArr = (req.headers['x-site-id'].indexOf(',') > -1) ? req.headers['x-site-id'].split(",") : [req.headers['x-site-id']];
+    }
     return this.userService.getUsers(params, siteIdArr);
   }
 
