@@ -26,13 +26,13 @@ export class FileService {
 
     if (file) {
       const fileName = ((userId) ? userId : companyId) + "-" + new Date().getTime() + "-" + file.originalname;
-      const blobClient = this.getBlobClient(fileName, payload.imgType);
+      const blobClient = this.getBlobClient(fileName, payload.fileType);
       try {
         const uploaded = await blobClient.uploadData(file.buffer);
-        if (payload.imgType == 'user')
+        if (payload.fileType == 'user')
           await this.userService.updateUserProfilePic({ id: companyId, imageUrl: fileName });
 
-        if (payload.imgType == 'pitchdeck' || payload.imgType == 'logo')
+        if (payload.fileType == 'pitchdeck' || payload.fileType == 'logo')
           await this.residentCompanyService.updateResidentCompanyImg({ id: companyId, imageUrl: fileName });
 
         return { upload: uploaded, fileName: fileName };
@@ -48,9 +48,9 @@ export class FileService {
     }
   }
 
-  async getfileStream(fileName: string, imgType: string) {
+  async getfileStream(fileName: string, fileType: string) {
     try {
-      const blobClient = this.getBlobClient(fileName, imgType);
+      const blobClient = this.getBlobClient(fileName, fileType);
       const blobDownloaded = await blobClient.download();
       return blobDownloaded.readableStreamBody;
     } catch (error) {
