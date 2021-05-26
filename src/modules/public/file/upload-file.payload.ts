@@ -19,6 +19,6 @@ export class UploadPayload {
   @ApiProperty({
     required: true,
   })
-  imgType: FILE_TYPE;
+  fileType: FILE_TYPE;
 
 }

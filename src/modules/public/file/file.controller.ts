@@ -32,10 +32,10 @@ export class FileController {
   @ApiFile()
   @ApiQuery({ name: 'userId', required: false, type: 'number' })
   @ApiQuery({ name: 'companyId', required: false, type: 'number' })
-  @ApiQuery({ name: 'imgType', required: true, type: 'string' })
+  @ApiQuery({ name: 'fileType', required: true, type: 'string' })
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async upload(@Query() payload: { userId: number, imgType: string, companyId : number }, @UploadedFile() file: Express.Multer.File): Promise<object> {
+  async upload(@Query() payload: { userId: number, fileType: string, companyId : number }, @UploadedFile() file: Express.Multer.File): Promise<object> {
     if(payload && (payload.userId || payload.companyId)){
       return await this.fileService.upload(file, payload);
     }else{
@@ -46,11 +46,11 @@ export class FileController {
   @Get('read-image')
   @Header('Content-Type', 'image/webp')
   @ApiQuery({ name: 'filename', type: String })
-  @ApiQuery({ name: 'imgType', required: true, type: 'string' })
+  @ApiQuery({ name: 'fileType', required: true, type: 'string' })
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async readImage(@Res() res, @Query('filename') filename, @Query('imgType') imgType) {
-    const file = await this.fileService.getfileStream(filename, imgType);
+  async readImage(@Res() res, @Query('filename') filename, @Query('fileType') fileType) {
+    const file = await this.fileService.getfileStream(filename, fileType);
     return file.pipe(res);
   }
 
@@ -58,21 +58,21 @@ export class FileController {
   @Header('Content-Type', 'image/webp')
   @Header('Content-Disposition', 'attachment; filename=test.webp')
   @ApiQuery({ name: 'filename', type: String })
-  @ApiQuery({ name: 'imgType', required: true, type: 'string' })
+  @ApiQuery({ name: 'fileType', required: true, type: 'string' })
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async downloadImage(@Res() res, @Query('filename') filename, @Query('imgType') imgType) {
-    const file = await this.fileService.getfileStream(filename, imgType);
+  async downloadImage(@Res() res, @Query('filename') filename, @Query('fileType') fileType) {
+    const file = await this.fileService.getfileStream(filename, fileType);
     return file.pipe(res);
   }
 
   @Get('delete-image')
   @ApiQuery({ name: 'filename', type: String })
-  @ApiQuery({ name: 'imgType', required: true, type: 'string' })
+  @ApiQuery({ name: 'fileType', required: true, type: 'string' })
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async delete(@Query('filename') filename, @Query('imgType') imgType) {
-    await this.fileService.delete(filename, imgType);
+  async delete(@Query('filename') filename, @Query('fileType') fileType) {
+    await this.fileService.delete(filename, fileType);
     return "deleted";
   }
 }

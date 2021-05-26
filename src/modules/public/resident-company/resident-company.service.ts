@@ -70,10 +70,10 @@ export class ResidentCompanyService {
       const companyId = payload.id;
       const resident = await this.get(payload.companyId);
       if (resident) {
-        if(payload.imgType == 'logo') {
+        if(payload.fileType == 'logo') {
           resident.logoImgUrl = payload.logoImgUrl;
           await this.residentCompanyRepository.update(companyId, resident);
-        }else if(payload.imgType == 'pitchdeck'){
+        }else if(payload.fileType == 'pitchdeck'){
           resident.pitchdeckImgUrl = payload.pitchdeckImgUrl;
           await this.residentCompanyRepository.update(companyId, resident);
         }

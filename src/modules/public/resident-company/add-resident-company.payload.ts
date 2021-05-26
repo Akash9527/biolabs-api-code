@@ -111,7 +111,7 @@ export class AddResidentCompanyPayload {
     required: false,
     nullable: true,
   })
-  @ValidateIf(o => o.companyStage == '9999')
+  @ValidateIf(o => o.fundingSource.includes('9999'))
   @IsNotEmpty()
   @MaxLength(100)
   otherFundingSource: string;
