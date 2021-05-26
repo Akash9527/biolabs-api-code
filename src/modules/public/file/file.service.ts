@@ -33,7 +33,7 @@ export class FileService {
           await this.userService.updateUserProfilePic({ id: companyId, imageUrl: fileName });
 
         if (payload.fileType == 'pitchdeck' || payload.fileType == 'logo')
-          await this.residentCompanyService.updateResidentCompanyImg({ id: companyId, imageUrl: fileName });
+          await this.residentCompanyService.updateResidentCompanyImg({ id: companyId, imageUrl: fileName, fileType : payload.fileType });
 
         return { upload: uploaded, fileName: fileName };
       } catch (error) {
