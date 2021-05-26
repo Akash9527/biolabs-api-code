@@ -61,6 +61,7 @@ export class ResidentCompanyTechnical {
 }
 
 export class ResidentCompanyTechnicalFillableFields {
+  id:number;
   companyId: number;
   name: string;
   title: string;

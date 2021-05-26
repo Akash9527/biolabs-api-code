@@ -40,6 +40,7 @@ export class ResidentCompanyDocuments {
 }
 
 export class ResidentCompanyDocumentsFillableFields {
+  id:number;
   email: string;
   company_id: number;
   doc_type: string;

@@ -64,6 +64,7 @@ export class ResidentCompanyManagement {
 }
 
 export class ResidentCompanyManagementFillableFields {
+  id:number;
   companyId: number;
   name: string;
   title: string;
