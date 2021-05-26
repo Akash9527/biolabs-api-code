@@ -45,9 +45,8 @@ export class ResidentCompanyController {
   })
   async getResidentCompanies(@Query() params: any, @Request() req): Promise<any> {
     let siteIdArr = req.user.site_id;
-    siteIdArr = ('string' === typeof siteIdArr) ? siteIdArr.split(",") : siteIdArr;
     if (req.headers['x-site-id']) {
-      siteIdArr = (req.headers['x-site-id'].indexOf(',') > -1) ? req.headers['x-site-id'].split(",") : [req.headers['x-site-id']];
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     }
     return this.residentCompanyService.getResidentCompanies(params, siteIdArr);
   }
