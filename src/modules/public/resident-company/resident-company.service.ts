@@ -67,7 +67,7 @@ export class ResidentCompanyService {
    * @return resident company object
    */
      async updateResidentCompanyImg(payload) {
-      const companyId = payload.companyId;
+      const companyId = payload.id;
       const resident = await this.get(payload.companyId);
       if (resident) {
         if(payload.imgType == 'logo') {
