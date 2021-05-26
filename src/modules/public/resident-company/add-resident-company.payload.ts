@@ -210,4 +210,5 @@ export class AddResidentCompanyPayload {
   })
   @MaxLength(500)
   equipmentOnsite: string;
+
 }

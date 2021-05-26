@@ -177,6 +177,13 @@ export class ResidentCompany {
 
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt: number;
+
+  @Column({ length: 255, nullable: true })
+  pitchdeckImgUrl: string;
+
+  @Column({ length: 255, nullable: true })
+  logoImgUrl: string;
+
 }
 
 export class ResidentCompanyFillableFields {
@@ -231,4 +238,6 @@ export class ResidentCompanyFillableFields {
   equipmentOnsite: string;
   website: string;
   foundersBusinessIndustryName: string;
+  pitchdeckImgUrl : string;
+  logoImgUrl : string;
 }
