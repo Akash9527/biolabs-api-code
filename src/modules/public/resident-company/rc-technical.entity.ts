@@ -42,7 +42,7 @@ export class ResidentCompanyTechnical {
   joiningAsMember: boolean;
 
   @Column({ nullable: true })
-  mainExecutivePOC: boolean;
+  emergencyExecutivePOC: boolean;
 
   @Column({  nullable: true })
   laboratoryExecutivePOC: boolean;
