@@ -1,5 +1,5 @@
-import { Controller, UseGuards, Get, Param, Post, Body, Query, Put } from '@nestjs/common';
-import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, UseGuards, Get, Param, Post, Body, Query, Put, Request } from '@nestjs/common';
+import { ApiResponse, ApiTags, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ResidentCompanyService } from '.';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
@@ -39,8 +39,16 @@ export class ResidentCompanyController {
   @Get()
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getResidentCompanies(@Query() params: any): Promise<any> {
-    return this.residentCompanyService.getResidentCompanies(params);
+  @ApiHeader({
+    name: 'x-site-id',
+    description: 'Selected site ids array',
+  })
+  async getResidentCompanies(@Query() params: any, @Request() req): Promise<any> {
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return this.residentCompanyService.getResidentCompanies(params, siteIdArr);
   }
 
   /**

@@ -1,11 +1,11 @@
-import { Controller, UseGuards, Get, Param, Post, Body, Delete, Query, Put, Req } from '@nestjs/common';
-import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, UseGuards, Get, Param, Post, Body, Delete, Query, Put, Req, Request } from '@nestjs/common';
+import { ApiResponse, ApiTags, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from '.';
 import { AddUserPayload } from './add-user.payload';
 import { UpdateUserPayload } from './update-user.payload';
 import { ListUserPayload } from './list-user.payload';
-import { Request } from 'express';
+import { Request as RequestExpress } from 'express';
 
 @Controller('api/user')
 @ApiTags('User')
@@ -25,7 +25,7 @@ export class UserController {
   @Post()
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async addUser(@Body() payload: AddUserPayload, @Req() req: Request): Promise<any> {
+  async addUser(@Body() payload: AddUserPayload, @Req() req: RequestExpress): Promise<any> {
     type status_enum = '-1' | '0' | '1' | '99';
     const status: status_enum = "0";
     const pal = { ...payload, status: status };
@@ -74,8 +74,16 @@ export class UserController {
   @Get()
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getUsers(@Query() params: ListUserPayload): Promise<any> {
-    return this.userService.getUsers(params);
+  @ApiHeader({
+    name: 'x-site-id',
+    description: 'Selected site ids array',
+  })
+  async getUsers(@Query() params: ListUserPayload, @Request() req): Promise<any> {
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return this.userService.getUsers(params, siteIdArr);
   }
 
   /**

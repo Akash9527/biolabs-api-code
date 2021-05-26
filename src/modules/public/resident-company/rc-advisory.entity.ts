@@ -40,6 +40,7 @@ export class ResidentCompanyAdvisory {
 }
 
 export class ResidentCompanyAdvisoryFillableFields {
+  id:number;
   companyId: number;
   name: string;
   title: string;

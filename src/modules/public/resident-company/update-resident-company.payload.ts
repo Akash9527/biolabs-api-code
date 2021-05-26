@@ -139,7 +139,7 @@ export class UpdateResidentCompanyPayload {
     nullable: true,
   })
   @IsNotEmpty()
-  isAffiliated: string;
+  isAffiliated: boolean;
 
   @ApiProperty({
     required: false,

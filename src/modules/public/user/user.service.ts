@@ -1,7 +1,7 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ListUserPayload } from './list-user.payload';
 
 import { User, UserFillableFields } from './user.entity';
@@ -42,6 +42,8 @@ export class UsersService {
   async getByEmail(email: string) {
     return await this.userRepository
       .createQueryBuilder('users')
+      .addSelect("users.email")
+      .addSelect("users.password")
       .where('users.email = :email')
       .setParameter('email', email)
       .getOne();
@@ -166,36 +168,37 @@ export class UsersService {
    * @param payload object of type ListUserPayload
    * @return array of user object
    */
-  async getUsers(payload: ListUserPayload) {
-    let search;
-    let skip;
-    let take;
-    let _search = {};
+  async getUsers(payload: ListUserPayload, siteIdArr?: number[]) {
+    let userQuery = await this.userRepository.createQueryBuilder("users")
+      .where("users.status IN (:...status)", { status: [1, 0] })
+      .andWhere("users.site_id && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
     if (payload.role || payload.role == 0) {
-      _search = { ..._search, ...{ role: payload.role } };
+      userQuery.andWhere("users.role = :role", { role: payload.role });
     }
     if (payload.q && payload.q != '') {
-      _search = { ..._search, ...{ name: Like('%' + payload.q + '%') } };
+      userQuery.andWhere("(users.firstName LIKE :name OR users.lastName LIKE :name) ", { name: `%${payload.q}%` });
     }
-    search = [
-      { ..._search, status: '1' },
-      { ..._search, status: '0' },
-    ];
+
     if (payload.pagination) {
-      skip = { skip: 0 };
-      take = { take: 10 };
+      let skip = 0;
+      let take = 10;
       if (payload.limit) {
-        take = { take: payload.limit };
+        take = payload.limit;
         if (payload.page) {
-          skip = { skip: payload.page * payload.limit };
+          skip = payload.page * payload.limit;
         }
       }
+      userQuery.skip(skip).take(take)
     }
-    return await this.userRepository.find({
-      where: search,
-      skip,
-      take,
-    });
+    userQuery.addOrderBy("users.firstName", "ASC");
+    userQuery.addOrderBy("users.lastName", "ASC");
+    return await userQuery.getMany();
+    // return await this.userRepository.find({
+    //   where: search,
+    //   skip,
+    //   take,
+    // });
+
   }
 
   /**

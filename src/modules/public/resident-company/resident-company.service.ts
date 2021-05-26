@@ -121,7 +121,11 @@ export class ResidentCompanyService {
    * @return resident companies advisor object
    */
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
-    const savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
+    let savedRcAdvisor:object;
+    if(payload.id)
+      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
+    else
+      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
     return savedRcAdvisor;
   }
 
@@ -160,7 +164,11 @@ export class ResidentCompanyService {
    * @return resident companies management object
    */
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
-    const savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
+    let savedRcManagement:object;
+    if(payload.id)
+      savedRcManagement = await this.residentCompanyManagementRepository.update(payload.id, payload);
+    else
+      savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
     return savedRcManagement;
   }
 
@@ -188,7 +196,12 @@ export class ResidentCompanyService {
    * @return resident companies technical object
    */
   async addResidentCompanyTechnical(payload: ResidentCompanyTechnicalFillableFields) {
-    const savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
+    let savedRcTechnical:object;
+    if(payload.id)
+      savedRcTechnical = await this.residentCompanyTechnicalRepository.update(payload.id, payload);
+    else
+      savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
+    
     return savedRcTechnical;
   }
 
@@ -241,7 +254,46 @@ export class ResidentCompanyService {
    * @param payload object of ListResidentCompanyPayload
    * @return array of resident companies object
    */
-  async getResidentCompanies(payload: ListResidentCompanyPayload) {
+  async getResidentCompanies(payload: ListResidentCompanyPayload, siteIdArr: number[]) {
+    let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
+      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", {siteIdArr: siteIdArr});
+
+    if (payload.q && payload.q != '') {
+      rcQuery.andWhere("(resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
+    }
+    if (payload.companyStatus && payload.companyStatus.length > 0) {
+      rcQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: payload.companyStatus });
+    }
+    if (typeof payload.companyVisibility !== 'undefined') {
+      rcQuery.andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: payload.companyVisibility });
+    }
+    if (typeof payload.companyOnboardingStatus !== 'undefined') {
+      rcQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: payload.companyOnboardingStatus });
+    }
+    
+    if (payload.pagination) {
+      let skip = 0;
+      let take = 10;
+      if (payload.limit) {
+        take = payload.limit;
+        if (payload.page) {
+          skip = payload.page * payload.limit;
+        }
+      }
+      rcQuery.skip(skip).take(take)
+    }
+    rcQuery.orderBy("id", "DESC");
+    return await rcQuery.getMany();
+  }
+
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
+  async getResidentCompaniesBkp(payload: ListResidentCompanyPayload) {
     let search;
     let skip;
     let take;

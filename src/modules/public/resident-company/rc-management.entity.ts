@@ -32,7 +32,7 @@ export class ResidentCompanyManagement {
   @Column({ length: 20, nullable: true })
   phone: string;
 
-  @Column({ length: 20, nullable: true })
+  @Column({ length: 255, nullable: true })
   linkedinLink: string;
 
   @Column({ length: 255, nullable: true })
@@ -44,14 +44,14 @@ export class ResidentCompanyManagement {
   @Column({ default: false, nullable: true })
   joiningAsMember: boolean;
 
-  @Column({ length: 255, nullable: true })
-  mainExecutivePOC: string;
+  @Column({ nullable: true })
+  mainExecutivePOC: boolean;
 
-  @Column({ length: 255, nullable: true })
-  laboratoryExecutivePOC: string;
+  @Column({ nullable: true })
+  laboratoryExecutivePOC: boolean;
 
-  @Column({ length: 255, nullable: true })
-  invoicingExecutivePOC: string;
+  @Column({ nullable: true })
+  invoicingExecutivePOC: boolean;
 
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
   status: status_enum;
@@ -64,6 +64,7 @@ export class ResidentCompanyManagement {
 }
 
 export class ResidentCompanyManagementFillableFields {
+  id:number;
   companyId: number;
   name: string;
   title: string;
@@ -73,8 +74,8 @@ export class ResidentCompanyManagementFillableFields {
   publications: string;
   academicAffiliation: string;
   joiningAsMember: boolean;
-  mainExecutivePOC: string;
-  laboratoryExecutivePOC: string;
-  invoicingExecutivePOC: string;
+  mainExecutivePOC: boolean;
+  laboratoryExecutivePOC: boolean;
+  invoicingExecutivePOC: boolean;
   status: status_enum;
 }
