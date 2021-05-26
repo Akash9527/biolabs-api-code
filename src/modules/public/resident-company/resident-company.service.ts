@@ -193,7 +193,6 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        console.log("companyMember", companyMember);
         let savedRcManagement = await this.addResidentCompanyTechnical(companyMember);
       }
     }
