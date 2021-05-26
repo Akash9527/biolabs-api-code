@@ -98,7 +98,11 @@ export class ResidentCompanyService {
    * @return resident companies advisor object
    */
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
-    const savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
+    let savedRcAdvisor:object;
+    if(payload.id)
+      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
+    else
+      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
     return savedRcAdvisor;
   }
 
@@ -137,7 +141,11 @@ export class ResidentCompanyService {
    * @return resident companies management object
    */
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
-    const savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
+    let savedRcManagement:object;
+    if(payload.id)
+      savedRcManagement = await this.residentCompanyManagementRepository.update(payload.id, payload);
+    else
+      savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
     return savedRcManagement;
   }
 
@@ -165,7 +173,12 @@ export class ResidentCompanyService {
    * @return resident companies technical object
    */
   async addResidentCompanyTechnical(payload: ResidentCompanyTechnicalFillableFields) {
-    const savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
+    let savedRcTechnical:object;
+    if(payload.id)
+      savedRcTechnical = await this.residentCompanyTechnicalRepository.update(payload.id, payload);
+    else
+      savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
+    
     return savedRcTechnical;
   }
 
