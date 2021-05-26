@@ -190,7 +190,8 @@ export class UsersService {
       }
       userQuery.skip(skip).take(take)
     }
-    userQuery.orderBy("users.firstName", "ASC");
+    userQuery.addOrderBy("users.firstName", "ASC");
+    userQuery.addOrderBy("users.lastName", "ASC");
     return await userQuery.getMany();
     // return await this.userRepository.find({
     //   where: search,
