@@ -69,17 +69,12 @@ export class ResidentCompanyService {
      async updateResidentCompanyImg(payload) {
       const companyId = payload.id;
       const resident = await this.get(companyId);
-
-      console.log('companyId==='+JSON.stringify(companyId));
-
       if (resident) {
         if(payload.fileType == 'logo') {
           resident.logoImgUrl = payload.imageUrl;
-          console.log('resident==='+JSON.stringify(resident));
           await this.residentCompanyRepository.update(companyId, resident);
         }else if(payload.fileType == 'pitchdeck'){
           resident.pitchdeck = payload.imageUrl;
-          console.log('resident==='+JSON.stringify(resident));
           await this.residentCompanyRepository.update(companyId, resident);
         }
         return resident;
