@@ -260,6 +260,7 @@ export class ResidentCompanyService {
       }
       rcQuery.skip(skip).take(take)
     }
+    rcQuery.orderBy("id", "DESC");
     return await rcQuery.getMany();
   }
 
