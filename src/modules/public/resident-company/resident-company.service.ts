@@ -101,9 +101,10 @@ export class ResidentCompanyService {
     let savedRcAdvisor:object;
     if(payload.id)
       savedRcAdvisor = await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
-    else
+    else{
+      delete payload.id;
       savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
-    return savedRcAdvisor;
+    }
   }
 
   /**
@@ -117,8 +118,7 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        const savedRcManagement = await this.addResidentCompanyAdvisor(companyMember);
-        return savedRcManagement;
+        let savedRcManagement = await this.addResidentCompanyAdvisor(companyMember);
       }
     }
   }
@@ -144,9 +144,10 @@ export class ResidentCompanyService {
     let savedRcManagement:object;
     if(payload.id)
       savedRcManagement = await this.residentCompanyManagementRepository.update(payload.id, payload);
-    else
+    else{
+      delete payload.id;
       savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
-    return savedRcManagement;
+    }
   }
 
   /**
@@ -160,8 +161,7 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        const savedRcManagement = await this.addResidentCompanyManagement(companyMember);
-        return savedRcManagement;
+        let savedRcManagement = await this.addResidentCompanyManagement(companyMember);
       }
     }
   }
@@ -176,10 +176,10 @@ export class ResidentCompanyService {
     let savedRcTechnical:object;
     if(payload.id)
       savedRcTechnical = await this.residentCompanyTechnicalRepository.update(payload.id, payload);
-    else
+    else{
+      delete payload.id;
       savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
-    
-    return savedRcTechnical;
+    }
   }
 
   /**
@@ -193,8 +193,8 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        const savedRcManagement = await this.addResidentCompanyTechnical(companyMember);
-        return savedRcManagement;
+        console.log("companyMember", companyMember);
+        let savedRcManagement = await this.addResidentCompanyTechnical(companyMember);
       }
     }
   }
