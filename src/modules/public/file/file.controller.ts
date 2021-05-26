@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileService } from './file.service';
 
-export const ApiFile = (fileName = 'myfile'): MethodDecorator => (
+export const ApiFile = (fileName = 'file'): MethodDecorator => (
   target: any,
   propertyKey: string,
   descriptor: PropertyDescriptor,
@@ -27,7 +27,7 @@ export class FileController {
 
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('myfile'))
+  @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @ApiFile()
   @ApiQuery({ name: 'userId', required: false, type: 'number' })
@@ -36,7 +36,7 @@ export class FileController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async upload(@Query() payload: { userId: number, fileType: string, companyId : number }, @UploadedFile() file: Express.Multer.File): Promise<object> {
-    if(payload && (payload.userId || payload.companyId)){
+   if(payload && (payload.userId || payload.companyId)){
       return await this.fileService.upload(file, payload);
     }else{
       return new BadRequestException('companyId or userId any one of them is required');

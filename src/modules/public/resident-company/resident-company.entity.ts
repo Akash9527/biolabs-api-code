@@ -179,7 +179,7 @@ export class ResidentCompany {
   updatedAt: number;
 
   @Column({ length: 255, nullable: true })
-  pitchdeckImgUrl: string;
+  pitchdeck: string;
 
   @Column({ length: 255, nullable: true })
   logoImgUrl: string;
@@ -238,6 +238,6 @@ export class ResidentCompanyFillableFields {
   equipmentOnsite: string;
   website: string;
   foundersBusinessIndustryName: string;
-  pitchdeckImgUrl : string;
+  pitchdeck : string;
   logoImgUrl : string;
 }
