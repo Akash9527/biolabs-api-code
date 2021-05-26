@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 /**
  * -1 = De-active
  * 0 = Pending/Default/
@@ -46,6 +40,7 @@ export class ResidentCompanyDocuments {
 }
 
 export class ResidentCompanyDocumentsFillableFields {
+  id:number;
   email: string;
   company_id: number;
   doc_type: string;

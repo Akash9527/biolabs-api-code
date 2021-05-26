@@ -98,8 +98,13 @@ export class ResidentCompanyService {
    * @return resident companies advisor object
    */
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
-    const savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
-    return savedRcAdvisor;
+    let savedRcAdvisor:object;
+    if(payload.id)
+      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
+    else{
+      delete payload.id;
+      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
+    }
   }
 
   /**
@@ -113,8 +118,7 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        const savedRcManagement = await this.addResidentCompanyAdvisor(companyMember);
-        return savedRcManagement;
+        let savedRcManagement = await this.addResidentCompanyAdvisor(companyMember);
       }
     }
   }
@@ -137,8 +141,13 @@ export class ResidentCompanyService {
    * @return resident companies management object
    */
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
-    const savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
-    return savedRcManagement;
+    let savedRcManagement:object;
+    if(payload.id)
+      savedRcManagement = await this.residentCompanyManagementRepository.update(payload.id, payload);
+    else{
+      delete payload.id;
+      savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
+    }
   }
 
   /**
@@ -152,8 +161,7 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        const savedRcManagement = await this.addResidentCompanyManagement(companyMember);
-        return savedRcManagement;
+        let savedRcManagement = await this.addResidentCompanyManagement(companyMember);
       }
     }
   }
@@ -165,8 +173,13 @@ export class ResidentCompanyService {
    * @return resident companies technical object
    */
   async addResidentCompanyTechnical(payload: ResidentCompanyTechnicalFillableFields) {
-    const savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
-    return savedRcTechnical;
+    let savedRcTechnical:object;
+    if(payload.id)
+      savedRcTechnical = await this.residentCompanyTechnicalRepository.update(payload.id, payload);
+    else{
+      delete payload.id;
+      savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
+    }
   }
 
   /**
@@ -180,8 +193,7 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        const savedRcManagement = await this.addResidentCompanyTechnical(companyMember);
-        return savedRcManagement;
+        let savedRcManagement = await this.addResidentCompanyTechnical(companyMember);
       }
     }
   }
@@ -218,7 +230,46 @@ export class ResidentCompanyService {
    * @param payload object of ListResidentCompanyPayload
    * @return array of resident companies object
    */
-  async getResidentCompanies(payload: ListResidentCompanyPayload) {
+  async getResidentCompanies(payload: ListResidentCompanyPayload, siteIdArr: number[]) {
+    let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
+      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", {siteIdArr: siteIdArr});
+
+    if (payload.q && payload.q != '') {
+      rcQuery.andWhere("(resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
+    }
+    if (payload.companyStatus && payload.companyStatus.length > 0) {
+      rcQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: payload.companyStatus });
+    }
+    if (typeof payload.companyVisibility !== 'undefined') {
+      rcQuery.andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: payload.companyVisibility });
+    }
+    if (typeof payload.companyOnboardingStatus !== 'undefined') {
+      rcQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: payload.companyOnboardingStatus });
+    }
+    
+    if (payload.pagination) {
+      let skip = 0;
+      let take = 10;
+      if (payload.limit) {
+        take = payload.limit;
+        if (payload.page) {
+          skip = payload.page * payload.limit;
+        }
+      }
+      rcQuery.skip(skip).take(take)
+    }
+    rcQuery.orderBy("id", "DESC");
+    return await rcQuery.getMany();
+  }
+
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
+  async getResidentCompaniesBkp(payload: ListResidentCompanyPayload) {
     let search;
     let skip;
     let take;
@@ -361,11 +412,11 @@ export class ResidentCompanyService {
    */
   async getRcMembers(id) {
     if (id) {
-      return await this.residentCompanyManagementRepository.findOne({
+      return await this.residentCompanyManagementRepository.find({
         where: { companyId: id },
       });
     }
-    return {}
+    return []
   }
 
   /**
@@ -376,11 +427,11 @@ export class ResidentCompanyService {
    */
   async getRcAdvisors(id) {
     if (id) {
-      return await this.residentCompanyAdvisoryRepository.findOne({
+      return await this.residentCompanyAdvisoryRepository.find({
         where: { companyId: id },
       });
     }
-    return {}
+    return []
   }
 
   /**
@@ -391,11 +442,11 @@ export class ResidentCompanyService {
    */
   async getRcTechnicalTeams(id) {
     if (id) {
-      return await this.residentCompanyTechnicalRepository.findOne({
+      return await this.residentCompanyTechnicalRepository.find({
         where: { companyId: id },
       });
     }
-    return {};
+    return [];
   }
 
   /**
@@ -474,9 +525,9 @@ export class ResidentCompanyService {
       );
     }
     if (residentCompany) {
-      const companyMembers: any = JSON.parse(JSON.stringify(payload.companyMembers));
-      const companyAdvisors: any = JSON.parse(JSON.stringify(payload.companyAdvisors));
-      const companyTechnicalTeams: any = JSON.parse(JSON.stringify(payload.companyTechnicalTeams));
+      const companyMembers: any = (payload.companyMembers) ? JSON.parse(JSON.stringify(payload.companyMembers)) : [];
+      const companyAdvisors: any = (payload.companyAdvisors) ? JSON.parse(JSON.stringify(payload.companyAdvisors)) : [];
+      const companyTechnicalTeams: any = (payload.companyTechnicalTeams) ? JSON.parse(JSON.stringify(payload.companyTechnicalTeams)) : [];
 
       delete payload.companyMembers;
       delete payload.companyAdvisors;

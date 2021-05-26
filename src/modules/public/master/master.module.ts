@@ -19,4 +19,4 @@ import { PassportModule } from '@nestjs/passport';
   providers: [MasterService],
   exports: [PassportModule.register({ defaultStrategy: 'jwt' }), MasterService],
 })
-export class MasterModule {}
+export class MasterModule { }

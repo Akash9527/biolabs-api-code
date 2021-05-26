@@ -30,21 +30,21 @@ export class UpdateUserPayload {
 
   @ApiProperty({
     required: false,
-    nullable:true
+    nullable: true
   })
   title: string;
 
   @ApiProperty({
     required: false,
-    nullable:true
+    nullable: true
   })
   phoneNumber: string;
-  
+
   @ApiProperty({
     required: true,
   })
   site_id: number[];
-  
+
   @ApiProperty({
     required: false,
   })

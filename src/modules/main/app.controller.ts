@@ -5,14 +5,14 @@ import { AppService } from './app.service';
 @ApiBearerAuth()
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AppService) { }
 
-    /**
-     * Description: This method will return the home page response.
-     * @description This method will return the home page response.
-     */
+  /**
+   * Description: This method will return the home page response.
+   * @description This method will return the home page response.
+   */
   @Get()
   root(): any {
-    return "Hello from Biolabs";
+    return 'Hello from Biolabs';
   }
 }

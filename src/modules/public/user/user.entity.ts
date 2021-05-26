@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { PasswordTransformer } from './password.transformer';
 /**
  * -1 = De-active
@@ -62,7 +56,8 @@ export class User {
     name: 'password',
     length: 255,
     transformer: new PasswordTransformer(),
-    nullable: true
+    nullable: true,
+    select: false
   })
   password: string;
 

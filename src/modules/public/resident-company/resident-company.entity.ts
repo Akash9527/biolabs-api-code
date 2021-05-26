@@ -1,16 +1,5 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-// import { Site } from '../master/site.entity';
-// import { Category } from '../master/category.entity';
-// import { Funding } from '../master/funding.entity';
-// import { BiolabsSource } from '../master/biolabs-source.entity';
-// import { Modality } from '../master/modality.entity';
-// import { TechnologyStage } from '../master/technology-stage.entity';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+
 /**
  * -1 = De-active
  * 0 = Pending/Default/
@@ -78,14 +67,14 @@ export class ResidentCompany {
   @Column({ length: 510, nullable: true })
   otherFundingSource: string;
 
-  @Column({ length: 510, nullable: true })
-  intellectualProperty: string;
+  @Column({ nullable: true })
+  intellectualProperty: number;
 
   @Column({ length: 510, nullable: true })
   otherIntellectualProperty: string;
 
-  @Column({ length: 510, nullable: true })
-  isAffiliated: string;
+  @Column({ nullable: true })
+  isAffiliated: boolean;
 
   @Column({ length: 510, nullable: true })
   affiliatedInstitution: string;
@@ -104,18 +93,18 @@ export class ResidentCompany {
 
   @Column("int", { array: true })
   industry: string[];
-  
-  @Column("json", {default: null})
+
+  @Column("json", { default: null })
   otherIndustries: any;
 
   @Column("int", { array: true })
   modality: string[];
-  
-  @Column("json",{default: null})
+
+  @Column("json", { default: null })
   otherModality: any;
 
-  @Column("int", { nullable: true, default:null })
-  preferredMoveIn:number;
+  @Column("int", { nullable: true, default: null })
+  preferredMoveIn: number;
 
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
   status: status_enum;
@@ -145,7 +134,7 @@ export class ResidentCompany {
   technologyPapersPublished: boolean;
 
   @Column({ length: 100, default: null })
-  technologyPapersPublishedLink:string;
+  technologyPapersPublishedLink: string;
 
   @Column({ default: null })
   patentsFiledGranted: boolean;
@@ -179,7 +168,10 @@ export class ResidentCompany {
 
   @Column({ length: 510, default: null, nullable: true })
   website: string;
-  
+
+  @Column({ length: 110, default: null, nullable: true })
+  foundersBusinessIndustryName:string;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt: number;
 
@@ -204,9 +196,9 @@ export class ResidentCompanyFillableFields {
   funding: string;
   fundingSource: number;
   otherFundingSource: string;
-  intellectualProperty: string;
+  intellectualProperty: number;
   otherIntellectualProperty: string;
-  isAffiliated: string;
+  isAffiliated: boolean;
   affiliatedInstitution: string;
   noOfFullEmp: number;
   empExpect12Months: number;
@@ -238,4 +230,5 @@ export class ResidentCompanyFillableFields {
   shareYourProfile: boolean;
   equipmentOnsite: string;
   website: string;
+  foundersBusinessIndustryName: string;
 }

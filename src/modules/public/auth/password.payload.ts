@@ -3,12 +3,12 @@ import { IsNotEmpty, MinLength } from 'class-validator';
 import { SameAs } from 'modules/common/validator/same-as.validator';
 
 export class PasswordPayload {
-  
+
   @ApiProperty({
     required: true,
   })
   token: string;
-  
+
   @ApiProperty({
     required: true,
   })
