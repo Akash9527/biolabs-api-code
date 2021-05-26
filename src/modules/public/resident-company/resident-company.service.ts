@@ -67,14 +67,15 @@ export class ResidentCompanyService {
    * @return resident company object
    */
      async updateResidentCompanyImg(payload) {
-      const resident = await this.get(payload.id);
+      const companyId = payload.companyId;
+      const resident = await this.get(payload.companyId);
       if (resident) {
         if(payload.imgType == 'logo') {
           resident.logoImgUrl = payload.logoImgUrl;
-          await this.residentCompanyRepository.update(resident.logoImgUrl, resident);
+          await this.residentCompanyRepository.update(companyId, resident);
         }else if(payload.imgType == 'pitchdeck'){
           resident.pitchdeckImgUrl = payload.pitchdeckImgUrl;
-          await this.residentCompanyRepository.update(resident.pitchdeckImgUrl, resident);
+          await this.residentCompanyRepository.update(companyId, resident);
         }
         return resident;
       } else {
