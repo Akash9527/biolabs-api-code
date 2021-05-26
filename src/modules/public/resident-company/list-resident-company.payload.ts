@@ -57,4 +57,6 @@ export class ListResidentCompanyPayload {
     required: false,
   })
   sortOrder: string;
+
+
 }
