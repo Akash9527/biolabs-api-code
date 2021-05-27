@@ -473,6 +473,92 @@ export class ResidentCompanyService {
   }
 
   /**
+   * Description: This method will get the resident company for sponsor.
+   * @description This method will get the resident company for sponsor.
+   * @param id number resident company id
+   * @return resident company object
+   */
+   async getResidentCompanyForSponsor() {
+    let response = {};
+
+    const graduate: any = await this.residentCompanyRepository.
+              createQueryBuilder("resident_companies").
+              select("count(*)","graduate").
+              where("resident_companies.status = :status",{status : '4'}).getRawOne();
+
+    //Get Sum of all companies and Average company size
+    const stats: any = await this.residentCompanyRepository.
+      createQueryBuilder("resident_companies").
+      select("AVG(resident_companies.companySize)::numeric(10,2)", "avgTeamSize").
+      addSelect("count(*)","startUpcount").
+      where("resident_companies.status = :status",{status : '1'}).
+      andWhere("resident_companies.companyVisibility = :companyVisibility", {companyVisibility : "true"}).getRawOne();
+
+    const categoryStats = await this.categoryRepository.
+                    query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc "+
+                          "where c.id = ANY(rc.industry::int[]) ) as industryCount "+
+                          "FROM public.categories as c order by industryCount desc limit 3;")
+
+    if(!stats){
+      return {startUpcount : 0, avgTeamSize : 0, graduate : 0};
+    }
+    response['companyStats'] = stats;
+    response['graduate'] = graduate;
+    response['categoryStats'] = categoryStats;
+
+    return response;
+
+   }
+
+   /**
+   * Description: This method will get the resident company for sponsor.
+   * @description This method will get the resident company for sponsor.
+   * @param id number resident company id
+   * @return resident company object
+   */
+    async getResidentCompanyForSponsorBySite() {
+      let res=[];
+
+      const sites = await this.siteRepository.find();
+
+      for (let site of sites){
+        let response = {};
+
+        const graduate: any = await this.residentCompanyRepository.
+                createQueryBuilder("resident_companies").
+                select("count(*)","graduate").
+                where("resident_companies.status = :status",{status : '4'}).
+                andWhere(":site = ANY(resident_companies.site::int[]) ", {site : site.id}).getRawOne();
+        
+        //Get Sum of all companies and Average company size
+        const companystats: any = await this.residentCompanyRepository.
+                createQueryBuilder("resident_companies").
+                select("AVG(resident_companies.companySize)::numeric(10,2)", "avg").
+                addSelect("count(*)","count").
+                where("resident_companies.status = :status",{status : '1'}).
+                andWhere("resident_companies.companyVisibility = :companyVisibility", {companyVisibility : "true"}).
+                andWhere(":site = ANY(resident_companies.site::int[]) ", {site : site.id}).getRawOne();
+
+        const categoryStats = await this.categoryRepository.
+                      query("SELECT c.name, c.id  as industryId, (select count(rc.*) FROM public.resident_companies as rc "+
+                            "where c.id = ANY(rc.industry::int[]) and "+site.id+" = ANY(rc.site::int[])  ) as industryCount "+
+                            "FROM public.categories as c order by industryCount desc limit 3;");
+        if(!companystats){
+          return {count : 0, avg : 0};
+        }
+        response['site'] = site;
+        response['graduate'] = graduate;
+        response['companyStats'] = companystats;
+        response['categoryStats'] = categoryStats;
+        res.push(response);
+      }
+      return res;
+  
+     }
+  
+  
+  
+  /**
    * Description: This method will get the resident company.
    * @description This method will get the resident company.
    * @param id number resident company id

@@ -9,6 +9,7 @@ import { MasterModule } from 'modules/public/master';
 import { UserModule } from 'modules/public/user';
 import { ResidentCompanyModule } from 'modules/public/resident-company'
 import { FileModule } from 'modules/public/file';
+import { SponsorModule } from 'modules/public/sponsor/sponsor.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { FileModule } from 'modules/public/file';
     UserModule,
     FileModule,
     ResidentCompanyModule,
+    SponsorModule
   ],
   controllers: [AppController],
   providers: [AppService],
