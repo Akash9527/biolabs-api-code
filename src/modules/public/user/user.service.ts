@@ -108,7 +108,7 @@ export class UsersService {
       user.lastName = payload.lastName;
       user.title = payload.title;
       user.phoneNumber = payload.phoneNumber;
-      user.companyId = payload.companyId;
+      user.companyId = (payload.companyId) ? payload.companyId : user.companyId;
       user.userType = payload.userType;
       if (
         payload.password &&
@@ -121,7 +121,7 @@ export class UsersService {
       }
       await this.userRepository.update(user.id, user);
       if (user.password) delete user.password;
-      return user;
+      return await this.getUserById(user.id);
     } else {
       throw new NotAcceptableException('User with provided id not available.');
     }
