@@ -121,7 +121,7 @@ export class UsersService {
       }
       await this.userRepository.update(user.id, user);
       if (user.password) delete user.password;
-      return this.getUserById(user.id);
+      return await this.getUserById(user.id);
     } else {
       throw new NotAcceptableException('User with provided id not available.');
     }
