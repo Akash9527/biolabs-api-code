@@ -364,6 +364,6 @@ export class UpdateResidentCompanyPayload {
   })
   @MaxLength(100)
   @IsOptional()
-  foundersBusinessIndustryName:string
+  foundersBusinessIndustryName: string
 
 }
