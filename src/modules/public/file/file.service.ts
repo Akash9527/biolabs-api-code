@@ -30,7 +30,7 @@ export class FileService {
       try {
         const uploaded = await blobClient.uploadData(file.buffer);
         if (payload.fileType == 'user')
-          await this.userService.updateUserProfilePic({ id: companyId, imageUrl: fileName });
+          await this.userService.updateUserProfilePic({ id: userId, imageUrl: fileName });
 
         if (payload.fileType == 'pitchdeck' || payload.fileType == 'logo')
           await this.residentCompanyService.updateResidentCompanyImg({ id: companyId, imageUrl: fileName, fileType : payload.fileType });
