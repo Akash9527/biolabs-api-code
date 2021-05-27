@@ -108,7 +108,7 @@ export class UsersService {
       user.lastName = payload.lastName;
       user.title = payload.title;
       user.phoneNumber = payload.phoneNumber;
-      user.companyId = payload.companyId;
+      user.companyId = (payload.companyId) ? payload.companyId : user.companyId;
       user.userType = payload.userType;
       if (
         payload.password &&
