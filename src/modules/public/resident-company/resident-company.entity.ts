@@ -133,6 +133,10 @@ export class ResidentCompany {
   @Column({ default: null })
   technologyPapersPublished: boolean;
 
+  
+  @Column({ default: null })
+  technologyPapersPublishedLinkCount: number;
+
   @Column({ length: 100, default: null })
   technologyPapersPublishedLink: string;
 
@@ -240,4 +244,5 @@ export class ResidentCompanyFillableFields {
   foundersBusinessIndustryName: string;
   pitchdeck : string;
   logoImgUrl : string;
+  technologyPapersPublishedLinkCount : number;
 }
