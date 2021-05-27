@@ -261,6 +261,13 @@ export class UpdateResidentCompanyPayload {
     required: false,
     nullable: true,
   })
+  technologyPapersPublishedLinkCount: number;
+
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
   @MaxLength(500)
   @IsOptional()
   technologyPapersPublishedLink: string;
