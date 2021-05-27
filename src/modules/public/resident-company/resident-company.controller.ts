@@ -65,17 +65,17 @@ export class ResidentCompanyController {
     return this.residentCompanyService.getResidentCompany(id);
   }
 
-   /**
-   * Description: This method is used to get a resident company information for sponsor dashboard.
-   * @description This method is used to get a resident company information  for sponsor dashboard.
-   * @param id it is a request parameter expect a number value of resident company id.
-   */
-    
-    @Get('/dashboard')    
-    @ApiResponse({ status: 200, description: 'Successful Response' })    
-    async getResidentCompanyForSponsor(): Promise<any> {           
-      return this.residentCompanyService.getResidentCompanyForSponsor();
-    }
+  /**
+  * Description: This method is used to get a resident company information for sponsor dashboard.
+  * @description This method is used to get a resident company information  for sponsor dashboard.
+  * @param id it is a request parameter expect a number value of resident company id.
+  */
+
+  @Get('/dashboard')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  async getResidentCompanyForSponsor(): Promise<any> {
+    return this.residentCompanyService.getResidentCompanyForSponsor();
+  }
 
   /**
    * Description: This method is used to upadte a resident company status.

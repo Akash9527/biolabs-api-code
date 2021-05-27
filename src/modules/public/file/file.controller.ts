@@ -35,10 +35,10 @@ export class FileController {
   @ApiQuery({ name: 'fileType', required: true, type: 'string' })
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async upload(@Query() payload: { userId: number, fileType: string, companyId : number }, @UploadedFile() file: Express.Multer.File): Promise<object> {
-   if(payload && (payload.userId || payload.companyId)){
+  async upload(@Query() payload: { userId: number, fileType: string, companyId: number }, @UploadedFile() file: Express.Multer.File): Promise<object> {
+    if (payload && (payload.userId || payload.companyId)) {
       return await this.fileService.upload(file, payload);
-    }else{
+    } else {
       return new BadRequestException('companyId or userId any one of them is required');
     }
   }
