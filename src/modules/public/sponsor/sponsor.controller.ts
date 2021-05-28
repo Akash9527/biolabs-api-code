@@ -5,7 +5,7 @@ import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
 
-@Controller('sponsor')
+@Controller('api/sponsor')
 @ApiTags('sponsor')
 export class SponsorController {
   constructor(private readonly sponsorService: SponsorService,
