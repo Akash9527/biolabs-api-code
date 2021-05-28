@@ -9,6 +9,7 @@ import { User, UsersService } from '../user';
 import { LoginPayload } from './login.payload';
 import { MasterService } from '../master';
 import { RESIDENT_ACCESSLEVELS } from 'constants/privileges-resident';
+import { ResidentCompanyService } from '../resident-company/resident-company.service';
 
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
@@ -19,7 +20,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly userService: UsersService,
-    private readonly masterService: MasterService
+    private readonly masterService: MasterService,
+    private readonly residentCompanyService: ResidentCompanyService
   ) { }
 
   /**
@@ -45,7 +47,6 @@ export class AuthService {
   private async createSuperAdmin() {
     const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
     if (!superAdmin) {
-      console.log("Creating Super Admin");
       await this.userService.create(migrationData['superadmin']);
     }
   }
@@ -56,7 +57,7 @@ export class AuthService {
    * @param user object of User
    * @return user object with token info
    */
-  async createToken(user: User) {
+  createToken(user: User) {
     let permissions = {};
     switch (user.role) {
       case 1:
@@ -90,9 +91,14 @@ export class AuthService {
    * @return user object
    */
   async validateUser(payload: LoginPayload): Promise<any> {
-    const user = await this.userService.getByEmail(payload.email);
+    const user: any = await this.userService.getByEmail(payload.email);
     if (!user || user.status != '1' || user.password == null || !Hash.compare(payload.password, user.password)) {
       throw new UnauthorizedException('Invalid credentials!');
+    }
+    if (user.companyId) {
+      const company = await this.residentCompanyService.getResidentCompany(user.companyId);
+      if (company)
+        user.company = company;
     }
     return user;
   }
@@ -106,7 +112,7 @@ export class AuthService {
   async validateToken(token) {
     return this.userService.validateToken(token);
   }
-  
+
   /**
    * Description: This method is used to generate the token for the user to reset the password.
    * @description This method is used to generate the token for the user to reset the password.

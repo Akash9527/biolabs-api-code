@@ -1,17 +1,5 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-} from 'typeorm';
-// import { Site } from '../master/site.entity';
-// import { Category } from '../master/category.entity';
-// import { Funding } from '../master/funding.entity';
-// import { BiolabsSource } from '../master/biolabs-source.entity';
-// import { Modality } from '../master/modality.entity';
-// import { TechnologyStage } from '../master/technology-stage.entity';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+
 /**
  * -1 = De-active
  * 0 = Pending/Default/
@@ -59,7 +47,10 @@ export class ResidentCompany {
   startDate: number;
 
   @Column({ nullable: true })
-  foundedDate: number;
+  companySize: number;
+
+  @Column({ length: 100, nullable: true })
+  foundedPlace: string;
 
   @Column({ nullable: true })
   companyStage: number;
@@ -70,20 +61,20 @@ export class ResidentCompany {
   @Column({ length: 510, nullable: true })
   funding: string;
 
-  @Column({ nullable: true })
-  fundingSource: number;
+  @Column("int", { array: true, nullable: true })
+  fundingSource: number[];
 
   @Column({ length: 510, nullable: true })
   otherFundingSource: string;
 
-  @Column({ length: 510, nullable: true })
-  intellectualProperty: string;
+  @Column({ nullable: true })
+  intellectualProperty: number;
 
   @Column({ length: 510, nullable: true })
   otherIntellectualProperty: string;
 
-  @Column({ length: 510, nullable: true })
-  isAffiliated: string;
+  @Column({ nullable: true })
+  isAffiliated: boolean;
 
   @Column({ length: 510, nullable: true })
   affiliatedInstitution: string;
@@ -103,8 +94,17 @@ export class ResidentCompany {
   @Column("int", { array: true })
   industry: string[];
 
+  @Column("json", { default: null })
+  otherIndustries: any;
+
   @Column("int", { array: true })
   modality: string[];
+
+  @Column("json", { default: null })
+  otherModality: any;
+
+  @Column("int", { nullable: true, default: null })
+  preferredMoveIn: number;
 
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
   status: status_enum;
@@ -127,11 +127,18 @@ export class ResidentCompany {
   @Column({ default: null })
   logoOnLicensedSpace: boolean;
 
-  @Column({ default: null })
-  bioLabsAssistanceNeeded: boolean;
+  @Column({ length: 500, default: null })
+  bioLabsAssistanceNeeded: string;
 
   @Column({ default: null })
   technologyPapersPublished: boolean;
+
+  
+  @Column({ default: null })
+  technologyPapersPublishedLinkCount: number;
+
+  @Column({ length: 100, default: null })
+  technologyPapersPublishedLink: string;
 
   @Column({ default: null })
   patentsFiledGranted: boolean;
@@ -162,6 +169,25 @@ export class ResidentCompany {
 
   @Column({ length: 510, default: null, nullable: true })
   equipmentOnsite: string;
+
+  @Column({ length: 510, default: null, nullable: true })
+  website: string;
+
+  @Column({ length: 110, default: null, nullable: true })
+  foundersBusinessIndustryName:string;
+
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt: number;
+
+  @UpdateDateColumn({ type: "timestamp" })
+  updatedAt: number;
+
+  @Column({ length: 255, nullable: true })
+  pitchdeck: string;
+
+  @Column({ length: 255, nullable: true })
+  logoImgUrl: string;
+
 }
 
 export class ResidentCompanyFillableFields {
@@ -174,22 +200,26 @@ export class ResidentCompanyFillableFields {
   technology: string;
   rAndDPath: string;
   startDate: number;
-  foundedDate: number;
+  companySize: number;
+  foundedPlace: string;
   companyStage: number;
   otherCompanyStage: string;
   funding: string;
   fundingSource: number;
   otherFundingSource: string;
-  intellectualProperty: string;
+  intellectualProperty: number;
   otherIntellectualProperty: string;
-  isAffiliated: string;
+  isAffiliated: boolean;
   affiliatedInstitution: string;
   noOfFullEmp: number;
   empExpect12Months: number;
   utilizeLab: number;
   expect12MonthsUtilizeLab: number;
   industry: string[];
+  otherIndustries: any;
   modality: string[];
+  otherModality: any;
+  preferredMoveIn: number;
   status: status_enum;
   companyStatus: company_status;
   companyVisibility: boolean;
@@ -197,8 +227,9 @@ export class ResidentCompanyFillableFields {
   elevatorPitch: string;
   logoOnWall: boolean;
   logoOnLicensedSpace: boolean;
-  bioLabsAssistanceNeeded: boolean;
+  bioLabsAssistanceNeeded: string;
   technologyPapersPublished: boolean;
+  technologyPapersPublishedLink: string;
   patentsFiledGranted: boolean;
   patentsFiledGrantedDetails: string;
   foundersBusinessIndustryBefore: boolean;
@@ -209,4 +240,9 @@ export class ResidentCompanyFillableFields {
   newsletters: boolean;
   shareYourProfile: boolean;
   equipmentOnsite: string;
+  website: string;
+  foundersBusinessIndustryName: string;
+  pitchdeck : string;
+  logoImgUrl : string;
+  technologyPapersPublishedLinkCount : number;
 }

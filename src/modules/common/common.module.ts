@@ -6,4 +6,4 @@ import { UniqueValidator } from './validator/unique.validator';
 @Module({
   providers: [UniqueValidator, ExistsValidator],
 })
-export class CommonModule {}
+export class CommonModule { }

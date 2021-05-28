@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { IsNumber, IsOptional, Max, MaxLength, Min, MinLength } from 'class-validator';
 
 export class MasterPayload {
   @ApiProperty({

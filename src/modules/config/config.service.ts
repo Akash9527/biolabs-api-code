@@ -8,11 +8,19 @@ export class ConfigService {
     this.envConfig = dotenv.parse(fs.readFileSync(filePath));
   }
 
+  /**
+   * Description: This method will return the system enviourment by key name.
+   * @description This method will return the system enviourment by key name.
+   */
   get(key: string): string {
     return this.envConfig[key];
   }
 
-  isEnv(env: string) {
+  /**
+   * Description: This method will return the system enviourment.
+   * @description This method will return the system enviourment.
+   */
+  isEnv() {
     return process.env.APPSETTING_APP_ENV;
   }
 }

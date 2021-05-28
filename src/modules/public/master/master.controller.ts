@@ -1,22 +1,11 @@
-import {
-  Controller,
-  UseGuards,
-  Get,
-  Request,
-  Param,
-  Query
-} from '@nestjs/common';
-import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MasterService, MasterPayload } from '.';
-
 
 @Controller('api/master')
 @ApiTags('Master')
 export class MasterController {
-  constructor(
-    private readonly masterService: MasterService
-  ) { }
+  constructor(private readonly masterService: MasterService) {}
 
   /**
    * Description: This method is used to list the sites by get method.
@@ -106,10 +95,21 @@ export class MasterController {
    * Description: This method is used to list the company status.
    * @description This method is used to list the company status.
    */
-   @Get('company-status')
-   @ApiResponse({ status: 200, description: 'Successful Response' })
-   @ApiResponse({ status: 401, description: 'Unauthorized' })
-   async getCompanyStatus(): Promise<any> {
-     return this.masterService.getCompanyStatus();
-   }
+  @Get('company-status')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getCompanyStatus(): Promise<any> {
+    return await this.masterService.getCompanyStatus();
+  }
+
+  /**
+   * Description: This method is used to list the user type.
+   * @description This method is used to list the user type.
+   */
+  @Get('user-types')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getUserTypes(): Promise<any> {
+    return await this.masterService.getUserTypes();
+  }
 }

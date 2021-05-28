@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 /**
  * -1 = De-active
  * 0 = Pending/Default/
@@ -38,9 +32,15 @@ export class ResidentCompanyDocuments {
   @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
   status: status_enum;
 
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt: number;
+
+  @UpdateDateColumn({ type: "timestamp" })
+  updatedAt: number;
 }
 
 export class ResidentCompanyDocumentsFillableFields {
+  id:number;
   email: string;
   company_id: number;
   doc_type: string;

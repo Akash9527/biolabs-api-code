@@ -22,5 +22,4 @@ export class UpdateResidentCompanyStatusPayload {
     required: false,
   })
   companyOnboardingStatus: boolean;
-
 }

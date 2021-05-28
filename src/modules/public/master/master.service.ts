@@ -1,4 +1,4 @@
-import { Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { MasterPayload } from './master.payload';
@@ -9,7 +9,8 @@ import { Modality } from './modality.entity';
 import { Role } from './role.entity';
 import { Site } from './site.entity';
 import { TechnologyStage } from './technology-stage.entity';
-import { COMPANY_STATUS } from 'constants/company-status';
+import { COMPANY_STATUS } from '../../../constants/company-status';
+import { USER_TYPE } from '../../../constants/user-type';
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
 type status_enum = '-1' | '0' | '1' | '99';
@@ -34,6 +35,12 @@ export class MasterService {
     private readonly technologyStageRepository: Repository<TechnologyStage>,
   ) { }
 
+  /**
+   * Description: This method will return the sites list.
+   * @description This method will return the sites list.
+   * @param payload MasterPayload[]
+   * @return array of sites object
+   */
   async getSites(payload: MasterPayload) {
     let search;
     let skip;
@@ -62,6 +69,11 @@ export class MasterService {
     });
   }
 
+  /**
+   * Description: This method will store the sites.
+   * @description This method will store the sites.
+   * @return array of site object
+   */
   async createSites() {
     const sites = this.getSites(new MasterPayload());
     let resp = {};
@@ -76,19 +88,32 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     })
   }
 
-  async createSite(name, id) {
+  /**
+   * Description: This method will store the site.
+   * @description This method will store the site.
+   * @param name string
+   * @param id number
+   * @return site object
+   */
+  async createSite(name: string, id: number) {
     const status: status_enum = '1';
     const payload = {
       id, name, status
     }
-    console.log("Adding Site: ", name);
     return await this.siteRepository.save(this.siteRepository.create(payload));
   }
 
+  /**
+   * Description: This method will return the roles list.
+   * @description This method will return the roles list.
+   * @param payload MasterPayload[]
+   * @return array of roles object
+   */
   async getRoles(payload: MasterPayload) {
     let search;
     let skip;
@@ -116,6 +141,11 @@ export class MasterService {
     });
   }
 
+  /**
+   * Description: This method will store the roles.
+   * @description This method will store the roles.
+   * @return array of role object
+   */
   async createRoles() {
     const roles = this.getRoles(new MasterPayload());
     let resp = {};
@@ -130,19 +160,32 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     });
   }
 
-  async createRole(name, id) {
+  /**
+   * Description: This method will store the role.
+   * @description This method will store the role.
+   * @param name string
+   * @param id number
+   * @return role object
+   */
+  async createRole(name: string, id: number) {
     const status: status_enum = '1';
     const payload = {
       id, name, status
     }
-    console.log("Adding Role: ", name);
     return await this.roleRepository.save(this.roleRepository.create(payload));
   }
 
+  /**
+   * Description: This method will return the categories list.
+   * @description This method will return the categories list.
+   * @param payload MasterPayload[]
+   * @return array of categories object
+   */
   async getCategories(payload: MasterPayload) {
     let search;
     let skip;
@@ -187,6 +230,11 @@ export class MasterService {
     return root;
   }
 
+  /**
+   * Description: This method will store the categories.
+   * @description This method will store the categories.
+   * @return array of category object
+   */
   async createCategories() {
     const _categories = migrationData['categories'];
     // for (const _category of _categories) {
@@ -201,12 +249,16 @@ export class MasterService {
     return categories;
   }
 
-  async createCategory(category, parent_id) {
+  /**
+   * Description: This method will store the category.
+   * @description This method will store the category.
+   * @param category object of category
+   * @param parent_id number
+   * @return category object
+   */
+  async createCategory(category: { name: string, id: number, subcategories?: [] }, parent_id: number) {
     this.saveCategory(category.name, category.id, parent_id);
     if (('subcategories' in category) && category.subcategories.length > 0) {
-      // for (const _subcategories of category.subcategories) {
-      //   await this.createCategory(_subcategories, category.id);
-      // }
       const promises = category.subcategories.map(
         async _subcategories => {
           return await this.createCategory(_subcategories, category.id);
@@ -217,20 +269,33 @@ export class MasterService {
     }
   }
 
-  async saveCategory(name, id, parent_id) {
+  /**
+   * Description: This method will store the category.
+   * @description This method will store the category.
+   * @param name string
+   * @param id number
+   * @param parent_id number
+   * @return category object
+   */
+  async saveCategory(name: string, id: number, parent_id: number) {
     const status: status_enum = '1';
     const payload = { id: id, name: name, parent_id: parent_id, status: status }
     const checkDuplicateCategory = await this.categoryRepository.find(
       { where: { name: name, parent_id: parent_id } }
     );
     if (checkDuplicateCategory && checkDuplicateCategory.length > 0) {
-      // console.log("payload",payload);
       return false;
     } else {
       return await this.categoryRepository.save(payload);
     }
   }
 
+  /**
+   * Description: This method will return the biolabs sources list.
+   * @description This method will return the biolabs sources list.
+   * @param payload MasterPayload[]
+   * @return array of biolabs sources object
+   */
   async getBiolabsSource(payload: MasterPayload) {
     let search;
     let skip;
@@ -258,6 +323,11 @@ export class MasterService {
     });
   }
 
+  /**
+   * Description: This method will store the biolabs sources.
+   * @description This method will store the biolabs sources.
+   * @return array of biolabs sources object
+   */
   async createBiolabsSources() {
     const biolabsSources = this.getBiolabsSource(new MasterPayload());
     let resp = {};
@@ -272,19 +342,32 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     });
   }
 
-  async createBiolabsSource(name, id) {
+  /**
+   * Description: This method will store the biolabs source.
+   * @description This method will store the biolabs source.
+   * @param name string
+   * @param id number
+   * @return biolabs source object
+   */
+  async createBiolabsSource(name: string, id: number) {
     const status: status_enum = '1';
     const payload = {
       id, name, status
     }
-    console.log("Adding biolabs sources: ", name);
     return await this.biolabsSourceRepository.save(this.biolabsSourceRepository.create(payload));
   }
 
+  /**
+   * Description: This method will return the fundings list.
+   * @description This method will return the fundings list.
+   * @param payload MasterPayload[]
+   * @return array of fundings object
+   */
   async getFundings(payload: MasterPayload) {
     let search;
     let skip;
@@ -312,6 +395,11 @@ export class MasterService {
     });
   }
 
+  /**
+   * Description: This method will store the fundings.
+   * @description This method will store the fundings.
+   * @return array of fundings object
+   */
   async createFundings() {
     const fundings = this.getFundings(new MasterPayload());
     let resp = {};
@@ -326,19 +414,32 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     });
   }
 
-  async createFunding(name, id) {
+  /**
+   * Description: This method will store the funding.
+   * @description This method will store the funding.
+   * @param name string
+   * @param id number
+   * @return funding object
+   */
+  async createFunding(name: string, id: number) {
     const status: status_enum = '1';
     const payload = {
       id, name, status
     }
-    console.log("Adding funding: ", name);
     return await this.fundingRepository.save(this.fundingRepository.create(payload));
   }
 
+  /**
+   * Description: This method will return the modalities list.
+   * @description This method will return the modalities list.
+   * @param payload MasterPayload[]
+   * @return array of modalities object
+   */
   async getModalities(payload: MasterPayload) {
     let search;
     let skip;
@@ -366,6 +467,11 @@ export class MasterService {
     });
   }
 
+  /**
+   * Description: This method will store the modalities.
+   * @description This method will store the modalities.
+   * @return array of modalities object
+   */
   async createModalities() {
     const modalities = this.getModalities(new MasterPayload());
     let resp = {};
@@ -380,19 +486,32 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     });
   }
 
-  async createModality(name, id) {
+  /**
+   * Description: This method will store the modality.
+   * @description This method will store the modality.
+   * @param name string
+   * @param id number
+   * @return modality object
+   */
+  async createModality(name: string, id: number) {
     const status: status_enum = '1';
     const payload = {
       id, name, status
     }
-    console.log("Adding modality: ", name);
     return await this.modalityRepository.save(this.modalityRepository.create(payload));
   }
 
+  /**
+   * Description: This method will return the technology stages list.
+   * @description This method will return the technology stages list.
+   * @param payload MasterPayload[]
+   * @return array of technology stages object
+   */
   async getTechnologyStages(payload: MasterPayload) {
     let search;
     let skip;
@@ -420,6 +539,11 @@ export class MasterService {
     });
   }
 
+  /**
+   * Description: This method will store the technology stages list.
+   * @description This method will store the technology stages list.
+   * @return array of technology stages object
+   */
   async createTechnologyStages() {
     const technologyStages = this.getTechnologyStages(new MasterPayload());
     let resp = {};
@@ -434,11 +558,19 @@ export class MasterService {
         }
       }
     }, error => {
-      console.log(error);
+      if (error)
+        return;
     });
   }
 
-  async createTechnologyStage(name, id) {
+  /**
+   * Description: This method will store the technology stage.
+   * @description This method will store the technology stage.
+   * @param name string
+   * @param id number
+   * @return technology stages object
+   */
+  async createTechnologyStage(name: string, id: number) {
     const status: status_enum = '1';
     const payload = {
       id, name, status
@@ -446,7 +578,22 @@ export class MasterService {
     return await this.technologyStageRepository.save(this.technologyStageRepository.create(payload));
   }
 
-  async getCompanyStatus() {
+  /**
+   * Description: This method will return the company status list.
+   * @description This method will return the company status list.
+   * @return array of company status object
+   */
+  getCompanyStatus() {
     return COMPANY_STATUS;
   }
+
+  /**
+   * Description: This method will return the user types list.
+   * @description This method will return the user types list.
+   * @return array of user type object
+   */
+  getUserTypes() {
+    return USER_TYPE;
+  }
+
 }

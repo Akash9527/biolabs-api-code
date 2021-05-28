@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsNumber, MinLength } from 'class-validator';
+import { IsEmail, IsNumber, IsOptional } from 'class-validator';
 import { Unique } from 'modules/common';
 import { SameAs } from 'modules/common/validator/same-as.validator';
 import { User } from 'modules/public/user';
+
+type user_type = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
 
 export class AddUserPayload {
   @ApiProperty({
@@ -17,6 +19,18 @@ export class AddUserPayload {
   })
   @IsNumber()
   role: number;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsNumber()
+  @IsOptional()
+  companyId: number;
+
+  @ApiProperty({
+    required: true,
+  })
+  userType: user_type;
 
   @ApiProperty({
     required: true,
@@ -41,13 +55,13 @@ export class AddUserPayload {
 
   @ApiProperty({
     required: false,
-    nullable:true
+    nullable: true
   })
   title: string;
 
   @ApiProperty({
     required: false,
-    nullable:true
+    nullable: true
   })
   phoneNumber: string;
 

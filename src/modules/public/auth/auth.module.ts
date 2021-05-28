@@ -7,23 +7,25 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { MasterModule } from '../master';
+import { ResidentCompanyModule } from '../resident-company/resident-company.module';
 
 @Module({
   imports: [
     UserModule,
     ConfigModule,
     MasterModule,
+    ResidentCompanyModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
+      useFactory: () => {
         return {
           secret: process.env.APPSETTING_JWT_SECRET_KEY,
           signOptions: {
             ...(process.env.APPSETTING_JWT_EXPIRATION_TIME
               ? {
-                  expiresIn: Number(process.env.APPSETTING_JWT_EXPIRATION_TIME),
-                }
+                expiresIn: Number(process.env.APPSETTING_JWT_EXPIRATION_TIME),
+              }
               : {}),
           },
         };
@@ -35,4 +37,4 @@ import { MasterModule } from '../master';
   providers: [AuthService, JwtStrategy],
   exports: [PassportModule.register({ defaultStrategy: 'jwt' })],
 })
-export class AuthModule {}
+export class AuthModule { }

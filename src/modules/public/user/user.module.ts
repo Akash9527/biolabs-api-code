@@ -1,3 +1,4 @@
+import { ResidentCompanyModule } from './../resident-company/resident-company.module';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,18 +15,19 @@ import { UserToken } from './user-token.entity';
   imports: [
     TypeOrmModule.forFeature([User, UserToken]),
     ConfigModule,
+    ResidentCompanyModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    
+
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
+      useFactory: () => {
         return {
           secret: process.env.APPSETTING_JWT_SECRET_KEY,
           signOptions: {
             ...(process.env.APPSETTING_JWT_EXPIRATION_TIME
               ? {
-                  expiresIn: Number(process.env.APPSETTING_JWT_EXPIRATION_TIME),
-                }
+                expiresIn: Number(process.env.APPSETTING_JWT_EXPIRATION_TIME),
+              }
               : {}),
           },
         };
@@ -37,4 +39,4 @@ import { UserToken } from './user-token.entity';
   exports: [UsersService],
   providers: [UsersService, JwtStrategy, Mail],
 })
-export class UserModule {}
+export class UserModule { }

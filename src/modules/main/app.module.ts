@@ -9,13 +9,14 @@ import { MasterModule } from 'modules/public/master';
 import { UserModule } from 'modules/public/user';
 import { ResidentCompanyModule } from 'modules/public/resident-company'
 import { FileModule } from 'modules/public/file';
+import { SponsorModule } from 'modules/public/sponsor/sponsor.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
+      useFactory: () => {
         return {
           type: process.env.POSTGRESQLCONNSTR_DB_TYPE,
           host: process.env.POSTGRESQLCONNSTR_DB_HOST,
@@ -25,7 +26,7 @@ import { FileModule } from 'modules/public/file';
           database: process.env.POSTGRESQLCONNSTR_DB_DATABASE,
           entities: [__dirname + './../**/**.entity{.ts,.js}'],
           synchronize: process.env.POSTGRESQLCONNSTR_DB_SYNC,
-          ssl :  process.env.POSTGRESQLCONNSTR_DB_SSL, 
+          ssl: (process.env.POSTGRESQLCONNSTR_DB_SSL == 'true'),
         } as TypeOrmModuleAsyncOptions;
       },
     }),
@@ -36,8 +37,9 @@ import { FileModule } from 'modules/public/file';
     UserModule,
     FileModule,
     ResidentCompanyModule,
+    SponsorModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -9,12 +9,9 @@ import { UsersService } from '../user';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     readonly configService: ConfigService,
-    private readonly usersService: UsersService,
+    private readonly usersService: UsersService
   ) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.APPSETTING_JWT_SECRET_KEY,
-    });
+    super({ jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), secretOrKey: process.env.APPSETTING_JWT_SECRET_KEY });
   }
 
   async validate({ iat, exp, id }: JwtPayload, done) {
