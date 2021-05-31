@@ -2,8 +2,8 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 
 /**
  * -1 = De-active
- * 0 = Pending/Default/
- * 1 = Active
+ * 0 = 
+ * 1 = Default/ Active
  * 96 = 
  * 97 = 
  * 98 = 
@@ -106,7 +106,7 @@ export class ResidentCompany {
   @Column("int", { nullable: true, default: null })
   preferredMoveIn: number;
 
-  @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '0' })
+  @Column({ length: 255, enum: ['-1', '0', '1', '99'], default: '1' })
   status: status_enum;
 
   @Column({ length: 255, enum: ['0', '1', '2', '3', '4', '5'], default: '0' })
