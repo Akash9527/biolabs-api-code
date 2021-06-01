@@ -541,7 +541,8 @@ export class ResidentCompanyService {
 
       const categoryStats = await this.categoryRepository.
         query("SELECT c.name, c.id  as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
-          "where c.id = ANY(rc.industry::int[]) and " + site.id + " = ANY(rc.site::int[])  ) as industryCount " +
+          "where c.id = ANY(rc.industry::int[]) and " + site.id + " = ANY(rc.site::int[])  ) as industryCount , (select count(rc.*) FROM resident_companies as rc "+
+          " where rc.'createdAt' >  CURRENT_DATE - INTERVAL '1 months' ) as newStartups " +
           "FROM public.categories as c order by industryCount desc limit 3;");
       if (!companystats) {
         return { count: 0, avg: 0 };
