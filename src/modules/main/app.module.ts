@@ -10,6 +10,7 @@ import { UserModule } from 'modules/public/user';
 import { ResidentCompanyModule } from 'modules/public/resident-company'
 import { FileModule } from 'modules/public/file';
 import { SponsorModule } from 'modules/public/sponsor/sponsor.module';
+import { InvoiceModule } from 'modules/public/invoice/invoice.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { SponsorModule } from 'modules/public/sponsor/sponsor.module';
     UserModule,
     FileModule,
     ResidentCompanyModule,
-    SponsorModule
+    SponsorModule,
+    InvoiceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
