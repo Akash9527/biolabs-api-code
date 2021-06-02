@@ -16,11 +16,11 @@ export class Order {
   @UpdateDateColumn({ type: "timestamp" })
   modifiedAt: number;
 
-  @Column({ nullable: false })
-  createdBy: number;
+  // @Column({ nullable: false })
+  // createdBy: number;
 
-  @Column({ nullable: false })
-  modifiedBy: number;
+  // @Column({ nullable: false })
+  // modifiedBy: number;
 
 }
 

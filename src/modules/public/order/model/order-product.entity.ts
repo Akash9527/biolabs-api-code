@@ -19,7 +19,7 @@ export class OrderProduct {
   @Column({ default: false })
   currentCharge: boolean;
 
-  @Column({ nullable: true })
+  @CreateDateColumn({ type: "timestamp" })
   startDate: number;
 
   @Column({ nullable: true })
@@ -31,11 +31,11 @@ export class OrderProduct {
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt: number;
 
-  @Column({ nullable: false })
-  createdBy: number;
+  // @Column({ nullable: false })
+  // createdBy: number;
 
-  @Column({ nullable: false })
-  modifiedBy: number;
+  // @Column({ nullable: false })
+  // modifiedBy: number;
 
 }
 

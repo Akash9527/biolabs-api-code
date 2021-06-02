@@ -22,8 +22,8 @@ export class Invoice {
   @CreateDateColumn({ type: "timestamp" })
   createdAt: number;
 
-  @Column({ nullable: false })
-  createdBy: number;
+  // @Column({ nullable: false })
+  // createdBy: number;
 
 }
 

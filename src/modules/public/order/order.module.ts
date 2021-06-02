@@ -3,10 +3,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '../../config';
-import { InvoiceController } from './invoice.controller';
-import { InvoiceService } from './invoice.service';
 import { OrderProduct } from './model/order-product.entity';
 import { Order } from './model/order.entity';
+import { OrderProductController } from './order.controller';
+import { OrderProductService } from './order.service';
 
 @Module({
   imports: [
@@ -34,8 +34,8 @@ import { Order } from './model/order.entity';
       inject: [ConfigService],
     }),
   ],
-  controllers: [InvoiceController],
-  exports: [InvoiceService],
-  providers: [InvoiceService],
+  controllers: [OrderProductController],
+  exports: [OrderProductService],
+  providers: [OrderProductService],
 })
-export class InvoiceModule {}
+export class OrderProductModule {}
