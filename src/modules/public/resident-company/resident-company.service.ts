@@ -239,6 +239,7 @@ export class ResidentCompanyService {
     let response = {};
     for await (const site of payload.site) {
       try {
+        payload.site = [site];
         const newRc = await this.residentCompanyRepository.create(payload);
         const savedRc = await this.residentCompanyRepository.save(newRc);
         if (savedRc.id) {
