@@ -236,15 +236,26 @@ export class ResidentCompanyService {
         'User with provided email already created.',
       );
     }
-    const newRc = await this.residentCompanyRepository.create(payload);
-    const savedRc = await this.residentCompanyRepository.save(newRc);
-    if (savedRc.id) {
-      const historyData: any = JSON.parse(JSON.stringify(savedRc));
-      historyData.companyId = historyData.id;
-      delete historyData.id;
-      await this.residentCompanyHistoryRepository.save(historyData);
+    let response = {};
+    for await (const site of payload.site) {
+      try {
+        payload.site = [site];
+        const newRc = await this.residentCompanyRepository.create(payload);
+        const savedRc = await this.residentCompanyRepository.save(newRc);
+        if (savedRc.id) {
+          const historyData: any = JSON.parse(JSON.stringify(savedRc));
+          historyData.companyId = historyData.id;
+          delete historyData.id;
+          await this.residentCompanyHistoryRepository.save(historyData);
+        }
+      } catch {
+        response['status'] = 'error';
+        response['message'] = 'Could not add application';
+      }
     }
-    return savedRc;
+    response['status'] = 'success';
+    response['message'] = 'Application Successfully submitted'
+    return response;
   }
 
   /**
@@ -255,6 +266,10 @@ export class ResidentCompanyService {
    */
   async getResidentCompanies(payload: ListResidentCompanyPayload, siteIdArr: number[]) {
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
+      .select("resident_companies.* ")
+      .addSelect("s.name", "siteName")
+      .addSelect("s.id", "siteId")
+      .leftJoin('sites', 's', 's.id = Any(resident_companies.site)')
       .where("resident_companies.status IN (:...status)", { status: [1, 0] })
       .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
 
@@ -283,7 +298,7 @@ export class ResidentCompanyService {
       rcQuery.skip(skip).take(take)
     }
     rcQuery.orderBy("id", "DESC");
-    return await rcQuery.getMany();
+    return await rcQuery.getRawMany();
   }
 
   /**
@@ -541,22 +556,22 @@ export class ResidentCompanyService {
           "where c.id = ANY(rc.industry::int[]) and " + site.id + " = ANY(rc.site::int[])  ) as industryCount " +
           " FROM public.categories as c order by industryCount desc limit 3;");
       let newStartUps: any = {};
-     // try {
-        //Get Sum of all New companies onboard in last 3 months
-        // newStartUps = await this.residentCompanyRepository.
-        // createQueryBuilder("resident_companies").
-        // addSelect("count(*)", "newStartUps").
-        // where("resident_companies.status = :status", { status: '1' }).
-        // where("resident_companies.createdAt  >  '06/01/2021' ").
-        // andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).
-        // andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
+      // try {
+      //Get Sum of all New companies onboard in last 3 months
+      // newStartUps = await this.residentCompanyRepository.
+      // createQueryBuilder("resident_companies").
+      // addSelect("count(*)", "newStartUps").
+      // where("resident_companies.status = :status", { status: '1' }).
+      // where("resident_companies.createdAt  >  '06/01/2021' ").
+      // andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).
+      // andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
 
-        newStartUps = await this.residentCompanyRepository.
-                      query(" select count(*) as newStartUps FROM resident_companies "+
-                      " where resident_companies.\"companyVisibility\" = true and "+
-                      " resident_companies.\"status\" = '1' and "+
-                      " (CURRENT_DATE - INTERVAL '3 months')  < (resident_companies.\"createdAt\") ");
-                      
+      newStartUps = await this.residentCompanyRepository.
+        query(" select count(*) as newStartUps FROM resident_companies " +
+          " where resident_companies.\"companyVisibility\" = true and " +
+          " resident_companies.\"status\" = '1' and " +
+          " (CURRENT_DATE - INTERVAL '3 months')  < (resident_companies.\"createdAt\") ");
+
       // } catch {
       //   newStartUps = {newStartUps : 'error'};
       // }

@@ -23,7 +23,7 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async addResidentCompany(@Body() payload: AddResidentCompanyPayload): Promise<any> {
     type status_enum = '-1' | '0' | '1' | '99';
-    const status: status_enum = '0';
+    const status: status_enum = '1';
     const pal = { ...payload, status: status };
     const user = await this.residentCompanyService.addResidentCompany(pal);
     return user;
