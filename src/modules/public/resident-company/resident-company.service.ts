@@ -266,6 +266,10 @@ export class ResidentCompanyService {
    */
   async getResidentCompanies(payload: ListResidentCompanyPayload, siteIdArr: number[]) {
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
+      .select("resident_companies.* ")
+      .addSelect("s.name", "siteName")
+      .addSelect("s.id", "siteId")
+      .leftJoin('sites', 's', 's.id = Any(resident_companies.site)')
       .where("resident_companies.status IN (:...status)", { status: [1, 0] })
       .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
 
@@ -294,7 +298,7 @@ export class ResidentCompanyService {
       rcQuery.skip(skip).take(take)
     }
     rcQuery.orderBy("id", "DESC");
-    return await rcQuery.getMany();
+    return await rcQuery.getRawMany();
   }
 
   /**
