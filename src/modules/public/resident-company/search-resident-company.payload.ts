@@ -19,14 +19,12 @@ export class SearchResidentCompanyPayload {
   @ApiProperty({
     required: false,
   })
-  @ValidateIf(o => o.sort == 'true')
-  @IsNotEmpty()
   pagination: boolean;
 
   @ApiProperty({
     required: false,
   })
-  @ValidateIf(o => o.sort == 'true')
+  @ValidateIf(o => o.pagination == 'true')
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
@@ -35,7 +33,7 @@ export class SearchResidentCompanyPayload {
   @ApiProperty({
     required: false,
   })
-  @ValidateIf(o => o.sort == 'true')
+  @ValidateIf(o => o.pagination == 'true')
   @IsNotEmpty()
   @IsNumber()
   @Min(1)
