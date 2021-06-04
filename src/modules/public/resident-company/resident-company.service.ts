@@ -688,6 +688,12 @@ export class ResidentCompanyService {
     }
   }
 
+  private parseToArray(val){
+    if(typeof val === 'object'){
+      return val;
+    }
+    return [val];
+  }
   /**
    * Description: This method will return the resident companies list.
    * @description This method will return the resident companies list.
@@ -712,15 +718,19 @@ export class ResidentCompanyService {
       rcQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: payload.companyOnboardingStatus });
     }
     if (payload.siteIdArr && payload.siteIdArr.length > 0) {
+      payload.siteIdArr = this.parseToArray(payload.siteIdArr)
       rcQuery.andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: payload.siteIdArr });
     }
     if (payload.industries && payload.industries.length > 0) {
+      payload.industries = this.parseToArray(payload.industries)
       rcQuery.andWhere("resident_companies.industry && ARRAY[:...industries]::int[]", { industries: payload.industries });
     }
     if (payload.modalities && payload.modalities.length > 0) {
+      payload.modalities = this.parseToArray(payload.modalities)
       rcQuery.andWhere("resident_companies.modality && ARRAY[:...modalities]::int[]", { modalities: payload.modalities });
     }
     if (payload.fundingSource && payload.fundingSource.length > 0) {
+      payload.fundingSource = this.parseToArray(payload.fundingSource)
       rcQuery.andWhere("resident_companies.fundingSource && ARRAY[:...fundingSource]::int[]", { fundingSource: payload.fundingSource });
     }
     if (payload.minFund >= 0) {
