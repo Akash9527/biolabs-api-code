@@ -697,14 +697,10 @@ export class ResidentCompanyService {
   async gloabalSearchCompanies(payload: SearchResidentCompanyPayload) {
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
       .where("resident_companies.status IN (:...status)", { status: [1, 0] });
-    /**
-     * SELECT rc."id", rc."name", rc."companyName", rc."technology", rc."rAndDPath"
-     * FROM public.resident_companies as rc
-     * WHERE (SELECT to_tsvector(rc."id" || ' ' || rc."name" || ' ' || rc."companyName" || ' ' || rc."technology") @@ to_tsquery('test'));
-     */
+
     if (payload.q && payload.q != '') {
-      // rcQuery.andWhere("(resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
-      rcQuery.andWhere("(SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\") @@ to_tsquery(:q)) ", { q: `%${payload.q}%` });
+      // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
+      rcQuery.andWhere("(resident_companies.name LIKE :q) OR (resident_companies.companyName LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\") @@ to_tsquery(:q)) ", { q: `%${payload.q}%` });
     }
     if (payload.companyStatus && payload.companyStatus.length > 0) {
       rcQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: payload.companyStatus });

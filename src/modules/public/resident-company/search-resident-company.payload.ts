@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, Min, ValidateIf } from 'class-validator';
+import { IsNotEmpty, IsOptional, Min, ValidateIf } from 'class-validator';
 import { GreaterThanEqualsTo } from 'modules/common/validator/greater-than-equals-to.validator';
 import { LessThanEqualsTo } from 'modules/common/validator/less-than-equals-to.validator';
 
@@ -25,8 +25,6 @@ export class SearchResidentCompanyPayload {
     required: false,
   })
   @ValidateIf(o => o.pagination == 'true')
-  @IsNotEmpty()
-  @IsNumber()
   @Min(0)
   page: number;
 
@@ -34,8 +32,6 @@ export class SearchResidentCompanyPayload {
     required: false,
   })
   @ValidateIf(o => o.pagination == 'true')
-  @IsNotEmpty()
-  @IsNumber()
   @Min(1)
   limit: number;
 
