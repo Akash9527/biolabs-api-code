@@ -20,6 +20,7 @@ import { ListResidentCompanyPayload } from './list-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { ResidentCompanyHistory } from './resident-company-history.entity';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
+import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 
 @Injectable()
 export class ResidentCompanyService {
@@ -685,5 +686,75 @@ export class ResidentCompanyService {
         'Company with provided id not available.',
       );
     }
+  }
+
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
+  async gloabalSearchCompanies(payload: SearchResidentCompanyPayload) {
+    let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] });
+    /**
+     * SELECT rc."id", rc."name", rc."companyName", rc."technology", rc."rAndDPath"
+     * FROM public.resident_companies as rc
+     * WHERE (SELECT to_tsvector(rc."id" || ' ' || rc."name" || ' ' || rc."companyName" || ' ' || rc."technology") @@ to_tsquery('test'));
+     */
+    if (payload.q && payload.q != '') {
+      // rcQuery.andWhere("(resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
+      rcQuery.andWhere("(SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\") @@ to_tsquery(:q)) ", { q: `%${payload.q}%` });
+    }
+    if (payload.companyStatus && payload.companyStatus.length > 0) {
+      rcQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: payload.companyStatus });
+    }
+    if (typeof payload.companyVisibility !== 'undefined') {
+      rcQuery.andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: payload.companyVisibility });
+    }
+    if (typeof payload.companyOnboardingStatus !== 'undefined') {
+      rcQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: payload.companyOnboardingStatus });
+    }
+    if (payload.siteIdArr && payload.siteIdArr.length > 0) {
+      rcQuery.andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: payload.siteIdArr });
+    }
+    if (payload.industries && payload.industries.length > 0) {
+      rcQuery.andWhere("resident_companies.industry && ARRAY[:...industries]::int[]", { industries: payload.industries });
+    }
+    if (payload.modalities && payload.modalities.length > 0) {
+      rcQuery.andWhere("resident_companies.modality && ARRAY[:...modalities]::int[]", { modalities: payload.modalities });
+    }
+    if (payload.fundingSource && payload.fundingSource.length > 0) {
+      rcQuery.andWhere("resident_companies.fundingSource && ARRAY[:...fundingSource]::int[]", { fundingSource: payload.fundingSource });
+    }
+    if (payload.minFund >= 0) {
+      rcQuery.andWhere("resident_companies.funding >= :minFunding", { minFunding: payload.minFund });
+    }
+    if (payload.maxFund >= 0) {
+      rcQuery.andWhere("resident_companies.funding <= :maxFunding", { maxFunding: payload.maxFund });
+    }
+    if (payload.minCompanySize >= 0) {
+      rcQuery.andWhere("resident_companies.companySize >= :minCompanySize", { minCompanySize: payload.minCompanySize });
+    }
+    if (payload.maxCompanySize >= 0) {
+      rcQuery.andWhere("resident_companies.companySize <= :maxCompanySize", { maxCompanySize: payload.maxCompanySize });
+    }
+
+    if (payload.pagination) {
+      let skip = 0;
+      let take = 10;
+      if (payload.limit) {
+        take = payload.limit;
+        if (payload.page) {
+          skip = payload.page * payload.limit;
+        }
+      }
+      rcQuery.skip(skip).take(take)
+    }
+    if (payload.sort) {
+      rcQuery.orderBy('"' + payload.sortFiled + '"', payload.sortOrder)
+    }
+    rcQuery.addOrderBy("id", "DESC");
+    return await rcQuery.getMany();
   }
 }
