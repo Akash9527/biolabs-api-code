@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Order } from './order.entity';
 
 @Entity({
   name: 'invoice',
@@ -21,6 +22,10 @@ export class Invoice {
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: number;
+
+  @ManyToMany(type => Order, order => order.invoices)
+  @JoinTable()
+  orders: Order[];
 
   // @Column({ nullable: false })
   // createdBy: number;

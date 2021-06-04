@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Invoice } from './invoice.entity';
+import { OrderProduct } from './order-product.entity';
 
 @Entity({
   name: 'order',
@@ -6,6 +8,9 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 export class Order {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.order)
+  orderProducts?: OrderProduct[];
 
   @Column({ nullable: true })
   companyId: number;
@@ -21,6 +26,9 @@ export class Order {
 
   // @Column({ nullable: false })
   // modifiedBy: number;
+
+  @ManyToMany(type => Invoice, invoice => invoice.orders)
+  invoices: Invoice[];
 
 }
 
