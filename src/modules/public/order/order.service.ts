@@ -11,8 +11,6 @@ import { Order } from './model/order.entity';
 export class OrderProductService {
   constructor(
     @InjectRepository(Order)
-    private readonly invoiceRepository: Repository<Invoice>,
-    @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
     @InjectRepository(OrderProduct)
     private readonly orderProductRepository: Repository<OrderProduct>
@@ -25,13 +23,14 @@ export class OrderProductService {
    * @return saved order product object
    */
    async addOrderProduct(payload: AddOrderDto) {
-    let order = new Order();
-    order.companyId = payload.companyId;
+    const newOrder: Order = this.orderRepository.create(payload);
+    await this .orderRepository.save(newOrder);
+    return await this.orderProductRepository.save(
+      this.orderProductRepository.create({...payload.orderProducts, order: newOrder})
+    );
     // set createdBy
     // set modifiedBy
-    await this.orderRepository.save(this.orderRepository.create(order));
-    return await this.orderProductRepository.save(this.orderProductRepository.create(payload.orderProducts));
-    //return await this.invoiceRepository.save(this.invoiceRepository.create(payload));
+    //return newOrder;
   }
 
   /**
@@ -43,9 +42,11 @@ export class OrderProductService {
    async updateOrderProduct(id: number, payload: UpdateOrderProductDto) {
     const orderProduct = await this.orderProductRepository.findOne(id);
     orderProduct.productName = payload.productName?payload.productName:orderProduct.productName;
+    orderProduct.productDescription = payload.productDescription?payload.productDescription:orderProduct.productDescription;
     orderProduct.cost = payload.cost?payload.cost:orderProduct.cost;
     orderProduct.recurrence = payload.recurrence?payload.recurrence:orderProduct.recurrence;
     orderProduct.currentCharge = payload.currentCharge?payload.currentCharge:orderProduct.currentCharge;
+    orderProduct.startDate = payload.startDate?payload.startDate:orderProduct.startDate;
     orderProduct.endDate = payload.endDate?payload.endDate:orderProduct.endDate;
     return await this.orderProductRepository.update(id, this.orderProductRepository.create(payload));
   }

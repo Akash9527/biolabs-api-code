@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '../../config';
+import { Invoice } from './model/invoice.entity';
 import { OrderProduct } from './model/order-product.entity';
 import { Order } from './model/order.entity';
 import { OrderProductController } from './order.controller';
@@ -12,7 +13,8 @@ import { OrderProductService } from './order.service';
   imports: [
     TypeOrmModule.forFeature([
       Order,
-      OrderProduct
+      OrderProduct,
+      Invoice
     ]),
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
