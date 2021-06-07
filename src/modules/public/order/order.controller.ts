@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AddOrderDto } from './dto/add-order.payload';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
@@ -36,5 +36,17 @@ export class OrderProductController {
      const user = await this.orderProductService.updateOrderProduct(id, payload);
      return user;
    }
+
+   /**
+   * Description: This method is used to fetch a resident company order product details of given month and year.
+   * @description This method is used to fetch a resident company order product details of given month and year.
+   */
+    @Get()
+    @ApiResponse({ status: 200, description: 'Successful Response' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    async fetchOrderProductsBetweenDates(@Query('startDate') startDate: Date, @Query('endDate') endDate: Date,): Promise<any> {
+      const orderProducts = await this.orderProductService.fetchOrderProductsBetweenDates(startDate, endDate);
+      return orderProducts;
+    }
 
 }
