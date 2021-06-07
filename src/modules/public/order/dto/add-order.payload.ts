@@ -3,14 +3,19 @@ import { CreateOrderProductDto } from "./order-product.create.dto";
 
 
 export class AddOrderDto {
-    @ApiProperty({
-        required: true,
-      })
-    companyId: number;
-    
-    @ApiProperty({
-        required: true,
-        type: CreateOrderProductDto
-      })
-    orderProducts: CreateOrderProductDto[];
+  @ApiProperty({
+    required: true,
+  })
+  companyId: number;
+
+  @ApiProperty({
+    required: true,
+  })
+  orderId: number;
+
+  @ApiProperty({
+    required: true,
+    type: CreateOrderProductDto
+  })
+  orderProducts: CreateOrderProductDto[];
 }

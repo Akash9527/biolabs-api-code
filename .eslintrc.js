@@ -169,5 +169,6 @@ module.exports = {
         '@typescript-eslint/no-floating-promises': 'off',
         '@typescript-eslint/restrict-template-expressions': 'off',
         '@typescript-eslint/unbound-method': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off'
     },
 };

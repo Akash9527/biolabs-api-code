@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, Min } from 'class-validator';
 
 export class UpdateOrderProductDto {
 
@@ -8,12 +7,10 @@ export class UpdateOrderProductDto {
   })
   productName: string;
 
-  // @ApiProperty({
-  //   required: true,
-  //   nullable: true,
-  // })
-  // @IsNotEmpty()
-  // companyId: number;
+  @ApiProperty({
+    required: true,
+  })
+  productDescription: string;
 
   @ApiProperty({
     required: false,
@@ -37,6 +34,12 @@ export class UpdateOrderProductDto {
     required: true,
     nullable: true,
   })
-  endDate: number;
+  startDate: Date;
+  
+  @ApiProperty({
+    required: true,
+    nullable: true,
+  })
+  endDate: Date;
 
 }
