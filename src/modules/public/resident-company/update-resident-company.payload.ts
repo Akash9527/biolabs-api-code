@@ -1,9 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, Max, MaxLength, Min, MinLength } from 'class-validator';
-import { Unique } from 'modules/common';
-import { ResidentCompany } from './resident-company.entity';
-
-type company_status = '0' | '1' | '2' | '3' | '4' | '5';
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, Matches, MaxLength, Min, MinLength, ValidateIf } from 'class-validator';
 
 export class UpdateResidentCompanyPayload {
   @ApiProperty({
@@ -11,7 +7,7 @@ export class UpdateResidentCompanyPayload {
   })
   @IsNumber()
   id: number;
-  
+
   @ApiProperty({
     required: true,
   })
@@ -22,6 +18,7 @@ export class UpdateResidentCompanyPayload {
     required: true,
   })
   @MaxLength(100)
+  @Matches('^[a-zA-Z. ]+')
   name: string;
 
   @ApiProperty({
@@ -33,275 +30,340 @@ export class UpdateResidentCompanyPayload {
   @ApiProperty({
     required: true,
   })
+  @Min(1, { each: true })
   site: number[];
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
+  @Min(1, { each: true })
   biolabsSources: number;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   @MaxLength(100)
+  @IsOptional()
   otherBiolabsSources: string;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
+  @MinLength(1)
+  @MaxLength(500)
   technology: string;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
+  @MinLength(1)
+  @MaxLength(500)
   rAndDPath: string;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
   startDate: number;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
-  companySize: number;
-  @ApiProperty({
-    required: false,
-    nullable: true
-  })
+  @MinLength(1)
+  @MaxLength(100)
   foundedPlace: string;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
+  @Min(1)
   companyStage: number;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
+  @ValidateIf(o => o.companyStage == '9999')
+  @IsNotEmpty()
+  @MaxLength(100)
   otherCompanyStage: string;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
+  @IsNotEmpty()
+  @Min(0)
   funding: string;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
+  @IsNotEmpty()
+  @Min(1, { each: true })
   fundingSource: number[];
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
+  @ValidateIf(o => o.fundingSource.includes('9999'))
+  @IsNotEmpty()
+  @MaxLength(100)
   otherFundingSource: string;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
-  intellectualProperty: string;
+  @IsNumber()
+  @IsOptional()
+  intellectualProperty: number;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
+  @MaxLength(100)
   otherIntellectualProperty: string;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
-  isAffiliated: string;
+  @IsNotEmpty()
+  isAffiliated: boolean;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
+  @MaxLength(250)
   affiliatedInstitution: string;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
+  @Min(0)
   noOfFullEmp: number;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
+  @Min(0)
   empExpect12Months: number;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
+  @Min(0)
   utilizeLab: number;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
+  @Min(0)
   expect12MonthsUtilizeLab: number;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
   industry: string[];
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   otherIndustries: any;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
   modality: string[];
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   otherModality: object;
 
   @ApiProperty({
-    required: false,
-    nullable: true
+    required: true,
+    nullable: true,
   })
-  preferredMoveIn:number;
+  @IsNotEmpty()
+  preferredMoveIn: number;
+
+  @ApiProperty({
+    required: true,
+    nullable: true,
+  })
+  @MaxLength(500)
+  equipmentOnsite: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
-  equipmentOnsite:string;
-
-  @ApiProperty({
-    required: false,
-    nullable: true
-  })
+  @MaxLength(500)
+  @IsOptional()
   elevatorPitch: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
+  })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  companySize: number;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
   })
   logoOnWall: boolean;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   logoOnLicensedSpace: boolean;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
+  @MaxLength(500)
+  @IsOptional()
   bioLabsAssistanceNeeded: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   technologyPapersPublished: boolean;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
-  technologyPapersPublishedLink:string;
+  technologyPapersPublishedLinkCount: number;
+
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
+  })
+  @MaxLength(500)
+  @IsOptional()
+  technologyPapersPublishedLink: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
   })
   patentsFiledGranted: boolean;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
+  @MaxLength(500)
+  @IsOptional()
   patentsFiledGrantedDetails: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   foundersBusinessIndustryBefore: boolean;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   academiaPartnerships: boolean;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
+  @MaxLength(100)
+  @IsOptional()
   academiaPartnershipDetails: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   industryPartnerships: boolean;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
+  @MaxLength(100)
+  @IsOptional()
   industryPartnershipsDetails: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   newsletters: boolean;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   shareYourProfile: boolean;
-  
+
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
+  @MaxLength(100)
+  @IsOptional()
   website: string;
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   companyMembers: [];
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   companyAdvisors: [];
 
   @ApiProperty({
     required: false,
-    nullable: true
+    nullable: true,
   })
   companyTechnicalTeams: [];
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  @MaxLength(100)
+  @IsOptional()
+  foundersBusinessIndustryName: string
+
 }

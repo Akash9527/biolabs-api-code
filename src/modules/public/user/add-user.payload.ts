@@ -55,13 +55,13 @@ export class AddUserPayload {
 
   @ApiProperty({
     required: false,
-    nullable:true
+    nullable: true
   })
   title: string;
 
   @ApiProperty({
     required: false,
-    nullable:true
+    nullable: true
   })
   phoneNumber: string;
 

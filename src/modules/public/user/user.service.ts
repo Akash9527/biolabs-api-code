@@ -1,7 +1,7 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ListUserPayload } from './list-user.payload';
 
 import { User, UserFillableFields } from './user.entity';
@@ -42,6 +42,8 @@ export class UsersService {
   async getByEmail(email: string) {
     return await this.userRepository
       .createQueryBuilder('users')
+      .addSelect("users.email")
+      .addSelect("users.password")
       .where('users.email = :email')
       .setParameter('email', email)
       .getOne();
@@ -85,11 +87,10 @@ export class UsersService {
     const userInfo = {
       token: userInformation.token,
       userName: savedUser.firstName,
-      origin: req.headers['origin']
-    }
+      origin: req.headers['origin'],
+    };
     let tenant = { tenantEmail: payload.email };
-    console.log('tenant in user service', tenant);
-    this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, "Invite", userInfo);
+    this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, 'Invite', userInfo);
 
     return savedUser;
   }
@@ -107,21 +108,22 @@ export class UsersService {
       user.lastName = payload.lastName;
       user.title = payload.title;
       user.phoneNumber = payload.phoneNumber;
-      user.companyId = payload.companyId;
+      user.companyId = (payload.companyId) ? payload.companyId : user.companyId;
       user.userType = payload.userType;
-      if (payload.password && (payload.password !== "" && payload.password != null)) {
+      if (
+        payload.password &&
+        payload.password !== '' &&
+        payload.password != null
+      ) {
         user.password = payload.password;
       } else {
         delete user.password;
       }
       await this.userRepository.update(user.id, user);
-      if (user.password)
-        delete user.password;
-      return user;
+      if (user.password) delete user.password;
+      return await this.getUserById(user.id);
     } else {
-      throw new NotAcceptableException(
-        'User with provided id not available.',
-      );
+      throw new NotAcceptableException('User with provided id not available.');
     }
   }
 
@@ -131,7 +133,7 @@ export class UsersService {
    * @param payload object of user information with imageUrl
    * @return user object
    */
-   async updateUserProfilePic(payload) {
+  async updateUserProfilePic(payload) {
     const user = await this.get(payload.id);
     if (user) {
       delete user.password;
@@ -139,9 +141,7 @@ export class UsersService {
       await this.userRepository.update(user.id, user);
       return user;
     } else {
-      throw new NotAcceptableException(
-        'User with provided id not available.',
-      );
+      throw new NotAcceptableException('User with provided id not available.');
     }
   }
 
@@ -155,12 +155,10 @@ export class UsersService {
     const user = await this.get(id);
 
     if (user) {
-      user.status = "99";
+      user.status = '99';
       return await this.userRepository.save(user);
     } else {
-      throw new NotAcceptableException(
-        'User with provided id not available.',
-      );
+      throw new NotAcceptableException('User with provided id not available.');
     }
   }
 
@@ -170,33 +168,37 @@ export class UsersService {
    * @param payload object of type ListUserPayload
    * @return array of user object
    */
-  async getUsers(payload: ListUserPayload) {
-    let search;
-    let skip;
-    let take;
-    let _search = {};
+  async getUsers(payload: ListUserPayload, siteIdArr?: number[]) {
+    let userQuery = await this.userRepository.createQueryBuilder("users")
+      .where("users.status IN (:...status)", { status: [1, 0] })
+      .andWhere("users.site_id && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
     if (payload.role || payload.role == 0) {
-      _search = { ..._search, ...{ role: payload.role } };
+      userQuery.andWhere("users.role = :role", { role: payload.role });
     }
-    if (payload.q && payload.q != "") {
-      _search = { ..._search, ...{ name: Like("%" + payload.q + "%") } };
+    if (payload.q && payload.q != '') {
+      userQuery.andWhere("(users.firstName LIKE :name OR users.lastName LIKE :name) ", { name: `%${payload.q}%` });
     }
-    search = [{ ..._search, status: '1' }, { ..._search, status: '0' }]
+
     if (payload.pagination) {
-      skip = { skip: 0 }
-      take = { take: 10 }
+      let skip = 0;
+      let take = 10;
       if (payload.limit) {
-        take = { take: payload.limit };
+        take = payload.limit;
         if (payload.page) {
-          skip = { skip: payload.page * payload.limit }
+          skip = payload.page * payload.limit;
         }
       }
+      userQuery.skip(skip).take(take)
     }
-    return await this.userRepository.find({
-      where: search,
-      skip,
-      take
-    });
+    userQuery.addOrderBy("users.firstName", "ASC");
+    userQuery.addOrderBy("users.lastName", "ASC");
+    return await userQuery.getMany();
+    // return await this.userRepository.find({
+    //   where: search,
+    //   skip,
+    //   take,
+    // });
+
   }
 
   /**
@@ -206,18 +208,17 @@ export class UsersService {
    * @return user object
    */
   async getUserById(id) {
-    const user:any = await this.get(id);
+    const user: any = await this.get(id);
     if (user) {
-      if(user.companyId){
-        const company = await this.residentCompanyService.getResidentCompany(user.companyId);
-        if(company)
-          user.company = company;
+      if (user.companyId) {
+        const company = await this.residentCompanyService.getResidentCompany(
+          user.companyId,
+        );
+        if (company) user.company = company;
       }
       return user;
     } else {
-      throw new NotAcceptableException(
-        'User with provided id not available.',
-      );
+      throw new NotAcceptableException('User with provided id not available.');
     }
   }
 
@@ -228,21 +229,17 @@ export class UsersService {
    * @return user object
    */
   async validateToken(token: string) {
-    const tokenData = await this.userTokenRepository.findOne({ where: [{ token: token, status: 1 }] });
+    const tokenData = await this.userTokenRepository.findOne({
+      where: [{ token: token, status: 1 }],
+    });
     if (tokenData) {
-      //console.log("tokenData",tokenData)
       const user = await this.get(tokenData.user_id);
-      if (user.status == "1" || user.status == "0")
-        return user;
+      if (user.status == '1' || user.status == '0') return user;
       else {
-        throw new NotAcceptableException(
-          'Token is invalid.',
-        );
+        throw new NotAcceptableException('Token is invalid.');
       }
     } else {
-      throw new NotAcceptableException(
-        'Token is invalid.',
-      );
+      throw new NotAcceptableException('Token is invalid.');
     }
   }
 
@@ -253,26 +250,23 @@ export class UsersService {
    * @return user object
    */
   async setNewPassword(payload) {
-    const tokenData = await this.userTokenRepository.findOne({ where: [{ token: payload.token, status: 1 }] });
+    const tokenData = await this.userTokenRepository.findOne({
+      where: [{ token: payload.token, status: 1 }],
+    });
     if (tokenData) {
       const user = await this.get(tokenData.user_id);
-      if (user.status == "1" || user.status == "0") {
+      if (user.status == '1' || user.status == '0') {
         user.password = payload.password;
-        user.status = "1";
+        user.status = '1';
         const newUser = await this.userRepository.save(user);
-        tokenData.status = "99";
+        tokenData.status = '99';
         this.userTokenRepository.save(tokenData);
         return newUser;
-      }
-      else {
-        throw new NotAcceptableException(
-          'Token is invalid.',
-        );
+      } else {
+        throw new NotAcceptableException('Token is invalid.');
       }
     } else {
-      throw new NotAcceptableException(
-        'Token is invalid.',
-      );
+      throw new NotAcceptableException('Token is invalid.');
     }
   }
 
@@ -283,14 +277,23 @@ export class UsersService {
    * @return user object
    */
   async generateToken(user) {
-    let token = this.jwtService.sign({ id: user.id, time: new Date().getTime() });
-    console.log("token==>", token);
+    let token = this.jwtService.sign({
+      id: user.id,
+      time: new Date().getTime(),
+    });
     const tokenData = { user_id: user.id, token: token };
-    const tokenChk = await this.userTokenRepository.find({ where: [{ user_id: user.id, status: "1" }] });
+    const tokenChk = await this.userTokenRepository.find({
+      where: [{ user_id: user.id, status: '1' }],
+    });
     if (tokenChk) {
-      await this.userTokenRepository.update({ user_id: user.id }, { status: "99" });
+      await this.userTokenRepository.update(
+        { user_id: user.id },
+        { status: '99' },
+      );
     }
-    return await this.userTokenRepository.save(this.userTokenRepository.create(tokenData));
+    return await this.userTokenRepository.save(
+      this.userTokenRepository.create(tokenData),
+    );
   }
 
   /**
@@ -307,10 +310,15 @@ export class UsersService {
       const userInfo = {
         token: userInformation.token,
         userName: user.firstName,
-        origin: req.headers['origin']
-      }
+        origin: req.headers['origin'],
+      };
       let tenant = { tenantEmail: payload.email, role: payload.role };
-      this.mail.sendEmail(tenant, EMAIL.SUBJECT_FORGOT_PASSWORD, "forgotMail", userInfo)
+      this.mail.sendEmail(
+        tenant,
+        EMAIL.SUBJECT_FORGOT_PASSWORD,
+        'forgotMail',
+        userInfo,
+      );
       return true;
     } else {
       throw new NotAcceptableException(

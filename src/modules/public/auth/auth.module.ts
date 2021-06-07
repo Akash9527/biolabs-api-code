@@ -24,8 +24,8 @@ import { ResidentCompanyModule } from '../resident-company/resident-company.modu
           signOptions: {
             ...(process.env.APPSETTING_JWT_EXPIRATION_TIME
               ? {
-                  expiresIn: Number(process.env.APPSETTING_JWT_EXPIRATION_TIME),
-                }
+                expiresIn: Number(process.env.APPSETTING_JWT_EXPIRATION_TIME),
+              }
               : {}),
           },
         };
@@ -37,4 +37,4 @@ import { ResidentCompanyModule } from '../resident-company/resident-company.modu
   providers: [AuthService, JwtStrategy],
   exports: [PassportModule.register({ defaultStrategy: 'jwt' })],
 })
-export class AuthModule {}
+export class AuthModule { }

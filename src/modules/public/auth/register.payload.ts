@@ -42,7 +42,7 @@ export class RegisterPayload {
     required: true,
   })
   phoneNumber: string;
-  
+
   @ApiProperty({
     required: false,
     nullable: true

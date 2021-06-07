@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Body,
-  Post,
-  Get,
-  Put,
-  Param,
-  Req,
-} from '@nestjs/common';
+import { Controller, Body, Post, Get, Put, Param, Req } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService, LoginPayload } from '.';
 import { UsersService } from '../user';
@@ -74,15 +66,4 @@ export class AuthController {
   async forgotPassword(@Body() payload: ForgotPasswordPayload, @Req() req: Request): Promise<any> {
     return await this.authService.forgotPassword(payload, req);
   }
-
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard())
-  // @Get('me')
-  // @ApiResponse({ status: 200, description: 'Successful Response' })
-  // @ApiResponse({ status: 401, description: 'Unauthorized' })
-  // async getLoggedInUser(@Request() request): Promise<any> {
-  //   return request.user;
-  // }
-
-
 }

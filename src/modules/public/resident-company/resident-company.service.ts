@@ -61,6 +61,29 @@ export class ResidentCompanyService {
   }
 
   /**
+ * Description: This method is used to update the resident company pitchdeck and logo.
+ * @description This method is used to update the  resident company pitchdeck and logo.
+ * @param payload object of user information with pitchdeckImgUrl or logoImgUrl
+ * @return resident company object
+ */
+  async updateResidentCompanyImg(payload) {
+    const companyId = payload.id;
+    const resident = await this.get(companyId);
+    if (resident) {
+      if (payload.fileType == 'logo') {
+        resident.logoImgUrl = payload.imageUrl;
+        await this.residentCompanyRepository.update(companyId, resident);
+      } else if (payload.fileType == 'pitchdeck') {
+        resident.pitchdeck = payload.imageUrl;
+        await this.residentCompanyRepository.update(companyId, resident);
+      }
+      return resident;
+    } else {
+      throw new NotAcceptableException('resident company with provided id not available.');
+    }
+  }
+
+  /**
    * Description: This method will get the resident company by email.
    * @description This method will get the resident company by email.
    * @param email string resident company email
@@ -98,8 +121,13 @@ export class ResidentCompanyService {
    * @return resident companies advisor object
    */
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
-    const savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
-    return savedRcAdvisor;
+    let savedRcAdvisor: object;
+    if (payload.id)
+      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
+    else {
+      delete payload.id;
+      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
+    }
   }
 
   /**
@@ -113,8 +141,7 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        const savedRcManagement = await this.addResidentCompanyAdvisor(companyMember);
-        return savedRcManagement;
+        let savedRcManagement = await this.addResidentCompanyAdvisor(companyMember);
       }
     }
   }
@@ -137,8 +164,13 @@ export class ResidentCompanyService {
    * @return resident companies management object
    */
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
-    const savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
-    return savedRcManagement;
+    let savedRcManagement: object;
+    if (payload.id)
+      savedRcManagement = await this.residentCompanyManagementRepository.update(payload.id, payload);
+    else {
+      delete payload.id;
+      savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
+    }
   }
 
   /**
@@ -152,8 +184,7 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        const savedRcManagement = await this.addResidentCompanyManagement(companyMember);
-        return savedRcManagement;
+        let savedRcManagement = await this.addResidentCompanyManagement(companyMember);
       }
     }
   }
@@ -165,8 +196,13 @@ export class ResidentCompanyService {
    * @return resident companies technical object
    */
   async addResidentCompanyTechnical(payload: ResidentCompanyTechnicalFillableFields) {
-    const savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
-    return savedRcTechnical;
+    let savedRcTechnical: object;
+    if (payload.id)
+      savedRcTechnical = await this.residentCompanyTechnicalRepository.update(payload.id, payload);
+    else {
+      delete payload.id;
+      savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
+    }
   }
 
   /**
@@ -180,8 +216,7 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        const savedRcManagement = await this.addResidentCompanyTechnical(companyMember);
-        return savedRcManagement;
+        let savedRcManagement = await this.addResidentCompanyTechnical(companyMember);
       }
     }
   }
@@ -201,15 +236,26 @@ export class ResidentCompanyService {
         'User with provided email already created.',
       );
     }
-    const newRc = await this.residentCompanyRepository.create(payload);
-    const savedRc = await this.residentCompanyRepository.save(newRc);
-    if (savedRc.id) {
-      const historyData: any = JSON.parse(JSON.stringify(savedRc));
-      historyData.companyId = historyData.id;
-      delete historyData.id;
-      await this.residentCompanyHistoryRepository.save(historyData);
+    let response = {};
+    for await (const site of payload.site) {
+      try {
+        payload.site = [site];
+        const newRc = await this.residentCompanyRepository.create(payload);
+        const savedRc = await this.residentCompanyRepository.save(newRc);
+        if (savedRc.id) {
+          const historyData: any = JSON.parse(JSON.stringify(savedRc));
+          historyData.companyId = historyData.id;
+          delete historyData.id;
+          await this.residentCompanyHistoryRepository.save(historyData);
+        }
+      } catch {
+        response['status'] = 'error';
+        response['message'] = 'Could not add application';
+      }
     }
-    return savedRc;
+    response['status'] = 'success';
+    response['message'] = 'Application Successfully submitted'
+    return response;
   }
 
   /**
@@ -218,7 +264,50 @@ export class ResidentCompanyService {
    * @param payload object of ListResidentCompanyPayload
    * @return array of resident companies object
    */
-  async getResidentCompanies(payload: ListResidentCompanyPayload) {
+  async getResidentCompanies(payload: ListResidentCompanyPayload, siteIdArr: number[]) {
+    let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
+      .select("resident_companies.* ")
+      .addSelect("s.name", "siteName")
+      .addSelect("s.id", "siteId")
+      .leftJoin('sites', 's', 's.id = Any(resident_companies.site)')
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
+      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+
+    if (payload.q && payload.q != '') {
+      rcQuery.andWhere("(resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
+    }
+    if (payload.companyStatus && payload.companyStatus.length > 0) {
+      rcQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: payload.companyStatus });
+    }
+    if (typeof payload.companyVisibility !== 'undefined') {
+      rcQuery.andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: payload.companyVisibility });
+    }
+    if (typeof payload.companyOnboardingStatus !== 'undefined') {
+      rcQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: payload.companyOnboardingStatus });
+    }
+
+    if (payload.pagination) {
+      let skip = 0;
+      let take = 10;
+      if (payload.limit) {
+        take = payload.limit;
+        if (payload.page) {
+          skip = payload.page * payload.limit;
+        }
+      }
+      rcQuery.skip(skip).take(take)
+    }
+    rcQuery.orderBy("id", "DESC");
+    return await rcQuery.getRawMany();
+  }
+
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
+  async getResidentCompaniesBkp(payload: ListResidentCompanyPayload) {
     let search;
     let skip;
     let take;
@@ -361,11 +450,11 @@ export class ResidentCompanyService {
    */
   async getRcMembers(id) {
     if (id) {
-      return await this.residentCompanyManagementRepository.findOne({
+      return await this.residentCompanyManagementRepository.find({
         where: { companyId: id },
       });
     }
-    return {}
+    return []
   }
 
   /**
@@ -376,11 +465,11 @@ export class ResidentCompanyService {
    */
   async getRcAdvisors(id) {
     if (id) {
-      return await this.residentCompanyAdvisoryRepository.findOne({
+      return await this.residentCompanyAdvisoryRepository.find({
         where: { companyId: id },
       });
     }
-    return {}
+    return []
   }
 
   /**
@@ -391,12 +480,114 @@ export class ResidentCompanyService {
    */
   async getRcTechnicalTeams(id) {
     if (id) {
-      return await this.residentCompanyTechnicalRepository.findOne({
+      return await this.residentCompanyTechnicalRepository.find({
         where: { companyId: id },
       });
     }
-    return {};
+    return [];
   }
+
+  /**
+   * Description: This method will get the resident company for sponsor.
+   * @description This method will get the resident company for sponsor.
+   * @param id number resident company id
+   * @return resident company object
+   */
+  async getResidentCompanyForSponsor() {
+    let response = {};
+
+    const graduate: any = await this.residentCompanyRepository.
+      createQueryBuilder("resident_companies").
+      select("count(*)", "graduate").
+      where("resident_companies.status = :status", { status: '4' }).getRawOne();
+
+    //Get Sum of all companies and Average company size
+    const stats: any = await this.residentCompanyRepository.
+      createQueryBuilder("resident_companies").
+      select("AVG(resident_companies.companySize)::numeric(10,2)", "avgTeamSize").
+      addSelect("count(*)", "startUpcount").
+      where("resident_companies.status = :status", { status: '1' }).
+      andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).getRawOne();
+
+    const categoryStats = await this.categoryRepository.
+      query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
+        "where c.id = ANY(rc.industry::int[]) ) as industryCount " +
+        "FROM public.categories as c order by industryCount desc limit 3;")
+
+    response['companyStats'] = (!stats) ? 0 : stats;
+    response['graduate'] = (!graduate) ? 0 : graduate;
+    response['categoryStats'] = (!categoryStats) ? 0 : categoryStats;
+
+    return response;
+
+  }
+
+  /**
+  * Description: This method will get the resident company for sponsor.
+  * @description This method will get the resident company for sponsor.
+  * @param id number resident company id
+  * @return resident company object
+  */
+  async getResidentCompanyForSponsorBySite() {
+    let res = [];
+
+    const sites = await this.siteRepository.find();
+
+    for (let site of sites) {
+      let response = {};
+
+      const graduate: any = await this.residentCompanyRepository.
+        createQueryBuilder("resident_companies").
+        select("count(*)", "graduate").
+        where("resident_companies.status = :status", { status: '4' }).
+        andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
+
+      //Get Sum of all companies and Average company size
+      const companystats: any = await this.residentCompanyRepository.
+        createQueryBuilder("resident_companies").
+        select("AVG(resident_companies.companySize)::numeric(10,2)", "avg").
+        addSelect("count(*)", "count").
+        where("resident_companies.status = :status", { status: '1' }).
+        andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).
+        andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
+
+      const categoryStats = await this.categoryRepository.
+        query("SELECT c.name, c.id  as industryId, (select count(rc.*) FROM resident_companies as rc " +
+          "where c.id = ANY(rc.industry::int[]) and " + site.id + " = ANY(rc.site::int[])  ) as industryCount " +
+          " FROM public.categories as c order by industryCount desc limit 3;");
+      let newStartUps: any = {};
+      // try {
+      //Get Sum of all New companies onboard in last 3 months
+      // newStartUps = await this.residentCompanyRepository.
+      // createQueryBuilder("resident_companies").
+      // addSelect("count(*)", "newStartUps").
+      // where("resident_companies.status = :status", { status: '1' }).
+      // where("resident_companies.createdAt  >  '06/01/2021' ").
+      // andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).
+      // andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
+
+      newStartUps = await this.residentCompanyRepository.
+        query(" select count(*) as newStartUps FROM resident_companies " +
+          " where resident_companies.\"companyVisibility\" = true and " +
+          " resident_companies.\"status\" = '1' and " +
+          " (CURRENT_DATE - INTERVAL '3 months')  < (resident_companies.\"createdAt\") ");
+
+      // } catch {
+      //   newStartUps = {newStartUps : 'error'};
+      // }
+
+      response['newStartUps'] = (!newStartUps) ? 0 : newStartUps;
+      response['site'] = (!site) ? 0 : site;
+      response['graduate'] = (!graduate) ? 0 : graduate;
+      response['companyStats'] = (!companystats) ? 0 : companystats;
+      response['categoryStats'] = (!categoryStats) ? 0 : categoryStats;
+      res.push(response);
+    }
+    return res;
+
+  }
+
+
 
   /**
    * Description: This method will get the resident company.
@@ -474,9 +665,9 @@ export class ResidentCompanyService {
       );
     }
     if (residentCompany) {
-      const companyMembers: any = JSON.parse(JSON.stringify(payload.companyMembers));
-      const companyAdvisors: any = JSON.parse(JSON.stringify(payload.companyAdvisors));
-      const companyTechnicalTeams: any = JSON.parse(JSON.stringify(payload.companyTechnicalTeams));
+      const companyMembers: any = (payload.companyMembers) ? JSON.parse(JSON.stringify(payload.companyMembers)) : [];
+      const companyAdvisors: any = (payload.companyAdvisors) ? JSON.parse(JSON.stringify(payload.companyAdvisors)) : [];
+      const companyTechnicalTeams: any = (payload.companyTechnicalTeams) ? JSON.parse(JSON.stringify(payload.companyTechnicalTeams)) : [];
 
       delete payload.companyMembers;
       delete payload.companyAdvisors;
