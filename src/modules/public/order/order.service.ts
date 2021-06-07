@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { AddOrderDto } from './dto/add-order.payload';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { OrderProduct } from './model/order-product.entity';
@@ -58,16 +58,19 @@ export class OrderProductService {
    * @param endDate 
    * @returns 
    */
-  async fetchOrderProductsBetweenDates(startDate: Date, endDate: Date) {
-    let findArgs = { 
+  async fetchOrderProductsBetweenDates(startDate: string, endDate: string, companyId: number) {
+    return await this.orderRepository.find({
       where: { 
-        startDate:  MoreThanOrEqual(startDate),
-        endDate:  LessThanOrEqual(endDate) 
+        createdAt: Between(new Date(startDate), new Date(endDate)),
+        companyId : companyId,
+      },
+      join: {
+          alias: "order",
+          leftJoinAndSelect: {
+              "orderProducts": "order.orderProducts"
+          }
       }
-    };
-    return this.orderProductRepository.find(
-      findArgs
-    );
+    });
   }
 
   /**
