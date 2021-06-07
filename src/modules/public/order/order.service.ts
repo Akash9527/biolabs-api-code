@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { AddOrderDto } from './dto/add-order.payload';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
-import { Invoice } from './model/invoice.entity';
 import { OrderProduct } from './model/order-product.entity';
 import { Order } from './model/order.entity';
 
 @Injectable()
 export class OrderProductService {
+
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
@@ -49,6 +49,24 @@ export class OrderProductService {
     orderProduct.startDate = payload.startDate?payload.startDate:orderProduct.startDate;
     orderProduct.endDate = payload.endDate?payload.endDate:orderProduct.endDate;
     return await this.orderProductRepository.update(id, this.orderProductRepository.create(payload));
+  }
+
+  /**
+   * @description This method will fetch the order products between given start date and end date
+   * @param startDate 
+   * @param endDate 
+   * @returns 
+   */
+  async fetchOrderProductsBetweenDates(startDate: Date, endDate: Date) {
+    let findArgs = { 
+      where: { 
+        startDate:  MoreThanOrEqual(startDate),
+        endDate:  LessThanOrEqual(endDate) 
+      }
+    };
+    return this.orderProductRepository.find(
+      findArgs
+    );
   }
 
 }
