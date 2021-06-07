@@ -23,14 +23,15 @@ export class OrderProductService {
    * @return saved order product object
    */
    async addOrderProduct(payload: AddOrderDto) {
-    const newOrder: Order = this.orderRepository.create(payload);
-    await this .orderRepository.save(newOrder);
-    return await this.orderProductRepository.save(
-      this.orderProductRepository.create({...payload.orderProducts, order: newOrder})
-    );
-    // set createdBy
-    // set modifiedBy
-    //return newOrder;
+    let order : Order;
+    if(payload.orderId){
+      payload.orderProducts['orderId'] = payload.orderId;
+      order = await this.orderRepository.findOne(payload.orderId);
+    }else{
+      order = this.orderRepository.create(payload);
+      await this .orderRepository.save(order);
+    }
+    return await this.orderProductRepository.save(this.orderProductRepository.create({...payload.orderProducts , order: order}));
   }
 
   /**
@@ -67,6 +68,15 @@ export class OrderProductService {
     return this.orderProductRepository.find(
       findArgs
     );
+  }
+
+  /**
+   * @description This method will Delete the order products.
+   * @param id this is orderProduct Id
+   * @returns  
+   */
+   async deleteOrderProduct(id : number) {    
+    return await this.orderProductRepository.delete(id);
   }
 
 }

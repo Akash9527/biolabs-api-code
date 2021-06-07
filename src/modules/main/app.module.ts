@@ -11,9 +11,11 @@ import { SponsorModule } from 'modules/public/sponsor/sponsor.module';
 import { UserModule } from 'modules/public/user';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
