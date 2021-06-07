@@ -16,16 +16,10 @@ export class Order {
   companyId: number;
 
   @CreateDateColumn({ type: "timestamp" })
-  createdAt: number;
+  createdAt: Date;
 
   @UpdateDateColumn({ type: "timestamp" })
-  modifiedAt: number;
-
-  // @Column({ nullable: false })
-  // createdBy: number;
-
-  // @Column({ nullable: false })
-  // modifiedBy: number;
+  modifiedAt: Date;
 
   @ManyToMany(type => Invoice, invoice => invoice.orders)
   invoices: Invoice[];

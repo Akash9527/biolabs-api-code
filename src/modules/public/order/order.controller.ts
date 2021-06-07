@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AddOrderDto } from './dto/add-order.payload';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
@@ -48,5 +48,17 @@ export class OrderProductController {
       const orderProducts = await this.orderProductService.fetchOrderProductsBetweenDates(startDate, endDate);
       return orderProducts;
     }
+
+    /**
+   * Description: This method is used to delete a resident company order product details .
+   * @description This method is used to delete a resident company order product details .
+   */
+     @Delete(':id')
+     @ApiResponse({ status: 200, description: 'Successful Response' })
+     @ApiResponse({ status: 401, description: 'Unauthorized' })
+     async deleteOrderProduct(@Param('id') id: number): Promise<any> {
+       const orderProducts = await this.orderProductService.deleteOrderProduct(id);
+       return orderProducts;
+     }
 
 }
