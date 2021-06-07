@@ -64,6 +64,7 @@ export class MasterService {
     return await this.siteRepository.find({
       select: ["id", "name"],
       where: search,
+      order: { ['name']: 'ASC' },
       skip,
       take
     });
