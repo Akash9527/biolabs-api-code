@@ -37,13 +37,6 @@ export class OrderProduct {
 
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt: number;
-
-  // @Column({ nullable: false })
-  // createdBy: number;
-
-  // @Column({ nullable: false })
-  // modifiedBy: number;
-
 }
 
 export class OrderProductFillableFields {
