@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AddOrderDto } from './dto/add-order.payload';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { OrderProductService } from './order.service';
@@ -44,6 +44,7 @@ export class OrderProductController {
     @Get()
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiQuery({ name: 'companyId', required: false, type: 'string' })
     async fetchOrderProductsBetweenDates(@Query('companyId') companyId: number,@Query('startDate') startDate: string, @Query('endDate') endDate: string,): Promise<any> {
       const orderProducts = await this.orderProductService.fetchOrderProductsBetweenDates(startDate, endDate, companyId);
       return orderProducts;

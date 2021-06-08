@@ -59,11 +59,13 @@ export class OrderProductService {
    * @returns 
    */
   async fetchOrderProductsBetweenDates(startDate: string, endDate: string, companyId: number) {
+    let filter = {};
+    filter['createdAt'] = Between(new Date(startDate), new Date(endDate));
+    if(companyId)
+      filter['companyId'] = companyId;
+      
     return await this.orderRepository.find({
-      where: { 
-        createdAt: Between(new Date(startDate), new Date(endDate)),
-        companyId : companyId,
-      },
+      where: filter,
       join: {
           alias: "order",
           leftJoinAndSelect: {
