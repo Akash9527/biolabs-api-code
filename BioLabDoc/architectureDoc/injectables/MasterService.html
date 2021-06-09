@@ -1,0 +1,2857 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>biolabs-api documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	      <link rel="stylesheet" href="../styles/style.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">biolabs-api documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content injectable">
+                   <div class="content-data">
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li>Injectables</li>
+  <li>MasterService</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info">
+        <p class="comment">
+            <h3>File</h3>
+        </p>
+        <p class="comment">
+            <code>src/modules/public/master/master.service.ts</code>
+        </p>
+
+
+
+
+            <section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createBiolabsSource">createBiolabsSource</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createBiolabsSources">createBiolabsSources</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createCategories">createCategories</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createCategory">createCategory</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createFunding">createFunding</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createFundings">createFundings</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createModalities">createModalities</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createModality">createModality</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createRole">createRole</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createRoles">createRoles</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createSite">createSite</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createSites">createSites</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createTechnologyStage">createTechnologyStage</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#createTechnologyStages">createTechnologyStages</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getBiolabsSource">getBiolabsSource</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getCategories">getCategories</a>
+                            </li>
+                            <li>
+                                <a href="#getCompanyStatus">getCompanyStatus</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getFundings">getFundings</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getModalities">getModalities</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getRoles">getRoles</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getSites">getSites</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getTechnologyStages">getTechnologyStages</a>
+                            </li>
+                            <li>
+                                <a href="#getUserTypes">getUserTypes</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#parseToArray">parseToArray</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#saveCategory">saveCategory</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+            <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(biolabsSourceRepository: <a href="../classes/BiolabsSource.html">Repository<BiolabsSource></a>, categoryRepository: <a href="../classes/Category.html">Repository<Category></a>, fundingRepository: <a href="../classes/Funding.html">Repository<Funding></a>, modalityRepository: <a href="../classes/Modality.html">Repository<Modality></a>, roleRepository: <a href="../classes/Role.html">Repository<Role></a>, siteRepository: <a href="../classes/Site.html">Repository<Site></a>, technologyStageRepository: <a href="../classes/TechnologyStage.html">Repository<TechnologyStage></a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="20" class="link-to-prism">src/modules/public/master/master.service.ts:20</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>biolabsSourceRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/BiolabsSource.html" target="_self" >Repository&lt;BiolabsSource&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>categoryRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/Category.html" target="_self" >Repository&lt;Category&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>fundingRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/Funding.html" target="_self" >Repository&lt;Funding&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>modalityRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/Modality.html" target="_self" >Repository&lt;Modality&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>roleRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/Role.html" target="_self" >Repository&lt;Role&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>siteRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/Site.html" target="_self" >Repository&lt;Site&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>technologyStageRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/TechnologyStage.html" target="_self" >Repository&lt;TechnologyStage&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+            <section>
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createBiolabsSource"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createBiolabsSource
+                        </b>
+                        <a href="#createBiolabsSource"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createBiolabsSource(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="364"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:364</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the biolabs source.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>name</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>string</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>biolabs source object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createBiolabsSources"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createBiolabsSources
+                        </b>
+                        <a href="#createBiolabsSources"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createBiolabsSources()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="338"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:338</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the biolabs sources.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of biolabs sources object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createCategories"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createCategories
+                        </b>
+                        <a href="#createCategories"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createCategories()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="245"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:245</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the categories.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of category object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createCategory"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createCategory
+                        </b>
+                        <a href="#createCategory"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createCategory(category: literal type, parent_id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="266"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:266</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the category.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>category</td>
+                                    <td>
+                                            <code>literal type</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of category</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>parent_id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>category object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createFunding"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createFunding
+                        </b>
+                        <a href="#createFunding"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createFunding(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="436"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:436</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the funding.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>name</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>string</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>funding object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createFundings"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createFundings
+                        </b>
+                        <a href="#createFundings"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createFundings()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="410"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:410</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the fundings.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of fundings object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createModalities"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createModalities
+                        </b>
+                        <a href="#createModalities"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createModalities()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="482"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:482</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the modalities.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of modalities object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createModality"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createModality
+                        </b>
+                        <a href="#createModality"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createModality(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="508"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:508</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the modality.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>name</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>string</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>modality object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createRole"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createRole
+                        </b>
+                        <a href="#createRole"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createRole(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="182"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:182</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the role.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>name</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>string</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>role object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createRoles"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createRoles
+                        </b>
+                        <a href="#createRoles"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createRoles()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="156"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:156</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the roles.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of role object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createSite"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createSite
+                        </b>
+                        <a href="#createSite"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createSite(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="110"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:110</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the site.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>name</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>string</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>site object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createSites"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createSites
+                        </b>
+                        <a href="#createSites"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createSites()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="84"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:84</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the sites.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of site object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createTechnologyStage"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createTechnologyStage
+                        </b>
+                        <a href="#createTechnologyStage"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createTechnologyStage(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="580"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:580</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the technology stage.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>name</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>string</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>technology stages object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createTechnologyStages"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            createTechnologyStages
+                        </b>
+                        <a href="#createTechnologyStages"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createTechnologyStages()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="554"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:554</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the technology stages list.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of technology stages object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getBiolabsSource"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getBiolabsSource
+                        </b>
+                        <a href="#getBiolabsSource"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getBiolabsSource(payload: <a href="../classes/MasterPayload.html">MasterPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="306"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:306</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the biolabs sources list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/MasterPayload.html" target="_self" >MasterPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>MasterPayload[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of biolabs sources object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getCategories"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getCategories
+                        </b>
+                        <a href="#getCategories"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getCategories(payload: <a href="../classes/MasterPayload.html">MasterPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="196"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:196</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the categories list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/MasterPayload.html" target="_self" >MasterPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>MasterPayload[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of categories object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getCompanyStatus"></a>
+                    <span class="name">
+                        <b>
+                            getCompanyStatus
+                        </b>
+                        <a href="#getCompanyStatus"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getCompanyStatus()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="593"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:593</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the company status list.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of company status object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getFundings"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getFundings
+                        </b>
+                        <a href="#getFundings"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getFundings(payload: <a href="../classes/MasterPayload.html">MasterPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="378"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:378</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the fundings list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/MasterPayload.html" target="_self" >MasterPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>MasterPayload[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of fundings object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getModalities"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getModalities
+                        </b>
+                        <a href="#getModalities"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getModalities(payload: <a href="../classes/MasterPayload.html">MasterPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="450"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:450</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the modalities list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/MasterPayload.html" target="_self" >MasterPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>MasterPayload[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of modalities object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getRoles"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getRoles
+                        </b>
+                        <a href="#getRoles"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getRoles(payload: <a href="../classes/MasterPayload.html">MasterPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="124"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:124</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the roles list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/MasterPayload.html" target="_self" >MasterPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>MasterPayload[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of roles object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getSites"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getSites
+                        </b>
+                        <a href="#getSites"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getSites(payload: <a href="../classes/MasterPayload.html">MasterPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="44"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:44</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the sites list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/MasterPayload.html" target="_self" >MasterPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>MasterPayload[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of sites object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getTechnologyStages"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getTechnologyStages
+                        </b>
+                        <a href="#getTechnologyStages"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getTechnologyStages(payload: <a href="../classes/MasterPayload.html">MasterPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="522"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:522</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the technology stages list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/MasterPayload.html" target="_self" >MasterPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>MasterPayload[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of technology stages object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getUserTypes"></a>
+                    <span class="name">
+                        <b>
+                            getUserTypes
+                        </b>
+                        <a href="#getUserTypes"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getUserTypes()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="602"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:602</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the user types list.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of user type object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="parseToArray"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Private</span>
+                            parseToArray
+                        </b>
+                        <a href="#parseToArray"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>parseToArray(val)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="611"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:611</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: used to convert data into array</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>val</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>input value</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="saveCategory"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            saveCategory
+                        </b>
+                        <a href="#saveCategory"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>saveCategory(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, parent_id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="287"
+                            class="link-to-prism">src/modules/public/master/master.service.ts:287</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will store the category.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>name</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>string</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>parent_id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>category object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+    </div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@nestjs/common&#x27;;
+import { InjectRepository } from &#x27;@nestjs/typeorm&#x27;;
+import { In, Like, Repository } from &#x27;typeorm&#x27;;
+import { MasterPayload } from &#x27;./master.payload&#x27;;
+import { BiolabsSource } from &#x27;./biolabs-source.entity&#x27;;
+import { Category } from &#x27;./category.entity&#x27;;
+import { Funding } from &#x27;./funding.entity&#x27;;
+import { Modality } from &#x27;./modality.entity&#x27;;
+import { Role } from &#x27;./role.entity&#x27;;
+import { Site } from &#x27;./site.entity&#x27;;
+import { TechnologyStage } from &#x27;./technology-stage.entity&#x27;;
+import { COMPANY_STATUS } from &#x27;../../../constants/company-status&#x27;;
+import { USER_TYPE } from &#x27;../../../constants/user-type&#x27;;
+const appRoot &#x3D; require(&#x27;app-root-path&#x27;);
+const migrationData &#x3D; JSON.parse(require(&quot;fs&quot;).readFileSync(appRoot.path + &quot;/migration.json&quot;));
+type status_enum &#x3D; &#x27;-1&#x27; | &#x27;0&#x27; | &#x27;1&#x27; | &#x27;99&#x27;;
+
+
+@Injectable()
+export class MasterService {
+  constructor(
+    @InjectRepository(BiolabsSource)
+    private readonly biolabsSourceRepository: Repository&lt;BiolabsSource&gt;,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository&lt;Category&gt;,
+    @InjectRepository(Funding)
+    private readonly fundingRepository: Repository&lt;Funding&gt;,
+    @InjectRepository(Modality)
+    private readonly modalityRepository: Repository&lt;Modality&gt;,
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository&lt;Role&gt;,
+    @InjectRepository(Site)
+    private readonly siteRepository: Repository&lt;Site&gt;,
+    @InjectRepository(TechnologyStage)
+    private readonly technologyStageRepository: Repository&lt;TechnologyStage&gt;,
+  ) { }
+
+  /**
+   * Description: This method will return the sites list.
+   * @description This method will return the sites list.
+   * @param payload MasterPayload[]
+   * @return array of sites object
+   */
+  async getSites(payload: MasterPayload) {
+    let search: any &#x3D; {};
+    let skip;
+    let take;
+    if (payload.siteIdArr) {
+      payload.siteIdArr &#x3D; this.parseToArray(payload.siteIdArr);
+      search &#x3D; {id: In(payload.siteIdArr)};
+    }
+
+    if (payload.q &amp;&amp; payload.q !&#x3D; &quot;&quot;) {
+      search &#x3D; {...search, ...{ name: Like(&quot;%&quot; + payload.q + &quot;%&quot;), status: &#x27;1&#x27; }};
+    } else {
+      search &#x3D; {...search, ...{ status: &#x27;1&#x27; }};
+    }
+
+    if (payload.pagination) {
+      skip &#x3D; { skip: 0 }
+      take &#x3D; { take: 10 }
+      if (payload.limit) {
+        take &#x3D; { take: payload.limit };
+        if (payload.page) {
+          skip &#x3D; { skip: payload.page * payload.limit }
+        }
+      }
+    }
+
+    return await this.siteRepository.find({
+      select: [&quot;id&quot;, &quot;name&quot;],
+      where: search,
+      order: { [&#x27;name&#x27;]: &#x27;ASC&#x27; },
+      skip,
+      take
+    });
+  }
+
+  /**
+   * Description: This method will store the sites.
+   * @description This method will store the sites.
+   * @return array of site object
+   */
+  async createSites() {
+    const sites &#x3D; this.getSites(new MasterPayload());
+    let resp &#x3D; {};
+    return await sites.then(async data &#x3D;&gt; {
+      const _sites &#x3D; migrationData[&#x27;sites&#x27;];
+      for (const _site of _sites) {
+        if (!data.find(r &#x3D;&gt; r.name &#x3D;&#x3D; _site.name)) {
+          resp[_site.name] &#x3D; await this.createSite(_site.name, _site.id);
+        }
+        if (_site.name &#x3D;&#x3D; _site[_site.length - 1]) {
+          return resp;
+        }
+      }
+    }, error &#x3D;&gt; {
+      if (error)
+        return;
+    })
+  }
+
+  /**
+   * Description: This method will store the site.
+   * @description This method will store the site.
+   * @param name string
+   * @param id number
+   * @return site object
+   */
+  async createSite(name: string, id: number) {
+    const status: status_enum &#x3D; &#x27;1&#x27;;
+    const payload &#x3D; {
+      id, name, status
+    }
+    return await this.siteRepository.save(this.siteRepository.create(payload));
+  }
+
+  /**
+   * Description: This method will return the roles list.
+   * @description This method will return the roles list.
+   * @param payload MasterPayload[]
+   * @return array of roles object
+   */
+  async getRoles(payload: MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if (payload.q &amp;&amp; payload.q !&#x3D; &quot;&quot;) {
+      search &#x3D; [{ name: Like(&quot;%&quot; + payload.q + &quot;%&quot;), status: &#x27;1&#x27; }]
+    } else {
+      search &#x3D; [{ status: &#x27;1&#x27; }]
+    }
+    if (payload.pagination) {
+      skip &#x3D; { skip: 0 }
+      take &#x3D; { take: 10 }
+      if (payload.limit) {
+        take &#x3D; { take: payload.limit };
+        if (payload.page) {
+          skip &#x3D; { skip: payload.page * payload.limit }
+        }
+      }
+    }
+    return await this.roleRepository.find({
+      select: [&quot;id&quot;, &quot;name&quot;],
+      where: search,
+      skip,
+      take
+    });
+  }
+
+  /**
+   * Description: This method will store the roles.
+   * @description This method will store the roles.
+   * @return array of role object
+   */
+  async createRoles() {
+    const roles &#x3D; this.getRoles(new MasterPayload());
+    let resp &#x3D; {};
+    return await roles.then(async data &#x3D;&gt; {
+      const _roles &#x3D; migrationData[&#x27;roles&#x27;];
+      for (const _role of _roles) {
+        if (!data.find(r &#x3D;&gt; r.name &#x3D;&#x3D; _role.name)) {
+          resp[_role.name] &#x3D; await this.createRole(_role.name, _role.id);
+        }
+        if (_role.name &#x3D;&#x3D; _roles[_roles.length - 1]) {
+          return resp;
+        }
+      }
+    }, error &#x3D;&gt; {
+      if (error)
+        return;
+    });
+  }
+
+  /**
+   * Description: This method will store the role.
+   * @description This method will store the role.
+   * @param name string
+   * @param id number
+   * @return role object
+   */
+  async createRole(name: string, id: number) {
+    const status: status_enum &#x3D; &#x27;1&#x27;;
+    const payload &#x3D; {
+      id, name, status
+    }
+    return await this.roleRepository.save(this.roleRepository.create(payload));
+  }
+
+  /**
+   * Description: This method will return the categories list.
+   * @description This method will return the categories list.
+   * @param payload MasterPayload[]
+   * @return array of categories object
+   */
+  async getCategories(payload: MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if (payload.q &amp;&amp; payload.q !&#x3D; &quot;&quot;) {
+      search &#x3D; [{ name: Like(&quot;%&quot; + payload.q + &quot;%&quot;), status: &#x27;1&#x27; }]
+    } else {
+      search &#x3D; [{ status: &#x27;1&#x27; }]
+    }
+    if (payload.pagination) {
+      skip &#x3D; { skip: 0 }
+      take &#x3D; { take: 10 }
+      if (payload.limit) {
+        take &#x3D; { take: payload.limit };
+        if (payload.page) {
+          skip &#x3D; { skip: payload.page * payload.limit }
+        }
+      }
+    }
+    const categories: any[] &#x3D; await this.categoryRepository.find({
+      select: [&quot;id&quot;, &quot;name&quot;, &quot;parent_id&quot;],
+      where: search,
+      order: { id: &quot;ASC&quot; },
+      skip,
+      take
+    });
+    // Create root for top-level node(s)
+    const root: any[] &#x3D; [];
+
+    categories.forEach(category &#x3D;&gt; {
+      // No parentId means top level
+      if (!category.parent_id) return root.push(category);
+
+      // Insert node as child of parent in flat array
+      const parentIndex &#x3D; categories.findIndex(el &#x3D;&gt; el.id &#x3D;&#x3D;&#x3D; category.parent_id);
+      if (!categories[parentIndex].children) {
+        return categories[parentIndex].children &#x3D; [category];
+      }
+      categories[parentIndex].children.push(category);
+
+    });
+    return root;
+  }
+
+  /**
+   * Description: This method will store the categories.
+   * @description This method will store the categories.
+   * @return array of category object
+   */
+  async createCategories() {
+    const _categories &#x3D; migrationData[&#x27;categories&#x27;];
+    // for (const _category of _categories) {
+    //   await this.createCategory(_category, 0);
+    // }
+    const promises &#x3D; _categories.map(
+      async _category &#x3D;&gt; {
+        return await this.createCategory(_category, 0);
+      }
+    );
+    const categories &#x3D; await Promise.all(promises);
+    return categories;
+  }
+
+  /**
+   * Description: This method will store the category.
+   * @description This method will store the category.
+   * @param category object of category
+   * @param parent_id number
+   * @return category object
+   */
+  async createCategory(category: { name: string, id: number, subcategories?: [] }, parent_id: number) {
+    this.saveCategory(category.name, category.id, parent_id);
+    if ((&#x27;subcategories&#x27; in category) &amp;&amp; category.subcategories.length &gt; 0) {
+      const promises &#x3D; category.subcategories.map(
+        async _subcategories &#x3D;&gt; {
+          return await this.createCategory(_subcategories, category.id);
+        }
+      );
+      const subCategories &#x3D; await Promise.all(promises);
+      return subCategories;
+    }
+  }
+
+  /**
+   * Description: This method will store the category.
+   * @description This method will store the category.
+   * @param name string
+   * @param id number
+   * @param parent_id number
+   * @return category object
+   */
+  async saveCategory(name: string, id: number, parent_id: number) {
+    const status: status_enum &#x3D; &#x27;1&#x27;;
+    const payload &#x3D; { id: id, name: name, parent_id: parent_id, status: status }
+    const checkDuplicateCategory &#x3D; await this.categoryRepository.find(
+      { where: { name: name, parent_id: parent_id } }
+    );
+    if (checkDuplicateCategory &amp;&amp; checkDuplicateCategory.length &gt; 0) {
+      return false;
+    } else {
+      return await this.categoryRepository.save(payload);
+    }
+  }
+
+  /**
+   * Description: This method will return the biolabs sources list.
+   * @description This method will return the biolabs sources list.
+   * @param payload MasterPayload[]
+   * @return array of biolabs sources object
+   */
+  async getBiolabsSource(payload: MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if (payload.q &amp;&amp; payload.q !&#x3D; &quot;&quot;) {
+      search &#x3D; [{ name: Like(&quot;%&quot; + payload.q + &quot;%&quot;), status: &#x27;1&#x27; }]
+    } else {
+      search &#x3D; [{ status: &#x27;1&#x27; }]
+    }
+    if (payload.pagination) {
+      skip &#x3D; { skip: 0 }
+      take &#x3D; { take: 10 }
+      if (payload.limit) {
+        take &#x3D; { take: payload.limit };
+        if (payload.page) {
+          skip &#x3D; { skip: payload.page * payload.limit }
+        }
+      }
+    }
+    return await this.biolabsSourceRepository.find({
+      select: [&quot;id&quot;, &quot;name&quot;],
+      where: search,
+      skip,
+      take
+    });
+  }
+
+  /**
+   * Description: This method will store the biolabs sources.
+   * @description This method will store the biolabs sources.
+   * @return array of biolabs sources object
+   */
+  async createBiolabsSources() {
+    const biolabsSources &#x3D; this.getBiolabsSource(new MasterPayload());
+    let resp &#x3D; {};
+    return await biolabsSources.then(async data &#x3D;&gt; {
+      const _biolabsSources &#x3D; migrationData[&#x27;biolabsSources&#x27;];
+      for (const _biolabsSource of _biolabsSources) {
+        if (!data.find(r &#x3D;&gt; r.name &#x3D;&#x3D; _biolabsSource.name)) {
+          resp[_biolabsSource.name] &#x3D; await this.createBiolabsSource(_biolabsSource.name, _biolabsSource.id);
+        }
+        if (_biolabsSource.name &#x3D;&#x3D; _biolabsSources[_biolabsSources.length - 1]) {
+          return resp;
+        }
+      }
+    }, error &#x3D;&gt; {
+      if (error)
+        return;
+    });
+  }
+
+  /**
+   * Description: This method will store the biolabs source.
+   * @description This method will store the biolabs source.
+   * @param name string
+   * @param id number
+   * @return biolabs source object
+   */
+  async createBiolabsSource(name: string, id: number) {
+    const status: status_enum &#x3D; &#x27;1&#x27;;
+    const payload &#x3D; {
+      id, name, status
+    }
+    return await this.biolabsSourceRepository.save(this.biolabsSourceRepository.create(payload));
+  }
+
+  /**
+   * Description: This method will return the fundings list.
+   * @description This method will return the fundings list.
+   * @param payload MasterPayload[]
+   * @return array of fundings object
+   */
+  async getFundings(payload: MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if (payload.q &amp;&amp; payload.q !&#x3D; &quot;&quot;) {
+      search &#x3D; [{ name: Like(&quot;%&quot; + payload.q + &quot;%&quot;), status: &#x27;1&#x27; }]
+    } else {
+      search &#x3D; [{ status: &#x27;1&#x27; }]
+    }
+    if (payload.pagination) {
+      skip &#x3D; { skip: 0 }
+      take &#x3D; { take: 10 }
+      if (payload.limit) {
+        take &#x3D; { take: payload.limit };
+        if (payload.page) {
+          skip &#x3D; { skip: payload.page * payload.limit }
+        }
+      }
+    }
+    return await this.fundingRepository.find({
+      select: [&quot;id&quot;, &quot;name&quot;],
+      where: search,
+      skip,
+      take
+    });
+  }
+
+  /**
+   * Description: This method will store the fundings.
+   * @description This method will store the fundings.
+   * @return array of fundings object
+   */
+  async createFundings() {
+    const fundings &#x3D; this.getFundings(new MasterPayload());
+    let resp &#x3D; {};
+    return await fundings.then(async data &#x3D;&gt; {
+      const _fundings &#x3D; migrationData[&#x27;fundings&#x27;];
+      for (const _funding of _fundings) {
+        if (!data.find(r &#x3D;&gt; r.name &#x3D;&#x3D; _funding.name)) {
+          resp[_funding.name] &#x3D; await this.createFunding(_funding.name, _funding.id);
+        }
+        if (_funding.name &#x3D;&#x3D; _fundings[_fundings.length - 1]) {
+          return resp;
+        }
+      }
+    }, error &#x3D;&gt; {
+      if (error)
+        return;
+    });
+  }
+
+  /**
+   * Description: This method will store the funding.
+   * @description This method will store the funding.
+   * @param name string
+   * @param id number
+   * @return funding object
+   */
+  async createFunding(name: string, id: number) {
+    const status: status_enum &#x3D; &#x27;1&#x27;;
+    const payload &#x3D; {
+      id, name, status
+    }
+    return await this.fundingRepository.save(this.fundingRepository.create(payload));
+  }
+
+  /**
+   * Description: This method will return the modalities list.
+   * @description This method will return the modalities list.
+   * @param payload MasterPayload[]
+   * @return array of modalities object
+   */
+  async getModalities(payload: MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if (payload.q &amp;&amp; payload.q !&#x3D; &quot;&quot;) {
+      search &#x3D; [{ name: Like(&quot;%&quot; + payload.q + &quot;%&quot;), status: &#x27;1&#x27; }]
+    } else {
+      search &#x3D; [{ status: &#x27;1&#x27; }]
+    }
+    if (payload.pagination) {
+      skip &#x3D; { skip: 0 }
+      take &#x3D; { take: 10 }
+      if (payload.limit) {
+        take &#x3D; { take: payload.limit };
+        if (payload.page) {
+          skip &#x3D; { skip: payload.page * payload.limit }
+        }
+      }
+    }
+    return await this.modalityRepository.find({
+      select: [&quot;id&quot;, &quot;name&quot;],
+      where: search,
+      skip,
+      take
+    });
+  }
+
+  /**
+   * Description: This method will store the modalities.
+   * @description This method will store the modalities.
+   * @return array of modalities object
+   */
+  async createModalities() {
+    const modalities &#x3D; this.getModalities(new MasterPayload());
+    let resp &#x3D; {};
+    return await modalities.then(async data &#x3D;&gt; {
+      const _modalities &#x3D; migrationData[&#x27;modalities&#x27;];
+      for (const _modalitie of _modalities) {
+        if (!data.find(r &#x3D;&gt; r.name &#x3D;&#x3D; _modalitie.name)) {
+          resp[_modalitie.name] &#x3D; await this.createModality(_modalitie.name, _modalitie.id);
+        }
+        if (_modalitie.name &#x3D;&#x3D; _modalities[_modalities.length - 1]) {
+          return resp;
+        }
+      }
+    }, error &#x3D;&gt; {
+      if (error)
+        return;
+    });
+  }
+
+  /**
+   * Description: This method will store the modality.
+   * @description This method will store the modality.
+   * @param name string
+   * @param id number
+   * @return modality object
+   */
+  async createModality(name: string, id: number) {
+    const status: status_enum &#x3D; &#x27;1&#x27;;
+    const payload &#x3D; {
+      id, name, status
+    }
+    return await this.modalityRepository.save(this.modalityRepository.create(payload));
+  }
+
+  /**
+   * Description: This method will return the technology stages list.
+   * @description This method will return the technology stages list.
+   * @param payload MasterPayload[]
+   * @return array of technology stages object
+   */
+  async getTechnologyStages(payload: MasterPayload) {
+    let search;
+    let skip;
+    let take;
+    if (payload.q &amp;&amp; payload.q !&#x3D; &quot;&quot;) {
+      search &#x3D; [{ name: Like(&quot;%&quot; + payload.q + &quot;%&quot;), status: &#x27;1&#x27; }]
+    } else {
+      search &#x3D; [{ status: &#x27;1&#x27; }]
+    }
+    if (payload.pagination) {
+      skip &#x3D; { skip: 0 }
+      take &#x3D; { take: 10 }
+      if (payload.limit) {
+        take &#x3D; { take: payload.limit };
+        if (payload.page) {
+          skip &#x3D; { skip: payload.page * payload.limit }
+        }
+      }
+    }
+    return await this.technologyStageRepository.find({
+      select: [&quot;id&quot;, &quot;name&quot;],
+      where: search,
+      skip,
+      take
+    });
+  }
+
+  /**
+   * Description: This method will store the technology stages list.
+   * @description This method will store the technology stages list.
+   * @return array of technology stages object
+   */
+  async createTechnologyStages() {
+    const technologyStages &#x3D; this.getTechnologyStages(new MasterPayload());
+    let resp &#x3D; {};
+    return await technologyStages.then(async data &#x3D;&gt; {
+      const _technologyStages &#x3D; migrationData[&#x27;companyStages&#x27;];
+      for (const _technologyStage of _technologyStages) {
+        if (!data.find(r &#x3D;&gt; r.name &#x3D;&#x3D; _technologyStage.name)) {
+          resp[_technologyStage.name] &#x3D; await this.createTechnologyStage(_technologyStage.name, _technologyStage.id);
+        }
+        if (_technologyStage.name &#x3D;&#x3D; _technologyStages[_technologyStages.length - 1]) {
+          return resp;
+        }
+      }
+    }, error &#x3D;&gt; {
+      if (error)
+        return;
+    });
+  }
+
+  /**
+   * Description: This method will store the technology stage.
+   * @description This method will store the technology stage.
+   * @param name string
+   * @param id number
+   * @return technology stages object
+   */
+  async createTechnologyStage(name: string, id: number) {
+    const status: status_enum &#x3D; &#x27;1&#x27;;
+    const payload &#x3D; {
+      id, name, status
+    }
+    return await this.technologyStageRepository.save(this.technologyStageRepository.create(payload));
+  }
+
+  /**
+   * Description: This method will return the company status list.
+   * @description This method will return the company status list.
+   * @return array of company status object
+   */
+  getCompanyStatus() {
+    return COMPANY_STATUS;
+  }
+
+  /**
+   * Description: This method will return the user types list.
+   * @description This method will return the user types list.
+   * @return array of user type object
+   */
+  getUserTypes() {
+    return USER_TYPE;
+  }
+
+  /**
+   * Description: used to convert data into array
+   * @description used to convert data into array
+   * @param val input value
+   */
+  private parseToArray(val){
+    if(typeof val &#x3D;&#x3D;&#x3D; &#x27;object&#x27;){
+      return val;
+    }
+    return [Number(val)];
+  }
+}</code></pre>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+                   
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'injectable';
+            var COMPODOC_CURRENT_PAGE_URL = 'MasterService.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+       <script src="../js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
+       <script src="../js/menu-wc.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>
