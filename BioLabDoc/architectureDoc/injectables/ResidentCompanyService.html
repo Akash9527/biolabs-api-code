@@ -1,0 +1,3565 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>biolabs-api documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	      <link rel="stylesheet" href="../styles/style.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">biolabs-api documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content injectable">
+                   <div class="content-data">
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li>Injectables</li>
+  <li>ResidentCompanyService</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info">
+        <p class="comment">
+            <h3>File</h3>
+        </p>
+        <p class="comment">
+            <code>src/modules/public/resident-company/resident-company.service.ts</code>
+        </p>
+
+
+
+
+            <section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#addResidentCompany">addResidentCompany</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#addResidentCompanyAdvisor">addResidentCompanyAdvisor</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#addResidentCompanyDocument">addResidentCompanyDocument</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#addResidentCompanyManagement">addResidentCompanyManagement</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#addResidentCompanyTechnical">addResidentCompanyTechnical</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#create">create</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#get">get</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getByEmail">getByEmail</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getRcAdvisors">getRcAdvisors</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getRcBiolabsSources">getRcBiolabsSources</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getRcCategories">getRcCategories</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getRcFundings">getRcFundings</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getRcMembers">getRcMembers</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getRcModalities">getRcModalities</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getRcSites">getRcSites</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getRcTechnicalTeams">getRcTechnicalTeams</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getRcTechnologyStages">getRcTechnologyStages</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getResidentCompanies">getResidentCompanies</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getResidentCompaniesBkp">getResidentCompaniesBkp</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getResidentCompany">getResidentCompany</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getResidentCompanyForSponsor">getResidentCompanyForSponsor</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getResidentCompanyForSponsorBySite">getResidentCompanyForSponsorBySite</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#gloabalSearchCompanies">gloabalSearchCompanies</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Private</span>
+                                <a href="#parseToArray">parseToArray</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#residentCompanyAdvisors">residentCompanyAdvisors</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#residentCompanyManagements">residentCompanyManagements</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#residentCompanyTechnicals">residentCompanyTechnicals</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#updateResidentCompany">updateResidentCompany</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#updateResidentCompanyImg">updateResidentCompanyImg</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#updateResidentCompanyStatus">updateResidentCompanyStatus</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+            <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(residentCompanyRepository: <a href="../classes/ResidentCompany.html">Repository<ResidentCompany></a>, residentCompanyHistoryRepository: Repository<ResidentCompanyHistory>, residentCompanyAdvisoryRepository: Repository<ResidentCompanyAdvisory>, residentCompanyDocumentsRepository: Repository<ResidentCompanyDocuments>, residentCompanyManagementRepository: Repository<ResidentCompanyManagement>, residentCompanyTechnicalRepository: Repository<ResidentCompanyTechnical>, siteRepository: <a href="../classes/Site.html">Repository<Site></a>, biolabsSourceRepository: <a href="../classes/BiolabsSource.html">Repository<BiolabsSource></a>, categoryRepository: <a href="../classes/Category.html">Repository<Category></a>, fundingRepository: <a href="../classes/Funding.html">Repository<Funding></a>, modalityRepository: <a href="../classes/Modality.html">Repository<Modality></a>, technologyStageRepository: <a href="../classes/TechnologyStage.html">Repository<TechnologyStage></a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="26" class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:26</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>residentCompanyRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/ResidentCompany.html" target="_self" >Repository&lt;ResidentCompany&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>residentCompanyHistoryRepository</td>
+                                                  
+                                                        <td>
+                                                                    <code>Repository&lt;ResidentCompanyHistory&gt;</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>residentCompanyAdvisoryRepository</td>
+                                                  
+                                                        <td>
+                                                                    <code>Repository&lt;ResidentCompanyAdvisory&gt;</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>residentCompanyDocumentsRepository</td>
+                                                  
+                                                        <td>
+                                                                    <code>Repository&lt;ResidentCompanyDocuments&gt;</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>residentCompanyManagementRepository</td>
+                                                  
+                                                        <td>
+                                                                    <code>Repository&lt;ResidentCompanyManagement&gt;</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>residentCompanyTechnicalRepository</td>
+                                                  
+                                                        <td>
+                                                                    <code>Repository&lt;ResidentCompanyTechnical&gt;</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>siteRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/Site.html" target="_self" >Repository&lt;Site&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>biolabsSourceRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/BiolabsSource.html" target="_self" >Repository&lt;BiolabsSource&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>categoryRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/Category.html" target="_self" >Repository&lt;Category&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>fundingRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/Funding.html" target="_self" >Repository&lt;Funding&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>modalityRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/Modality.html" target="_self" >Repository&lt;Modality&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>technologyStageRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/TechnologyStage.html" target="_self" >Repository&lt;TechnologyStage&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+            <section>
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addResidentCompany"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            addResidentCompany
+                        </b>
+                        <a href="#addResidentCompany"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addResidentCompany(payload: <a href="../classes/AddResidentCompanyPayload.html">AddResidentCompanyPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="232"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:232</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will create the new resident companies.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/AddResidentCompanyPayload.html" target="_self" >AddResidentCompanyPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of AddResidentCompanyPayload.</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident companies object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addResidentCompanyAdvisor"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            addResidentCompanyAdvisor
+                        </b>
+                        <a href="#addResidentCompanyAdvisor"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addResidentCompanyAdvisor(payload: <a href="../classes/ResidentCompanyAdvisoryFillableFields.html">ResidentCompanyAdvisoryFillableFields</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="124"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:124</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will create the new resident companies advisor.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/ResidentCompanyAdvisoryFillableFields.html" target="_self" >ResidentCompanyAdvisoryFillableFields</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of ResidentCompanyAdvisoryFillableFields.</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident companies advisor object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addResidentCompanyDocument"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            addResidentCompanyDocument
+                        </b>
+                        <a href="#addResidentCompanyDocument"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addResidentCompanyDocument(payload: <a href="../classes/ResidentCompanyDocumentsFillableFields.html">ResidentCompanyDocumentsFillableFields</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="156"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:156</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will create the new resident companies document.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/ResidentCompanyDocumentsFillableFields.html" target="_self" >ResidentCompanyDocumentsFillableFields</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of ResidentCompanyDocumentsFillableFields.</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident companies document object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addResidentCompanyManagement"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            addResidentCompanyManagement
+                        </b>
+                        <a href="#addResidentCompanyManagement"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addResidentCompanyManagement(payload: <a href="../classes/ResidentCompanyManagementFillableFields.html">ResidentCompanyManagementFillableFields</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="167"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:167</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will create the new resident companies management.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/ResidentCompanyManagementFillableFields.html" target="_self" >ResidentCompanyManagementFillableFields</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of ResidentCompanyManagementFillableFields.</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident companies management object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addResidentCompanyTechnical"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            addResidentCompanyTechnical
+                        </b>
+                        <a href="#addResidentCompanyTechnical"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addResidentCompanyTechnical(payload: <a href="../classes/ResidentCompanyTechnicalFillableFields.html">ResidentCompanyTechnicalFillableFields</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="199"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:199</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will create the new resident companies technical.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/ResidentCompanyTechnicalFillableFields.html" target="_self" >ResidentCompanyTechnicalFillableFields</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of ResidentCompanyTechnicalFillableFields.</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident companies technical object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="create"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            create
+                        </b>
+                        <a href="#create"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>create(payload: <a href="../classes/AddResidentCompanyPayload.html">AddResidentCompanyPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="107"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:107</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will create the new resident companies.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/AddResidentCompanyPayload.html" target="_self" >AddResidentCompanyPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of AddResidentCompanyPayload.</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident companies object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="get"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            get
+                        </b>
+                        <a href="#get"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>get(id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="60"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:60</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will get the resident company by id.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number resident company id</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident company object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getByEmail"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getByEmail
+                        </b>
+                        <a href="#getByEmail"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getByEmail(email: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="93"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:93</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will get the resident company by email.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>email</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>string resident company email</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident company object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getRcAdvisors"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getRcAdvisors
+                        </b>
+                        <a href="#getRcAdvisors"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getRcAdvisors(id)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="467"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:467</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the advisors members list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of biolabs sources object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getRcBiolabsSources"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getRcBiolabsSources
+                        </b>
+                        <a href="#getRcBiolabsSources"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getRcBiolabsSources(ids)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="420"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:420</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the biolabs sources list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ids</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of biolabs sources object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getRcCategories"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getRcCategories
+                        </b>
+                        <a href="#getRcCategories"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getRcCategories(ids)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="372"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:372</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the categories list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ids</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of categories object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getRcFundings"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getRcFundings
+                        </b>
+                        <a href="#getRcFundings"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getRcFundings(ids)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="388"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:388</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the fundings list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ids</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of fundings object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getRcMembers"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getRcMembers
+                        </b>
+                        <a href="#getRcMembers"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getRcMembers(id)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="452"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:452</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the management members list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of biolabs sources object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getRcModalities"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getRcModalities
+                        </b>
+                        <a href="#getRcModalities"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getRcModalities(ids)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="436"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:436</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the modalities list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ids</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of modalities object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getRcSites"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getRcSites
+                        </b>
+                        <a href="#getRcSites"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getRcSites(ids)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="356"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:356</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the sites list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ids</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of sites object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getRcTechnicalTeams"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getRcTechnicalTeams
+                        </b>
+                        <a href="#getRcTechnicalTeams"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getRcTechnicalTeams(id)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="482"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:482</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the technical teams members list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of biolabs sources object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getRcTechnologyStages"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getRcTechnologyStages
+                        </b>
+                        <a href="#getRcTechnologyStages"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getRcTechnologyStages(ids)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="404"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:404</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the technology stages list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ids</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number[]</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of technology stages object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getResidentCompanies"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getResidentCompanies
+                        </b>
+                        <a href="#getResidentCompanies"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getResidentCompanies(payload: <a href="../classes/ListResidentCompanyPayload.html">ListResidentCompanyPayload</a>, siteIdArr: number[])</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="268"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:268</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the resident companies list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/ListResidentCompanyPayload.html" target="_self" >ListResidentCompanyPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of ListResidentCompanyPayload</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>siteIdArr</td>
+                                    <td>
+                                            <code>number[]</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of resident companies object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getResidentCompaniesBkp"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getResidentCompaniesBkp
+                        </b>
+                        <a href="#getResidentCompaniesBkp"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getResidentCompaniesBkp(payload: <a href="../classes/ListResidentCompanyPayload.html">ListResidentCompanyPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="311"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:311</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the resident companies list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/ListResidentCompanyPayload.html" target="_self" >ListResidentCompanyPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of ListResidentCompanyPayload</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of resident companies object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getResidentCompany"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getResidentCompany
+                        </b>
+                        <a href="#getResidentCompany"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getResidentCompany(id)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="599"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:599</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will get the resident company.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number resident company id</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident company object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getResidentCompanyForSponsor"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getResidentCompanyForSponsor
+                        </b>
+                        <a href="#getResidentCompanyForSponsor"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getResidentCompanyForSponsor()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="497"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:497</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will get the resident company for sponsor.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident company object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getResidentCompanyForSponsorBySite"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getResidentCompanyForSponsorBySite
+                        </b>
+                        <a href="#getResidentCompanyForSponsorBySite"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getResidentCompanyForSponsorBySite()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="532"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:532</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will get the resident company for sponsor.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident company object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="gloabalSearchCompanies"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            gloabalSearchCompanies
+                        </b>
+                        <a href="#gloabalSearchCompanies"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>gloabalSearchCompanies(payload: <a href="../classes/SearchResidentCompanyPayload.html">SearchResidentCompanyPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="712"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:712</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will return the resident companies list.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/SearchResidentCompanyPayload.html" target="_self" >SearchResidentCompanyPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of ListResidentCompanyPayload</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of resident companies object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="parseToArray"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Private</span>
+                            parseToArray
+                        </b>
+                        <a href="#parseToArray"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>parseToArray(val)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="700"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:700</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: used to convert data into array</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>val</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>input value</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="residentCompanyAdvisors"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            residentCompanyAdvisors
+                        </b>
+                        <a href="#residentCompanyAdvisors"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>residentCompanyAdvisors(companyMembers, id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="140"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:140</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will create the new resident companies advisors.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>companyMembers</td>
+                                    <td>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number of Company id.</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="residentCompanyManagements"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            residentCompanyManagements
+                        </b>
+                        <a href="#residentCompanyManagements"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>residentCompanyManagements(companyMembers, id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="183"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:183</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will create the new resident companies managements.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>companyMembers</td>
+                                    <td>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number of Company id.</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="residentCompanyTechnicals"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            residentCompanyTechnicals
+                        </b>
+                        <a href="#residentCompanyTechnicals"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>residentCompanyTechnicals(companyMembers, id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="215"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:215</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will create the new resident companies technicals.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>companyMembers</td>
+                                    <td>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number of Company id.</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="updateResidentCompany"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            updateResidentCompany
+                        </b>
+                        <a href="#updateResidentCompany"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>updateResidentCompany(payload: <a href="../classes/UpdateResidentCompanyPayload.html">UpdateResidentCompanyPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="655"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:655</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will update the resident company info.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/UpdateResidentCompanyPayload.html" target="_self" >UpdateResidentCompanyPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of type UpdateResidentCompanyPayload</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident company object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="updateResidentCompanyImg"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            updateResidentCompanyImg
+                        </b>
+                        <a href="#updateResidentCompanyImg"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>updateResidentCompanyImg(payload)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="70"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:70</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to update the resident company pitchdeck and logo.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of user information with pitchdeckImgUrl or logoImgUrl</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident company object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="updateResidentCompanyStatus"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            updateResidentCompanyStatus
+                        </b>
+                        <a href="#updateResidentCompanyStatus"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>updateResidentCompanyStatus(payload: <a href="../classes/UpdateResidentCompanyStatusPayload.html">UpdateResidentCompanyStatusPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="630"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:630</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will update the resident company status.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/UpdateResidentCompanyStatusPayload.html" target="_self" >UpdateResidentCompanyStatusPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of type UpdateResidentCompanyStatusPayload</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>resident company object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+    </div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable, NotAcceptableException } from &#x27;@nestjs/common&#x27;;
+import { InjectRepository } from &#x27;@nestjs/typeorm&#x27;;
+import { In, Like, Not, Repository } from &#x27;typeorm&#x27;;
+import { AddResidentCompanyPayload } from &#x27;./add-resident-company.payload&#x27;;
+
+import { ResidentCompany } from &#x27;./resident-company.entity&#x27;;
+import { ResidentCompanyAdvisory, ResidentCompanyAdvisoryFillableFields } from &#x27;./rc-advisory.entity&#x27;
+import { ResidentCompanyDocuments, ResidentCompanyDocumentsFillableFields } from &#x27;./rc-documents.entity&#x27;
+import { ResidentCompanyManagement, ResidentCompanyManagementFillableFields } from &#x27;./rc-management.entity&#x27;
+import { ResidentCompanyTechnical, ResidentCompanyTechnicalFillableFields } from &#x27;./rc-technical.entity&#x27;
+
+import { Site } from &#x27;../master/site.entity&#x27;;
+import { Category } from &#x27;../master/category.entity&#x27;;
+import { Funding } from &#x27;../master/funding.entity&#x27;;
+import { BiolabsSource } from &#x27;../master/biolabs-source.entity&#x27;;
+import { Modality } from &#x27;../master/modality.entity&#x27;;
+import { TechnologyStage } from &#x27;../master/technology-stage.entity&#x27;;
+
+import { ListResidentCompanyPayload } from &#x27;./list-resident-company.payload&#x27;;
+import { UpdateResidentCompanyStatusPayload } from &#x27;./update-resident-company-status.payload&#x27;;
+import { ResidentCompanyHistory } from &#x27;./resident-company-history.entity&#x27;;
+import { UpdateResidentCompanyPayload } from &#x27;./update-resident-company.payload&#x27;;
+import { SearchResidentCompanyPayload } from &#x27;./search-resident-company.payload&#x27;;
+
+@Injectable()
+export class ResidentCompanyService {
+  constructor(
+    @InjectRepository(ResidentCompany)
+    private readonly residentCompanyRepository: Repository&lt;ResidentCompany&gt;,
+    @InjectRepository(ResidentCompanyHistory)
+    private readonly residentCompanyHistoryRepository: Repository&lt;ResidentCompanyHistory&gt;,
+    @InjectRepository(ResidentCompanyAdvisory)
+    private readonly residentCompanyAdvisoryRepository: Repository&lt;ResidentCompanyAdvisory&gt;,
+    @InjectRepository(ResidentCompanyDocuments)
+    private readonly residentCompanyDocumentsRepository: Repository&lt;ResidentCompanyDocuments&gt;,
+    @InjectRepository(ResidentCompanyManagement)
+    private readonly residentCompanyManagementRepository: Repository&lt;ResidentCompanyManagement&gt;,
+    @InjectRepository(ResidentCompanyTechnical)
+    private readonly residentCompanyTechnicalRepository: Repository&lt;ResidentCompanyTechnical&gt;,
+    @InjectRepository(Site)
+    private readonly siteRepository: Repository&lt;Site&gt;,
+    @InjectRepository(BiolabsSource)
+    private readonly biolabsSourceRepository: Repository&lt;BiolabsSource&gt;,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository&lt;Category&gt;,
+    @InjectRepository(Funding)
+    private readonly fundingRepository: Repository&lt;Funding&gt;,
+    @InjectRepository(Modality)
+    private readonly modalityRepository: Repository&lt;Modality&gt;,
+    @InjectRepository(TechnologyStage)
+    private readonly technologyStageRepository: Repository&lt;TechnologyStage&gt;,
+  ) { }
+
+  /**
+   * Description: This method will get the resident company by id.
+   * @description This method will get the resident company by id.
+   * @param id number resident company id
+   * @return resident company object
+   */
+  async get(id: number) {
+    return this.residentCompanyRepository.findOne(id);
+  }
+
+  /**
+ * Description: This method is used to update the resident company pitchdeck and logo.
+ * @description This method is used to update the  resident company pitchdeck and logo.
+ * @param payload object of user information with pitchdeckImgUrl or logoImgUrl
+ * @return resident company object
+ */
+  async updateResidentCompanyImg(payload) {
+    const companyId &#x3D; payload.id;
+    const resident &#x3D; await this.get(companyId);
+    if (resident) {
+      if (payload.fileType &#x3D;&#x3D; &#x27;logo&#x27;) {
+        resident.logoImgUrl &#x3D; payload.imageUrl;
+        await this.residentCompanyRepository.update(companyId, resident);
+      } else if (payload.fileType &#x3D;&#x3D; &#x27;pitchdeck&#x27;) {
+        resident.pitchdeck &#x3D; payload.imageUrl;
+        await this.residentCompanyRepository.update(companyId, resident);
+      }
+      return resident;
+    } else {
+      throw new NotAcceptableException(&#x27;resident company with provided id not available.&#x27;);
+    }
+  }
+
+  /**
+   * Description: This method will get the resident company by email.
+   * @description This method will get the resident company by email.
+   * @param email string resident company email
+   * @return resident company object
+   */
+  async getByEmail(email: string) {
+    return await this.residentCompanyRepository
+      .createQueryBuilder(&#x27;resident-companies&#x27;)
+      .where(&#x27;resident-companies.email &#x3D; :email&#x27;)
+      .setParameter(&#x27;email&#x27;, email)
+      .getOne();
+  }
+
+  /**
+   * Description: This method will create the new resident companies.
+   * @description This method will create the new resident companies.
+   * @param payload object of AddResidentCompanyPayload.
+   * @return resident companies object
+   */
+  async create(payload: AddResidentCompanyPayload) {
+    const rc &#x3D; await this.getByEmail(payload.email);
+
+    if (rc) {
+      throw new NotAcceptableException(
+        &#x27;User with provided email already created.&#x27;,
+      );
+    }
+    return await this.residentCompanyRepository.save(this.residentCompanyRepository.create(payload));
+  }
+
+  /**
+   * Description: This method will create the new resident companies advisor.
+   * @description This method will create the new resident companies advisor.
+   * @param payload object of ResidentCompanyAdvisoryFillableFields.
+   * @return resident companies advisor object
+   */
+  async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
+    let savedRcAdvisor: object;
+    if (payload.id)
+      savedRcAdvisor &#x3D; await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
+    else {
+      delete payload.id;
+      savedRcAdvisor &#x3D; await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
+    }
+  }
+
+  /**
+   * Description: This method will create the new resident companies advisors.
+   * @description This method will create the new resident companies advisors.
+   * @param companyMember array of companyMember.
+   * @param id number of Company id.
+   */
+  async residentCompanyAdvisors(companyMembers: [], id: number) {
+    if (companyMembers.length &gt; 0) {
+      for (let i &#x3D; 0; i &lt; companyMembers.length; i++) {
+        let companyMember: any &#x3D; companyMembers[i];
+        companyMember.companyId &#x3D; id;
+        let savedRcManagement &#x3D; await this.addResidentCompanyAdvisor(companyMember);
+      }
+    }
+  }
+
+  /**
+   * Description: This method will create the new resident companies document.
+   * @description This method will create the new resident companies document.
+   * @param payload object of ResidentCompanyDocumentsFillableFields.
+   * @return resident companies document object
+   */
+  async addResidentCompanyDocument(payload: ResidentCompanyDocumentsFillableFields) {
+    const savedRcDocument &#x3D; await this.residentCompanyDocumentsRepository.save(this.residentCompanyDocumentsRepository.create(payload));
+    return savedRcDocument;
+  }
+
+  /**
+   * Description: This method will create the new resident companies management.
+   * @description This method will create the new resident companies management.
+   * @param payload object of ResidentCompanyManagementFillableFields.
+   * @return resident companies management object
+   */
+  async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
+    let savedRcManagement: object;
+    if (payload.id)
+      savedRcManagement &#x3D; await this.residentCompanyManagementRepository.update(payload.id, payload);
+    else {
+      delete payload.id;
+      savedRcManagement &#x3D; await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
+    }
+  }
+
+  /**
+   * Description: This method will create the new resident companies managements.
+   * @description This method will create the new resident companies managements.
+   * @param companyMember array of companyMember.
+   * @param id number of Company id.
+   */
+  async residentCompanyManagements(companyMembers: [], id: number) {
+    if (companyMembers.length &gt; 0) {
+      for (let i &#x3D; 0; i &lt; companyMembers.length; i++) {
+        let companyMember: any &#x3D; companyMembers[i];
+        companyMember.companyId &#x3D; id;
+        let savedRcManagement &#x3D; await this.addResidentCompanyManagement(companyMember);
+      }
+    }
+  }
+
+  /**
+   * Description: This method will create the new resident companies technical.
+   * @description This method will create the new resident companies technical.
+   * @param payload object of ResidentCompanyTechnicalFillableFields.
+   * @return resident companies technical object
+   */
+  async addResidentCompanyTechnical(payload: ResidentCompanyTechnicalFillableFields) {
+    let savedRcTechnical: object;
+    if (payload.id)
+      savedRcTechnical &#x3D; await this.residentCompanyTechnicalRepository.update(payload.id, payload);
+    else {
+      delete payload.id;
+      savedRcTechnical &#x3D; await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
+    }
+  }
+
+  /**
+   * Description: This method will create the new resident companies technicals.
+   * @description This method will create the new resident companies technicals.
+   * @param companyMember array of companyMember.
+   * @param id number of Company id.
+   */
+  async residentCompanyTechnicals(companyMembers: [], id: number) {
+    if (companyMembers.length &gt; 0) {
+      for (let i &#x3D; 0; i &lt; companyMembers.length; i++) {
+        let companyMember: any &#x3D; companyMembers[i];
+        companyMember.companyId &#x3D; id;
+        let savedRcManagement &#x3D; await this.addResidentCompanyTechnical(companyMember);
+      }
+    }
+  }
+
+  /**
+   * Description: This method will create the new resident companies.
+   * @description This method will create the new resident companies.
+   * @param payload object of AddResidentCompanyPayload.
+   * @param req object of Request.
+   * @return resident companies object
+   */
+  async addResidentCompany(payload: AddResidentCompanyPayload) {
+    const rc &#x3D; await this.getByEmail(payload.email);
+
+    if (rc) {
+      throw new NotAcceptableException(
+        &#x27;User with provided email already created.&#x27;,
+      );
+    }
+    let response &#x3D; {};
+    for await (const site of payload.site) {
+      try {
+        payload.site &#x3D; [site];
+        const newRc &#x3D; await this.residentCompanyRepository.create(payload);
+        const savedRc &#x3D; await this.residentCompanyRepository.save(newRc);
+        if (savedRc.id) {
+          const historyData: any &#x3D; JSON.parse(JSON.stringify(savedRc));
+          historyData.companyId &#x3D; historyData.id;
+          delete historyData.id;
+          await this.residentCompanyHistoryRepository.save(historyData);
+        }
+      } catch {
+        response[&#x27;status&#x27;] &#x3D; &#x27;error&#x27;;
+        response[&#x27;message&#x27;] &#x3D; &#x27;Could not add application&#x27;;
+      }
+    }
+    response[&#x27;status&#x27;] &#x3D; &#x27;success&#x27;;
+    response[&#x27;message&#x27;] &#x3D; &#x27;Application Successfully submitted&#x27;
+    return response;
+  }
+
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
+  async getResidentCompanies(payload: ListResidentCompanyPayload, siteIdArr: number[]) {
+    let rcQuery &#x3D; await this.residentCompanyRepository.createQueryBuilder(&quot;resident_companies&quot;)
+      .select(&quot;resident_companies.* &quot;)
+      .addSelect(&quot;s.name&quot;, &quot;siteName&quot;)
+      .addSelect(&quot;s.id&quot;, &quot;siteId&quot;)
+      .leftJoin(&#x27;sites&#x27;, &#x27;s&#x27;, &#x27;s.id &#x3D; Any(resident_companies.site)&#x27;)
+      .where(&quot;resident_companies.status IN (:...status)&quot;, { status: [1, 0] })
+      .andWhere(&quot;resident_companies.site &amp;&amp; ARRAY[:...siteIdArr]::int[]&quot;, { siteIdArr: siteIdArr });
+
+    if (payload.q &amp;&amp; payload.q !&#x3D; &#x27;&#x27;) {
+      rcQuery.andWhere(&quot;(resident_companies.companyName LIKE :name) &quot;, { name: &#x60;%${payload.q}%&#x60; });
+    }
+    if (payload.companyStatus &amp;&amp; payload.companyStatus.length &gt; 0) {
+      rcQuery.andWhere(&quot;resident_companies.companyStatus &#x3D; :companyStatus&quot;, { companyStatus: payload.companyStatus });
+    }
+    if (typeof payload.companyVisibility !&#x3D;&#x3D; &#x27;undefined&#x27;) {
+      rcQuery.andWhere(&quot;resident_companies.companyVisibility &#x3D; :companyVisibility&quot;, { companyVisibility: payload.companyVisibility });
+    }
+    if (typeof payload.companyOnboardingStatus !&#x3D;&#x3D; &#x27;undefined&#x27;) {
+      rcQuery.andWhere(&quot;resident_companies.companyOnboardingStatus &#x3D; :companyOnboardingStatus&quot;, { companyOnboardingStatus: payload.companyOnboardingStatus });
+    }
+
+    if (payload.pagination) {
+      let skip &#x3D; 0;
+      let take &#x3D; 10;
+      if (payload.limit) {
+        take &#x3D; payload.limit;
+        if (payload.page) {
+          skip &#x3D; payload.page * payload.limit;
+        }
+      }
+      rcQuery.skip(skip).take(take)
+    }
+    rcQuery.orderBy(&quot;id&quot;, &quot;DESC&quot;);
+    return await rcQuery.getRawMany();
+  }
+
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
+  async getResidentCompaniesBkp(payload: ListResidentCompanyPayload) {
+    let search;
+    let skip;
+    let take;
+    let _search &#x3D; {};
+    if (payload.role || payload.role &#x3D;&#x3D; 0) {
+      _search &#x3D; { ..._search, ...{ role: payload.role } };
+    }
+    if (payload.q &amp;&amp; payload.q !&#x3D; &quot;&quot;) {
+      _search &#x3D; { ..._search, ...{ companyName: Like(&quot;%&quot; + payload.q + &quot;%&quot;) } };
+    }
+    if (payload.companyStatus &amp;&amp; payload.companyStatus.length &gt; 0) {
+      _search &#x3D; { ..._search, ...{ companyStatus: payload.companyStatus } };
+    }
+    if (typeof payload.companyVisibility !&#x3D;&#x3D; &#x27;undefined&#x27;) {
+      _search &#x3D; { ..._search, ...{ companyVisibility: payload.companyVisibility } };
+    }
+    if (typeof payload.companyOnboardingStatus !&#x3D;&#x3D; &#x27;undefined&#x27;) {
+      _search &#x3D; { ..._search, ...{ companyOnboardingStatus: payload.companyOnboardingStatus } };
+    }
+    search &#x3D; [{ ..._search, status: In([&#x27;1&#x27;, &#x27;0&#x27;]) }]
+    if (payload.pagination) {
+      skip &#x3D; { skip: 0 }
+      take &#x3D; { take: 10 }
+      if (payload.limit) {
+        take &#x3D; { take: payload.limit };
+        if (payload.page) {
+          skip &#x3D; { skip: payload.page * payload.limit }
+        }
+      }
+    }
+    return await this.residentCompanyRepository.find({
+      where: search,
+      order: { id: &quot;DESC&quot; },
+      skip,
+      take
+    });
+  }
+
+  /**
+   * Description: This method will return the sites list.
+   * @description This method will return the sites list.
+   * @param ids number[]
+   * @return array of sites object
+   */
+  async getRcSites(ids) {
+    if (ids &amp;&amp; ids.length &gt; 0) {
+      return await this.siteRepository.find({
+        select: [&quot;id&quot;, &quot;name&quot;],
+        where: { id: In(ids) },
+      });
+    }
+    return [];
+  }
+
+  /**
+   * Description: This method will return the categories list.
+   * @description This method will return the categories list.
+   * @param ids number[]
+   * @return array of categories object
+   */
+  async getRcCategories(ids) {
+    if (ids &amp;&amp; ids.length &gt; 0) {
+      return await this.categoryRepository.find({
+        select: [&quot;id&quot;, &quot;name&quot;],
+        where: { id: In(ids) },
+      });
+    }
+    return [];
+  }
+
+  /**
+   * Description: This method will return the fundings list.
+   * @description This method will return the fundings list.
+   * @param ids number[]
+   * @return array of fundings object
+   */
+  async getRcFundings(ids) {
+    if (ids &amp;&amp; ids.length &gt; 0) {
+      return await this.fundingRepository.find({
+        select: [&quot;id&quot;, &quot;name&quot;],
+        where: { id: In(ids) },
+      });
+    }
+    return [];
+  }
+
+  /**
+   * Description: This method will return the technology stages list.
+   * @description This method will return the technology stages list.
+   * @param ids number[]
+   * @return array of technology stages object
+   */
+  async getRcTechnologyStages(ids) {
+    if (ids) {
+      return await this.technologyStageRepository.findOne({
+        select: [&quot;id&quot;, &quot;name&quot;],
+        where: { id: ids },
+      });
+    }
+    return {};
+  }
+
+  /**
+   * Description: This method will return the biolabs sources list.
+   * @description This method will return the biolabs sources list.
+   * @param ids number[]
+   * @return array of biolabs sources object
+   */
+  async getRcBiolabsSources(ids) {
+    if (ids) {
+      return await this.biolabsSourceRepository.findOne({
+        select: [&quot;id&quot;, &quot;name&quot;],
+        where: { id: ids },
+      });
+    }
+    return {};
+  }
+
+  /**
+   * Description: This method will return the modalities list.
+   * @description This method will return the modalities list.
+   * @param ids number[]
+   * @return array of modalities object
+   */
+  async getRcModalities(ids) {
+    if (ids) {
+      return await this.modalityRepository.find({
+        select: [&quot;id&quot;, &quot;name&quot;],
+        where: { id: In(ids) },
+      });
+    }
+    return [];
+  }
+
+  /**
+   * Description: This method will return the management members list.
+   * @description This method will return the management members list.
+   * @param ids number[]
+   * @return array of biolabs sources object
+   */
+  async getRcMembers(id) {
+    if (id) {
+      return await this.residentCompanyManagementRepository.find({
+        where: { companyId: id },
+      });
+    }
+    return []
+  }
+
+  /**
+   * Description: This method will return the advisors members list.
+   * @description This method will return the advisors members list.
+   * @param ids number[]
+   * @return array of biolabs sources object
+   */
+  async getRcAdvisors(id) {
+    if (id) {
+      return await this.residentCompanyAdvisoryRepository.find({
+        where: { companyId: id },
+      });
+    }
+    return []
+  }
+
+  /**
+   * Description: This method will return the technical teams members list.
+   * @description This method will return the technical teams members list.
+   * @param ids number[]
+   * @return array of biolabs sources object
+   */
+  async getRcTechnicalTeams(id) {
+    if (id) {
+      return await this.residentCompanyTechnicalRepository.find({
+        where: { companyId: id },
+      });
+    }
+    return [];
+  }
+
+  /**
+   * Description: This method will get the resident company for sponsor.
+   * @description This method will get the resident company for sponsor.
+   * @param id number resident company id
+   * @return resident company object
+   */
+  async getResidentCompanyForSponsor() {
+    let response &#x3D; {};
+
+    const graduate: any &#x3D; await this.residentCompanyRepository.
+      createQueryBuilder(&quot;resident_companies&quot;).
+      select(&quot;count(*)&quot;, &quot;graduate&quot;).
+      where(&quot;resident_companies.status &#x3D; :status&quot;, { status: &#x27;4&#x27; }).getRawOne();
+
+    //Get Sum of all companies and Average company size
+    const stats: any &#x3D; await this.residentCompanyRepository.
+      createQueryBuilder(&quot;resident_companies&quot;).
+      select(&quot;AVG(resident_companies.companySize)::numeric(10,2)&quot;, &quot;avgTeamSize&quot;).
+      addSelect(&quot;count(*)&quot;, &quot;startUpcount&quot;).
+      where(&quot;resident_companies.status &#x3D; :status&quot;, { status: &#x27;1&#x27; }).
+      andWhere(&quot;resident_companies.companyVisibility &#x3D; :companyVisibility&quot;, { companyVisibility: &quot;true&quot; }).getRawOne();
+
+    const categoryStats &#x3D; await this.categoryRepository.
+      query(&quot;SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc &quot; +
+        &quot;where c.id &#x3D; ANY(rc.industry::int[]) ) as industryCount &quot; +
+        &quot;FROM public.categories as c order by industryCount desc limit 3;&quot;)
+
+    response[&#x27;companyStats&#x27;] &#x3D; (!stats) ? 0 : stats;
+    response[&#x27;graduate&#x27;] &#x3D; (!graduate) ? 0 : graduate;
+    response[&#x27;categoryStats&#x27;] &#x3D; (!categoryStats) ? 0 : categoryStats;
+
+    return response;
+
+  }
+
+  /**
+  * Description: This method will get the resident company for sponsor.
+  * @description This method will get the resident company for sponsor.
+  * @param id number resident company id
+  * @return resident company object
+  */
+  async getResidentCompanyForSponsorBySite() {
+    let res &#x3D; [];
+
+    const sites &#x3D; await this.siteRepository.find();
+
+    for (let site of sites) {
+      let response &#x3D; {};
+
+      const graduate: any &#x3D; await this.residentCompanyRepository.
+        createQueryBuilder(&quot;resident_companies&quot;).
+        select(&quot;count(*)&quot;, &quot;graduate&quot;).
+        where(&quot;resident_companies.status &#x3D; :status&quot;, { status: &#x27;4&#x27; }).
+        andWhere(&quot;:site &#x3D; ANY(resident_companies.site::int[]) &quot;, { site: site.id }).getRawOne();
+
+      //Get Sum of all companies and Average company size
+      const companystats: any &#x3D; await this.residentCompanyRepository.
+        createQueryBuilder(&quot;resident_companies&quot;).
+        select(&quot;AVG(resident_companies.companySize)::numeric(10,2)&quot;, &quot;avg&quot;).
+        addSelect(&quot;count(*)&quot;, &quot;count&quot;).
+        where(&quot;resident_companies.status &#x3D; :status&quot;, { status: &#x27;1&#x27; }).
+        andWhere(&quot;resident_companies.companyVisibility &#x3D; :companyVisibility&quot;, { companyVisibility: &quot;true&quot; }).
+        andWhere(&quot;:site &#x3D; ANY(resident_companies.site::int[]) &quot;, { site: site.id }).getRawOne();
+
+      const categoryStats &#x3D; await this.categoryRepository.
+        query(&quot;SELECT c.name, c.id  as industryId, (select count(rc.*) FROM resident_companies as rc &quot; +
+          &quot;where c.id &#x3D; ANY(rc.industry::int[]) and &quot; + site.id + &quot; &#x3D; ANY(rc.site::int[])  ) as industryCount &quot; +
+          &quot; FROM public.categories as c order by industryCount desc limit 3;&quot;);
+      let newStartUps: any &#x3D; {};
+      // try {
+      //Get Sum of all New companies onboard in last 3 months
+      // newStartUps &#x3D; await this.residentCompanyRepository.
+      // createQueryBuilder(&quot;resident_companies&quot;).
+      // addSelect(&quot;count(*)&quot;, &quot;newStartUps&quot;).
+      // where(&quot;resident_companies.status &#x3D; :status&quot;, { status: &#x27;1&#x27; }).
+      // where(&quot;resident_companies.createdAt  &gt;  &#x27;06/01/2021&#x27; &quot;).
+      // andWhere(&quot;resident_companies.companyVisibility &#x3D; :companyVisibility&quot;, { companyVisibility: &quot;true&quot; }).
+      // andWhere(&quot;:site &#x3D; ANY(resident_companies.site::int[]) &quot;, { site: site.id }).getRawOne();
+
+      newStartUps &#x3D; await this.residentCompanyRepository.
+        query(&quot; select count(*) as newStartUps FROM resident_companies &quot; +
+          &quot; where resident_companies.\&quot;companyVisibility\&quot; &#x3D; true and &quot; +
+          &quot; resident_companies.\&quot;status\&quot; &#x3D; &#x27;1&#x27; and &quot; +
+          &quot; (CURRENT_DATE - INTERVAL &#x27;3 months&#x27;)  &lt; (resident_companies.\&quot;createdAt\&quot;) &quot;);
+
+      // } catch {
+      //   newStartUps &#x3D; {newStartUps : &#x27;error&#x27;};
+      // }
+
+      response[&#x27;newStartUps&#x27;] &#x3D; (!newStartUps) ? 0 : newStartUps;
+      response[&#x27;site&#x27;] &#x3D; (!site) ? 0 : site;
+      response[&#x27;graduate&#x27;] &#x3D; (!graduate) ? 0 : graduate;
+      response[&#x27;companyStats&#x27;] &#x3D; (!companystats) ? 0 : companystats;
+      response[&#x27;categoryStats&#x27;] &#x3D; (!categoryStats) ? 0 : categoryStats;
+      res.push(response);
+    }
+    return res;
+
+  }
+
+
+
+  /**
+   * Description: This method will get the resident company.
+   * @description This method will get the resident company.
+   * @param id number resident company id
+   * @return resident company object
+   */
+  async getResidentCompany(id) {
+    if (id &#x3D;&#x3D; null) {
+      return {};
+    }
+    const residentCompany: any &#x3D; await this.residentCompanyRepository.findOne({
+      where: { id: id }
+    });
+    if (residentCompany) {
+      residentCompany.sites &#x3D; await this.getRcSites(residentCompany.site);
+      residentCompany.categories &#x3D; await this.getRcCategories(residentCompany.industry);
+      residentCompany.modalities &#x3D; await this.getRcModalities(residentCompany.modality);
+      residentCompany.fundingSources &#x3D; await this.getRcFundings(residentCompany.fundingSource);
+      residentCompany.companyStages &#x3D; await this.getRcTechnologyStages(residentCompany.companyStage);
+      residentCompany.biolabsSources &#x3D; await this.getRcBiolabsSources(residentCompany.biolabsSources);
+      residentCompany.companyMembers &#x3D; await this.getRcMembers(residentCompany.id);
+      residentCompany.companyAdvisors &#x3D; await this.getRcAdvisors(residentCompany.id);
+      residentCompany.companyTechnicalTeams &#x3D; await this.getRcTechnicalTeams(residentCompany.id);
+      return residentCompany;
+    } else {
+      throw new NotAcceptableException(
+        &#x27;Company with provided id not available.&#x27;,
+      );
+    }
+  }
+
+  /**
+   * Description: This method will update the resident company status.
+   * @description This method will update the resident company status.
+   * @param payload object of type UpdateResidentCompanyStatusPayload
+   * @return resident company object
+   */
+  async updateResidentCompanyStatus(payload: UpdateResidentCompanyStatusPayload) {
+    const residentCompany: any &#x3D; await this.residentCompanyRepository.findOne({
+      where: { id: payload.companyId }
+    });
+    if (residentCompany) {
+      residentCompany.companyStatus &#x3D; payload.companyStatus;
+      residentCompany.companyVisibility &#x3D; payload.companyVisibility;
+      residentCompany.companyOnboardingStatus &#x3D; payload.companyOnboardingStatus;
+      if (Number(residentCompany.companyStatus) !&#x3D;&#x3D; 1)
+        residentCompany.companyVisibility &#x3D; false;
+      this.residentCompanyRepository.update(residentCompany.id, residentCompany);
+      return residentCompany;
+    } else {
+      throw new NotAcceptableException(
+        &#x27;Company with provided id not available.&#x27;,
+      );
+    }
+  }
+
+  /**
+   * Description: This method will update the resident company info.
+   * @description This method will update the resident company info.
+   * @param payload object of type UpdateResidentCompanyPayload
+   * @return resident company object
+   */
+  async updateResidentCompany(payload: UpdateResidentCompanyPayload) {
+    const residentCompany: any &#x3D; await this.residentCompanyRepository.findOne({
+      where: { id: payload.id }
+    });
+
+    const residentCompanyEmailChk: any &#x3D; await this.residentCompanyRepository.findOne({
+      where: { id: Not(payload.id), email: payload.email }
+    });
+    if (residentCompanyEmailChk) {
+      throw new NotAcceptableException(
+        &#x27;User with provided email already existed.&#x27;,
+      );
+    }
+    if (residentCompany) {
+      const companyMembers: any &#x3D; (payload.companyMembers) ? JSON.parse(JSON.stringify(payload.companyMembers)) : [];
+      const companyAdvisors: any &#x3D; (payload.companyAdvisors) ? JSON.parse(JSON.stringify(payload.companyAdvisors)) : [];
+      const companyTechnicalTeams: any &#x3D; (payload.companyTechnicalTeams) ? JSON.parse(JSON.stringify(payload.companyTechnicalTeams)) : [];
+
+      delete payload.companyMembers;
+      delete payload.companyAdvisors;
+      delete payload.companyTechnicalTeams;
+
+      await this.residentCompanyRepository.update(residentCompany.id, this.residentCompanyRepository.create(payload));
+      await this.residentCompanyManagements(companyMembers, residentCompany.id);
+      await this.residentCompanyAdvisors(companyAdvisors, residentCompany.id);
+      await this.residentCompanyTechnicals(companyTechnicalTeams, residentCompany.id);
+
+      const historyData: any &#x3D; JSON.parse(JSON.stringify(payload));
+      historyData.companyId &#x3D; historyData.id;
+      delete historyData.id;
+
+      await this.residentCompanyHistoryRepository.save(historyData);
+      return await this.getResidentCompany(residentCompany.id);
+    } else {
+      throw new NotAcceptableException(
+        &#x27;Company with provided id not available.&#x27;,
+      );
+    }
+  }
+
+  /**
+   * Description: used to convert data into array
+   * @description used to convert data into array
+   * @param val input value
+   */
+  private parseToArray(val){
+    if(typeof val &#x3D;&#x3D;&#x3D; &#x27;object&#x27;){
+      return val;
+    }
+    return [val];
+  }
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
+  async gloabalSearchCompanies(payload: SearchResidentCompanyPayload) {
+    let rcQuery &#x3D; await this.residentCompanyRepository.createQueryBuilder(&quot;resident_companies&quot;)
+      .where(&quot;resident_companies.status IN (:...status)&quot;, { status: [1, 0] });
+
+    if (payload.q &amp;&amp; payload.q !&#x3D; &#x27;&#x27;) {
+      // rcQuery.andWhere(&quot;(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) &quot;, { name: &#x60;%${payload.q}%&#x60; });
+      rcQuery.andWhere(&quot;(resident_companies.name LIKE :q) OR (resident_companies.companyName LIKE :q) OR (SELECT to_tsvector(resident_companies.\&quot;name\&quot; || &#x27; &#x27; || resident_companies.\&quot;companyName\&quot; || &#x27; &#x27; || resident_companies.\&quot;technology\&quot;) @@ to_tsquery(:q)) &quot;, { q: &#x60;%${payload.q}%&#x60; });
+    }
+    if (payload.companyStatus &amp;&amp; payload.companyStatus.length &gt; 0) {
+      rcQuery.andWhere(&quot;resident_companies.companyStatus &#x3D; :companyStatus&quot;, { companyStatus: payload.companyStatus });
+    }
+    if (typeof payload.companyVisibility !&#x3D;&#x3D; &#x27;undefined&#x27;) {
+      rcQuery.andWhere(&quot;resident_companies.companyVisibility &#x3D; :companyVisibility&quot;, { companyVisibility: payload.companyVisibility });
+    }
+    if (typeof payload.companyOnboardingStatus !&#x3D;&#x3D; &#x27;undefined&#x27;) {
+      rcQuery.andWhere(&quot;resident_companies.companyOnboardingStatus &#x3D; :companyOnboardingStatus&quot;, { companyOnboardingStatus: payload.companyOnboardingStatus });
+    }
+    if (payload.siteIdArr &amp;&amp; payload.siteIdArr.length &gt; 0) {
+      payload.siteIdArr &#x3D; this.parseToArray(payload.siteIdArr)
+      rcQuery.andWhere(&quot;resident_companies.site &amp;&amp; ARRAY[:...siteIdArr]::int[]&quot;, { siteIdArr: payload.siteIdArr });
+    }
+    if (payload.industries &amp;&amp; payload.industries.length &gt; 0) {
+      payload.industries &#x3D; this.parseToArray(payload.industries)
+      rcQuery.andWhere(&quot;resident_companies.industry &amp;&amp; ARRAY[:...industries]::int[]&quot;, { industries: payload.industries });
+    }
+    if (payload.modalities &amp;&amp; payload.modalities.length &gt; 0) {
+      payload.modalities &#x3D; this.parseToArray(payload.modalities)
+      rcQuery.andWhere(&quot;resident_companies.modality &amp;&amp; ARRAY[:...modalities]::int[]&quot;, { modalities: payload.modalities });
+    }
+    if (payload.fundingSource &amp;&amp; payload.fundingSource.length &gt; 0) {
+      payload.fundingSource &#x3D; this.parseToArray(payload.fundingSource)
+      rcQuery.andWhere(&quot;resident_companies.fundingSource &amp;&amp; ARRAY[:...fundingSource]::int[]&quot;, { fundingSource: payload.fundingSource });
+    }
+    if (payload.minFund &gt;&#x3D; 0) {
+      rcQuery.andWhere(&quot;resident_companies.funding::int &gt;&#x3D; :minFunding&quot;, {​​​​ minFunding: payload.minFund }​​​​);
+    }
+    if (payload.maxFund &gt;&#x3D; 0) {
+      rcQuery.andWhere(&quot;resident_companies.funding::int &lt;&#x3D; :maxFunding&quot;, { maxFunding: payload.maxFund });
+    }
+    if (payload.minCompanySize &gt;&#x3D; 0) {
+      rcQuery.andWhere(&quot;resident_companies.\&quot;companySize\&quot;::int &gt;&#x3D; :minCompanySize&quot;, {​​​​ minCompanySize: payload.minCompanySize }​​​​);
+    }
+    if (payload.maxCompanySize &gt;&#x3D; 0) {
+      rcQuery.andWhere(&quot;resident_companies.\&quot;companySize\&quot;::int &lt;&#x3D; :maxCompanySize&quot;, {​​​​ maxCompanySize: payload.maxCompanySize }​​​​);
+    }
+
+    if (payload.pagination) {
+      let skip &#x3D; 0;
+      let take &#x3D; 10;
+      if (payload.limit) {
+        take &#x3D; payload.limit;
+        if (payload.page) {
+          skip &#x3D; payload.page * payload.limit;
+        }
+      }
+      rcQuery.skip(skip).take(take)
+    }
+    if (payload.sort) {
+      rcQuery.orderBy(&#x27;&quot;&#x27; + payload.sortFiled + &#x27;&quot;&#x27;, payload.sortOrder)
+    }
+    rcQuery.addOrderBy(&quot;id&quot;, &quot;DESC&quot;);
+    return await rcQuery.getMany();
+  }
+}</code></pre>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+                   
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'injectable';
+            var COMPODOC_CURRENT_PAGE_URL = 'ResidentCompanyService.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+       <script src="../js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
+       <script src="../js/menu-wc.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>
