@@ -7,7 +7,7 @@ import { User } from './user.entity';
 import { UsersService } from './user.service';
 import { UserController } from './user.controller';
 import { PassportModule } from '@nestjs/passport';
-import { Mail } from 'utils/Mail';
+import { Mail } from '../../../utils/Mail';
 import { JwtStrategy } from '../auth/jwt.strategy';
 import { UserToken } from './user-token.entity';
 
