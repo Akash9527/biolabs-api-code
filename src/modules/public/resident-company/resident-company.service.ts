@@ -692,6 +692,11 @@ export class ResidentCompanyService {
     }
   }
 
+  /**
+   * Description: used to convert data into array
+   * @description used to convert data into array
+   * @param val input value
+   */
   private parseToArray(val){
     if(typeof val === 'object'){
       return val;
