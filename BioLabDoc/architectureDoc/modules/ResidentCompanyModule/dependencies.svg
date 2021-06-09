@@ -24,59 +24,59 @@
 <title>cluster_ResidentCompanyModule</title>
 <polygon fill="none" stroke="black" stroke-dasharray="1,5" points="60,-70 60,-268 436,-268 436,-70 60,-70"/>
 </g>
-<g id="clust3" class="cluster">
-<title>cluster_ResidentCompanyModule_imports</title>
-<polygon fill="none" stroke="black" points="314,-78 314,-130 428,-130 428,-78 314,-78"/>
-</g>
 <g id="clust6" class="cluster">
 <title>cluster_ResidentCompanyModule_providers</title>
-<polygon fill="none" stroke="black" points="68,-78 68,-130 306,-130 306,-78 68,-78"/>
+<polygon fill="none" stroke="black" points="190,-78 190,-130 428,-130 428,-78 190,-78"/>
 </g>
 <g id="clust4" class="cluster">
 <title>cluster_ResidentCompanyModule_exports</title>
-<polygon fill="none" stroke="black" points="172,-208 172,-260 352,-260 352,-208 172,-208"/>
+<polygon fill="none" stroke="black" points="143,-208 143,-260 323,-260 323,-208 143,-208"/>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_ResidentCompanyModule_imports</title>
+<polygon fill="none" stroke="black" points="68,-78 68,-130 182,-130 182,-78 68,-78"/>
 </g>
 <!-- ConfigModule -->
 <g id="node1" class="node">
 <title>ConfigModule</title>
-<polygon fill="#8dd3c7" stroke="black" points="420.44,-122 417.44,-126 396.44,-126 393.44,-122 321.56,-122 321.56,-86 420.44,-86 420.44,-122"/>
-<text text-anchor="middle" x="371" y="-99.8" font-family="Times,serif" font-size="14.00">ConfigModule</text>
+<polygon fill="#8dd3c7" stroke="black" points="174.44,-122 171.44,-126 150.44,-126 147.44,-122 75.56,-122 75.56,-86 174.44,-86 174.44,-122"/>
+<text text-anchor="middle" x="125" y="-99.8" font-family="Times,serif" font-size="14.00">ConfigModule</text>
 </g>
 <!-- ResidentCompanyModule -->
 <g id="node2" class="node">
 <title>ResidentCompanyModule</title>
-<polygon fill="#8dd3c7" stroke="black" points="343.48,-187 340.48,-191 319.48,-191 316.48,-187 180.52,-187 180.52,-151 343.48,-151 343.48,-187"/>
-<text text-anchor="middle" x="262" y="-164.8" font-family="Times,serif" font-size="14.00">ResidentCompanyModule</text>
+<polygon fill="#8dd3c7" stroke="black" points="314.48,-187 311.48,-191 290.48,-191 287.48,-187 151.52,-187 151.52,-151 314.48,-151 314.48,-187"/>
+<text text-anchor="middle" x="233" y="-164.8" font-family="Times,serif" font-size="14.00">ResidentCompanyModule</text>
 </g>
 <!-- ConfigModule&#45;&gt;ResidentCompanyModule -->
 <g id="edge1" class="edge">
 <title>ConfigModule&#45;&gt;ResidentCompanyModule</title>
-<path fill="none" stroke="black" d="M332.64,-122.11C332.64,-122.11 332.64,-140.99 332.64,-140.99"/>
-<polygon fill="black" stroke="black" points="329.14,-140.99 332.64,-150.99 336.14,-140.99 329.14,-140.99"/>
+<path fill="none" stroke="black" d="M162.86,-122.11C162.86,-122.11 162.86,-140.99 162.86,-140.99"/>
+<polygon fill="black" stroke="black" points="159.36,-140.99 162.86,-150.99 166.36,-140.99 159.36,-140.99"/>
 </g>
 <!-- ResidentCompanyService  -->
 <g id="node3" class="node">
 <title>ResidentCompanyService </title>
-<polygon fill="#fb8072" stroke="black" points="344.41,-252 179.59,-252 179.59,-216 344.41,-216 344.41,-252"/>
-<text text-anchor="middle" x="262" y="-229.8" font-family="Times,serif" font-size="14.00">ResidentCompanyService </text>
+<polygon fill="#fb8072" stroke="black" points="315.41,-252 150.59,-252 150.59,-216 315.41,-216 315.41,-252"/>
+<text text-anchor="middle" x="233" y="-229.8" font-family="Times,serif" font-size="14.00">ResidentCompanyService </text>
 </g>
 <!-- ResidentCompanyModule&#45;&gt;ResidentCompanyService  -->
 <g id="edge2" class="edge">
 <title>ResidentCompanyModule&#45;&gt;ResidentCompanyService </title>
-<path fill="none" stroke="black" stroke-dasharray="5,2" d="M262,-187.11C262,-187.11 262,-205.99 262,-205.99"/>
-<polygon fill="black" stroke="black" points="258.5,-205.99 262,-215.99 265.5,-205.99 258.5,-205.99"/>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M233,-187.11C233,-187.11 233,-205.99 233,-205.99"/>
+<polygon fill="black" stroke="black" points="229.5,-205.99 233,-215.99 236.5,-205.99 229.5,-205.99"/>
 </g>
 <!-- ResidentCompanyService -->
 <g id="node4" class="node">
 <title>ResidentCompanyService</title>
-<ellipse fill="#fdb462" stroke="black" cx="187" cy="-104" rx="111.18" ry="18"/>
-<text text-anchor="middle" x="187" y="-99.8" font-family="Times,serif" font-size="14.00">ResidentCompanyService</text>
+<ellipse fill="#fdb462" stroke="black" cx="309" cy="-104" rx="111.18" ry="18"/>
+<text text-anchor="middle" x="309" y="-99.8" font-family="Times,serif" font-size="14.00">ResidentCompanyService</text>
 </g>
 <!-- ResidentCompanyService&#45;&gt;ResidentCompanyModule -->
 <g id="edge3" class="edge">
 <title>ResidentCompanyService&#45;&gt;ResidentCompanyModule</title>
-<path fill="none" stroke="black" d="M239.42,-120.07C239.42,-120.07 239.42,-140.82 239.42,-140.82"/>
-<polygon fill="black" stroke="black" points="235.92,-140.82 239.42,-150.82 242.92,-140.82 235.92,-140.82"/>
+<path fill="none" stroke="black" d="M256.08,-120.07C256.08,-120.07 256.08,-140.82 256.08,-140.82"/>
+<polygon fill="black" stroke="black" points="252.58,-140.82 256.08,-150.82 259.58,-140.82 252.58,-140.82"/>
 </g>
 </g>
 </svg>

@@ -24,10 +24,6 @@
 <title>cluster_OrderProductModule</title>
 <polygon fill="none" stroke="black" stroke-dasharray="1,5" points="78,-70 78,-268 418,-268 418,-70 78,-70"/>
 </g>
-<g id="clust4" class="cluster">
-<title>cluster_OrderProductModule_exports</title>
-<polygon fill="none" stroke="black" points="183,-208 183,-260 337,-260 337,-208 183,-208"/>
-</g>
 <g id="clust3" class="cluster">
 <title>cluster_OrderProductModule_imports</title>
 <polygon fill="none" stroke="black" points="296,-78 296,-130 410,-130 410,-78 296,-78"/>
@@ -35,6 +31,10 @@
 <g id="clust6" class="cluster">
 <title>cluster_OrderProductModule_providers</title>
 <polygon fill="none" stroke="black" points="86,-78 86,-130 288,-130 288,-78 86,-78"/>
+</g>
+<g id="clust4" class="cluster">
+<title>cluster_OrderProductModule_exports</title>
+<polygon fill="none" stroke="black" points="183,-208 183,-260 337,-260 337,-208 183,-208"/>
 </g>
 <!-- ConfigModule -->
 <g id="node1" class="node">

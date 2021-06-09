@@ -122,7 +122,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/modules/public/auth/auth.service.ts:18</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/modules/public/auth/auth.service.ts:19</a></div>
                             </td>
                         </tr>
 
@@ -238,8 +238,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="47"
-                            class="link-to-prism">src/modules/public/auth/auth.service.ts:47</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="48"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:48</a></div>
                 </td>
             </tr>
 
@@ -285,8 +285,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="60"
-                            class="link-to-prism">src/modules/public/auth/auth.service.ts:60</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="61"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:61</a></div>
                 </td>
             </tr>
 
@@ -365,8 +365,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="123"
-                            class="link-to-prism">src/modules/public/auth/auth.service.ts:123</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="124"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:124</a></div>
                 </td>
             </tr>
 
@@ -454,8 +454,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="31"
-                            class="link-to-prism">src/modules/public/auth/auth.service.ts:31</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="32"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:32</a></div>
                 </td>
             </tr>
 
@@ -497,8 +497,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="112"
-                            class="link-to-prism">src/modules/public/auth/auth.service.ts:112</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="113"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:113</a></div>
                 </td>
             </tr>
 
@@ -573,8 +573,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="93"
-                            class="link-to-prism">src/modules/public/auth/auth.service.ts:93</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="94"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:94</a></div>
                 </td>
             </tr>
 
@@ -637,16 +637,17 @@
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable, UnauthorizedException } from &#x27;@nestjs/common&#x27;;
 import { JwtService } from &#x27;@nestjs/jwt&#x27;;
-import { SITE_ADMIN_ACCESSLEVELS } from &#x27;constants/privileges-site-admin&#x27;;
-import { SPONSOR_ACCESSLEVELS } from &#x27;constants/privileges-sponsor&#x27;;
-import { SUPER_ADMIN_ACCESSLEVELS } from &#x27;constants/privileges-super-admin&#x27;;
+import { SITE_ADMIN_ACCESSLEVELS } from &#x27;../../../constants/privileges-site-admin&#x27;;
+import { SPONSOR_ACCESSLEVELS } from &#x27;../../../constants/privileges-sponsor&#x27;;
+import { SUPER_ADMIN_ACCESSLEVELS } from &#x27;../../../constants/privileges-super-admin&#x27;;
 import { Hash } from &#x27;../../../utils/Hash&#x27;;
 import { ConfigService } from &#x27;../../config&#x27;;
 import { User, UsersService } from &#x27;../user&#x27;;
 import { LoginPayload } from &#x27;./login.payload&#x27;;
 import { MasterService } from &#x27;../master&#x27;;
-import { RESIDENT_ACCESSLEVELS } from &#x27;constants/privileges-resident&#x27;;
+import { RESIDENT_ACCESSLEVELS } from &#x27;../../../constants/privileges-resident&#x27;;
 import { ResidentCompanyService } from &#x27;../resident-company/resident-company.service&#x27;;
+
 
 const appRoot &#x3D; require(&#x27;app-root-path&#x27;);
 const migrationData &#x3D; JSON.parse(require(&quot;fs&quot;).readFileSync(appRoot.path + &quot;/migration.json&quot;));

@@ -509,37 +509,37 @@ export class OrderProductController {
    * @description This method is used to update a resident company order product details.
    * @param payload it is a request body contains payload of type AddOrderDto.
    */
-   @Put(&#x27;:id&#x27;)
-   @ApiResponse({ status: 200, description: &#x27;Successful Response&#x27; })
-   @ApiResponse({ status: 401, description: &#x27;Unauthorized&#x27; })
-   async updateOrderProduct(@Param(&#x27;id&#x27;) id: number, @Body() payload: UpdateOrderProductDto): Promise&lt;any&gt; {
-     const user &#x3D; await this.orderProductService.updateOrderProduct(id, payload);
-     return user;
-   }
+  @Put(&#x27;:id&#x27;)
+  @ApiResponse({ status: 200, description: &#x27;Successful Response&#x27; })
+  @ApiResponse({ status: 401, description: &#x27;Unauthorized&#x27; })
+  async updateOrderProduct(@Param(&#x27;id&#x27;) id: number, @Body() payload: UpdateOrderProductDto): Promise&lt;any&gt; {
+    const user &#x3D; await this.orderProductService.updateOrderProduct(id, payload);
+    return user;
+  }
 
-   /**
-   * Description: This method is used to fetch a resident company order product details of given month and year.
-   * @description This method is used to fetch a resident company order product details of given month and year.
-   */
-    @Get()
-    @ApiResponse({ status: 200, description: &#x27;Successful Response&#x27; })
-    @ApiResponse({ status: 401, description: &#x27;Unauthorized&#x27; })
-    async fetchOrderProductsBetweenDates(@Query(&#x27;startDate&#x27;) startDate: Date, @Query(&#x27;endDate&#x27;) endDate: Date,): Promise&lt;any&gt; {
-      const orderProducts &#x3D; await this.orderProductService.fetchOrderProductsBetweenDates(startDate, endDate);
-      return orderProducts;
-    }
+  /**
+  * Description: This method is used to fetch a resident company order product details of given month and year.
+  * @description This method is used to fetch a resident company order product details of given month and year.
+  */
+  @Get()
+  @ApiResponse({ status: 200, description: &#x27;Successful Response&#x27; })
+  @ApiResponse({ status: 401, description: &#x27;Unauthorized&#x27; })
+  async fetchOrderProductsBetweenDates(@Query(&#x27;startDate&#x27;) startDate: Date, @Query(&#x27;endDate&#x27;) endDate: Date,): Promise&lt;any&gt; {
+    const orderProducts &#x3D; await this.orderProductService.fetchOrderProductsBetweenDates(startDate, endDate);
+    return orderProducts;
+  }
 
-    /**
-   * Description: This method is used to delete a resident company order product details .
-   * @description This method is used to delete a resident company order product details .
-   */
-     @Delete(&#x27;:id&#x27;)
-     @ApiResponse({ status: 200, description: &#x27;Successful Response&#x27; })
-     @ApiResponse({ status: 401, description: &#x27;Unauthorized&#x27; })
-     async deleteOrderProduct(@Param(&#x27;id&#x27;) id: number): Promise&lt;any&gt; {
-       const orderProducts &#x3D; await this.orderProductService.deleteOrderProduct(id);
-       return orderProducts;
-     }
+  /**
+ * Description: This method is used to delete a resident company order product details .
+ * @description This method is used to delete a resident company order product details .
+ */
+  @Delete(&#x27;:id&#x27;)
+  @ApiResponse({ status: 200, description: &#x27;Successful Response&#x27; })
+  @ApiResponse({ status: 401, description: &#x27;Unauthorized&#x27; })
+  async deleteOrderProduct(@Param(&#x27;id&#x27;) id: number): Promise&lt;any&gt; {
+    const orderProducts &#x3D; await this.orderProductService.deleteOrderProduct(id);
+    return orderProducts;
+  }
 
 }
 </code></pre>

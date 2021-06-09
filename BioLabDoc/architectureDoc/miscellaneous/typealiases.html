@@ -91,13 +91,10 @@
                             <a href="#status_enum" title="src/modules/public/master/funding.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../funding.entity.ts)</a>
                         </li>
                         <li>
-                            <a href="#status_enum" title="src/modules/public/master/master.service.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../master.service.ts)</a>
-                        </li>
-                        <li>
                             <a href="#status_enum" title="src/modules/public/master/modality.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../modality.entity.ts)</a>
                         </li>
                         <li>
-                            <a href="#status_enum" title="src/modules/public/master/role.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../role.entity.ts)</a>
+                            <a href="#status_enum" title="src/modules/public/master/master.service.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../master.service.ts)</a>
                         </li>
                         <li>
                             <a href="#status_enum" title="src/modules/public/master/site.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../site.entity.ts)</a>
@@ -106,16 +103,19 @@
                             <a href="#status_enum" title="src/modules/public/master/technology-stage.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../technology-stage.entity.ts)</a>
                         </li>
                         <li>
+                            <a href="#status_enum" title="src/modules/public/master/role.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../role.entity.ts)</a>
+                        </li>
+                        <li>
                             <a href="#status_enum" title="src/modules/public/resident-company/rc-advisory.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../rc-advisory.entity.ts)</a>
+                        </li>
+                        <li>
+                            <a href="#status_enum" title="src/modules/public/resident-company/rc-technical.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../rc-technical.entity.ts)</a>
                         </li>
                         <li>
                             <a href="#status_enum" title="src/modules/public/resident-company/rc-documents.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../rc-documents.entity.ts)</a>
                         </li>
                         <li>
                             <a href="#status_enum" title="src/modules/public/resident-company/rc-management.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../rc-management.entity.ts)</a>
-                        </li>
-                        <li>
-                            <a href="#status_enum" title="src/modules/public/resident-company/rc-technical.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../rc-technical.entity.ts)</a>
                         </li>
                         <li>
                             <a href="#status_enum" title="src/modules/public/resident-company/resident-company-history.entity.ts"><b>status_enum</b>&nbsp;&nbsp;&nbsp;(src/.../resident-company-history.entity.ts)</a>
@@ -400,24 +400,6 @@
             </tr>
         </tbody>
     </table>
-</section>    <h3>src/modules/public/master/master.service.ts</h3>
-    <section>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="status_enum"></a>
-                    <span class="name"><b>status_enum</b><a href="#status_enum"><span class="icon ion-ios-link"></span></a></span>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-                    <code>    <code>&quot;-1&quot; | &quot;0&quot; | &quot;1&quot; | &quot;99&quot;</code>
-</code>
-                </td>
-            </tr>
-        </tbody>
-    </table>
 </section>    <h3>src/modules/public/master/modality.entity.ts</h3>
     <section>
     <table class="table table-sm table-bordered">
@@ -436,7 +418,7 @@
             </tr>
         </tbody>
     </table>
-</section>    <h3>src/modules/public/master/role.entity.ts</h3>
+</section>    <h3>src/modules/public/master/master.service.ts</h3>
     <section>
     <table class="table table-sm table-bordered">
         <tbody>
@@ -490,7 +472,55 @@
             </tr>
         </tbody>
     </table>
+</section>    <h3>src/modules/public/master/role.entity.ts</h3>
+    <section>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="status_enum"></a>
+                    <span class="name"><b>status_enum</b><a href="#status_enum"><span class="icon ion-ios-link"></span></a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <code>    <code>&quot;-1&quot; | &quot;0&quot; | &quot;1&quot; | &quot;99&quot;</code>
+</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </section>    <h3>src/modules/public/resident-company/rc-advisory.entity.ts</h3>
+    <section>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="status_enum"></a>
+                    <span class="name"><b>status_enum</b><a href="#status_enum"><span class="icon ion-ios-link"></span></a></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>-1 = De-active
+0 = Pending/Default/
+1 = Active
+96 = 
+97 = 
+98 = 
+99 = Soft delete (Deleted by admin)</p>
+</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <code>    <code>&quot;-1&quot; | &quot;0&quot; | &quot;1&quot; | &quot;99&quot;</code>
+</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>    <h3>src/modules/public/resident-company/rc-technical.entity.ts</h3>
     <section>
     <table class="table table-sm table-bordered">
         <tbody>
@@ -551,36 +581,6 @@
         </tbody>
     </table>
 </section>    <h3>src/modules/public/resident-company/rc-management.entity.ts</h3>
-    <section>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="status_enum"></a>
-                    <span class="name"><b>status_enum</b><a href="#status_enum"><span class="icon ion-ios-link"></span></a></span>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-description"><p>-1 = De-active
-0 = Pending/Default/
-1 = Active
-96 = 
-97 = 
-98 = 
-99 = Soft delete (Deleted by admin)</p>
-</div>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-                    <code>    <code>&quot;-1&quot; | &quot;0&quot; | &quot;1&quot; | &quot;99&quot;</code>
-</code>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</section>    <h3>src/modules/public/resident-company/rc-technical.entity.ts</h3>
     <section>
     <table class="table table-sm table-bordered">
         <tbody>

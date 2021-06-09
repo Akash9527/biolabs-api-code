@@ -2074,8 +2074,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="707"
-                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:707</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="712"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:712</a></div>
                 </td>
             </tr>
 
@@ -2154,14 +2154,16 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="695"
-                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:695</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="700"
+                            class="link-to-prism">src/modules/public/resident-company/resident-company.service.ts:700</a></div>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
+                    <div class="io-description"><p>Description: used to convert data into array</p>
+</div>
 
                     <div class="io-description">
                         <b>Parameters :</b>
@@ -2170,6 +2172,7 @@
                                 <tr>
                                     <td>Name</td>
                                     <td>Optional</td>
+                                    <td>Description</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -2181,6 +2184,10 @@
                                     </td>
 
 
+                                    <td>
+                                        <p>input value</p>
+
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -3410,6 +3417,11 @@ export class ResidentCompanyService {
     }
   }
 
+  /**
+   * Description: used to convert data into array
+   * @description used to convert data into array
+   * @param val input value
+   */
   private parseToArray(val){
     if(typeof val &#x3D;&#x3D;&#x3D; &#x27;object&#x27;){
       return val;
@@ -3456,16 +3468,16 @@ export class ResidentCompanyService {
       rcQuery.andWhere(&quot;resident_companies.fundingSource &amp;&amp; ARRAY[:...fundingSource]::int[]&quot;, { fundingSource: payload.fundingSource });
     }
     if (payload.minFund &gt;&#x3D; 0) {
-      rcQuery.andWhere(&quot;resident_companies.funding &gt;&#x3D; :minFunding&quot;, { minFunding: payload.minFund });
+      rcQuery.andWhere(&quot;resident_companies.funding::int &gt;&#x3D; :minFunding&quot;, {​​​​ minFunding: payload.minFund }​​​​);
     }
     if (payload.maxFund &gt;&#x3D; 0) {
-      rcQuery.andWhere(&quot;resident_companies.funding &lt;&#x3D; :maxFunding&quot;, { maxFunding: payload.maxFund });
+      rcQuery.andWhere(&quot;resident_companies.funding::int &lt;&#x3D; :maxFunding&quot;, { maxFunding: payload.maxFund });
     }
     if (payload.minCompanySize &gt;&#x3D; 0) {
-      rcQuery.andWhere(&quot;resident_companies.companySize &gt;&#x3D; :minCompanySize&quot;, { minCompanySize: payload.minCompanySize });
+      rcQuery.andWhere(&quot;resident_companies.\&quot;companySize\&quot;::int &gt;&#x3D; :minCompanySize&quot;, {​​​​ minCompanySize: payload.minCompanySize }​​​​);
     }
     if (payload.maxCompanySize &gt;&#x3D; 0) {
-      rcQuery.andWhere(&quot;resident_companies.companySize &lt;&#x3D; :maxCompanySize&quot;, { maxCompanySize: payload.maxCompanySize });
+      rcQuery.andWhere(&quot;resident_companies.\&quot;companySize\&quot;::int &lt;&#x3D; :maxCompanySize&quot;, {​​​​ maxCompanySize: payload.maxCompanySize }​​​​);
     }
 
     if (payload.pagination) {

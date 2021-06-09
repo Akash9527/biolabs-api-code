@@ -534,16 +534,16 @@ export class OrderProductService {
    * @param payload object of AddOrderDto.
    * @return saved order product object
    */
-   async addOrderProduct(payload: AddOrderDto) {
-    let order : Order;
-    if(payload.orderId){
+  async addOrderProduct(payload: AddOrderDto) {
+    let order: Order;
+    if (payload.orderId) {
       payload.orderProducts[&#x27;orderId&#x27;] &#x3D; payload.orderId;
       order &#x3D; await this.orderRepository.findOne(payload.orderId);
-    }else{
+    } else {
       order &#x3D; this.orderRepository.create(payload);
-      await this .orderRepository.save(order);
+      await this.orderRepository.save(order);
     }
-    return await this.orderProductRepository.save(this.orderProductRepository.create({...payload.orderProducts , order: order}));
+    return await this.orderProductRepository.save(this.orderProductRepository.create({ ...payload.orderProducts, order: order }));
   }
 
   /**
@@ -552,15 +552,15 @@ export class OrderProductService {
    * @param payload object of UpdateOrderProductDto.
    * @return updated order product object
    */
-   async updateOrderProduct(id: number, payload: UpdateOrderProductDto) {
+  async updateOrderProduct(id: number, payload: UpdateOrderProductDto) {
     const orderProduct &#x3D; await this.orderProductRepository.findOne(id);
-    orderProduct.productName &#x3D; payload.productName?payload.productName:orderProduct.productName;
-    orderProduct.productDescription &#x3D; payload.productDescription?payload.productDescription:orderProduct.productDescription;
-    orderProduct.cost &#x3D; payload.cost?payload.cost:orderProduct.cost;
-    orderProduct.recurrence &#x3D; payload.recurrence?payload.recurrence:orderProduct.recurrence;
-    orderProduct.currentCharge &#x3D; payload.currentCharge?payload.currentCharge:orderProduct.currentCharge;
-    orderProduct.startDate &#x3D; payload.startDate?payload.startDate:orderProduct.startDate;
-    orderProduct.endDate &#x3D; payload.endDate?payload.endDate:orderProduct.endDate;
+    orderProduct.productName &#x3D; payload.productName ? payload.productName : orderProduct.productName;
+    orderProduct.productDescription &#x3D; payload.productDescription ? payload.productDescription : orderProduct.productDescription;
+    orderProduct.cost &#x3D; payload.cost ? payload.cost : orderProduct.cost;
+    orderProduct.recurrence &#x3D; payload.recurrence ? payload.recurrence : orderProduct.recurrence;
+    orderProduct.currentCharge &#x3D; payload.currentCharge ? payload.currentCharge : orderProduct.currentCharge;
+    orderProduct.startDate &#x3D; payload.startDate ? payload.startDate : orderProduct.startDate;
+    orderProduct.endDate &#x3D; payload.endDate ? payload.endDate : orderProduct.endDate;
     return await this.orderProductRepository.update(id, this.orderProductRepository.create(payload));
   }
 
@@ -571,10 +571,10 @@ export class OrderProductService {
    * @returns 
    */
   async fetchOrderProductsBetweenDates(startDate: Date, endDate: Date) {
-    let findArgs &#x3D; { 
-      where: { 
-        startDate:  MoreThanOrEqual(startDate),
-        endDate:  LessThanOrEqual(endDate) 
+    let findArgs &#x3D; {
+      where: {
+        startDate: MoreThanOrEqual(startDate),
+        endDate: LessThanOrEqual(endDate)
       }
     };
     return this.orderProductRepository.find(
@@ -587,7 +587,7 @@ export class OrderProductService {
    * @param id this is orderProduct Id
    * @returns  
    */
-   async deleteOrderProduct(id : number) {    
+  async deleteOrderProduct(id: number) {
     return await this.orderProductRepository.delete(id);
   }
 

@@ -24,71 +24,71 @@
 <title>cluster_FileModule</title>
 <polygon fill="none" stroke="black" stroke-dasharray="1,5" points="32,-70 32,-268 464,-268 464,-70 32,-70"/>
 </g>
-<g id="clust6" class="cluster">
-<title>cluster_FileModule_providers</title>
-<polygon fill="none" stroke="black" points="330,-78 330,-130 456,-130 456,-78 330,-78"/>
-</g>
 <g id="clust3" class="cluster">
 <title>cluster_FileModule_imports</title>
-<polygon fill="none" stroke="black" points="40,-78 40,-130 322,-130 322,-78 40,-78"/>
+<polygon fill="none" stroke="black" points="174,-78 174,-130 456,-130 456,-78 174,-78"/>
 </g>
 <g id="clust4" class="cluster">
 <title>cluster_FileModule_exports</title>
-<polygon fill="none" stroke="black" points="183,-208 183,-260 283,-260 283,-208 183,-208"/>
+<polygon fill="none" stroke="black" points="175,-208 175,-260 275,-260 275,-208 175,-208"/>
+</g>
+<g id="clust6" class="cluster">
+<title>cluster_FileModule_providers</title>
+<polygon fill="none" stroke="black" points="40,-78 40,-130 166,-130 166,-78 40,-78"/>
 </g>
 <!-- ResidentCompanyModule -->
 <g id="node1" class="node">
 <title>ResidentCompanyModule</title>
-<polygon fill="#8dd3c7" stroke="black" points="314.48,-122 311.48,-126 290.48,-126 287.48,-122 151.52,-122 151.52,-86 314.48,-86 314.48,-122"/>
-<text text-anchor="middle" x="233" y="-99.8" font-family="Times,serif" font-size="14.00">ResidentCompanyModule</text>
+<polygon fill="#8dd3c7" stroke="black" points="448.48,-122 445.48,-126 424.48,-126 421.48,-122 285.52,-122 285.52,-86 448.48,-86 448.48,-122"/>
+<text text-anchor="middle" x="367" y="-99.8" font-family="Times,serif" font-size="14.00">ResidentCompanyModule</text>
 </g>
 <!-- FileModule -->
 <g id="node3" class="node">
 <title>FileModule</title>
-<polygon fill="#8dd3c7" stroke="black" points="273.83,-187 270.83,-191 249.83,-191 246.83,-187 192.17,-187 192.17,-151 273.83,-151 273.83,-187"/>
-<text text-anchor="middle" x="233" y="-164.8" font-family="Times,serif" font-size="14.00">FileModule</text>
+<polygon fill="#8dd3c7" stroke="black" points="265.83,-187 262.83,-191 241.83,-191 238.83,-187 184.17,-187 184.17,-151 265.83,-151 265.83,-187"/>
+<text text-anchor="middle" x="225" y="-164.8" font-family="Times,serif" font-size="14.00">FileModule</text>
 </g>
 <!-- ResidentCompanyModule&#45;&gt;FileModule -->
 <g id="edge1" class="edge">
 <title>ResidentCompanyModule&#45;&gt;FileModule</title>
-<path fill="none" stroke="black" d="M233,-122.11C233,-122.11 233,-140.99 233,-140.99"/>
-<polygon fill="black" stroke="black" points="229.5,-140.99 233,-150.99 236.5,-140.99 229.5,-140.99"/>
+<path fill="none" stroke="black" d="M367,-122.11C367,-141.34 367,-169 367,-169 367,-169 275.69,-169 275.69,-169"/>
+<polygon fill="black" stroke="black" points="275.69,-165.5 265.69,-169 275.69,-172.5 275.69,-165.5"/>
 </g>
 <!-- UserModule -->
 <g id="node2" class="node">
 <title>UserModule</title>
-<polygon fill="#8dd3c7" stroke="black" points="133.98,-122 130.98,-126 109.98,-126 106.98,-122 48.02,-122 48.02,-86 133.98,-86 133.98,-122"/>
-<text text-anchor="middle" x="91" y="-99.8" font-family="Times,serif" font-size="14.00">UserModule</text>
+<polygon fill="#8dd3c7" stroke="black" points="267.98,-122 264.98,-126 243.98,-126 240.98,-122 182.02,-122 182.02,-86 267.98,-86 267.98,-122"/>
+<text text-anchor="middle" x="225" y="-99.8" font-family="Times,serif" font-size="14.00">UserModule</text>
 </g>
 <!-- UserModule&#45;&gt;FileModule -->
 <g id="edge2" class="edge">
 <title>UserModule&#45;&gt;FileModule</title>
-<path fill="none" stroke="black" d="M91,-122.11C91,-141.34 91,-169 91,-169 91,-169 182.31,-169 182.31,-169"/>
-<polygon fill="black" stroke="black" points="182.31,-172.5 192.31,-169 182.31,-165.5 182.31,-172.5"/>
+<path fill="none" stroke="black" d="M225,-122.11C225,-122.11 225,-140.99 225,-140.99"/>
+<polygon fill="black" stroke="black" points="221.5,-140.99 225,-150.99 228.5,-140.99 221.5,-140.99"/>
 </g>
 <!-- FileService  -->
 <g id="node4" class="node">
 <title>FileService </title>
-<polygon fill="#fb8072" stroke="black" points="274.76,-252 191.24,-252 191.24,-216 274.76,-216 274.76,-252"/>
-<text text-anchor="middle" x="233" y="-229.8" font-family="Times,serif" font-size="14.00">FileService </text>
+<polygon fill="#fb8072" stroke="black" points="266.76,-252 183.24,-252 183.24,-216 266.76,-216 266.76,-252"/>
+<text text-anchor="middle" x="225" y="-229.8" font-family="Times,serif" font-size="14.00">FileService </text>
 </g>
 <!-- FileModule&#45;&gt;FileService  -->
 <g id="edge3" class="edge">
 <title>FileModule&#45;&gt;FileService </title>
-<path fill="none" stroke="black" stroke-dasharray="5,2" d="M233,-187.11C233,-187.11 233,-205.99 233,-205.99"/>
-<polygon fill="black" stroke="black" points="229.5,-205.99 233,-215.99 236.5,-205.99 229.5,-205.99"/>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M225,-187.11C225,-187.11 225,-205.99 225,-205.99"/>
+<polygon fill="black" stroke="black" points="221.5,-205.99 225,-215.99 228.5,-205.99 221.5,-205.99"/>
 </g>
 <!-- FileService -->
 <g id="node5" class="node">
 <title>FileService</title>
-<ellipse fill="#fdb462" stroke="black" cx="393" cy="-104" rx="55.03" ry="18"/>
-<text text-anchor="middle" x="393" y="-99.8" font-family="Times,serif" font-size="14.00">FileService</text>
+<ellipse fill="#fdb462" stroke="black" cx="103" cy="-104" rx="55.03" ry="18"/>
+<text text-anchor="middle" x="103" y="-99.8" font-family="Times,serif" font-size="14.00">FileService</text>
 </g>
 <!-- FileService&#45;&gt;FileModule -->
 <g id="edge4" class="edge">
 <title>FileService&#45;&gt;FileModule</title>
-<path fill="none" stroke="black" d="M393,-122.11C393,-141.34 393,-169 393,-169 393,-169 283.79,-169 283.79,-169"/>
-<polygon fill="black" stroke="black" points="283.79,-165.5 273.79,-169 283.79,-172.5 283.79,-165.5"/>
+<path fill="none" stroke="black" d="M103,-122.11C103,-141.34 103,-169 103,-169 103,-169 174.04,-169 174.04,-169"/>
+<polygon fill="black" stroke="black" points="174.04,-172.5 184.04,-169 174.04,-165.5 174.04,-172.5"/>
 </g>
 </g>
 </svg>
