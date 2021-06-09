@@ -1,8 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNumber, IsOptional } from 'class-validator';
-import { Unique } from '../../common';
-import { SameAs } from '../../common/validator/same-as.validator';
-import { User } from '../user';
+import {​​​ ApiProperty }​​​ from'@nestjs/swagger';
+import {​​​ IsEmail, IsNumber, IsOptional }​​​ from'class-validator';
+import {​​​ Unique }​​​ from'../../common';
+import {​​​ SameAs }​​​ from'../../common/validator/same-as.validator';
+import {​​​ User }​​​ from'../user';
+
 
 type user_type = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
 

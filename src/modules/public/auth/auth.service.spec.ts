@@ -8,6 +8,8 @@ import { ResidentCompanyService } from '../resident-company';
 import { NotAcceptableException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '../../config';
 import { UserToken } from '../user/user-token.entity';
+import { Hash } from '../../../utils/Hash';
+jest.mock('../../../utils/Hash');
 const mockUser: User = {
     id: 1,
     role: 1,
@@ -74,6 +76,14 @@ describe('AuthService', () => {
             authService.validateUser(mockLoginPayLoad);
             expect(await usersService.getByEmail).toHaveBeenCalledWith(mockLoginPayLoad.email);
         });
+        // it('should validate user', async () => {
+        //     const hashCompareStatic = jest.fn().mockReturnValue(true);
+        //     Hash.compare = hashCompareStatic;
+        //     usersService.getByEmail.mockResolvedValue(mockUser);
+        //     Hash.compare('payload password','user password');
+        //     expect(await authService.validateUser(mockLoginPayLoad)).toMatchObject(mockUser);
+        //     expect(Hash.compare).toHaveBeenCalledWith('payload password','user password');
+        // });
         it('should be validate User', async () => {
             await usersService.getByEmail.mockReturnValueOnce(mockUser);
             let user: User = await usersService.getByEmail();

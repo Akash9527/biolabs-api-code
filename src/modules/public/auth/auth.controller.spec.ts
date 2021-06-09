@@ -4,10 +4,6 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersService } from '../user/user.service'
 import { InternalServerErrorException, NotAcceptableException, UnauthorizedException } from '@nestjs/common';
-import { UserToken } from '../user/user-token.entity';
-import { ConfigService } from '../../config';
-import { JwtSecretRequestType } from '@nestjs/jwt';
-import { hasUncaughtExceptionCaptureCallback } from 'node:process';
 import { HTTP_CODES } from '../../../utils/httpcode';
 const responseMock = {
     writeHead: jest.fn(),

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, Min, ValidateIf } from 'class-validator';
-import { GreaterThanEqualsTo } from 'modules/common/validator/greater-than-equals-to.validator';
-import { LessThanEqualsTo } from 'modules/common/validator/less-than-equals-to.validator';
+import { GreaterThanEqualsTo } from '../../common/validator/greater-than-equals-to.validator';
+import { LessThanEqualsTo } from '../../common/validator/less-than-equals-to.validator';
 
 type company_status = '0' | '1' | '2' | '3' | '4' | '5';
 type sortOrderType = 'ASC' | 'DESC'
