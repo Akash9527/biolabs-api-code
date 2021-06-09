@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Any, In, Like, Repository } from 'typeorm';
 import { MasterPayload } from './master.payload';
 import { BiolabsSource } from './biolabs-source.entity';
 import { Category } from './category.entity';
@@ -42,14 +42,20 @@ export class MasterService {
    * @return array of sites object
    */
   async getSites(payload: MasterPayload) {
-    let search;
+    let search: any = {};
     let skip;
     let take;
-    if (payload.q && payload.q != "") {
-      search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
-    } else {
-      search = [{ status: '1' }]
+    if (payload.siteIdArr) {
+      payload.siteIdArr = this.parseToArray(payload.siteIdArr);
+      search = {id: In(payload.siteIdArr)};
     }
+
+    if (payload.q && payload.q != "") {
+      search = {...search, ...{ name: Like("%" + payload.q + "%"), status: '1' }};
+    } else {
+      search = {...search, ...{ status: '1' }};
+    }
+
     if (payload.pagination) {
       skip = { skip: 0 }
       take = { take: 10 }
@@ -597,4 +603,15 @@ export class MasterService {
     return USER_TYPE;
   }
 
+  /**
+   * Description: used to convert data into array
+   * @description used to convert data into array
+   * @param val input value
+   */
+  private parseToArray(val){
+    if(typeof val === 'object'){
+      return val;
+    }
+    return [Number(val)];
+  }
 }
