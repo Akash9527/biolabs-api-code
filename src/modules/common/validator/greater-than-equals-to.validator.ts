@@ -11,7 +11,7 @@ export function GreaterThanEqualsTo(property: string, validationOptions?: Valida
       validator: {
         validate(value: any, args: any) {
           const [relatedPropertyName] = args.constraints;
-          return Number(args.object[relatedPropertyName]) <= Number(value);;
+          return Number(args.object[relatedPropertyName]) <= Number(value);
         },
         defaultMessage() {
           return '$property must be greater than equals to $constraint1';
