@@ -47,4 +47,9 @@ export class MasterPayload {
     required: false,
   })
   sortFiled: string;
+
+  @ApiProperty({
+    required: false,
+  })
+  siteIdArr: number[];
 }

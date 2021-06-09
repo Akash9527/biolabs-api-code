@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { AddOrderDto } from './dto/add-order.payload';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
-import { Invoice } from './model/invoice.entity';
 import { OrderProduct } from './model/order-product.entity';
 import { Order } from './model/order.entity';
 
 @Injectable()
 export class OrderProductService {
+
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
@@ -23,14 +23,15 @@ export class OrderProductService {
    * @return saved order product object
    */
    async addOrderProduct(payload: AddOrderDto) {
-    const newOrder: Order = this.orderRepository.create(payload);
-    await this .orderRepository.save(newOrder);
-    return await this.orderProductRepository.save(
-      this.orderProductRepository.create({...payload.orderProducts, order: newOrder})
-    );
-    // set createdBy
-    // set modifiedBy
-    //return newOrder;
+    let order : Order;
+    if(payload.orderId){
+      payload.orderProducts['orderId'] = payload.orderId;
+      order = await this.orderRepository.findOne(payload.orderId);
+    }else{
+      order = this.orderRepository.create(payload);
+      await this .orderRepository.save(order);
+    }
+    return await this.orderProductRepository.save(this.orderProductRepository.create({...payload.orderProducts , order: order}));
   }
 
   /**
@@ -49,6 +50,33 @@ export class OrderProductService {
     orderProduct.startDate = payload.startDate?payload.startDate:orderProduct.startDate;
     orderProduct.endDate = payload.endDate?payload.endDate:orderProduct.endDate;
     return await this.orderProductRepository.update(id, this.orderProductRepository.create(payload));
+  }
+
+  /**
+   * @description This method will fetch the order products between given start date and end date
+   * @param startDate 
+   * @param endDate 
+   * @returns 
+   */
+  async fetchOrderProductsBetweenDates(startDate: Date, endDate: Date) {
+    let findArgs = { 
+      where: { 
+        startDate:  MoreThanOrEqual(startDate),
+        endDate:  LessThanOrEqual(endDate) 
+      }
+    };
+    return this.orderProductRepository.find(
+      findArgs
+    );
+  }
+
+  /**
+   * @description This method will Delete the order products.
+   * @param id this is orderProduct Id
+   * @returns  
+   */
+   async deleteOrderProduct(id : number) {    
+    return await this.orderProductRepository.delete(id);
   }
 
 }

@@ -26,24 +26,17 @@ export class OrderProduct {
   @Column({ default: false })
   currentCharge: boolean;
 
-  @Column({ nullable: true })
-  startDate: number;
+  @Column({ type: 'timestamptz' })
+  startDate: Date;
 
-  @Column({ nullable: true })
-  endDate: number;
+  @Column({ type: 'timestamptz' })
+  endDate: Date;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: number;
 
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt: number;
-
-  // @Column({ nullable: false })
-  // createdBy: number;
-
-  // @Column({ nullable: false })
-  // modifiedBy: number;
-
 }
 
 export class OrderProductFillableFields {
