@@ -11,7 +11,7 @@ export function LessThanEqualsTo(property: string, validationOptions?: Validatio
       validator: {
         validate(value: any, args: any) {
           const [relatedPropertyName] = args.constraints;
-          return args.object[relatedPropertyName] >= value;
+          return Number(args.object[relatedPropertyName]) >= Number(value);
         },
         defaultMessage() {
           return '$property must be less than equals to $constraint1';

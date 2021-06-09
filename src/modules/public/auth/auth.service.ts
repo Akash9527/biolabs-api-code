@@ -1,15 +1,16 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { SITE_ADMIN_ACCESSLEVELS } from 'constants/privileges-site-admin';
-import { SPONSOR_ACCESSLEVELS } from 'constants/privileges-sponsor';
-import { SUPER_ADMIN_ACCESSLEVELS } from 'constants/privileges-super-admin';
+import { SITE_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-site-admin';
+import { SPONSOR_ACCESSLEVELS } from '../../../constants/privileges-sponsor';
+import { SUPER_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-super-admin';
 import { Hash } from '../../../utils/Hash';
 import { ConfigService } from '../../config';
 import { User, UsersService } from '../user';
 import { LoginPayload } from './login.payload';
 import { MasterService } from '../master';
-import { RESIDENT_ACCESSLEVELS } from 'constants/privileges-resident';
+import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
+
 
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));

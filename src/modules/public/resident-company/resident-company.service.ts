@@ -743,16 +743,16 @@ export class ResidentCompanyService {
       rcQuery.andWhere("resident_companies.fundingSource && ARRAY[:...fundingSource]::int[]", { fundingSource: payload.fundingSource });
     }
     if (payload.minFund >= 0) {
-      rcQuery.andWhere("resident_companies.funding >= :minFunding", { minFunding: payload.minFund });
+      rcQuery.andWhere("resident_companies.funding::int >= :minFunding", {​​​​ minFunding: payload.minFund }​​​​);
     }
     if (payload.maxFund >= 0) {
-      rcQuery.andWhere("resident_companies.funding <= :maxFunding", { maxFunding: payload.maxFund });
+      rcQuery.andWhere("resident_companies.funding::int <= :maxFunding", { maxFunding: payload.maxFund });
     }
     if (payload.minCompanySize >= 0) {
-      rcQuery.andWhere("resident_companies.companySize >= :minCompanySize", { minCompanySize: payload.minCompanySize });
+      rcQuery.andWhere("resident_companies.\"companySize\"::int >= :minCompanySize", {​​​​ minCompanySize: payload.minCompanySize }​​​​);
     }
     if (payload.maxCompanySize >= 0) {
-      rcQuery.andWhere("resident_companies.companySize <= :maxCompanySize", { maxCompanySize: payload.maxCompanySize });
+      rcQuery.andWhere("resident_companies.\"companySize\"::int <= :maxCompanySize", {​​​​ maxCompanySize: payload.maxCompanySize }​​​​);
     }
 
     if (payload.pagination) {
