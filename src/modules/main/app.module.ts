@@ -23,6 +23,10 @@ const appRoot = require('app-root-path');
       serveRoot: '/doc',
       rootPath: join(appRoot.path + '/BioLabDoc/architectureDoc'),
     }),
+    ServeStaticModule.forRoot({
+      serveRoot: '/coverage',
+      rootPath: join(appRoot.path + '/coverage/lcov-report'),
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
