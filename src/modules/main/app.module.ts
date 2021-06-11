@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from 'modules/config';
 import { AuthModule } from 'modules/public/auth';
 import { FileModule } from 'modules/public/file';
 import { MasterModule } from 'modules/public/master';
-import { OrderProductModule } from 'modules/public/order/order.module';
+import { OrderProductModule } from 'modules/public/order/order-product.module';
 import { ResidentCompanyModule } from 'modules/public/resident-company';
 import { SponsorModule } from 'modules/public/sponsor/sponsor.module';
 import { UserModule } from 'modules/public/user';
