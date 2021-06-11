@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AddOrderDto } from './dto/add-order.payload';
+import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
-import { OrderProductService } from './order.service';
+import { OrderProductService } from './order-product.service';
 
 @Controller('api/order-product')
 @ApiTags('Resident Company Order Product')
@@ -19,9 +19,8 @@ export class OrderProductController {
   @Post()
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async addOrderProduct(@Body() payload: AddOrderDto): Promise<any> {
-    const user = await this.orderProductService.addOrderProduct(payload);
-    return user;
+  async addOrderProduct(@Body() payload: CreateOrderProductDto): Promise<any> {
+    return await this.orderProductService.addOrderProduct(payload);
   }
 
   /**
@@ -33,8 +32,7 @@ export class OrderProductController {
    @ApiResponse({ status: 200, description: 'Successful Response' })
    @ApiResponse({ status: 401, description: 'Unauthorized' })
    async updateOrderProduct(@Param('id') id: number, @Body() payload: UpdateOrderProductDto): Promise<any> {
-     const user = await this.orderProductService.updateOrderProduct(id, payload);
-     return user;
+     return await this.orderProductService.updateOrderProduct(id, payload);
    }
 
    /**
@@ -44,11 +42,11 @@ export class OrderProductController {
     @Get()
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    @ApiQuery({ name: 'companyId', required: false, type: 'string' })
-    async fetchOrderProductsBetweenDates(@Query('companyId') companyId: number,@Query('startDate') startDate: string, @Query('endDate') endDate: string,): Promise<any> {
-      const orderProducts = await this.orderProductService.fetchOrderProductsBetweenDates(startDate, endDate, companyId);
-      return orderProducts;
+    @ApiQuery({ name: 'companyId', required: true, type: 'string' })
+    async fetchOrderProductsBetweenDates(@Query('companyId') companyId: number,@Query('startDate') startDate: string, @Query('endDate') endDate: string): Promise<any> {
+      return await this.orderProductService.fetchOrderProductsBetweenDates(startDate, endDate, companyId);
     }
+
 
     /**
    * Description: This method is used to delete a resident company order product details .
@@ -58,8 +56,7 @@ export class OrderProductController {
      @ApiResponse({ status: 200, description: 'Successful Response' })
      @ApiResponse({ status: 401, description: 'Unauthorized' })
      async deleteOrderProduct(@Param('id') id: number): Promise<any> {
-       const orderProducts = await this.orderProductService.deleteOrderProduct(id);
-       return orderProducts;
+       return await this.orderProductService.deleteOrderProduct(id);
      }
 
 }
