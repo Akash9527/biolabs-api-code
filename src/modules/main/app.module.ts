@@ -12,10 +12,17 @@ import { UserModule } from 'modules/public/user';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
+const appRoot = require('app-root-path'); 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    ServeStaticModule.forRoot({
+      serveRoot: '/doc',
+      rootPath: join(appRoot.path + '/BioLabDoc/architectureDoc'),
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

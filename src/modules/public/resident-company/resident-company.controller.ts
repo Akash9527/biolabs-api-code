@@ -102,8 +102,17 @@ export class ResidentCompanyController {
   @Get('/search')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async gloabalSearchCompanies(@Query() params: SearchResidentCompanyPayload): Promise<any> {
-    return this.residentCompanyService.gloabalSearchCompanies(params);
+  @ApiHeader({
+    name: 'x-site-id',
+    description: 'Selected site ids array',
+  })
+
+  async gloabalSearchCompanies(@Query() params: SearchResidentCompanyPayload, @Request() req): Promise<any> {
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return this.residentCompanyService.gloabalSearchCompanies(params, siteIdArr);
   }
 
   /**

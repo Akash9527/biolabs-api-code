@@ -1,0 +1,829 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>biolabs-api documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	      <link rel="stylesheet" href="../styles/style.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">biolabs-api documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content injectable">
+                   <div class="content-data">
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li>Injectables</li>
+  <li>AuthService</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info">
+        <p class="comment">
+            <h3>File</h3>
+        </p>
+        <p class="comment">
+            <code>src/modules/public/auth/auth.service.ts</code>
+        </p>
+
+
+
+
+            <section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Private</span>
+                                    <span class="modifier">Async</span>
+                                <a href="#createSuperAdmin">createSuperAdmin</a>
+                            </li>
+                            <li>
+                                <a href="#createToken">createToken</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#forgotPassword">forgotPassword</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#onApplicationBootstrap">onApplicationBootstrap</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#validateToken">validateToken</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#validateUser">validateUser</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+            <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(jwtService: JwtService, configService: <a href="../classes/ConfigService.html">ConfigService</a>, userService: <a href="../injectables/UsersService.html">UsersService</a>, masterService: <a href="../injectables/MasterService.html">MasterService</a>, residentCompanyService: <a href="../injectables/ResidentCompanyService.html">ResidentCompanyService</a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/modules/public/auth/auth.service.ts:19</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>jwtService</td>
+                                                  
+                                                        <td>
+                                                                    <code>JwtService</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>configService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/ConfigService.html" target="_self" >ConfigService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>userService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/UsersService.html" target="_self" >UsersService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>masterService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/MasterService.html" target="_self" >MasterService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>residentCompanyService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/ResidentCompanyService.html" target="_self" >ResidentCompanyService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+            <section>
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createSuperAdmin"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Private</span>
+                            <span class="modifier">Async</span>
+                            createSuperAdmin
+                        </b>
+                        <a href="#createSuperAdmin"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>createSuperAdmin()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="48"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:48</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method creates the default super admin with all site access.</p>
+</div>
+
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object with token info</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createToken"></a>
+                    <span class="name">
+                        <b>
+                            createToken
+                        </b>
+                        <a href="#createToken"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>createToken(user: <a href="../classes/User.html">User</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="61"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:61</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to generate the token for the logged in user.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>user</td>
+                                    <td>
+                                                <code><a href="../classes/User.html" target="_self" >User</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of User</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{ expiresIn: any; accessToken: any; permissions: {}; user: any; }</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object with token info</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="forgotPassword"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            forgotPassword
+                        </b>
+                        <a href="#forgotPassword"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>forgotPassword(payload, req)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="124"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:124</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to generate the token for the user to reset the password.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of user info for reset passsword</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>req</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of Request</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="onApplicationBootstrap"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            onApplicationBootstrap
+                        </b>
+                        <a href="#onApplicationBootstrap"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>onApplicationBootstrap()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="32"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:32</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method will call on appliaction boot up to generate the master data.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="validateToken"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            validateToken
+                        </b>
+                        <a href="#validateToken"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>validateToken(token)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="113"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:113</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to validate the user token.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>token</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>string</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="validateUser"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            validateUser
+                        </b>
+                        <a href="#validateUser"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>validateUser(payload: <a href="../classes/LoginPayload.html">LoginPayload</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="94"
+                            class="link-to-prism">src/modules/public/auth/auth.service.ts:94</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to validate the user.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/LoginPayload.html" target="_self" >LoginPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of LoginPayload</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Promise&lt;any&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+    </div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable, UnauthorizedException } from &#x27;@nestjs/common&#x27;;
+import { JwtService } from &#x27;@nestjs/jwt&#x27;;
+import { SITE_ADMIN_ACCESSLEVELS } from &#x27;../../../constants/privileges-site-admin&#x27;;
+import { SPONSOR_ACCESSLEVELS } from &#x27;../../../constants/privileges-sponsor&#x27;;
+import { SUPER_ADMIN_ACCESSLEVELS } from &#x27;../../../constants/privileges-super-admin&#x27;;
+import { Hash } from &#x27;../../../utils/Hash&#x27;;
+import { ConfigService } from &#x27;../../config&#x27;;
+import { User, UsersService } from &#x27;../user&#x27;;
+import { LoginPayload } from &#x27;./login.payload&#x27;;
+import { MasterService } from &#x27;../master&#x27;;
+import { RESIDENT_ACCESSLEVELS } from &#x27;../../../constants/privileges-resident&#x27;;
+import { ResidentCompanyService } from &#x27;../resident-company/resident-company.service&#x27;;
+
+
+const appRoot &#x3D; require(&#x27;app-root-path&#x27;);
+const migrationData &#x3D; JSON.parse(require(&quot;fs&quot;).readFileSync(appRoot.path + &quot;/migration.json&quot;));
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+    private readonly userService: UsersService,
+    private readonly masterService: MasterService,
+    private readonly residentCompanyService: ResidentCompanyService
+  ) { }
+
+  /**
+   * Description: This method will call on appliaction boot up to generate the master data.
+   * @description This method will call on appliaction boot up to generate the master data.
+   */
+  async onApplicationBootstrap() {
+    await this.masterService.createRoles();
+    await this.masterService.createSites();
+    await this.masterService.createFundings();
+    await this.masterService.createModalities();
+    await this.masterService.createBiolabsSources();
+    await this.masterService.createCategories();
+    await this.masterService.createTechnologyStages();
+    await this.createSuperAdmin();
+  }
+
+  /**
+   * Description: This method creates the default super admin with all site access.
+   * @description This method creates the default super admin with all site access.
+   * @return user object with token info
+   */
+  private async createSuperAdmin() {
+    const superAdmin &#x3D; await this.userService.getByEmail(&#x27;superadmin@biolabs.io&#x27;);
+    if (!superAdmin) {
+      await this.userService.create(migrationData[&#x27;superadmin&#x27;]);
+    }
+  }
+
+  /**
+   * Description: This method is used to generate the token for the logged in user.
+   * @description This method is used to generate the token for the logged in user.
+   * @param user object of User
+   * @return user object with token info
+   */
+  createToken(user: User) {
+    let permissions &#x3D; {};
+    switch (user.role) {
+      case 1:
+        permissions &#x3D; SUPER_ADMIN_ACCESSLEVELS;
+        break;
+      case 2:
+        permissions &#x3D; SITE_ADMIN_ACCESSLEVELS;
+        break;
+      case 3:
+        permissions &#x3D; SPONSOR_ACCESSLEVELS;
+        break;
+      case 4:
+        permissions &#x3D; RESIDENT_ACCESSLEVELS;
+        break;
+      default:
+        break;
+    }
+
+    return {
+      expiresIn: process.env.APPSETTING_JWT_EXPIRATION_TIME,
+      accessToken: this.jwtService.sign({ id: user.id }),
+      permissions: permissions,
+      user,
+    };
+  }
+
+  /**
+   * Description: This method is used to validate the user.
+   * @description This method is used to validate the user.
+   * @param payload object of LoginPayload
+   * @return user object
+   */
+  async validateUser(payload: LoginPayload): Promise&lt;any&gt; {
+    const user: any &#x3D; await this.userService.getByEmail(payload.email);
+    if (!user || user.status !&#x3D; &#x27;1&#x27; || user.password &#x3D;&#x3D; null || !Hash.compare(payload.password, user.password)) {
+      throw new UnauthorizedException(&#x27;Invalid credentials!&#x27;);
+    }
+    if (user.companyId) {
+      const company &#x3D; await this.residentCompanyService.getResidentCompany(user.companyId);
+      if (company)
+        user.company &#x3D; company;
+    }
+    return user;
+  }
+
+  /**
+   * Description: This method is used to validate the user token.
+   * @description This method is used to validate the user token.
+   * @param token string
+   * @return user object
+   */
+  async validateToken(token) {
+    return this.userService.validateToken(token);
+  }
+
+  /**
+   * Description: This method is used to generate the token for the user to reset the password.
+   * @description This method is used to generate the token for the user to reset the password.
+   * @param payload object of user info for reset passsword
+   * @param req object of Request
+   * @return user object
+   */
+  async forgotPassword(payload, req) {
+    return this.userService.forgotPassword(payload, req);
+  }
+}</code></pre>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+                   
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'injectable';
+            var COMPODOC_CURRENT_PAGE_URL = 'AuthService.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+       <script src="../js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
+       <script src="../js/menu-wc.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

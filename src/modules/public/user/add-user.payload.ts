@@ -1,8 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNumber, IsOptional } from 'class-validator';
-import { Unique } from 'modules/common';
-import { SameAs } from 'modules/common/validator/same-as.validator';
-import { User } from 'modules/public/user';
+import {​​​ ApiProperty }​​​ from'@nestjs/swagger';
+import {​​​ IsEmail, IsNumber, IsOptional }​​​ from'class-validator';
+import {​​​ Unique }​​​ from'../../common';
+import {​​​ SameAs }​​​ from'../../common/validator/same-as.validator';
+import {​​​ User }​​​ from'../user';
+
 
 type user_type = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
 
@@ -10,7 +11,7 @@ export class AddUserPayload {
   @ApiProperty({
     required: true,
   })
-  @IsEmail()
+  @IsEmail()                 
   @Unique([User])
   email: string;
 

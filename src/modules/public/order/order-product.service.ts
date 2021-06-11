@@ -115,7 +115,7 @@ export class OrderProductService {
       const deleteProducts = await this.orderProductRepository.find({
         productName: orderProduct.productName,
         status : 0,
-        startDate : MoreThanOrEqual(orderProduct.startDate),
+        endDate : MoreThan(orderProduct.endDate),
       });
       for await (const product of deleteProducts) {
         await this.orderProductRepository.delete(product.id);

@@ -1,0 +1,1705 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>biolabs-api documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	      <link rel="stylesheet" href="../styles/style.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">biolabs-api documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content injectable">
+                   <div class="content-data">
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li>Injectables</li>
+  <li>UsersService</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info">
+        <p class="comment">
+            <h3>File</h3>
+        </p>
+        <p class="comment">
+            <code>src/modules/public/user/user.service.ts</code>
+        </p>
+
+
+
+
+            <section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#addUser">addUser</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#create">create</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#forgotPassword">forgotPassword</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#generateToken">generateToken</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#get">get</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getByEmail">getByEmail</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getUserById">getUserById</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#getUsers">getUsers</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#setNewPassword">setNewPassword</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#softDeleteUser">softDeleteUser</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#updateUser">updateUser</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#updateUserProfilePic">updateUserProfilePic</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#validateToken">validateToken</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+            <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(jwtService: JwtService, residentCompanyService: <a href="../injectables/ResidentCompanyService.html">ResidentCompanyService</a>, mail: <a href="../classes/Mail.html">Mail</a>, userRepository: <a href="../classes/User.html">Repository<User></a>, userTokenRepository: Repository<UserToken>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="15" class="link-to-prism">src/modules/public/user/user.service.ts:15</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>jwtService</td>
+                                                  
+                                                        <td>
+                                                                    <code>JwtService</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>residentCompanyService</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/ResidentCompanyService.html" target="_self" >ResidentCompanyService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>mail</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/Mail.html" target="_self" >Mail</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>userRepository</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../classes/User.html" target="_self" >Repository&lt;User&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>userTokenRepository</td>
+                                                  
+                                                        <td>
+                                                                    <code>Repository&lt;UserToken&gt;</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+            <section>
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="addUser"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            addUser
+                        </b>
+                        <a href="#addUser"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>addUser(payload: <a href="../classes/UserFillableFields.html">UserFillableFields</a>, req: Request)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="76"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:76</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to create the new user.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/UserFillableFields.html" target="_self" >UserFillableFields</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of type UserFillableFields</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>req</td>
+                                    <td>
+                                            <code>Request</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of type Request</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="create"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            create
+                        </b>
+                        <a href="#create"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>create(payload: <a href="../classes/UserFillableFields.html">UserFillableFields</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="58"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:58</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to create the new user.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/UserFillableFields.html" target="_self" >UserFillableFields</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of type UserFillableFields</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="forgotPassword"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            forgotPassword
+                        </b>
+                        <a href="#forgotPassword"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>forgotPassword(payload: <a href="../classes/UserFillableFields.html">UserFillableFields</a>, req: Request)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="306"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:306</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to generate the token for the user to reset the password.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/UserFillableFields.html" target="_self" >UserFillableFields</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of user info for reset passsword</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>req</td>
+                                    <td>
+                                            <code>Request</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of Request</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="generateToken"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            generateToken
+                        </b>
+                        <a href="#generateToken"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>generateToken(user)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="279"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:279</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to generate the token for the user.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>user</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of user info asnd new passsword</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="get"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            get
+                        </b>
+                        <a href="#get"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>get(id: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="32"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:32</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to get the user information by id.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number user id</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getByEmail"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getByEmail
+                        </b>
+                        <a href="#getByEmail"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getByEmail(email: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="42"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:42</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to get the user information by email.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>email</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>string user email</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getUserById"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getUserById
+                        </b>
+                        <a href="#getUserById"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getUserById(id)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="210"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:210</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to get the user by id.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number of user id</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getUsers"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            getUsers
+                        </b>
+                        <a href="#getUsers"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>getUsers(payload: <a href="../classes/ListUserPayload.html">ListUserPayload</a>, siteIdArr?: number[])</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="171"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:171</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to list the user.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+                                    <td>
+                                                <code><a href="../classes/ListUserPayload.html" target="_self" >ListUserPayload</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of type ListUserPayload</p>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>siteIdArr</td>
+                                    <td>
+                                            <code>number[]</code>
+                                    </td>
+
+                                    <td>
+                                        Yes
+                                    </td>
+
+
+                                    <td>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>array of user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="setNewPassword"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            setNewPassword
+                        </b>
+                        <a href="#setNewPassword"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>setNewPassword(payload)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="252"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:252</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to set new password for the user.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of user info asnd new passsword</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="softDeleteUser"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            softDeleteUser
+                        </b>
+                        <a href="#softDeleteUser"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>softDeleteUser(id)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="154"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:154</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to soft delete the user.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>id</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>number of user id</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>object of affected rows</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="updateUser"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            updateUser
+                        </b>
+                        <a href="#updateUser"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>updateUser(payload)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="104"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:104</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to update the user.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of user information</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="updateUserProfilePic"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            updateUserProfilePic
+                        </b>
+                        <a href="#updateUserProfilePic"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>updateUserProfilePic(payload)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="136"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:136</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to update the user profile pic.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>payload</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>object of user information with imageUrl</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="validateToken"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            validateToken
+                        </b>
+                        <a href="#validateToken"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>validateToken(token: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="231"
+                            class="link-to-prism">src/modules/public/user/user.service.ts:231</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Description: This method is used to validate the user token.</p>
+</div>
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                    <td>Description</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>token</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                    <td>
+                                        <p>string</p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>{}</code>
+
+                    </div>
+                    <div class="io-description">
+                        <p>user object</p>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+    </div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable, NotAcceptableException } from &#x27;@nestjs/common&#x27;;
+import { JwtService } from &#x27;@nestjs/jwt&#x27;;
+import { InjectRepository } from &#x27;@nestjs/typeorm&#x27;;
+import { Repository } from &#x27;typeorm&#x27;;
+import { ListUserPayload } from &#x27;./list-user.payload&#x27;;
+
+import { User, UserFillableFields } from &#x27;./user.entity&#x27;;
+import { UserToken } from &#x27;./user-token.entity&#x27;;
+import { Mail } from &#x27;../../../utils/Mail&#x27;;
+import { EMAIL } from &#x27;../../../constants/email&#x27;;
+import { Request } from &#x27;express&#x27;;
+import { ResidentCompanyService } from &#x27;../resident-company/resident-company.service&#x27;;
+
+@Injectable()
+export class UsersService {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly residentCompanyService: ResidentCompanyService,
+    private readonly mail: Mail,
+    @InjectRepository(User)
+    private readonly userRepository: Repository&lt;User&gt;,
+    @InjectRepository(UserToken)
+    private readonly userTokenRepository: Repository&lt;UserToken&gt;,
+  ) { }
+
+  /**
+   * Description: This method is used to get the user information by id.
+   * @description This method is used to get the user information by id.
+   * @param id number user id
+   * @return user object
+   */
+  async get(id: number) {
+    return this.userRepository.findOne(id);
+  }
+
+  /**
+   * Description: This method is used to get the user information by email.
+   * @description This method is used to get the user information by email.
+   * @param email string user email
+   * @return user object
+   */
+  async getByEmail(email: string) {
+    return await this.userRepository
+      .createQueryBuilder(&#x27;users&#x27;)
+      .addSelect(&quot;users.email&quot;)
+      .addSelect(&quot;users.password&quot;)
+      .where(&#x27;users.email &#x3D; :email&#x27;)
+      .setParameter(&#x27;email&#x27;, email)
+      .getOne();
+  }
+
+  /**
+   * Description: This method is used to create the new user.
+   * @description This method is used to create the new user.
+   * @param payload object of type UserFillableFields
+   * @return user object
+   */
+  async create(payload: UserFillableFields) {
+    const user &#x3D; await this.getByEmail(payload.email);
+
+    if (user) {
+      throw new NotAcceptableException(
+        &#x27;User with provided email already created.&#x27;,
+      );
+    }
+    return await this.userRepository.save(this.userRepository.create(payload));
+  }
+
+  /**
+   * Description: This method is used to create the new user.
+   * @description This method is used to create the new user.
+   * @param payload object of type UserFillableFields
+   * @param req object of type Request
+   * @return user object
+   */
+  async addUser(payload: UserFillableFields, req: Request) {
+    const user &#x3D; await this.getByEmail(payload.email);
+
+    if (user) {
+      throw new NotAcceptableException(
+        &#x27;User with provided email already created.&#x27;,
+      );
+    }
+    const newUser &#x3D; await this.userRepository.create(payload);
+    const savedUser &#x3D; await this.userRepository.save(newUser);
+    const userInformation &#x3D; await this.generateToken(savedUser);
+    const userInfo &#x3D; {
+      token: userInformation.token,
+      userName: savedUser.firstName,
+      origin: req.headers[&#x27;origin&#x27;],
+    };
+    let tenant &#x3D; { tenantEmail: payload.email };
+    this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, &#x27;Invite&#x27;, userInfo);
+
+    return savedUser;
+  }
+
+  /**
+   * Description: This method is used to update the user.
+   * @description This method is used to update the user.
+   * @param payload object of user information
+   * @return user object
+   */
+  async updateUser(payload) {
+    const user &#x3D; await this.get(payload.id);
+    if (user) {
+      user.firstName &#x3D; payload.firstName;
+      user.lastName &#x3D; payload.lastName;
+      user.title &#x3D; payload.title;
+      user.phoneNumber &#x3D; payload.phoneNumber;
+      user.companyId &#x3D; (payload.companyId) ? payload.companyId : user.companyId;
+      user.userType &#x3D; payload.userType;
+      if (
+        payload.password &amp;&amp;
+        payload.password !&#x3D;&#x3D; &#x27;&#x27; &amp;&amp;
+        payload.password !&#x3D; null
+      ) {
+        user.password &#x3D; payload.password;
+      } else {
+        delete user.password;
+      }
+      await this.userRepository.update(user.id, user);
+      if (user.password) delete user.password;
+      return await this.getUserById(user.id);
+    } else {
+      throw new NotAcceptableException(&#x27;User with provided id not available.&#x27;);
+    }
+  }
+
+  /**
+   * Description: This method is used to update the user profile pic.
+   * @description This method is used to update the user profile pic.
+   * @param payload object of user information with imageUrl
+   * @return user object
+   */
+  async updateUserProfilePic(payload) {
+    const user &#x3D; await this.get(payload.id);
+    if (user) {
+      delete user.password;
+      user.imageUrl &#x3D; payload.imageUrl;
+      await this.userRepository.update(user.id, user);
+      return user;
+    } else {
+      throw new NotAcceptableException(&#x27;User with provided id not available.&#x27;);
+    }
+  }
+
+  /**
+   * Description: This method is used to soft delete the user.
+   * @description This method is used to soft delete the user.
+   * @param id number of user id
+   * @return object of affected rows
+   */
+  async softDeleteUser(id) {
+    const user &#x3D; await this.get(id);
+
+    if (user) {
+      user.status &#x3D; &#x27;99&#x27;;
+      return await this.userRepository.save(user);
+    } else {
+      throw new NotAcceptableException(&#x27;User with provided id not available.&#x27;);
+    }
+  }
+
+  /**
+   * Description: This method is used to list the user.
+   * @description This method is used to list the user.
+   * @param payload object of type ListUserPayload
+   * @return array of user object
+   */
+  async getUsers(payload: ListUserPayload, siteIdArr?: number[]) {
+    let userQuery &#x3D; await this.userRepository.createQueryBuilder(&quot;users&quot;)
+      .where(&quot;users.status IN (:...status)&quot;, { status: [1, 0] })
+      .andWhere(&quot;users.site_id &amp;&amp; ARRAY[:...siteIdArr]::int[]&quot;, { siteIdArr: siteIdArr });
+    if (payload.role || payload.role &#x3D;&#x3D; 0) {
+      userQuery.andWhere(&quot;users.role &#x3D; :role&quot;, { role: payload.role });
+    }
+    if (payload.q &amp;&amp; payload.q !&#x3D; &#x27;&#x27;) {
+      userQuery.andWhere(&quot;(users.firstName LIKE :name OR users.lastName LIKE :name) &quot;, { name: &#x60;%${payload.q}%&#x60; });
+    }
+
+    if (payload.pagination) {
+      let skip &#x3D; 0;
+      let take &#x3D; 10;
+      if (payload.limit) {
+        take &#x3D; payload.limit;
+        if (payload.page) {
+          skip &#x3D; payload.page * payload.limit;
+        }
+      }
+      userQuery.skip(skip).take(take)
+    }
+    userQuery.addOrderBy(&quot;users.firstName&quot;, &quot;ASC&quot;);
+    userQuery.addOrderBy(&quot;users.lastName&quot;, &quot;ASC&quot;);
+    return await userQuery.getMany();
+    // return await this.userRepository.find({
+    //   where: search,
+    //   skip,
+    //   take,
+    // });
+
+  }
+
+  /**
+   * Description: This method is used to get the user by id.
+   * @description This method is used to get the user by id.
+   * @param id number of user id
+   * @return user object
+   */
+  async getUserById(id) {
+    const user: any &#x3D; await this.get(id);
+    if (user) {
+      if (user.companyId) {
+        const company &#x3D; await this.residentCompanyService.getResidentCompany(
+          user.companyId,
+        );
+        if (company) user.company &#x3D; company;
+      }
+      return user;
+    } else {
+      throw new NotAcceptableException(&#x27;User with provided id not available.&#x27;);
+    }
+  }
+
+  /**
+   * Description: This method is used to validate the user token.
+   * @description This method is used to validate the user token.
+   * @param token string
+   * @return user object
+   */
+  async validateToken(token: string) {
+    const tokenData &#x3D; await this.userTokenRepository.findOne({
+      where: [{ token: token, status: 1 }],
+    });
+    if (tokenData) {
+      const user &#x3D; await this.get(tokenData.user_id);
+      if (user.status &#x3D;&#x3D; &#x27;1&#x27; || user.status &#x3D;&#x3D; &#x27;0&#x27;) return user;
+      else {
+        throw new NotAcceptableException(&#x27;Token is invalid.&#x27;);
+      }
+    } else {
+      throw new NotAcceptableException(&#x27;Token is invalid.&#x27;);
+    }
+  }
+
+  /**
+   * Description: This method is used to set new password for the user.
+   * @description This method is used to set new password for the user.
+   * @param payload object of user info asnd new passsword
+   * @return user object
+   */
+  async setNewPassword(payload) {
+    const tokenData &#x3D; await this.userTokenRepository.findOne({
+      where: [{ token: payload.token, status: 1 }],
+    });
+    if (tokenData) {
+      const user &#x3D; await this.get(tokenData.user_id);
+      if (user.status &#x3D;&#x3D; &#x27;1&#x27; || user.status &#x3D;&#x3D; &#x27;0&#x27;) {
+        user.password &#x3D; payload.password;
+        user.status &#x3D; &#x27;1&#x27;;
+        const newUser &#x3D; await this.userRepository.save(user);
+        tokenData.status &#x3D; &#x27;99&#x27;;
+        this.userTokenRepository.save(tokenData);
+        return newUser;
+      } else {
+        throw new NotAcceptableException(&#x27;Token is invalid.&#x27;);
+      }
+    } else {
+      throw new NotAcceptableException(&#x27;Token is invalid.&#x27;);
+    }
+  }
+
+  /**
+   * Description: This method is used to generate the token for the user.
+   * @description This method is used to generate the token for the user.
+   * @param user object of user info asnd new passsword
+   * @return user object
+   */
+  async generateToken(user) {
+    let token &#x3D; this.jwtService.sign({
+      id: user.id,
+      time: new Date().getTime(),
+    });
+    const tokenData &#x3D; { user_id: user.id, token: token };
+    const tokenChk &#x3D; await this.userTokenRepository.find({
+      where: [{ user_id: user.id, status: &#x27;1&#x27; }],
+    });
+    if (tokenChk) {
+      await this.userTokenRepository.update(
+        { user_id: user.id },
+        { status: &#x27;99&#x27; },
+      );
+    }
+    return await this.userTokenRepository.save(
+      this.userTokenRepository.create(tokenData),
+    );
+  }
+
+  /**
+   * Description: This method is used to generate the token for the user to reset the password.
+   * @description This method is used to generate the token for the user to reset the password.
+   * @param payload object of user info for reset passsword
+   * @param req object of Request
+   * @return user object
+   */
+  async forgotPassword(payload: UserFillableFields, req: Request) {
+    const user &#x3D; await this.getByEmail(payload.email);
+    if (user) {
+      const userInformation &#x3D; await this.generateToken(user);
+      const userInfo &#x3D; {
+        token: userInformation.token,
+        userName: user.firstName,
+        origin: req.headers[&#x27;origin&#x27;],
+      };
+      let tenant &#x3D; { tenantEmail: payload.email, role: payload.role };
+      this.mail.sendEmail(
+        tenant,
+        EMAIL.SUBJECT_FORGOT_PASSWORD,
+        &#x27;forgotMail&#x27;,
+        userInfo,
+      );
+      return true;
+    } else {
+      throw new NotAcceptableException(
+        &#x27;User with provided email already created.&#x27;,
+      );
+    }
+  }
+}</code></pre>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+                   
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'injectable';
+            var COMPODOC_CURRENT_PAGE_URL = 'UsersService.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+       <script src="../js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
+       <script src="../js/menu-wc.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

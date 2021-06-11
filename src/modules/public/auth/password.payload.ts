@@ -1,6 +1,9 @@
+
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, MinLength } from 'class-validator';
-import { SameAs } from 'modules/common/validator/same-as.validator';
+// import { SameAs } from 'modules/common/validator/same-as.validator';
+import { SameAs } from '../../common/validator/same-as.validator';
+
 
 export class PasswordPayload {
 
