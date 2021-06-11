@@ -709,9 +709,11 @@ export class ResidentCompanyService {
    * @param payload object of ListResidentCompanyPayload
    * @return array of resident companies object
    */
-  async gloabalSearchCompanies(payload: SearchResidentCompanyPayload) {
+  async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
-      .where("resident_companies.status IN (:...status)", { status: [1, 0] });
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
+      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+
 
     if (payload.q && payload.q != '') {
       // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
