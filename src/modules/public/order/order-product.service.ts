@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual, Repository, SimpleConsoleLogger } from 'typeorm';
+import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { OrderProduct } from './model/order-product.entity';
@@ -172,7 +172,3 @@ export class OrderProductService {
   }
 
 }
-function ed(arg0: Date, ed: any): any {
-  throw new Error('Function not implemented.');
-}
-
