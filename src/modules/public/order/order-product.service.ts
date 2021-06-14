@@ -20,7 +20,7 @@ export class OrderProductService {
    * @return saved order product object
    */
   async addOrderProduct(orderProduct: CreateOrderProductDto) {
-
+    const todayDate = new Date();
     /**
      * ***********************setting Default Dates***********************
      */
@@ -36,6 +36,11 @@ export class OrderProductService {
       orderProduct.endDate = '12/31/9999';
     } else {
       orderProduct.endDate = orderProduct.endDate+' 23:59:59';
+    }
+    
+    if(!orderProduct.startDate || !orderProduct.endDate || ((new Date(orderProduct.startDate) < (new Date(`${todayDate.getMonth()+1}/01/${todayDate.getFullYear()} 00:00:00`))) 
+       || (new Date(orderProduct.endDate) < new Date(orderProduct.startDate) ))){
+      return {error : 'Please Select Valid Start Date and End Date'};
     }
 
     /**
