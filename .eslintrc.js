@@ -69,7 +69,7 @@ module.exports = {
                 accessibility: 'explicit',
             },
         ],
-        '@typescript-eslint/indent': ['warn', 2],
+        '@typescript-eslint/indent': 'off',
         '@typescript-eslint/member-ordering': 'off',
         '@typescript-eslint/naming-convention': 'off',
         '@typescript-eslint/no-empty-function': 'off',
@@ -169,5 +169,6 @@ module.exports = {
         '@typescript-eslint/no-floating-promises': 'off',
         '@typescript-eslint/restrict-template-expressions': 'off',
         '@typescript-eslint/unbound-method': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off'
     },
 };

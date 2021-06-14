@@ -5,6 +5,7 @@ import { ResidentCompanyService } from '.';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
+import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 
 @Controller('api/resident-company')
 @ApiTags('Resident Company')
@@ -23,7 +24,7 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async addResidentCompany(@Body() payload: AddResidentCompanyPayload): Promise<any> {
     type status_enum = '-1' | '0' | '1' | '99';
-    const status: status_enum = '0';
+    const status: status_enum = '1';
     const pal = { ...payload, status: status };
     const user = await this.residentCompanyService.addResidentCompany(pal);
     return user;
@@ -49,20 +50,6 @@ export class ResidentCompanyController {
       siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     }
     return this.residentCompanyService.getResidentCompanies(params, siteIdArr);
-  }
-
-  /**
-   * Description: This method is used to get a resident company information.
-   * @description This method is used to get a resident company information.
-   * @param id it is a request parameter expect a number value of resident company id.
-   */
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard())
-  @Get(':id')
-  @ApiResponse({ status: 200, description: 'Successful Response' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getResidentCompany(@Param('id') id: number): Promise<any> {
-    return this.residentCompanyService.getResidentCompany(id);
   }
 
   /**
@@ -103,5 +90,42 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateResidentCompany(@Body() payload: UpdateResidentCompanyPayload): Promise<any> {
     return this.residentCompanyService.updateResidentCompany(payload);
+  }
+
+  /**
+   * Description: This method is used to global search for resident companies.
+   * @description This method is used to global search for resident companies.
+   * @param payload it is a request body contains payload of type UpdateResidentCompanyStatusPayload.
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('/search')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiHeader({
+    name: 'x-site-id',
+    description: 'Selected site ids array',
+  })
+
+  async gloabalSearchCompanies(@Query() params: SearchResidentCompanyPayload, @Request() req): Promise<any> {
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return this.residentCompanyService.gloabalSearchCompanies(params, siteIdArr);
+  }
+
+  /**
+   * Description: This method is used to get a resident company information.
+   * @description This method is used to get a resident company information.
+   * @param id it is a request parameter expect a number value of resident company id.
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get(':id')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getResidentCompany(@Param('id') id: number): Promise<any> {
+    return this.residentCompanyService.getResidentCompany(id);
   }
 }
