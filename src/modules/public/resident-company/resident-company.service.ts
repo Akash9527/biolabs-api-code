@@ -1,4 +1,5 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+//Sir update
+import { forwardRef, Inject, Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Like, Not, Repository } from 'typeorm';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
@@ -20,8 +21,11 @@ import { ListResidentCompanyPayload } from './list-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { ResidentCompanyHistory } from './resident-company-history.entity';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
+import { Mail } from '../../../utils/Mail';
+import { Request } from 'express';
+import { User } from '../user';
+import { EMAIL } from 'constants/email';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
-
 @Injectable()
 export class ResidentCompanyService {
   constructor(
@@ -49,8 +53,11 @@ export class ResidentCompanyService {
     private readonly modalityRepository: Repository<Modality>,
     @InjectRepository(TechnologyStage)
     private readonly technologyStageRepository: Repository<TechnologyStage>,
+    private readonly mail: Mail,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    // private readonly userService: UsersService
   ) { }
-
   /**
    * Description: This method will get the resident company by id.
    * @description This method will get the resident company by id.
@@ -229,7 +236,7 @@ export class ResidentCompanyService {
    * @param req object of Request.
    * @return resident companies object
    */
-  async addResidentCompany(payload: AddResidentCompanyPayload) {
+  async addResidentCompany(payload: AddResidentCompanyPayload, req: Request) {
     const rc = await this.getByEmail(payload.email);
 
     if (rc) {
@@ -248,6 +255,27 @@ export class ResidentCompanyService {
           historyData.companyId = historyData.id;
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
+          let siteAdmin:any = await this.userRepository
+            .createQueryBuilder('users')
+            .select('users.email', 'email')
+            .addSelect('s.name', 'siteName')
+            .leftJoin('sites', 's', 's.id = Any(users.site_id)')
+            .where(':sitesid = ANY(users.site_id::int[])', {sitesid: site})
+            .andWhere('users.role = 2')
+            .andWhere('s.id = :sitesid', {sitesid: site})
+            .getRawMany();
+            
+            for(let i = 0; i < siteAdmin.length; i++){
+              let tenant = { tenantEmail: siteAdmin[i]['email']};
+              let userInfo = {
+                token: req.headers.authorization,
+                company_name: savedRc.companyName,
+                site: site,
+                origin: req.headers['origin'],
+                site_name: siteAdmin[i].siteName 
+              };
+            this.mail.sendEmail(tenant, EMAIL.SUBJECT_FORM, 'formSubmit', userInfo);
+          }
         }
       } catch {
         response['status'] = 'error';
@@ -556,6 +584,7 @@ export class ResidentCompanyService {
         query("SELECT c.name, c.id  as industryId, (select count(rc.*) FROM resident_companies as rc " +
           "where c.id = ANY(rc.industry::int[]) and " + site.id + " = ANY(rc.site::int[])  ) as industryCount " +
           " FROM public.categories as c order by industryCount desc limit 3;");
+
       let newStartUps: any = {};
       // try {
       //Get Sum of all New companies onboard in last 3 months
@@ -698,56 +727,62 @@ export class ResidentCompanyService {
     }
     return [val];
   }
-  /**
-   * Description: This method will return the resident companies list.
-   * @description This method will return the resident companies list.
-   * @param payload object of ListResidentCompanyPayload
-   * @return array of resident companies object
-   */
+
   async gloabalSearchCompanies(payload: SearchResidentCompanyPayload) {
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
       .where("resident_companies.status IN (:...status)", { status: [1, 0] });
 
     if (payload.q && payload.q != '') {
-      // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
+      // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` }); 
       rcQuery.andWhere("(resident_companies.name LIKE :q) OR (resident_companies.companyName LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\") @@ to_tsquery(:q)) ", { q: `%${payload.q}%` });
     }
+
     if (payload.companyStatus && payload.companyStatus.length > 0) {
       rcQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: payload.companyStatus });
     }
+
     if (typeof payload.companyVisibility !== 'undefined') {
       rcQuery.andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: payload.companyVisibility });
     }
+
     if (typeof payload.companyOnboardingStatus !== 'undefined') {
       rcQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: payload.companyOnboardingStatus });
     }
+
     if (payload.siteIdArr && payload.siteIdArr.length > 0) {
       payload.siteIdArr = this.parseToArray(payload.siteIdArr)
       rcQuery.andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: payload.siteIdArr });
     }
+
     if (payload.industries && payload.industries.length > 0) {
       payload.industries = this.parseToArray(payload.industries)
       rcQuery.andWhere("resident_companies.industry && ARRAY[:...industries]::int[]", { industries: payload.industries });
     }
+
     if (payload.modalities && payload.modalities.length > 0) {
       payload.modalities = this.parseToArray(payload.modalities)
       rcQuery.andWhere("resident_companies.modality && ARRAY[:...modalities]::int[]", { modalities: payload.modalities });
     }
+
     if (payload.fundingSource && payload.fundingSource.length > 0) {
       payload.fundingSource = this.parseToArray(payload.fundingSource)
       rcQuery.andWhere("resident_companies.fundingSource && ARRAY[:...fundingSource]::int[]", { fundingSource: payload.fundingSource });
     }
+
     if (payload.minFund >= 0) {
-      rcQuery.andWhere("resident_companies.funding >= :minFunding", { minFunding: payload.minFund });
+      rcQuery.andWhere("resident_companies.funding::int >= :minFunding", { minFunding: payload.minFund });
     }
+
     if (payload.maxFund >= 0) {
-      rcQuery.andWhere("resident_companies.funding <= :maxFunding", { maxFunding: payload.maxFund });
+      rcQuery.andWhere("resident_companies.funding::int <= :maxFunding", { maxFunding: payload.maxFund });
     }
+
     if (payload.minCompanySize >= 0) {
-      rcQuery.andWhere("resident_companies.companySize >= :minCompanySize", { minCompanySize: payload.minCompanySize });
+      rcQuery.andWhere("resident_companies.\"companySize\"::int >= :minCompanySize", { minCompanySize: payload.minCompanySize });
     }
+
     if (payload.maxCompanySize >= 0) {
-      rcQuery.andWhere("resident_companies.companySize <= :maxCompanySize", { maxCompanySize: payload.maxCompanySize });
+      rcQuery.andWhere("resident_companies.\"companySize\"::int <= :maxCompanySize", { maxCompanySize: payload.maxCompanySize });
     }
 
     if (payload.pagination) {
@@ -761,10 +796,13 @@ export class ResidentCompanyService {
       }
       rcQuery.skip(skip).take(take)
     }
+
     if (payload.sort) {
       rcQuery.orderBy('"' + payload.sortFiled + '"', payload.sortOrder)
     }
+
     rcQuery.addOrderBy("id", "DESC");
     return await rcQuery.getMany();
   }
-}
+
+} 

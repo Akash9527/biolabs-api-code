@@ -16,17 +16,17 @@ export class ResidentCompanyController {
 
   /**
    * Description: This method is used to create a resident company.
-   * @description This method is used to create a resident company.
+   * @description This method will create the new resident companies and sends email associate site_admins.
    * @param payload it is a request body contains payload of type AddResidentCompanyPayload.
    */
   @Post()
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async addResidentCompany(@Body() payload: AddResidentCompanyPayload): Promise<any> {
+  async addResidentCompany(@Body() payload: AddResidentCompanyPayload, @Request() req): Promise<any> {
     type status_enum = '-1' | '0' | '1' | '99';
     const status: status_enum = '1';
     const pal = { ...payload, status: status };
-    const user = await this.residentCompanyService.addResidentCompany(pal);
+    const user = await this.residentCompanyService.addResidentCompany(pal, req);
     return user;
   }
 
