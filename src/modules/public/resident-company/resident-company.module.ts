@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '../../config';
@@ -19,6 +19,9 @@ import { ResidentCompanyService } from './resident-company.service';
 import { ResidentCompanyController } from './resident-company.controller';
 import { PassportModule } from '@nestjs/passport';
 import { ResidentCompanyHistory } from './resident-company-history.entity';
+import { User, UserModule } from '../user';
+// import { Mail } from 'utils/Mail';
+import { Mail } from '../../../utils/Mail';
 
 @Module({
   imports: [
@@ -35,6 +38,7 @@ import { ResidentCompanyHistory } from './resident-company-history.entity';
       Modality,
       Site,
       TechnologyStage,
+      User
     ]),
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -58,6 +62,6 @@ import { ResidentCompanyHistory } from './resident-company-history.entity';
   ],
   controllers: [ResidentCompanyController],
   exports: [ResidentCompanyService],
-  providers: [ResidentCompanyService],
+  providers: [ResidentCompanyService, Mail],
 })
 export class ResidentCompanyModule {}
