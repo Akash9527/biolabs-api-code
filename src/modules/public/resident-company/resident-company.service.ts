@@ -721,16 +721,28 @@ export class ResidentCompanyService {
     }
   }
 
+  /**
+   * Description: used to convert data into array
+   * @description used to convert data into array
+   * @param val input value
+   */
   private parseToArray(val){
     if(typeof val === 'object'){
       return val;
     }
     return [val];
   }
-
-  async gloabalSearchCompanies(payload: SearchResidentCompanyPayload) {
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
+  async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
-      .where("resident_companies.status IN (:...status)", { status: [1, 0] });
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
+      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+
 
     if (payload.q && payload.q != '') {
       // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` }); 
@@ -770,7 +782,7 @@ export class ResidentCompanyService {
     }
 
     if (payload.minFund >= 0) {
-      rcQuery.andWhere("resident_companies.funding::int >= :minFunding", { minFunding: payload.minFund });
+      rcQuery.andWhere("resident_companies.funding::int >= :minFunding", {​​​​ minFunding: payload.minFund }​​​​);
     }
 
     if (payload.maxFund >= 0) {
@@ -778,11 +790,11 @@ export class ResidentCompanyService {
     }
 
     if (payload.minCompanySize >= 0) {
-      rcQuery.andWhere("resident_companies.\"companySize\"::int >= :minCompanySize", { minCompanySize: payload.minCompanySize });
+      rcQuery.andWhere("resident_companies.\"companySize\"::int >= :minCompanySize", {​​​​ minCompanySize: payload.minCompanySize }​​​​);
     }
 
     if (payload.maxCompanySize >= 0) {
-      rcQuery.andWhere("resident_companies.\"companySize\"::int <= :maxCompanySize", { maxCompanySize: payload.maxCompanySize });
+      rcQuery.andWhere("resident_companies.\"companySize\"::int <= :maxCompanySize", {​​​​ maxCompanySize: payload.maxCompanySize }​​​​);
     }
 
     if (payload.pagination) {

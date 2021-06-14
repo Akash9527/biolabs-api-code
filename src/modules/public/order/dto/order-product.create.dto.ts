@@ -5,6 +5,20 @@ export class CreateOrderProductDto {
 
   @ApiProperty({
     required: true,
+    nullable: true,
+  })
+  @IsNotEmpty()
+  companyId: number;
+
+  @ApiProperty({
+    required: true,
+    nullable: true,
+  })
+  @IsNotEmpty()
+  status: number;
+
+  @ApiProperty({
+    required: true,
   })
   @IsNotEmpty()
   productName: string;
@@ -26,6 +40,12 @@ export class CreateOrderProductDto {
     required: true,
     nullable: true,
   })
+  quantity: number;
+
+  @ApiProperty({
+    required: true,
+    nullable: true,
+  })
   @IsNotEmpty()
   recurrence: boolean;
 
@@ -37,15 +57,15 @@ export class CreateOrderProductDto {
   currentCharge: boolean;
 
   @ApiProperty({
-    required: true,
+    required: false,
     nullable: true,
   })
-  startDate: number;
+  startDate: string;
 
   @ApiProperty({
-    required: true,
+    required: false,
     nullable: true,
   })
-  endDate: number;
+  endDate: string;
 
 }

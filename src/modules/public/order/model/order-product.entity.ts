@@ -1,5 +1,5 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Order } from './order.entity';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+
 
 @Entity({
   name: 'order_product',
@@ -8,8 +8,12 @@ export class OrderProduct {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Order, (order) => order.orderProducts)
-  order?: Order;
+  @Column({ nullable: false })
+  companyId: number;
+
+  // Status will be "0" if invoice is not created, "1" if invoice is created. 
+  @Column({ nullable: false })
+  status: number;
 
   @Column({ length: 510, nullable: true })
   productName: string;
@@ -19,6 +23,9 @@ export class OrderProduct {
 
   @Column({ nullable: true })
   cost: number;
+
+  @Column({ nullable: true })
+  quantity: number;
 
   @Column({ default: false })
   recurrence: boolean;
@@ -46,4 +53,5 @@ export class OrderProductFillableFields {
   currentCharge: boolean;
   startDate: number;
   endDate: number;
+  quantity : number;
 }
