@@ -1,5 +1,5 @@
 //Sir update
-import { forwardRef, Inject, Injectable, NotAcceptableException } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Like, Not, Repository } from 'typeorm';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';

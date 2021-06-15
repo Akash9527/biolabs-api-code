@@ -40,12 +40,12 @@ export class UpdateOrderProductDto {
     required: true,
     nullable: true,
   })
-  startDate: Date;
+  startDate: string;
   
   @ApiProperty({
     required: true,
     nullable: true,
   })
-  endDate: Date;
+  endDate: string;
 
 }

@@ -1,8 +1,10 @@
-import { Test, TestingModule } from "@nestjs/testing";
+/*import { Test, TestingModule } from "@nestjs/testing";
 import { MasterController } from "./master.controller";
 import { MasterService } from "./master.service";
+
 const mockMasterService = () => ({
 });
+
 describe('MasterController', () => {
 
     let masterController;
@@ -23,4 +25,23 @@ describe('MasterController', () => {
     it('should be defined', () => {
         expect(masterController).toBeDefined();
     });
+});*/
+
+import { Test, TestingModule } from '@nestjs/testing';
+import { MasterService } from "./master.service";
+
+describe('MasterService', () => {
+  let service: MasterService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [MasterService],
+    }).compile();
+
+    service = module.get<MasterService>(MasterService);
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 });
