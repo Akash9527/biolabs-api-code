@@ -1,4 +1,3 @@
-//Sir update
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Like, Not, Repository } from 'typeorm';
@@ -26,6 +25,7 @@ import { Request } from 'express';
 import { User } from '../user';
 import { EMAIL } from 'constants/email';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
+
 @Injectable()
 export class ResidentCompanyService {
   constructor(
@@ -56,7 +56,6 @@ export class ResidentCompanyService {
     private readonly mail: Mail,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    // private readonly userService: UsersService
   ) { }
   /**
    * Description: This method will get the resident company by id.
@@ -149,7 +148,7 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        let savedRcManagement = await this.addResidentCompanyAdvisor(companyMember);
+        await this.addResidentCompanyAdvisor(companyMember);
       }
     }
   }
@@ -224,7 +223,7 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        let savedRcManagement = await this.addResidentCompanyTechnical(companyMember);
+        await this.addResidentCompanyTechnical(companyMember);
       }
     }
   }
@@ -238,6 +237,7 @@ export class ResidentCompanyService {
    */
   async addResidentCompany(payload: AddResidentCompanyPayload, req: Request) {
     const rc = await this.getByEmail(payload.email);
+    const sites = payload.site;
 
     if (rc) {
       throw new NotAcceptableException(
@@ -245,8 +245,9 @@ export class ResidentCompanyService {
       );
     }
     let response = {};
-    for await (const site of payload.site) {
-      try {
+    
+    try {
+      for await (const site of payload.site) {
         payload.site = [site];
         const newRc = await this.residentCompanyRepository.create(payload);
         const savedRc = await this.residentCompanyRepository.save(newRc);
@@ -255,36 +256,47 @@ export class ResidentCompanyService {
           historyData.companyId = historyData.id;
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
-          let siteAdmin:any = await this.userRepository
-            .createQueryBuilder('users')
-            .select('users.email', 'email')
-            .addSelect('s.name', 'siteName')
-            .leftJoin('sites', 's', 's.id = Any(users.site_id)')
-            .where(':sitesid = ANY(users.site_id::int[])', {sitesid: site})
-            .andWhere('users.role = 2')
-            .andWhere('s.id = :sitesid', {sitesid: site})
-            .getRawMany();
-            
-            for(let i = 0; i < siteAdmin.length; i++){
-              let tenant = { tenantEmail: siteAdmin[i]['email']};
-              let userInfo = {
-                token: req.headers.authorization,
-                company_name: savedRc.companyName,
-                site: site,
-                origin: req.headers['origin'],
-                site_name: siteAdmin[i].siteName 
-              };
-            this.mail.sendEmail(tenant, EMAIL.SUBJECT_FORM, 'formSubmit', userInfo);
-          }
         }
-      } catch {
-        response['status'] = 'error';
-        response['message'] = 'Could not add application';
       }
+      await this.sendEmailToSiteAdmin(sites, req, payload.companyName);
+    } catch {
+      response['status'] = 'error';
+      response['message'] = 'Could not add application';
     }
+
     response['status'] = 'success';
     response['message'] = 'Application Successfully submitted'
     return response;
+  }
+
+  /**
+   * Description: This method will notify site admin on new application submission via email.
+   * @description This method will notify site admin on new application submission via email.
+   * @param site array of sites.
+   * @param req object of Request.
+   * @param companyName name of the company for which application is submitted.
+   */
+  private async sendEmailToSiteAdmin(site: any, req, companyName: string) {
+    let siteAdmin: any = await this.userRepository
+      .createQueryBuilder('users')
+      .select('users.email', 'email')
+      .addSelect("string_agg(s.name::text, ',')", 'siteName')
+      .leftJoin('sites', 's', 's.id = Any(users.site_id)')
+      .where('users.role = 2')
+      .andWhere("s.id = Any(:siteArray)", { siteArray: site })
+      .groupBy('users.email')
+      .getRawMany();
+
+    for (let i = 0; i < siteAdmin.length; i++) {
+      let tenant = { tenantEmail: siteAdmin[i]['email'] };
+      let userInfo = {
+        token: req.headers.authorization,
+        company_name: companyName,
+        site_name: siteAdmin[i]['siteName'],
+        origin: req.headers['origin'],
+      };
+      this.mail.sendEmail(tenant, EMAIL.SUBJECT_FORM, 'applicationFormSubmit', userInfo);
+    }
   }
 
   /**
