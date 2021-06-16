@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '../../config';
@@ -19,8 +19,7 @@ import { ResidentCompanyService } from './resident-company.service';
 import { ResidentCompanyController } from './resident-company.controller';
 import { PassportModule } from '@nestjs/passport';
 import { ResidentCompanyHistory } from './resident-company-history.entity';
-import { User, UserModule } from '../user';
-// import { Mail } from 'utils/Mail';
+import { User } from '../user';
 import { Mail } from '../../../utils/Mail';
 
 @Module({
