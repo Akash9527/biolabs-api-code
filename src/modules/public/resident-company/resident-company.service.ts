@@ -237,7 +237,6 @@ export class ResidentCompanyService {
    */
   async addResidentCompany(payload: AddResidentCompanyPayload, req: Request) {
     const rc = await this.getByEmail(payload.email);
-    let savedRc = null;
     const sites = payload.site;
 
     if (rc) {
@@ -251,7 +250,7 @@ export class ResidentCompanyService {
       for await (const site of payload.site) {
         payload.site = [site];
         const newRc = await this.residentCompanyRepository.create(payload);
-        savedRc = await this.residentCompanyRepository.save(newRc);
+        const savedRc = await this.residentCompanyRepository.save(newRc);
         if (savedRc.id) {
           const historyData: any = JSON.parse(JSON.stringify(savedRc));
           historyData.companyId = historyData.id;
@@ -259,7 +258,7 @@ export class ResidentCompanyService {
           await this.residentCompanyHistoryRepository.save(historyData);
         }
       }
-      await this.sendEmailToSiteAdmin(sites, req, savedRc);
+      await this.sendEmailToSiteAdmin(sites, req, payload.companyName);
     } catch {
       response['status'] = 'error';
       response['message'] = 'Could not add application';
@@ -271,28 +270,28 @@ export class ResidentCompanyService {
   }
 
   /**
-   * Description: This method will email to associate site admins.
-   * @description This method will email to associate site admins.
-   * @param payload array of sites.
+   * Description: This method will notify site admin on new application submission via email.
+   * @description This method will notify site admin on new application submission via email.
+   * @param site array of sites.
    * @param req object of Request.
-   * @param savedRc object of save resident company
+   * @param companyName name of the company for which application is submitted.
    */
-  private async sendEmailToSiteAdmin(site: any, req, savedRc: ResidentCompany) {
+  private async sendEmailToSiteAdmin(site: any, req, companyName: string) {
     let siteAdmin: any = await this.userRepository
       .createQueryBuilder('users')
       .select('users.email', 'email')
       .addSelect("string_agg(s.name::text, ',')", 'siteName')
       .leftJoin('sites', 's', 's.id = Any(users.site_id)')
       .where('users.role = 2')
-      .andWhere("s.id = Any(:siteArray)", {siteArray : site})
+      .andWhere("s.id = Any(:siteArray)", { siteArray: site })
       .groupBy('users.email')
       .getRawMany();
 
-    for(let i = 0; i < siteAdmin.length; i++) {
+    for (let i = 0; i < siteAdmin.length; i++) {
       let tenant = { tenantEmail: siteAdmin[i]['email'] };
       let userInfo = {
         token: req.headers.authorization,
-        company_name: savedRc.companyName,
+        company_name: companyName,
         site_name: siteAdmin[i]['siteName'],
         origin: req.headers['origin'],
       };
