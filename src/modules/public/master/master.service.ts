@@ -45,6 +45,7 @@ export class MasterService {
     let search: any = {};
     let skip;
     let take;
+    // filtering site list. Use payload.role if role is required.
     if (payload.siteIdArr) {
       payload.siteIdArr = this.parseToArray(payload.siteIdArr);
       search = {id: In(payload.siteIdArr)};

@@ -311,9 +311,10 @@ export class ResidentCompanyService {
       .addSelect("s.name", "siteName")
       .addSelect("s.id", "siteId")
       .leftJoin('sites', 's', 's.id = Any(resident_companies.site)')
-      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
-      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
-
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] });
+    if (siteIdArr && siteIdArr.length) {
+      rcQuery.andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+    }
     if (payload.q && payload.q != '') {
       rcQuery.andWhere("(resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
     }
@@ -752,9 +753,11 @@ export class ResidentCompanyService {
    */
   async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
-      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
-      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] });
 
+    if (siteIdArr && siteIdArr.length) {
+      rcQuery.andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+    }
 
     if (payload.q && payload.q != '') {
       // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` }); 
