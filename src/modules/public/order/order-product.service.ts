@@ -20,7 +20,7 @@ export class OrderProductService {
    * @return saved order product object
    */
   async addOrderProduct(orderProduct: CreateOrderProductDto) {
-
+    const todayDate = new Date();
     /**
      * ***********************setting Default Dates***********************
      */
@@ -37,7 +37,12 @@ export class OrderProductService {
     } else {
       orderProduct.endDate = orderProduct.endDate+' 23:59:59';
     }
-
+    
+    if(!orderProduct.startDate || !orderProduct.endDate || ((new Date(orderProduct.startDate) < (new Date(`${todayDate.getMonth()+1}/01/${todayDate.getFullYear()} 00:00:00`))) 
+       || (new Date(orderProduct.endDate) < new Date(orderProduct.startDate) ))){
+      return {error : 'Please Select Valid Start Date and End Date'};
+    }
+    
     /**
      * **********************************End*************************************
      */
@@ -47,19 +52,19 @@ export class OrderProductService {
       /**
        * Add next 3 months Products
        */
-      for (let i = 2; i <=4 ; i++) {
+      for (let i = 1; i <=3 ; i++) {
 
         let futureOrderProduct = { ...orderProduct };
         let sd = new Date(futureOrderProduct.startDate);
-        let ed = new Date(futureOrderProduct.endDate);
+        let ed = new Date(new Date(futureOrderProduct.endDate).setDate(1));
 
         const startDT = new Date(sd.setMonth(sd.getMonth() + i));
         const endDT = new Date(ed.setMonth(ed.getMonth() + i));
-        const lastDay = new Date(ed.getFullYear(), ed.getMonth(), 0).getDate();
-
+        const lastDay = new Date(endDT.getFullYear(), endDT.getMonth()+1, 0).getDate();
+        
         futureOrderProduct.currentCharge = true;
-        futureOrderProduct.startDate = `${startDT.getMonth()}/01/${startDT.getFullYear()}`;
-        futureOrderProduct.endDate = `${endDT.getMonth()}/${lastDay}/${endDT.getFullYear()} 23:59:59`;
+        futureOrderProduct.startDate = `${startDT.getMonth()+1}/01/${startDT.getFullYear()}`;
+        futureOrderProduct.endDate = `${endDT.getMonth()+1}/${lastDay}/${endDT.getFullYear()} 23:59:59`;
         
         this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct));
       }
@@ -95,8 +100,10 @@ export class OrderProductService {
       endDate = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0, 23, 59, 59);
     }
 
-    payload.startDate = startDate;
-    payload.endDate = endDate;
+    const lastDay = new Date(endDate.getFullYear(), endDate.getMonth()+1, 0).getDate();
+
+    payload.startDate = `${startDate.getMonth()+1}/${startDate.getDate()}/${startDate.getFullYear()}`;
+    payload.endDate = `${endDate.getMonth()+1}/${lastDay}/${endDate.getFullYear()} 23:59:59`;
     /**
      * **********************************End*************************************
      */
@@ -107,15 +114,19 @@ export class OrderProductService {
     orderProduct.cost = payload.cost ? payload.cost : orderProduct.cost;
     orderProduct.recurrence = payload.recurrence ;
     orderProduct.currentCharge = payload.currentCharge ;
-    orderProduct.startDate = payload.startDate ? payload.startDate : orderProduct.startDate;
-    orderProduct.endDate = payload.endDate ? payload.endDate : orderProduct.endDate;
+    orderProduct.startDate = payload.startDate ? new Date(payload.startDate) : orderProduct.startDate;
+    orderProduct.endDate = payload.endDate ? new Date(payload.endDate) : orderProduct.endDate;
     orderProduct.quantity = payload.quantity ? payload.quantity : orderProduct.quantity;
 
     if (!payload.recurrence) {
+
+      let ed = orderProduct.endDate;
+      ed = new Date(ed.setDate(ed.getDate() + 1));
+      
       const deleteProducts = await this.orderProductRepository.find({
         productName: orderProduct.productName,
         status : 0,
-        endDate : MoreThan(orderProduct.endDate),
+        endDate : MoreThan(ed),
       });
       for await (const product of deleteProducts) {
         await this.orderProductRepository.delete(product.id);
@@ -125,15 +136,6 @@ export class OrderProductService {
     return await this.orderProductRepository.update(id, this.orderProductRepository.create(payload));
   }
 
-  /**
-   * @description return last day of the month.
-   * @param y  year 
-   * @param m month
-   * @returns last day of the month
-   */
-  lastday(y: number, m: number) {
-    return new Date(y, m + 1, 0).getDate();
-  }
 
 
   /**
