@@ -49,6 +49,10 @@ export class ResidentCompanyController {
     if (req.headers['x-site-id']) {
       siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     }
+    // removing site filter for sponsor user BIOL-224 BIOL-225
+    if (req.user && req.user.role == 3) {
+      siteIdArr = [];
+    }
     return this.residentCompanyService.getResidentCompanies(params, siteIdArr);
   }
 
