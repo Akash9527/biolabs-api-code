@@ -131,7 +131,7 @@ export class OrderProductService {
         await this.orderProductRepository.delete(product.id);
       }
     } else {
-      for (let i = 0; i < futureProducts.length; i++) {
+      for (let i = 1; i <= futureProducts.length; i++) {
         let futureOrderProduct = { ...payload };
         const product = futureProducts[i];
         const productData = await this.orderProductRepository.findOne(product.id);
