@@ -5,11 +5,6 @@ export class UpdateOrderProductDto {
   @ApiProperty({
     required: true,
   })
-  productName: string;
-
-  @ApiProperty({
-    required: true,
-  })
   productDescription: string;
 
   @ApiProperty({
