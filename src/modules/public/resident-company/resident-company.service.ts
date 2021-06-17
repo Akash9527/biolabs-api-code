@@ -128,12 +128,11 @@ export class ResidentCompanyService {
    * @return resident companies advisor object
    */
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
-    let savedRcAdvisor: object;
     if (payload.id)
-      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
+      await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
     else {
       delete payload.id;
-      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
+      await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
     }
   }
 
@@ -148,9 +147,32 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        await this.addResidentCompanyAdvisor(companyMember);
+        if (this.checkEmptyVal('advisors', companyMember)) {
+          await this.addResidentCompanyAdvisor(companyMember);
+        }
       }
     }
+  }
+
+  /**
+   * Description: check for null values in object
+   * @description check for null values in object
+   * @param type type of list like advisors,managements,technicals
+   * @param data data to be saved (for advisors,managements,technicals)
+   */
+  checkEmptyVal(type, data) {
+    if (type == 'advisors' && (data.name || data.title || data.organization)) {
+      return true;
+    } else if (type == 'managements' &&
+      (data.email || data.emergencyExecutivePOC || data.invoicingExecutivePOC || data.joiningAsMember
+        || data.laboratoryExecutivePOC || data.linkedinLink || data.name || data.phone || data.publications || data.title)) {
+      return true;
+    } else if (type == 'technicals' &&
+      (data.email || data.emergencyExecutivePOC || data.invoicingExecutivePOC || data.joiningAsMember
+        || data.laboratoryExecutivePOC || data.linkedinLink || data.name || data.phone || data.publications || data.title)) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -171,12 +193,11 @@ export class ResidentCompanyService {
    * @return resident companies management object
    */
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
-    let savedRcManagement: object;
     if (payload.id)
-      savedRcManagement = await this.residentCompanyManagementRepository.update(payload.id, payload);
+      await this.residentCompanyManagementRepository.update(payload.id, payload);
     else {
       delete payload.id;
-      savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
+      await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
     }
   }
 
@@ -191,7 +212,9 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        let savedRcManagement = await this.addResidentCompanyManagement(companyMember);
+        if (this.checkEmptyVal('managements', companyMember)) {
+          await this.addResidentCompanyManagement(companyMember);
+        }
       }
     }
   }
@@ -203,12 +226,11 @@ export class ResidentCompanyService {
    * @return resident companies technical object
    */
   async addResidentCompanyTechnical(payload: ResidentCompanyTechnicalFillableFields) {
-    let savedRcTechnical: object;
     if (payload.id)
-      savedRcTechnical = await this.residentCompanyTechnicalRepository.update(payload.id, payload);
+      await this.residentCompanyTechnicalRepository.update(payload.id, payload);
     else {
       delete payload.id;
-      savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
+      await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
     }
   }
 
@@ -223,7 +245,9 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        await this.addResidentCompanyTechnical(companyMember);
+        if (this.checkEmptyVal('technicals', companyMember)) {
+          await this.addResidentCompanyTechnical(companyMember);
+        }
       }
     }
   }
