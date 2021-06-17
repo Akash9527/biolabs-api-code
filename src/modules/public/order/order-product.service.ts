@@ -122,26 +122,25 @@ export class OrderProductService {
     ed = new Date(ed.setDate(ed.getDate() + 1));
 
     const futureProducts = await this.orderProductRepository.find({
-      productName: orderProduct.productName,
-      status: 0,
-      endDate: MoreThan(ed),
+      where: {
+        productName: orderProduct.productName,
+        status: 0,
+        endDate: MoreThan(ed),
+      }
     });
     if (!payload.recurrence) {
       for await (const product of futureProducts) {
         await this.orderProductRepository.delete(product.id);
       }
     } else {
-      for (let i = 1; i <= futureProducts.length; i++) {
+      for await (const product of futureProducts) {
         let futureOrderProduct = { ...payload };
-        const product = futureProducts[i];
         const productData = await this.orderProductRepository.findOne(product.id);
         const st = productData['startDate'];
         const ed = new Date(new Date(productData['endDate']).setDate(1));
-
         const lastDay = new Date(ed.getFullYear(), ed.getMonth() + 1, 0).getDate();
         futureOrderProduct.startDate = `${st.getFullYear()}-${st.getMonth() + 1}-${st.getDate()}`;
         futureOrderProduct.endDate = `${ed.getFullYear()}-${ed.getMonth() + 1}-${lastDay} 23:59:59`;
-
         await this.orderProductRepository.update(product.id, this.orderProductRepository.create(futureOrderProduct));
       }
     }
