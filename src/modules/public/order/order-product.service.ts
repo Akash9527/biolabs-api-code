@@ -97,7 +97,7 @@ export class OrderProductService {
     if (payload.endDate) {
       endDate = new Date(payload.endDate);
     } else {
-      endDate = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0, 23, 59, 59);
+      endDate = new Date(endDate.getFullYear(), endDate.getMonth(),1);
     }
 
     const lastDay = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
@@ -119,7 +119,7 @@ export class OrderProductService {
     orderProduct.quantity = payload.quantity ? payload.quantity : orderProduct.quantity;
 
     let ed = orderProduct.endDate;
-    ed = new Date(ed.setDate(ed.getDate() + 1));
+    ed = new Date(new Date(ed.setDate(ed.getDate() + 1)).setHours(0,0,0,0));
 
     const futureProducts = await this.orderProductRepository.find({
       where: {
