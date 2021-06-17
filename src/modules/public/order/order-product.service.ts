@@ -134,13 +134,23 @@ export class OrderProductService {
       }
     } else {
       for await (const product of futureProducts) {
-        let futureOrderProduct = { ...payload };
+        
+        let futureOrderProduct = {
+          productDescription: payload.productDescription,
+          cost: payload.cost,
+          quantity: payload.quantity,
+          recurrence:  payload.recurrence,
+          currentCharge:  payload.currentCharge,
+          startDate:  new Date(payload.startDate),
+          endDate:  new Date(payload.endDate)
+        }
+
         const productData = await this.orderProductRepository.findOne(product.id);
         const st = productData['startDate'];
         const ed = new Date(new Date(productData['endDate']).setDate(1));
         const lastDay = new Date(ed.getFullYear(), ed.getMonth() + 1, 0).getDate();
-        futureOrderProduct.startDate = `${st.getFullYear()}-${st.getMonth() + 1}-${st.getDate()}`;
-        futureOrderProduct.endDate = `${ed.getFullYear()}-${ed.getMonth() + 1}-${lastDay} 23:59:59`;
+        futureOrderProduct.startDate = new Date(`${st.getFullYear()}-${st.getMonth() + 1}-${st.getDate()}`);
+        futureOrderProduct.endDate = new Date(`${ed.getFullYear()}-${ed.getMonth() + 1}-${lastDay} 23:59:59`);
         await this.orderProductRepository.update(product.id, this.orderProductRepository.create(futureOrderProduct));
       }
     }
