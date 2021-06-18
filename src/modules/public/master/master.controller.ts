@@ -112,4 +112,15 @@ export class MasterController {
   async getUserTypes(): Promise<any> {
     return await this.masterService.getUserTypes();
   }
+
+  /**
+   * Description: This method is used to list the committee status.
+   * @description This method is used to list the committee status.
+   */
+  @Get('committee-status')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getCommitteeStatus():any {
+    return this.masterService.getCommitteeStatus();
+  }
 }
