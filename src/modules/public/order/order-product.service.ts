@@ -83,8 +83,7 @@ export class OrderProductService {
     /**
     * ***********************setting Default Dates***********************
     */
-    let startDate = new Date('01/01/2021');
-    let endDate = new Date('12/31/9999');
+    let startDate, endDate;
 
     // Setting StartDate
     if (payload.startDate) {
