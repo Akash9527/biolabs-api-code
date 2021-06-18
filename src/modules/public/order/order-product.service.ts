@@ -61,16 +61,14 @@ export class OrderProductService {
       for (let i = 1; i <= 3; i++) {
 
         let futureOrderProduct = { ...orderProduct };
-        let sd = new Date(futureOrderProduct.startDate);
-        let ed = new Date(futureOrderProduct.endDate);
+        let tDate = new Date();
 
-        const startDT = new Date(sd.setMonth(sd.getMonth() + i));
-        const endDT = new Date(ed.setMonth(ed.getMonth() + i));
-        const lastDay = new Date(endDT.getFullYear(), endDT.getMonth() + 1, 0).getDate();
+        const startDT = new Date(tDate.setMonth(tDate.getMonth() + i));
+        const lastDay = new Date(startDT.getFullYear(), startDT.getMonth() + 1, 0).getDate();
 
         futureOrderProduct.currentCharge = true;
         futureOrderProduct.startDate = `${startDT.getFullYear()}-${startDT.getMonth() + 1}-01`;
-        futureOrderProduct.endDate = `${endDT.getFullYear()}-${endDT.getMonth()+1}-${lastDay} 23:59:59`;
+        futureOrderProduct.endDate = `${startDT.getFullYear()}-${startDT.getMonth()+1}-${lastDay} 23:59:59`;
 
         this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct));
       }
