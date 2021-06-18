@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { constants } from 'node:crypto';
 import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
@@ -97,29 +98,28 @@ export class OrderProductService {
       endDate = new Date(payload.endDate);
     } else {
       endDate = new Date(endDate.getFullYear(), endDate.getMonth(),1);
+      const lastDay = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
+      payload.endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${lastDay} 23:59:59`;
     }
-
-    const lastDay = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
-
-    payload.startDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-${startDate.getDate()}`;
-    payload.endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${lastDay} 23:59:59`;
 
     /**
      * **********************************End*************************************
      */
 
     const orderProduct = await this.orderProductRepository.findOne(id);
-    orderProduct.productDescription = payload.productDescription ? payload.productDescription : orderProduct.productDescription;
-    orderProduct.cost = payload.cost ? payload.cost : orderProduct.cost;
-    orderProduct.recurrence = payload.recurrence;
-    orderProduct.currentCharge = payload.currentCharge;
-    orderProduct.startDate = payload.startDate ? new Date(payload.startDate) : orderProduct.startDate;
-    orderProduct.endDate = payload.endDate ? new Date(payload.endDate) : orderProduct.endDate;
-    orderProduct.quantity = payload.quantity ? payload.quantity : orderProduct.quantity;
 
+    const orderProductUpdate = {
+      productDescription: payload.productDescription ? payload.productDescription : orderProduct.productDescription,
+      cost: payload.cost ? payload.cost : orderProduct.cost,
+      quantity: payload.quantity ? payload.quantity : orderProduct.quantity,
+      recurrence:  payload.recurrence,
+      currentCharge:  payload.currentCharge,
+      startDate:  new Date(payload.startDate),
+      endDate:  new Date(payload.endDate)
+    }
+    
     let ed = orderProduct.endDate;
     ed = new Date(new Date(ed.setDate(ed.getDate() + 1)).setHours(0,0,0,0));
-
     const futureProducts = await this.orderProductRepository.find({
       where: {
         productName: orderProduct.productName,
@@ -153,7 +153,7 @@ export class OrderProductService {
         await this.orderProductRepository.update(product.id, this.orderProductRepository.create(futureOrderProduct));
       }
     }
-    return await this.orderProductRepository.update(id, this.orderProductRepository.create(payload));
+    return await this.orderProductRepository.update(id, this.orderProductRepository.create(orderProductUpdate));
   }
 
 
