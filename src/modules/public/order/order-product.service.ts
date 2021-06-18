@@ -70,7 +70,7 @@ export class OrderProductService {
 
         futureOrderProduct.currentCharge = true;
         futureOrderProduct.startDate = `${startDT.getFullYear()}-${startDT.getMonth() + 1}-01`;
-        futureOrderProduct.endDate = `${endDT.getFullYear()}-${endDT.getMonth() + 1}-${lastDay} 23:59:59`;
+        futureOrderProduct.endDate = `${endDT.getFullYear()}-${endDT.getMonth()}-${lastDay} 23:59:59`;
 
         this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct));
       }
