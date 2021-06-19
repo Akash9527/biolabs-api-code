@@ -1,34 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
-
-describe('AuthService', () => {
-  let service: AuthService;
-
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService],
-    }).compile();
-
-    service = module.get<AuthService>(AuthService);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-});
-
-/*import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '../user';
 import { UsersService } from '../user/user.service'
 import { AuthService } from './auth.service';
-import { JwtSecretRequestType, JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { MasterService } from '../master';
 import { ResidentCompanyService } from '../resident-company';
 import { NotAcceptableException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '../../config';
-import { UserToken } from '../user/user-token.entity';
 import { Hash } from '../../../utils/Hash';
-jest.mock('../../../utils/Hash');
+import { HTTP_CODES } from '../../../utils/httpcode';
 const mockUser: User = {
     id: 1,
     role: 1,
@@ -58,13 +38,16 @@ const mockJwtService = () => ({
     sign: jest.fn()
 })
 const mockMasterService = () => ({})
-const mockResidentCompanyService = () => ({})
+const mockResidentCompanyService = () => ({
+    getResidentCompany: jest.fn()
+})
 let req: Request;
 
 describe('AuthService', () => {
     let authService;
     let usersService;
     let jwtService;
+    let residentCompanyService;
 
 
     beforeEach(async () => {
@@ -83,6 +66,7 @@ describe('AuthService', () => {
         authService = await module.get<AuthService>(AuthService);
         usersService = await module.get<UsersService>(UsersService);
         jwtService = await module.get<JwtService>(JwtService);
+        residentCompanyService = await module.get<ResidentCompanyService>(ResidentCompanyService);
     });
     it('should be defined', () => {
         expect(authService).toBeDefined();
@@ -94,28 +78,31 @@ describe('AuthService', () => {
         it('should be called userService getByEmail method', async () => {
             authService.validateUser(mockLoginPayLoad);
             expect(await usersService.getByEmail).toHaveBeenCalledWith(mockLoginPayLoad.email);
+
         });
-        // it('should validate user', async () => {
-        //     const hashCompareStatic = jest.fn().mockReturnValue(true);
-        //     Hash.compare = hashCompareStatic;
-        //     usersService.getByEmail.mockResolvedValue(mockUser);
-        //     Hash.compare('payload password','user password');
-        //     expect(await authService.validateUser(mockLoginPayLoad)).toMatchObject(mockUser);
-        //     expect(Hash.compare).toHaveBeenCalledWith('payload password','user password');
-        // });
-        it('should be validate User', async () => {
-            await usersService.getByEmail.mockReturnValueOnce(mockUser);
-            let user: User = await usersService.getByEmail();
-            expect(user.email).toEqual(mockLoginPayLoad.email);
-            expect(user.password).toEqual(mockLoginPayLoad.password);
+        it('should validate user', async () => {
+            const hashCompareStatic = jest.fn().mockReturnValue(true);
+            Hash.compare = hashCompareStatic;
+            usersService.getByEmail.mockResolvedValue(mockUser);
+            Hash.compare('payload password', 'user password');
+            expect(await authService.validateUser(mockLoginPayLoad)).toMatchObject(mockUser);
+            expect(Hash.compare).toHaveBeenCalledWith('payload password', 'user password');
+        });
+        it('should validate user and check companyId is present', async () => {
+            usersService.getByEmail.mockResolvedValue(mockUser);
+            let user: User = await authService.validateUser(mockLoginPayLoad);
+            expect(user.companyId).toBe(mockUser.companyId);
+            expect(await residentCompanyService.getResidentCompany).toHaveBeenCalledWith(user.companyId);
         });
         it('should not validate invalid user', async () => {
-            usersService.getByEmail.mockResolvedValue(new UnauthorizedException());
+            const hashCompareStatic = jest.fn().mockReturnValue(false);
+            Hash.compare = hashCompareStatic;
+            usersService.getByEmail.mockResolvedValue(mockUser);
+            Hash.compare('payload password', 'user password');
             try {
                 await authService.validateUser(mockLoginPayLoad);
             } catch (e) {
-                //console.log(e);
-                expect(e.message).toBe('Invalid credentials!');
+                expect(e.response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
                 expect(e.response.error).toBe('Unauthorized');
             }
         });
@@ -189,4 +176,3 @@ describe('AuthService', () => {
         });
     });
 });
-*/
