@@ -52,4 +52,9 @@ export class MasterPayload {
     required: false,
   })
   siteIdArr: number[];
+
+  @ApiProperty({
+    required: false,
+  })
+  role: number;
 }

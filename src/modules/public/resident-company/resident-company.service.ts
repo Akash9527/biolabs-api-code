@@ -25,6 +25,8 @@ import { Request } from 'express';
 import { User } from '../user';
 import { EMAIL } from 'constants/email';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
+import { Notes } from './rc-notes.entity';
+import { AddNotesDto } from './add-notes.dto';
 
 @Injectable()
 export class ResidentCompanyService {
@@ -53,9 +55,11 @@ export class ResidentCompanyService {
     private readonly modalityRepository: Repository<Modality>,
     @InjectRepository(TechnologyStage)
     private readonly technologyStageRepository: Repository<TechnologyStage>,
-    private readonly mail: Mail,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Notes)
+    private readonly notesRepository: Repository<Notes>,
+    private readonly mail: Mail,
   ) { }
   /**
    * Description: This method will get the resident company by id.
@@ -128,12 +132,11 @@ export class ResidentCompanyService {
    * @return resident companies advisor object
    */
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
-    let savedRcAdvisor: object;
     if (payload.id)
-      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
+      await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
     else {
       delete payload.id;
-      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
+      await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
     }
   }
 
@@ -143,12 +146,14 @@ export class ResidentCompanyService {
    * @param companyMember array of companyMember.
    * @param id number of Company id.
    */
-  async residentCompanyAdvisors(companyMembers: [], id: number) {
-    if (companyMembers.length > 0) {
-      for (let i = 0; i < companyMembers.length; i++) {
-        let companyMember: any = companyMembers[i];
-        companyMember.companyId = id;
-        await this.addResidentCompanyAdvisor(companyMember);
+  async residentCompanyAdvisors(Advisors: [], id: number) {
+    if (Advisors.length > 0) {
+      for (let i = 0; i < Advisors.length; i++) {
+        let advisor: any = Advisors[i];
+        advisor.companyId = id;
+        if (this.checkEmptyVal('advisors', advisor)) {
+          await this.addResidentCompanyAdvisor(advisor);
+        }
       }
     }
   }
@@ -171,19 +176,18 @@ export class ResidentCompanyService {
    * @return resident companies management object
    */
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
-    let savedRcManagement: object;
     if (payload.id)
-      savedRcManagement = await this.residentCompanyManagementRepository.update(payload.id, payload);
+      await this.residentCompanyManagementRepository.update(payload.id, payload);
     else {
       delete payload.id;
-      savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
+      await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
     }
   }
 
   /**
    * Description: This method will create the new resident companies managements.
    * @description This method will create the new resident companies managements.
-   * @param companyMember array of companyMember.
+   * @param companyMember array of company magmt Member.
    * @param id number of Company id.
    */
   async residentCompanyManagements(companyMembers: [], id: number) {
@@ -191,7 +195,9 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        let savedRcManagement = await this.addResidentCompanyManagement(companyMember);
+        if (this.checkEmptyVal('managements', companyMember)) {
+          await this.addResidentCompanyManagement(companyMember);
+        }
       }
     }
   }
@@ -203,27 +209,28 @@ export class ResidentCompanyService {
    * @return resident companies technical object
    */
   async addResidentCompanyTechnical(payload: ResidentCompanyTechnicalFillableFields) {
-    let savedRcTechnical: object;
     if (payload.id)
-      savedRcTechnical = await this.residentCompanyTechnicalRepository.update(payload.id, payload);
+      await this.residentCompanyTechnicalRepository.update(payload.id, payload);
     else {
       delete payload.id;
-      savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
+      await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
     }
   }
 
   /**
    * Description: This method will create the new resident companies technicals.
    * @description This method will create the new resident companies technicals.
-   * @param companyMember array of companyMember.
+   * @param companyMember array of technical Member.
    * @param id number of Company id.
    */
-  async residentCompanyTechnicals(companyMembers: [], id: number) {
-    if (companyMembers.length > 0) {
-      for (let i = 0; i < companyMembers.length; i++) {
-        let companyMember: any = companyMembers[i];
-        companyMember.companyId = id;
-        await this.addResidentCompanyTechnical(companyMember);
+  async residentCompanyTechnicals(techMembers: [], id: number) {
+    if (techMembers.length > 0) {
+      for (let i = 0; i < techMembers.length; i++) {
+        let techMember: any = techMembers[i];
+        techMember.companyId = id;
+        if (this.checkEmptyVal('technicals', techMember)) {
+          await this.addResidentCompanyTechnical(techMember);
+        }
       }
     }
   }
@@ -245,7 +252,7 @@ export class ResidentCompanyService {
       );
     }
     let response = {};
-    
+
     try {
       for await (const site of payload.site) {
         payload.site = [site];
@@ -318,9 +325,11 @@ export class ResidentCompanyService {
       .addSelect("s.name", "siteName")
       .addSelect("s.id", "siteId")
       .leftJoin('sites', 's', 's.id = Any(resident_companies.site)')
-      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
-      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] });
 
+    if (siteIdArr && siteIdArr.length) {
+      rcQuery.andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+    }
     if (payload.q && payload.q != '') {
       rcQuery.andWhere("(resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
     }
@@ -683,6 +692,9 @@ export class ResidentCompanyService {
       residentCompany.companyStatus = payload.companyStatus;
       residentCompany.companyVisibility = payload.companyVisibility;
       residentCompany.companyOnboardingStatus = payload.companyOnboardingStatus;
+
+      residentCompany.committeeStatus = payload.committeeStatus;
+      residentCompany.selectionDate = payload.selectionDate;
       if (Number(residentCompany.companyStatus) !== 1)
         residentCompany.companyVisibility = false;
       this.residentCompanyRepository.update(residentCompany.id, residentCompany);
@@ -745,8 +757,8 @@ export class ResidentCompanyService {
    * @description used to convert data into array
    * @param val input value
    */
-  private parseToArray(val){
-    if(typeof val === 'object'){
+  private parseToArray(val) {
+    if (typeof val === 'object') {
       return val;
     }
     return [val];
@@ -759,9 +771,11 @@ export class ResidentCompanyService {
    */
   async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
-      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
-      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] });
 
+    if (siteIdArr && siteIdArr.length) {
+      rcQuery.andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+    }
 
     if (payload.q && payload.q != '') {
       // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` }); 
@@ -801,7 +815,7 @@ export class ResidentCompanyService {
     }
 
     if (payload.minFund >= 0) {
-      rcQuery.andWhere("resident_companies.funding::int >= :minFunding", {​​​​ minFunding: payload.minFund }​​​​);
+      rcQuery.andWhere("resident_companies.funding::int >= :minFunding", { minFunding: payload.minFund });
     }
 
     if (payload.maxFund >= 0) {
@@ -809,11 +823,11 @@ export class ResidentCompanyService {
     }
 
     if (payload.minCompanySize >= 0) {
-      rcQuery.andWhere("resident_companies.\"companySize\"::int >= :minCompanySize", {​​​​ minCompanySize: payload.minCompanySize }​​​​);
+      rcQuery.andWhere("resident_companies.\"companySize\"::int >= :minCompanySize", { minCompanySize: payload.minCompanySize });
     }
 
     if (payload.maxCompanySize >= 0) {
-      rcQuery.andWhere("resident_companies.\"companySize\"::int <= :maxCompanySize", {​​​​ maxCompanySize: payload.maxCompanySize }​​​​);
+      rcQuery.andWhere("resident_companies.\"companySize\"::int <= :maxCompanySize", { maxCompanySize: payload.maxCompanySize });
     }
 
     if (payload.pagination) {
@@ -836,4 +850,82 @@ export class ResidentCompanyService {
     return await rcQuery.getMany();
   }
 
-} 
+  /**
+  * Description: This method is used to create the new note.
+  * @description This method is used to create the new note.
+  * @param req object of type Request
+  * @return note object
+  */
+  async addNote(payload: AddNotesDto, req: any): Promise<any> {
+    const company = await this.residentCompanyRepository.findOne(payload.companyId);
+    const note = new Notes();
+    note.createdBy = req.user.id;
+    note.notes = payload.notes;
+    note.residentCompany = company;
+    return await this.notesRepository.save(await this.notesRepository.create(note));
+  }
+
+  /**
+     * Description: This method is used to get a note information.
+     * @description This method is used to get a note information.
+     * @param id it is a request parameter expect a number value of note id.
+     */
+  async getNote(id: number) {
+    return this.notesRepository.findOne(id);
+  }
+
+  /**
+   * Description: This method is used to get the note by id.
+   * @description This method is used to get the note by id.
+   * @param id number of note id
+   * @return notes object
+   */
+  async getNoteById(id: number) {
+    const note: Notes = await this.getNote(id);
+    if (note) {
+      if (!note.residentCompany) {
+        throw new NotAcceptableException('Note with provided id has no companyId.');
+      }
+      return note;
+    } else {
+      throw new NotAcceptableException('Note with provided id not available.');
+    }
+  }
+
+  /**
+     * Description: This method is used to soft delete the note.
+     * @description This method is used to soft delete the note.
+     * @param id number of note id
+     * @return object of affected rows
+     */
+  async softDeleteNote(id) {
+    const note = await this.getNote(id);
+    if (note) {
+      note.notesStatus = 99;
+      return await this.notesRepository.save(note);
+    } else {
+      throw new NotAcceptableException('Note with provided id not available.');
+    }
+  }
+
+  /**
+   * Description: check for null values in object BIOL-224
+   * @description check for null values in object BIOL-224
+   * @param type type of list like advisors,managements,technicals
+   * @param data data to be saved (for advisors,managements,technicals)
+   */
+  checkEmptyVal(type, data) {
+    if (type == 'advisors' && (data.name || data.title || data.organization)) {
+      return true;
+    } else if (type == 'managements' &&
+      (data.email || data.emergencyExecutivePOC || data.invoicingExecutivePOC || data.joiningAsMember
+        || data.laboratoryExecutivePOC || data.linkedinLink || data.name || data.phone || data.publications || data.title)) {
+      return true;
+    } else if (type == 'technicals' &&
+      (data.email || data.emergencyExecutivePOC || data.invoicingExecutivePOC || data.joiningAsMember
+        || data.laboratoryExecutivePOC || data.linkedinLink || data.name || data.phone || data.publications || data.title)) {
+      return true;
+    }
+    return false;
+  }
+}

@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Param, Post, Body, Query, Put, Request } from '@nestjs/common';
+import { Controller, UseGuards, Get, Param, Post, Body, Query, Put, Request, Delete } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ResidentCompanyService } from '.';
@@ -6,6 +6,7 @@ import { AddResidentCompanyPayload } from './add-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
+import { AddNotesDto } from './add-notes.dto';
 
 @Controller('api/resident-company')
 @ApiTags('Resident Company')
@@ -49,6 +50,10 @@ export class ResidentCompanyController {
     if (req.headers['x-site-id']) {
       siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     }
+    // removing site filter for sponsor user BIOL-224 BIOL-225
+    if (req.user && req.user.role == 3) {
+      siteIdArr = [];
+    }
     return this.residentCompanyService.getResidentCompanies(params, siteIdArr);
   }
 
@@ -65,7 +70,7 @@ export class ResidentCompanyController {
   }
 
   /**
-   * Description: This method is used to upadte a resident company status.
+   * Description: This method is used to update a resident company status.
    * @description This method is used to update a resident company status.
    * @param payload it is a request body contains payload of type UpdateResidentCompanyStatusPayload.
    */
@@ -128,4 +133,49 @@ export class ResidentCompanyController {
   async getResidentCompany(@Param('id') id: number): Promise<any> {
     return this.residentCompanyService.getResidentCompany(id);
   }
+
+  /**
+   * Description: This method is used to get a notes information.
+   * @description This method is used to get a notes information.
+   * @param id it is a request parameter expect a number value of note id.
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('notes/:id')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getNoteById(@Param('id') id: number): Promise<any> {
+    return this.residentCompanyService.getNoteById(id);
+  }
+
+  /**
+     * Description: This method is used to create a new note in the application.
+     * @description This method is used to create a new note in the application.
+     * @param payload it is a request body contains payload of type AddNotesPayload.
+     * @param req this parameter contains the header of the request api.
+     */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Post("/notes")
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async addNote(@Body() payload: AddNotesDto, @Request() req) {
+    return await this.residentCompanyService.addNote(payload, req);
+  }
+
+  /**
+  * Description: This method is used to soft delete a notes in the application.
+  * @description This method is used to soft delete a notes in the application.
+  * @param id it is a request parameter expect a number value of note id.
+  */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Delete('notes/:id')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async softDeleteNote(@Param('id') id: number): Promise<any> {
+    const notes = await this.residentCompanyService.softDeleteNote(id);
+    return notes;
+  }
+
 }
