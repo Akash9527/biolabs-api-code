@@ -132,12 +132,11 @@ export class ResidentCompanyService {
    * @return resident companies advisor object
    */
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
-    let savedRcAdvisor: object;
     if (payload.id)
-      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
+      await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
     else {
       delete payload.id;
-      savedRcAdvisor = await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
+      await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
     }
   }
 
@@ -147,12 +146,14 @@ export class ResidentCompanyService {
    * @param companyMember array of companyMember.
    * @param id number of Company id.
    */
-  async residentCompanyAdvisors(companyMembers: [], id: number) {
-    if (companyMembers.length > 0) {
-      for (let i = 0; i < companyMembers.length; i++) {
-        let companyMember: any = companyMembers[i];
-        companyMember.companyId = id;
-        await this.addResidentCompanyAdvisor(companyMember);
+  async residentCompanyAdvisors(Advisors: [], id: number) {
+    if (Advisors.length > 0) {
+      for (let i = 0; i < Advisors.length; i++) {
+        let advisor: any = Advisors[i];
+        advisor.companyId = id;
+        if (this.checkEmptyVal('advisors', advisor)) {
+          await this.addResidentCompanyAdvisor(advisor);
+        }
       }
     }
   }
@@ -175,19 +176,18 @@ export class ResidentCompanyService {
    * @return resident companies management object
    */
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
-    let savedRcManagement: object;
     if (payload.id)
-      savedRcManagement = await this.residentCompanyManagementRepository.update(payload.id, payload);
+      await this.residentCompanyManagementRepository.update(payload.id, payload);
     else {
       delete payload.id;
-      savedRcManagement = await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
+      await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
     }
   }
 
   /**
    * Description: This method will create the new resident companies managements.
    * @description This method will create the new resident companies managements.
-   * @param companyMember array of companyMember.
+   * @param companyMember array of company magmt Member.
    * @param id number of Company id.
    */
   async residentCompanyManagements(companyMembers: [], id: number) {
@@ -195,7 +195,9 @@ export class ResidentCompanyService {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
         companyMember.companyId = id;
-        let savedRcManagement = await this.addResidentCompanyManagement(companyMember);
+        if (this.checkEmptyVal('managements', companyMember)) {
+          await this.addResidentCompanyManagement(companyMember);
+        }
       }
     }
   }
@@ -207,27 +209,28 @@ export class ResidentCompanyService {
    * @return resident companies technical object
    */
   async addResidentCompanyTechnical(payload: ResidentCompanyTechnicalFillableFields) {
-    let savedRcTechnical: object;
     if (payload.id)
-      savedRcTechnical = await this.residentCompanyTechnicalRepository.update(payload.id, payload);
+      await this.residentCompanyTechnicalRepository.update(payload.id, payload);
     else {
       delete payload.id;
-      savedRcTechnical = await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
+      await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
     }
   }
 
   /**
    * Description: This method will create the new resident companies technicals.
    * @description This method will create the new resident companies technicals.
-   * @param companyMember array of companyMember.
+   * @param companyMember array of technical Member.
    * @param id number of Company id.
    */
-  async residentCompanyTechnicals(companyMembers: [], id: number) {
-    if (companyMembers.length > 0) {
-      for (let i = 0; i < companyMembers.length; i++) {
-        let companyMember: any = companyMembers[i];
-        companyMember.companyId = id;
-        await this.addResidentCompanyTechnical(companyMember);
+  async residentCompanyTechnicals(techMembers: [], id: number) {
+    if (techMembers.length > 0) {
+      for (let i = 0; i < techMembers.length; i++) {
+        let techMember: any = techMembers[i];
+        techMember.companyId = id;
+        if (this.checkEmptyVal('technicals', techMember)) {
+          await this.addResidentCompanyTechnical(techMember);
+        }
       }
     }
   }
@@ -315,9 +318,11 @@ export class ResidentCompanyService {
       .addSelect("s.name", "siteName")
       .addSelect("s.id", "siteId")
       .leftJoin('sites', 's', 's.id = Any(resident_companies.site)')
-      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
-      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] });
 
+    if (siteIdArr && siteIdArr.length) {
+      rcQuery.andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+    }
     if (payload.q && payload.q != '') {
       rcQuery.andWhere("(resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` });
     }
@@ -759,9 +764,11 @@ export class ResidentCompanyService {
    */
   async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
-      .where("resident_companies.status IN (:...status)", { status: [1, 0] })
-      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+      .where("resident_companies.status IN (:...status)", { status: [1, 0] });
 
+    if (siteIdArr && siteIdArr.length) {
+      rcQuery.andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+    }
 
     if (payload.q && payload.q != '') {
       // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` }); 
@@ -892,5 +899,26 @@ export class ResidentCompanyService {
     } else {
       throw new NotAcceptableException('Note with provided id not available.');
     }
+  }
+
+  /**
+   * Description: check for null values in object
+   * @description check for null values in object
+   * @param type type of list like advisors,managements,technicals
+   * @param data data to be saved (for advisors,managements,technicals)
+   */
+  checkEmptyVal(type, data) {
+    if (type == 'advisors' && (data.name || data.title || data.organization)) {
+      return true;
+    } else if (type == 'managements' &&
+      (data.email || data.emergencyExecutivePOC || data.invoicingExecutivePOC || data.joiningAsMember
+        || data.laboratoryExecutivePOC || data.linkedinLink || data.name || data.phone || data.publications || data.title)) {
+      return true;
+    } else if (type == 'technicals' &&
+      (data.email || data.emergencyExecutivePOC || data.invoicingExecutivePOC || data.joiningAsMember
+        || data.laboratoryExecutivePOC || data.linkedinLink || data.name || data.phone || data.publications || data.title)) {
+      return true;
+    }
+    return false;
   }
 }

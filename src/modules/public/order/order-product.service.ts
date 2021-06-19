@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { constants } from 'node:crypto';
 import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
@@ -144,7 +143,7 @@ export class OrderProductService {
           startDate: product.startDate,
           endDate: product.endDate
         }
-        const productData = await this.orderProductRepository.findOne(product.id);
+        await this.orderProductRepository.findOne(product.id);
         await this.orderProductRepository.update(product.id, this.orderProductRepository.create(futureOrderProduct));
       }
     }

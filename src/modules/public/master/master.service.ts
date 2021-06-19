@@ -46,6 +46,7 @@ export class MasterService {
     let search: any = {};
     let skip;
     let take;
+    // filtering site list. Use payload.role if role is required.
     if (payload.siteIdArr) {
       payload.siteIdArr = this.parseToArray(payload.siteIdArr);
       search = {id: In(payload.siteIdArr)};
@@ -619,7 +620,7 @@ export class MasterService {
   /**
    * Description: This method will return the committee status type list.
    * @description This method will return the committee status type list.
-   * @return array of user type object
+   * @return array of COMMITTEE_STATUS object
    */
   getCommitteeStatus() {
     return COMMITTEE_STATUS;
