@@ -13,7 +13,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
 
-const appRoot = require('app-root-path'); 
 @Module({
   imports: [
     ScheduleModule.forRoot(),

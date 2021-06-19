@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Notes } from './rc-notes.entity';
 
 /**
  * -1 = De-active
@@ -11,6 +12,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
  */
 type status_enum = '-1' | '0' | '1' | '99';
 type company_status = '0' | '1' | '2' | '3' | '4' | '5';
+type committee_status = '0' | '1' | '2' | '3';
 
 @Entity({
   name: 'resident_companies',
@@ -188,6 +190,14 @@ export class ResidentCompany {
   @Column({ length: 255, nullable: true })
   logoImgUrl: string;
 
+  @Column({nullable:true})
+  committeeStatus: committee_status;
+
+  @UpdateDateColumn({ type: 'timestamptz'})
+  selectionDate: Date;
+
+ @OneToMany(() => Notes , (notes) => notes.residentCompany)
+  notes?: Notes[];
 }
 
 export class ResidentCompanyFillableFields {
