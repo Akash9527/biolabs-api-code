@@ -902,8 +902,8 @@ export class ResidentCompanyService {
   }
 
   /**
-   * Description: check for null values in object
-   * @description check for null values in object
+   * Description: check for null values in object BIOL-224
+   * @description check for null values in object BIOL-224
    * @param type type of list like advisors,managements,technicals
    * @param data data to be saved (for advisors,managements,technicals)
    */
