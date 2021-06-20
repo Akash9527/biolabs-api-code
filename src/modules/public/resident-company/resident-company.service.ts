@@ -284,6 +284,9 @@ export class ResidentCompanyService {
    * @param companyName name of the company for which application is submitted.
    */
   private async sendEmailToSiteAdmin(site: any, req, companyName: string) {
+    let siteAdminEmails = [];
+    let userInfo;
+
     let siteAdmin: any = await this.userRepository
       .createQueryBuilder('users')
       .select('users.email', 'email')
@@ -293,17 +296,21 @@ export class ResidentCompanyService {
       .andWhere("s.id = Any(:siteArray)", { siteArray: site })
       .groupBy('users.email')
       .getRawMany();
-
+    
     for (let i = 0; i < siteAdmin.length; i++) {
-      let tenant = { tenantEmail: siteAdmin[i]['email'] };
-      let userInfo = {
+      siteAdminEmails.push({
+        emailAddress: {
+          address: siteAdmin[i]['email']
+        },
+      });
+      userInfo = {
         token: req.headers.authorization,
         company_name: companyName,
         site_name: siteAdmin[i]['siteName'],
         origin: req.headers['origin'],
       };
-      this.mail.sendEmail(tenant, EMAIL.SUBJECT_FORM, 'applicationFormSubmit', userInfo);
     }
+    this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, 'applicationFormSubmit', userInfo);
   }
 
   /**
