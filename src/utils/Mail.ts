@@ -585,15 +585,7 @@ export class Mail {
                      </body>
                   </html>`,
                },
-               toRecipients: [
-                  {
-                     emailAddress: {
-                        address: tenant.tenantEmail
-                           ? tenant.tenantEmail
-                           : tenant.officialEmail,
-                     },
-                  },
-               ],
+               toRecipients: tenant,
                ccRecipients: [],
             },
          };
