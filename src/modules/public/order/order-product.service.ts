@@ -38,7 +38,6 @@ export class OrderProductService {
       orderProduct.endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${lastDay} 23:59:59`;
     }
 
-
     /**
      * **********************************End*************************************
      */
@@ -60,14 +59,14 @@ export class OrderProductService {
       for (let i = 1; i <= 3; i++) {
 
         let futureOrderProduct = { ...orderProduct };
-        let tDate = new Date();
+        let sDate = new Date(futureOrderProduct.startDate);
 
-        const startDT = new Date(tDate.setMonth(tDate.getMonth() + i));
+        const startDT = new Date(sDate.setMonth(sDate.getMonth() + i));
         const lastDay = new Date(startDT.getFullYear(), startDT.getMonth() + 1, 0).getDate();
 
         futureOrderProduct.currentCharge = true;
         futureOrderProduct.startDate = `${startDT.getFullYear()}-${startDT.getMonth() + 1}-01`;
-        futureOrderProduct.endDate = `${startDT.getFullYear()}-${startDT.getMonth()+1}-${lastDay} 23:59:59`;
+        futureOrderProduct.endDate = `${startDT.getFullYear()}-${startDT.getMonth() + 1}-${lastDay} 23:59:59`;
 
         this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct));
       }
@@ -159,10 +158,10 @@ export class OrderProductService {
    * @returns 
    */
   async fetchOrderProductsBetweenDates(startDate: string, endDate: string, companyId: number) {
- 
+
     return await this.orderProductRepository.createQueryBuilder("order_product")
       .where("order_product.companyId = :companyId", { companyId: companyId })
-      .andWhere("order_product.endDate <= :endDate", {  endDate: endDate+' 23:59:59' })
+      .andWhere("order_product.endDate <= :endDate", { endDate: endDate + ' 23:59:59' })
       .andWhere("order_product.startDate >= :startDate", { startDate: startDate })
       .getRawMany();
 
@@ -174,12 +173,12 @@ export class OrderProductService {
    * @returns  
    */
   async deleteOrderProduct(id: number) {
-    
+
     const orderProduct = await this.orderProductRepository.findByIds([id]);
     const deleteProducts = await this.orderProductRepository.find({
       productName: orderProduct[0].productName,
-      status : 0,
-      startDate : MoreThanOrEqual(orderProduct[0].startDate),
+      status: 0,
+      startDate: MoreThanOrEqual(orderProduct[0].startDate),
     });
     for await (const product of deleteProducts) {
       await this.orderProductRepository.delete(product.id);

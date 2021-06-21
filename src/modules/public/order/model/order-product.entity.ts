@@ -18,7 +18,7 @@ export class OrderProduct {
   @Column({ length: 510, nullable: true })
   productName: string;
 
-  @Column({ length: 510, nullable: true })
+  @Column({ length: 510, nullable: false })
   productDescription: string;
 
   @Column({ nullable: true })
