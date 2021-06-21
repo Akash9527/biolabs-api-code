@@ -37,13 +37,13 @@ export class Mail {
          });
    }
 
-   private sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
+   private async sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
       let userTxt = tenant && tenant.role && tenant.role == 3 ? 'Insight' : 'Connect';
       let siteNamesList = ""
 
       if (userInfo && userInfo.site_name) {
          var siteNames = userInfo.site_name.split(",")
-         siteNames.forEach(siteName => {
+         await siteNames.forEach(siteName => {
             siteNamesList += '<li>' + siteName + '</li>';
          });
       }
@@ -549,7 +549,7 @@ export class Mail {
                                                                   <tr style="border-collapse:collapse">
                                                                      <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
                                                                         <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">A new application from <strong>${userInfo.company_name}</strong> has been submitted to the following sites: 
-                                                                        ,<br><ul style="color=#000000;">${siteNamesList}</ul><br><br><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Please click the link below to view this application.</p>
+                                                                        <br><ul style="color=#000000;">${siteNamesList}</ul><br><br><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Please click the link below to view this application.</p>
                                                                      </td>
                                                                   </tr>
                                                                   

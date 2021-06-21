@@ -135,17 +135,17 @@ export class ResidentCompanyController {
   }
 
   /**
-   * Description: This method is used to get a notes information.
-   * @description This method is used to get a notes information.
-   * @param id it is a request parameter expect a number value of note id.
+   * Description: This method is used to get a notes information by companyId.
+   * @description This method is used to get a notes information by companyId.
+   * @param companyId it is a request parameter expect a number value of companyId.
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  @Get('notes/:id')
+  @Get('notes/:companyId')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getNoteById(@Param('id') id: number): Promise<any> {
-    return this.residentCompanyService.getNoteById(id);
+  async getNoteByCompanyId(@Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getNoteByCompanyId(companyId);
   }
 
   /**

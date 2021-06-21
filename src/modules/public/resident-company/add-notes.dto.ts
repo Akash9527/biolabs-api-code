@@ -7,10 +7,10 @@ export class AddNotesDto {
     @IsNumber()
     companyId: number
 
-    @ApiProperty({ description: 'The id of creater' })
-    @IsNotEmpty()
-    @IsNumber()
-    createdBy: number;
+    // @ApiProperty({ description: 'The id of creater' })
+    // @IsNotEmpty()
+    // @IsNumber()
+    // createdBy: number;
 
     @ApiProperty({ description: 'The note' })
     @IsNotEmpty()
