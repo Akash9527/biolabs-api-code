@@ -163,7 +163,7 @@ export class OrderProductService {
       .where("order_product.companyId = :companyId", { companyId: companyId })
       .andWhere("order_product.endDate <= :endDate", { endDate: endDate + ' 23:59:59' })
       .andWhere("order_product.startDate >= :startDate", { startDate: startDate })
-      .orderBy("rder_product.updatedAt", 'DESC')
+      .orderBy("order_product.updatedAt", 'DESC')
       .getRawMany();
 
   }
