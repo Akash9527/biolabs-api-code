@@ -297,20 +297,21 @@ export class ResidentCompanyService {
       .groupBy('users.email')
       .getRawMany();
     
-    for (let i = 0; i < siteAdmin.length; i++) {
+    for await (const admin of siteAdmin) {
       siteAdminEmails.push({
         emailAddress: {
-          address: siteAdmin[i]['email']
+          address: admin['email']
         },
       });
       userInfo = {
         token: req.headers.authorization,
         company_name: companyName,
-        site_name: siteAdmin[i]['siteName'],
+        site_name: admin['siteName'],
         origin: req.headers['origin'],
       };
     }
-    this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, 'applicationFormSubmit', userInfo);
+
+    await this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, 'applicationFormSubmit', userInfo);
   }
 
   /**
@@ -870,26 +871,28 @@ export class ResidentCompanyService {
      * @description This method is used to get a note information.
      * @param id it is a request parameter expect a number value of note id.
      */
-  async getNote(id: number) {
-    return this.notesRepository.findOne(id);
+  async getNoteById(id: number) {
+    return await this.notesRepository.findOne(id);
   }
 
   /**
-   * Description: This method is used to get the note by id.
-   * @description This method is used to get the note by id.
+   * Description: This method is used to get the note by companyId.
+   * @description This method is used to get the note by companyId.
    * @param id number of note id
    * @return notes object
    */
-  async getNoteById(id: number) {
-    const note: Notes = await this.getNote(id);
-    if (note) {
-      if (!note.residentCompany) {
-        throw new NotAcceptableException('Note with provided id has no companyId.');
-      }
-      return note;
-    } else {
-      throw new NotAcceptableException('Note with provided id not available.');
-    }
+  async getNoteByCompanyId(companyId: number) {
+    return await this.notesRepository
+      .createQueryBuilder('notes')
+      .select('notes.id', 'id')
+      .addSelect("notes.createdAt", 'createdAt')
+      .addSelect("notes.notes", "notes")
+      .addSelect("usr.firstName", "firstname")
+      .addSelect("usr.lastName", "lastname")
+      .leftJoin('users', 'usr', 'usr.id = notes.createdBy')
+      .where('notes.notesStatus = 1')
+      .andWhere("notes.residentCompanyId = :residentCompanyId", { residentCompanyId: companyId })
+      .getRawMany();
   }
 
   /**
@@ -899,7 +902,7 @@ export class ResidentCompanyService {
      * @return object of affected rows
      */
   async softDeleteNote(id) {
-    const note = await this.getNote(id);
+    const note = await this.getNoteById(id);
     if (note) {
       note.notesStatus = 99;
       return await this.notesRepository.save(note);
