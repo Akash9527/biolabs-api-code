@@ -37,13 +37,13 @@ export class Mail {
          });
    }
 
-   private sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
+   private async sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
       let userTxt = tenant && tenant.role && tenant.role == 3 ? 'Insight' : 'Connect';
       let siteNamesList = ""
 
       if (userInfo && userInfo.site_name) {
          var siteNames = userInfo.site_name.split(",")
-         siteNames.forEach(siteName => {
+         await siteNames.forEach(siteName => {
             siteNamesList += '<li>' + siteName + '</li>';
          });
       }
