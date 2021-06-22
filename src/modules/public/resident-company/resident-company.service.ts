@@ -881,7 +881,7 @@ export class ResidentCompanyService {
    * @param id number of note id
    * @return notes object
    */
-  async getNoteByCompanyId(companyId: number) {
+  async getNoteByCompanyId(companyId) {
     return await this.notesRepository
       .createQueryBuilder('notes')
       .select('notes.id', 'id')
@@ -892,6 +892,7 @@ export class ResidentCompanyService {
       .leftJoin('users', 'usr', 'usr.id = notes.createdBy')
       .where('notes.notesStatus = 1')
       .andWhere("notes.residentCompanyId = :residentCompanyId", { residentCompanyId: companyId })
+      .orderBy("notes.createdAt", "DESC")
       .getRawMany();
   }
 
