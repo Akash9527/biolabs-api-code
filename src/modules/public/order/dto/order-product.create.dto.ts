@@ -67,4 +67,16 @@ export class CreateOrderProductDto {
   })
   endDate: string;
 
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  startDtNull: boolean;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  endDtNull: boolean;
+
 }

@@ -44,6 +44,12 @@ export class OrderProduct {
 
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt: number;
+
+  @Column({ default: false })
+  startDtNull: boolean;
+  
+  @Column({ default: false })
+  endDtNull: boolean;
 }
 
 export class OrderProductFillableFields {
@@ -54,4 +60,6 @@ export class OrderProductFillableFields {
   startDate: number;
   endDate: number;
   quantity : number;
+  startDtNull : boolean;
+  endDtNull : boolean;
 }
