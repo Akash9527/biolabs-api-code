@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 type company_status = '0' | '1' | '2' | '3' | '4' | '5';
+type committeeStatus = '0' | '1' | '2' | '3';
 
 export class ListResidentCompanyPayload {
   @ApiProperty({
@@ -36,6 +37,11 @@ export class ListResidentCompanyPayload {
   @ApiProperty({
     required: false,
   })
+  committeeStatus: committeeStatus;
+
+  @ApiProperty({
+    required: false,
+  })
   companyVisibility: boolean;
 
   @ApiProperty({
@@ -57,6 +63,5 @@ export class ListResidentCompanyPayload {
     required: false,
   })
   sortOrder: string;
-
 
 }
