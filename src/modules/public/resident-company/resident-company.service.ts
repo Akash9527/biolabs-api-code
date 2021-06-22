@@ -296,7 +296,7 @@ export class ResidentCompanyService {
       .andWhere("s.id = Any(:siteArray)", { siteArray: site })
       .groupBy('users.email')
       .getRawMany();
-    
+
     for await (const admin of siteAdmin) {
       siteAdminEmails.push({
         emailAddress: {

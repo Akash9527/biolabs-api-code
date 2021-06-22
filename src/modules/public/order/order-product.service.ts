@@ -20,15 +20,23 @@ export class OrderProductService {
    * @return saved order product object
    */
   async addOrderProduct(orderProduct: CreateOrderProductDto) {
+
     /**
     * ***********************setting Default Dates***********************
     */
-    let startDate, endDate, todayDate = new Date();
+    let startDate = new Date();
+    let endDate = new Date();
+    const todayDate = new Date();
+    orderProduct.startDtNull = false;
+    orderProduct.endDtNull = false;
 
     // Setting StartDate
     if (!orderProduct.startDate) {
       startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
       orderProduct.startDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-1`;
+      orderProduct.startDtNull = true;
+    } else if (isNaN(Date.parse(orderProduct.startDate.trim()))) {
+      return 'Prodvide correct date formate';
     }
 
     // Setting End Date
@@ -36,12 +44,14 @@ export class OrderProductService {
       endDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
       const lastDay = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
       orderProduct.endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${lastDay} 23:59:59`;
+      orderProduct.endDtNull = true;
+    } else if (isNaN(Date.parse(orderProduct.startDate.trim()))) {
+      return 'Prodvide correct date formate';
     }
 
     /**
      * **********************************End*************************************
      */
-
     if (!orderProduct.startDate || !orderProduct.endDate || ((new Date(orderProduct.startDate) < (new Date(`${todayDate.getMonth() + 1}/01/${todayDate.getFullYear()} 00:00:00`)))
       || (new Date(orderProduct.endDate) < new Date(orderProduct.startDate)))) {
       return { error: 'Please Select Valid Start Date and End Date' };
@@ -85,12 +95,20 @@ export class OrderProductService {
     /**
     * ***********************setting Default Dates***********************
     */
-    let startDate, endDate = new Date();
-
+    let startDate = new Date();
+    let endDate = new Date();
+    payload.startDtNull = false;
+    payload.endDtNull = false;
     // Setting StartDate
     if (!payload.startDate) {
+      if (!isNaN(Date.parse(payload.startDate.trim()))) {
+        return 'Prodvide correct date formate';
+      }
       startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
       payload.startDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-1`;
+      payload.startDtNull = true;
+    } else if (isNaN(Date.parse(payload.startDate.trim()))) {
+      return 'Prodvide correct date formate';
     }
 
     // Setting End Date
@@ -98,23 +116,25 @@ export class OrderProductService {
       endDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
       const lastDay = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
       payload.endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${lastDay} 23:59:59`;
+      payload.endDtNull = true;
+    } else if (isNaN(Date.parse(payload.endDate.trim()))) {
+      return 'Prodvide correct date formate';
     }
-
-
     /**
      * **********************************End*************************************
      */
-
     const orderProduct = await this.orderProductRepository.findOne(id);
 
     const orderProductUpdate = {
-      productDescription: payload.productDescription ? payload.productDescription : orderProduct.productDescription,
+      productDescription: payload.productDescription,
       cost: payload.cost ? payload.cost : orderProduct.cost,
       quantity: payload.quantity ? payload.quantity : orderProduct.quantity,
       recurrence: payload.recurrence,
       currentCharge: payload.currentCharge,
-      startDate: new Date(payload.startDate),
-      endDate: new Date(payload.endDate)
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+      startDtNull: payload.startDtNull,
+      endDtNull: payload.endDtNull,
     }
 
     let ed = orderProduct.endDate;
@@ -132,6 +152,11 @@ export class OrderProductService {
       }
     } else {
       for await (const product of futureProducts) {
+        let futureSd = new Date(product.startDate.getFullYear(), product.startDate.getMonth(), 1);
+        payload.startDate = `${futureSd.getFullYear()}-${futureSd.getMonth() + 1}-1`;
+
+        const lastDay = new Date(futureSd.getFullYear(), futureSd.getMonth() + 1, 0).getDate();
+        payload.endDate = `${futureSd.getFullYear()}-${futureSd.getMonth() + 1}-${lastDay} 23:59:59`;
 
         let futureOrderProduct = {
           productDescription: payload.productDescription,
@@ -140,16 +165,15 @@ export class OrderProductService {
           recurrence: payload.recurrence,
           currentCharge: payload.currentCharge,
           startDate: product.startDate,
-          endDate: product.endDate
+          endDate: product.endDate,
+          startDtNull: false,
+          endDtNull: false
         }
-        await this.orderProductRepository.findOne(product.id);
-        await this.orderProductRepository.update(product.id, this.orderProductRepository.create(futureOrderProduct));
+        await this.orderProductRepository.update(product.id, futureOrderProduct);
       }
     }
-    return await this.orderProductRepository.update(id, this.orderProductRepository.create(orderProductUpdate));
+    return await this.orderProductRepository.update(id, orderProductUpdate);
   }
-
-
 
   /**
    * @description This method will fetch the order products between given start date and end date

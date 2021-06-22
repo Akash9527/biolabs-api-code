@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UpdateOrderProductDto {
 
   @ApiProperty({
-    required: true,
+    required: false,
   })
   productDescription: string;
 
@@ -42,5 +42,17 @@ export class UpdateOrderProductDto {
     nullable: true,
   })
   endDate: string;
+  
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  startDtNull: boolean;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  endDtNull: boolean;
 
 }
