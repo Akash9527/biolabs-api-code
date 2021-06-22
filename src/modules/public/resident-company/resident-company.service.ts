@@ -719,15 +719,15 @@ export class ResidentCompanyService {
     const residentCompany: any = await this.residentCompanyRepository.findOne({
       where: { id: payload.id }
     });
-
-    const residentCompanyEmailChk: any = await this.residentCompanyRepository.findOne({
-      where: { id: Not(payload.id), email: payload.email }
-    });
-    if (residentCompanyEmailChk) {
-      throw new NotAcceptableException(
-        'User with provided email already existed.',
-      );
-    }
+    // Not needed anymore because we are saving multiple instance of same application based on siteId
+    // const residentCompanyEmailChk: any = await this.residentCompanyRepository.findOne({
+    //   where: { id: Not(payload.id), email: payload.email }
+    // });
+    // if (residentCompanyEmailChk) {
+    //   throw new NotAcceptableException(
+    //     'User with provided email already existed.',
+    //   );
+    // }
     if (residentCompany) {
       const companyMembers: any = (payload.companyMembers) ? JSON.parse(JSON.stringify(payload.companyMembers)) : [];
       const companyAdvisors: any = (payload.companyAdvisors) ? JSON.parse(JSON.stringify(payload.companyAdvisors)) : [];
