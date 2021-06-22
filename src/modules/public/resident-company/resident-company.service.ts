@@ -511,7 +511,7 @@ export class ResidentCompanyService {
   async getRcMembers(id) {
     if (id) {
       return await this.residentCompanyManagementRepository.find({
-        where: { companyId: id },
+        where: { companyId: id, status: 0 },
       });
     }
     return []
@@ -526,7 +526,7 @@ export class ResidentCompanyService {
   async getRcAdvisors(id) {
     if (id) {
       return await this.residentCompanyAdvisoryRepository.find({
-        where: { companyId: id },
+        where: { companyId: id, status: 0 },
       });
     }
     return []
@@ -541,7 +541,7 @@ export class ResidentCompanyService {
   async getRcTechnicalTeams(id) {
     if (id) {
       return await this.residentCompanyTechnicalRepository.find({
-        where: { companyId: id },
+        where: { companyId: id, status: 0 },
       });
     }
     return [];
@@ -933,5 +933,33 @@ export class ResidentCompanyService {
       return true;
     }
     return false;
+  }
+
+   /**
+   * Description: This method is used to soft delete the list(for advisors,managements,technicals).
+   * @description This method is used to soft delete the list(for advisors,managements,technicals).
+   * @param id member id
+   * @return object of affected rows
+   */
+  async softDeleteMember(id, type: string) {
+    let repo;
+    if (type == 'advisors') {
+      repo = this.residentCompanyAdvisoryRepository;
+    }
+    if (type == 'managements') {
+      repo = this.residentCompanyManagementRepository;
+    }
+    if (type == 'technicals') {
+      repo = this.residentCompanyTechnicalRepository;
+    }
+    const item = await repo.findOne({
+      where: { id: id }
+    });
+    if (item) {
+      item.status = '99';
+      return await repo.save(item);
+    } else {
+      throw new NotAcceptableException('Member with provided id not available.');
+    }
   }
 }

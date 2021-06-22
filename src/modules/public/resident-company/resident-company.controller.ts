@@ -178,4 +178,19 @@ export class ResidentCompanyController {
     return notes;
   }
 
+  /**
+  * Description: This method is used to soft delete the list(for advisors,managements,technicals).
+  * @description This method is used to soft delete the list(for advisors,managements,technicals).
+  * @param id it is a request parameter expect a number value of member id.
+  * @param type it is a request parameter expect a string value of list type(for advisors,managements,technicals).
+  */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Delete('member-list/:id/:type')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async softDeleteList(@Param('id') id: number, @Param('type') type: string): Promise<any> {
+    const member = await this.residentCompanyService.softDeleteMember(id, type);
+    return member;
+  }
 }
