@@ -35,7 +35,7 @@ export class OrderProductService {
       startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
       orderProduct.startDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-1`;
       orderProduct.startDtNull = true;
-    } else if(!isNaN(Date.parse(orderProduct.startDate.trim()))) {
+    } else if (isNaN(Date.parse(orderProduct.startDate.trim()))) {
       return 'Prodvide correct date formate';
     }
 
@@ -45,7 +45,7 @@ export class OrderProductService {
       const lastDay = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
       orderProduct.endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${lastDay} 23:59:59`;
       orderProduct.endDtNull = true;
-    } else if(!isNaN(Date.parse(orderProduct.startDate.trim()))) {
+    } else if (isNaN(Date.parse(orderProduct.startDate.trim()))) {
       return 'Prodvide correct date formate';
     }
 
@@ -74,8 +74,6 @@ export class OrderProductService {
         const startDT = new Date(sDate.setMonth(sDate.getMonth() + i));
         const lastDay = new Date(startDT.getFullYear(), startDT.getMonth() + 1, 0).getDate();
 
-        futureOrderProduct.startDtNull = false;
-        futureOrderProduct.endDtNull = false;
         futureOrderProduct.currentCharge = true;
         futureOrderProduct.startDate = `${startDT.getFullYear()}-${startDT.getMonth() + 1}-01`;
         futureOrderProduct.endDate = `${startDT.getFullYear()}-${startDT.getMonth() + 1}-${lastDay} 23:59:59`;
@@ -99,7 +97,6 @@ export class OrderProductService {
     */
     let startDate = new Date();
     let endDate = new Date();
-    const todayDate = new Date();
     payload.startDtNull = false;
     payload.endDtNull = false;
     // Setting StartDate
@@ -110,17 +107,18 @@ export class OrderProductService {
       startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
       payload.startDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-1`;
       payload.startDtNull = true;
+    } else if (isNaN(Date.parse(payload.startDate.trim()))) {
+      return 'Prodvide correct date formate';
     }
 
     // Setting End Date
     if (!payload.endDate) {
-      if (!isNaN(Date.parse(payload.endDate.trim()))) {
-        return 'Prodvide correct date formate';
-      }
       endDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
       const lastDay = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
       payload.endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${lastDay} 23:59:59`;
       payload.endDtNull = true;
+    } else if (isNaN(Date.parse(payload.endDate.trim()))) {
+      return 'Prodvide correct date formate';
     }
     /**
      * **********************************End*************************************
@@ -128,13 +126,13 @@ export class OrderProductService {
     const orderProduct = await this.orderProductRepository.findOne(id);
 
     const orderProductUpdate = {
-      productDescription: payload.productDescription ? payload.productDescription : orderProduct.productDescription,
+      productDescription: payload.productDescription,
       cost: payload.cost ? payload.cost : orderProduct.cost,
       quantity: payload.quantity ? payload.quantity : orderProduct.quantity,
       recurrence: payload.recurrence,
       currentCharge: payload.currentCharge,
-      startDate: new Date(payload.startDate),
-      endDate: new Date(payload.endDate),
+      startDate: payload.startDate,
+      endDate: payload.endDate,
       startDtNull: payload.startDtNull,
       endDtNull: payload.endDtNull,
     }
@@ -154,6 +152,11 @@ export class OrderProductService {
       }
     } else {
       for await (const product of futureProducts) {
+        let futureSd = new Date(product.startDate.getFullYear(), product.startDate.getMonth(), 1);
+        payload.startDate = `${futureSd.getFullYear()}-${futureSd.getMonth() + 1}-1`;
+
+        const lastDay = new Date(futureSd.getFullYear(), futureSd.getMonth() + 1, 0).getDate();
+        payload.endDate = `${futureSd.getFullYear()}-${futureSd.getMonth() + 1}-${lastDay} 23:59:59`;
 
         let futureOrderProduct = {
           productDescription: payload.productDescription,
@@ -166,14 +169,11 @@ export class OrderProductService {
           startDtNull: false,
           endDtNull: false
         }
-
         await this.orderProductRepository.update(product.id, futureOrderProduct);
       }
     }
     return await this.orderProductRepository.update(id, orderProductUpdate);
   }
-
-
 
   /**
    * @description This method will fetch the order products between given start date and end date

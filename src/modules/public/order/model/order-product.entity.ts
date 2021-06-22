@@ -18,7 +18,7 @@ export class OrderProduct {
   @Column({ length: 510, nullable: false })
   productName: string;
 
-  @Column({ length: 510 , nullable: true })
+  @Column({ length: 510, nullable: true })
   productDescription: string;
 
   @Column({ nullable: true })
@@ -47,7 +47,7 @@ export class OrderProduct {
 
   @Column({ default: false })
   startDtNull: boolean;
-  
+
   @Column({ default: false })
   endDtNull: boolean;
 }
@@ -59,7 +59,7 @@ export class OrderProductFillableFields {
   currentCharge: boolean;
   startDate: number;
   endDate: number;
-  quantity : number;
-  startDtNull : boolean;
-  endDtNull : boolean;
+  quantity: number;
+  startDtNull: boolean;
+  endDtNull: boolean;
 }
