@@ -15,10 +15,10 @@ export class OrderProduct {
   @Column({ nullable: false })
   status: number;
 
-  @Column({ length: 510, nullable: true })
+  @Column({ length: 510, nullable: false })
   productName: string;
 
-  @Column({ length: 510, nullable: true })
+  @Column({ length: 510 , nullable: true })
   productDescription: string;
 
   @Column({ nullable: true })

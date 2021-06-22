@@ -11,10 +11,11 @@ import { Site } from './site.entity';
 import { TechnologyStage } from './technology-stage.entity';
 import { COMPANY_STATUS } from '../../../constants/company-status';
 import { USER_TYPE } from '../../../constants/user-type';
+import { COMMITTEE_STATUS } from 'constants/committee_status';
+
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
 type status_enum = '-1' | '0' | '1' | '99';
-
 
 @Injectable()
 export class MasterService {
@@ -45,6 +46,7 @@ export class MasterService {
     let search: any = {};
     let skip;
     let take;
+    // filtering site list. Use payload.role if role is required.
     if (payload.siteIdArr) {
       payload.siteIdArr = this.parseToArray(payload.siteIdArr);
       search = {id: In(payload.siteIdArr)};
@@ -613,5 +615,14 @@ export class MasterService {
       return val;
     }
     return [Number(val)];
+  }
+
+  /**
+   * Description: This method will return the committee status type list.
+   * @description This method will return the committee status type list.
+   * @return array of COMMITTEE_STATUS object
+   */
+  getCommitteeStatus() {
+    return COMMITTEE_STATUS;
   }
 }

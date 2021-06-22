@@ -27,21 +27,26 @@ export class Mail {
          },
          data: data,
       };
-      // console.log("config logging",config);
       return await axios(config)
          .then(function (response) {
-            // console.log(response);
             return response.data;
          })
          .catch(function (error) {
             if (error)
-               console.log('error=====>', error.message);
               return;
          });
    }
 
-   private sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
+   private async sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
       let userTxt = tenant && tenant.role && tenant.role == 3 ? 'Insight' : 'Connect';
+      let siteNamesList = ""
+
+      if (userInfo && userInfo.site_name) {
+         var siteNames = userInfo.site_name.split(",")
+         await siteNames.forEach(siteName => {
+            siteNamesList += '<li>' + siteName + '</li>';
+         });
+      }
 
       let data;
       if (content == 'forgotMail') {
@@ -427,7 +432,7 @@ export class Mail {
                },
             });
          }
-      } else if (content == 'formSubmit'){
+      } else if (content == 'applicationFormSubmit'){
          data = {
             message: {
                subject: subject,
@@ -544,7 +549,7 @@ export class Mail {
                                                                   <tr style="border-collapse:collapse">
                                                                      <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
                                                                         <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">A new application from <strong>${userInfo.company_name}</strong> has been submitted to the following sites: 
-                                                                        ,<br><ul style="color=#000000;"><li style="color=#000000"><strong color="#000000">${userInfo.site_name}</strong></li></ul><br><br><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Please click the link below to view this application.</p>
+                                                                        <br><ul style="color=#000000;">${siteNamesList}</ul><br><br><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Please click the link below to view this application.</p>
                                                                      </td>
                                                                   </tr>
                                                                   
@@ -580,15 +585,7 @@ export class Mail {
                      </body>
                   </html>`,
                },
-               toRecipients: [
-                  {
-                     emailAddress: {
-                        address: tenant.tenantEmail
-                           ? tenant.tenantEmail
-                           : tenant.officialEmail,
-                     },
-                  },
-               ],
+               toRecipients: tenant,
                ccRecipients: [],
             },
          };
@@ -600,7 +597,6 @@ export class Mail {
             });
          }
       }
-      // console.log("=========>",token,"=========>")
       let authToken = token['token_type'] + ' ' + token['access_token'];
       axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
       axios.defaults.headers.post['Authorization'] = authToken;

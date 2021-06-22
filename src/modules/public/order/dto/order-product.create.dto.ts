@@ -26,7 +26,6 @@ export class CreateOrderProductDto {
   @ApiProperty({
     required: true,
   })
-  @IsNotEmpty()
   productDescription: string;
 
   @ApiProperty({

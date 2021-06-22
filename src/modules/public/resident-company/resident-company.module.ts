@@ -20,8 +20,8 @@ import { ResidentCompanyController } from './resident-company.controller';
 import { PassportModule } from '@nestjs/passport';
 import { ResidentCompanyHistory } from './resident-company-history.entity';
 import { User } from '../user';
-// import { Mail } from 'utils/Mail';
 import { Mail } from '../../../utils/Mail';
+import { Notes } from './rc-notes.entity';
 
 @Module({
   imports: [
@@ -38,7 +38,8 @@ import { Mail } from '../../../utils/Mail';
       Modality,
       Site,
       TechnologyStage,
-      User
+      User,
+      Notes
     ]),
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
