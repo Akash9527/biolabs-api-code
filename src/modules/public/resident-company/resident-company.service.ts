@@ -343,7 +343,9 @@ export class ResidentCompanyService {
     if (typeof payload.companyOnboardingStatus !== 'undefined') {
       rcQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: payload.companyOnboardingStatus });
     }
-
+    if (typeof payload.committeeStatus !== 'undefined') {
+      rcQuery.andWhere("resident_companies.committeeStatus = :committeeStatus", { committeeStatus: payload.committeeStatus });
+    }
     if (payload.pagination) {
       let skip = 0;
       let take = 10;
