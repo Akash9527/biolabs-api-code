@@ -343,7 +343,9 @@ export class ResidentCompanyService {
     if (typeof payload.companyOnboardingStatus !== 'undefined') {
       rcQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: payload.companyOnboardingStatus });
     }
-
+    if (typeof payload.committeeStatus !== 'undefined') {
+      rcQuery.andWhere("resident_companies.committeeStatus = :committeeStatus", { committeeStatus: payload.committeeStatus });
+    }
     if (payload.pagination) {
       let skip = 0;
       let take = 10;
@@ -881,7 +883,7 @@ export class ResidentCompanyService {
    * @param id number of note id
    * @return notes object
    */
-  async getNoteByCompanyId(companyId: number) {
+  async getNoteByCompanyId(companyId) {
     return await this.notesRepository
       .createQueryBuilder('notes')
       .select('notes.id', 'id')
@@ -892,6 +894,7 @@ export class ResidentCompanyService {
       .leftJoin('users', 'usr', 'usr.id = notes.createdBy')
       .where('notes.notesStatus = 1')
       .andWhere("notes.residentCompanyId = :residentCompanyId", { residentCompanyId: companyId })
+      .orderBy("notes.createdAt", "DESC")
       .getRawMany();
   }
 
