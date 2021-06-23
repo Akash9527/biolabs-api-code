@@ -189,7 +189,7 @@ export class ResidentCompanyController {
   @Delete('member-list/:id/:type')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async softDeleteList(@Param('id') id: number, @Param('type') type: string): Promise<any> {
+  async softDeleteMember(@Param('id') id: number, @Param('type') type: string): Promise<any> {
     const member = await this.residentCompanyService.softDeleteMember(id, type);
     return member;
   }
