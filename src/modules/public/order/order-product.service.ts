@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { equals } from 'class-validator';
 import { MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
@@ -103,8 +102,6 @@ export class OrderProductService {
     /**
     * ***********************setting Default Dates***********************
     */
-
-    let todayDate = new Date();
     // Setting StartDate
     if (isNaN(Date.parse(payload.startDate.trim()))) {
       return 'Prodvide correct date formate';
