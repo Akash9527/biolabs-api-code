@@ -42,6 +42,18 @@ export class CreateOrderProductDto {
   quantity: number;
 
   @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  productId: number;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  month: number;
+
+  @ApiProperty({
     required: true,
     nullable: true,
   })
@@ -71,12 +83,6 @@ export class CreateOrderProductDto {
     required: false,
     nullable: true,
   })
-  startDtNull: boolean;
-
-  @ApiProperty({
-    required: false,
-    nullable: true,
-  })
-  endDtNull: boolean;
+  manuallyEnteredProduct: boolean;
 
 }
