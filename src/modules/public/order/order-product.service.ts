@@ -23,13 +23,13 @@ export class OrderProductService {
 
     const todayDate = new Date();
     // checking StartDate
-    if (orderProduct.startDate && isNaN(Date.parse(orderProduct.startDate.trim()))) {
-      return 'Prodvide correct date formate';
+    if (orderProduct.startDate && isNaN(Date.parse(orderProduct.startDate))) {
+      return { message: 'Prodvide correct date formate', status: 'error' };
     }
 
     // checking End Date
-    if (orderProduct.endDate && isNaN(Date.parse(orderProduct.endDate.trim()))) {
-      return 'Prodvide correct date formate';
+    if (orderProduct.endDate && isNaN(Date.parse(orderProduct.endDate))) {
+      return { message: 'Prodvide correct date formate', status: 'error' };
     }
 
     //date Validation
@@ -58,14 +58,14 @@ export class OrderProductService {
         let futureOrderProduct = { ...orderProduct };
         futureOrderProduct.month = orderProduct.month + i;
         futureOrderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
-        this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
+        await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
           throw new HttpException({
             message: err.message
           }, HttpStatus.BAD_REQUEST);
         });
       }
     }
-    return { message: 'Added successfully', status: true };
+    return { message: 'Added successfully', status: 'success' };
   }
 
   /**
@@ -80,13 +80,13 @@ export class OrderProductService {
     * ***********************setting Default Dates***********************
     */
     // Setting StartDate
-    if (isNaN(Date.parse(payload.startDate.trim()))) {
-      return 'Prodvide correct date formate';
+    if (payload.startDate && isNaN(Date.parse(payload.startDate))) {
+      return { message: 'Prodvide correct date formate', status: 'error' };
     }
 
     // Setting End Date
-    if (isNaN(Date.parse(payload.endDate.trim()))) {
-      return 'Prodvide correct date formate';
+    if (payload.endDate && isNaN(Date.parse(payload.endDate))) {
+      return { message: 'Prodvide correct date formate', status: 'error' };
     }
     /**
      * **********************************End*************************************
@@ -96,10 +96,9 @@ export class OrderProductService {
         message: err.message
       }, HttpStatus.BAD_REQUEST);
     });
-
     const futureProducts = await this.orderProductRepository.find({
       where: {
-        productName: orderProduct.productName,
+        productId: orderProduct.id,
         status: 0,
         month: MoreThanOrEqual(orderProduct.month),
       }
@@ -128,6 +127,7 @@ export class OrderProductService {
         });
       }
     }
+
     return await this.orderProductRepository.update(id, payload).catch(err => {
       throw new HttpException({
         message: err.message
