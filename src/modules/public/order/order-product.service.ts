@@ -56,7 +56,6 @@ export class OrderProductService {
       for (let i = 1; i <= 3; i++) {
 
         let futureOrderProduct = { ...orderProduct };
-        futureOrderProduct.currentCharge = (futureOrderProduct.endDate) ? false : orderProduct.currentCharge;
         futureOrderProduct.month = orderProduct.month + i;
         futureOrderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
         this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
