@@ -5,6 +5,11 @@ export class UpdateOrderProductDto {
   @ApiProperty({
     required: false,
   })
+  productName: string;
+
+  @ApiProperty({
+    required: false,
+  })
   productDescription: string;
 
   @ApiProperty({
@@ -12,7 +17,7 @@ export class UpdateOrderProductDto {
     nullable: true,
   })
   cost: number;
-  
+
   @ApiProperty({
     required: false,
     nullable: true,
@@ -36,23 +41,29 @@ export class UpdateOrderProductDto {
     nullable: true,
   })
   startDate: string;
-  
+
   @ApiProperty({
     required: true,
     nullable: true,
   })
   endDate: string;
-  
-  @ApiProperty({
-    required: false,
-    nullable: true,
-  })
-  startDtNull: boolean;
 
   @ApiProperty({
     required: false,
     nullable: true,
   })
-  endDtNull: boolean;
+  productId: number;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  month: number;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  manuallyEnteredProduct: boolean;
 
 }
