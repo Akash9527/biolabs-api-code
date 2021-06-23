@@ -21,18 +21,6 @@ export class OrderProductService {
    */
   async addOrderProduct(orderProduct: CreateOrderProductDto) {
 
-
-    const product = await this.orderProductRepository.find({
-      productName: orderProduct.productName,
-      month: orderProduct.month
-    });
-
-    if (product.length > 0) {
-      throw new HttpException({
-        message: `Product with ${orderProduct.productName} name is already exist`
-      }, HttpStatus.BAD_REQUEST);
-    }
-
     const todayDate = new Date();
     // checking StartDate
     if (orderProduct.startDate && isNaN(Date.parse(orderProduct.startDate.trim()))) {
@@ -68,7 +56,6 @@ export class OrderProductService {
       for (let i = 1; i <= 3; i++) {
 
         let futureOrderProduct = { ...orderProduct };
-        futureOrderProduct.currentCharge = (futureOrderProduct.endDate) ? false : orderProduct.currentCharge;
         futureOrderProduct.month = orderProduct.month + i;
         futureOrderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
         this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
@@ -89,16 +76,6 @@ export class OrderProductService {
    */
   async updateOrderProduct(id: number, payload: UpdateOrderProductDto) {
 
-    const product = await this.orderProductRepository.find({
-      productName: payload.productName,
-      month: payload.month
-    });
-
-    if (product.length > 0) {
-      throw new HttpException({
-        message: `Product with ${payload.productName} name is already exist`
-      }, HttpStatus.BAD_REQUEST);
-    }
     /**
     * ***********************setting Default Dates***********************
     */
