@@ -290,7 +290,7 @@ export class ResidentCompanyService {
         const savedRc = await this.residentCompanyRepository.save(newRc);
         if (savedRc.id) {
           const historyData: any = JSON.parse(JSON.stringify(savedRc));
-          historyData.companyId = historyData.id;
+          historyData.companyId = savedRc.id;
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
         }
@@ -728,6 +728,10 @@ export class ResidentCompanyService {
 
       residentCompany.committeeStatus = payload.committeeStatus;
       residentCompany.selectionDate = payload.selectionDate;
+      // Checking companyStatusChangeDate is the instanceof Date, then only update.
+      if (payload.companyStatusChangeDate && payload.companyStatusChangeDate instanceof Date) {
+        residentCompany.companyStatusChangeDate = payload.companyStatusChangeDate;
+      }
       if (Number(residentCompany.companyStatus) !== 1) {
         residentCompany.companyOnboardingStatus = false;
         residentCompany.companyVisibility = false;
@@ -775,7 +779,7 @@ export class ResidentCompanyService {
       await this.residentCompanyTechnicals(companyTechnicalTeams, residentCompany.id);
 
       const historyData: any = JSON.parse(JSON.stringify(payload));
-      historyData.companyId = historyData.id;
+      historyData.companyId = residentCompany.id;
       delete historyData.id;
 
       await this.residentCompanyHistoryRepository.save(historyData);

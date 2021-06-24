@@ -80,6 +80,9 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateResidentCompanyStatus(@Body() payload: UpdateResidentCompanyStatusPayload): Promise<any> {
+    if (payload.companyStatusChangeDate) {
+      payload.companyStatusChangeDate = new Date();
+    }
     return this.residentCompanyService.updateResidentCompanyStatus(payload);
   }
 
