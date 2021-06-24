@@ -66,4 +66,5 @@ export class OrderProductFillableFields {
   startDate: number;
   endDate: number;
   quantity: number;
+  manuallyEnteredProduct: boolean;
 }
