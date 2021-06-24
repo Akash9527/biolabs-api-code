@@ -39,10 +39,10 @@ export class OrderProduct {
   @Column({ default: false })
   currentCharge: boolean;
 
-  @Column({ nullable: true, type: 'timestamptz' })
+  @Column({ nullable: true, type: 'timestamp' })
   startDate: Date;
 
-  @Column({ nullable: true, type: 'timestamptz' })
+  @Column({ nullable: true, type: 'timestamp' })
   endDate: Date;
 
   @CreateDateColumn({ type: "timestamp" })
