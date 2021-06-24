@@ -728,6 +728,7 @@ export class ResidentCompanyService {
 
       residentCompany.committeeStatus = payload.committeeStatus;
       residentCompany.selectionDate = payload.selectionDate;
+      residentCompany.companyStatusChangeDate = payload.companyStatusChangeDate;
       if (Number(residentCompany.companyStatus) !== 1) {
         residentCompany.companyOnboardingStatus = false;
         residentCompany.companyVisibility = false;
