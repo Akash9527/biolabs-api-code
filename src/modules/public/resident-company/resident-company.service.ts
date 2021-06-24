@@ -998,4 +998,48 @@ export class ResidentCompanyService {
       throw new NotAcceptableException('Member with provided id not available.');
     }
   }
+
+  /**
+   * @description This method returns stages of technology by siteId
+   * @param siteId The Site id
+   * @returns stages of technology
+   */
+  async getStagesOfTechnologyBySiteId(siteId: number) {
+    const response = {};
+    const queryStr = " SELECT rch.\"companyStage\" as \"stageId\", ts.name as \"stageName\", " +
+      " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
+      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
+      " FROM public.resident_company_history as rch " +
+      " LEFT JOIN technology_stages as ts ON ts.id = rch.\"companyStage\" " +
+      " WHERE rch.\"site\" = \'{ " + siteId + "}\' " +
+      " group by rch.\"companyStage\", ts.name, " +
+      " extract(quarter from rch.\"createdAt\"), " +
+      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
+      " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
+    const compResidentHistory = await this.residentCompanyHistoryRepository.query(queryStr);
+    response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
+    return response;
+  }
+
+  /**
+   * @description This method returns fundings by siteId and companyId
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns fundings
+   */
+  async getFundingBySiteIdAndCompanyId(siteId: number, companyId: number) {
+    const response = {};
+    const queryStr = " SELECT AVG(\"funding\" ::Decimal) as \"Funding\", " +
+      " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
+      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
+      " FROM public.resident_company_history as rch " +
+      " WHERE rch.\"site\" = \'{" + siteId + "}\' " +
+      " group by " +
+      " extract(quarter from rch.\"createdAt\"), " +
+      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
+      " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
+    const fundigs = await this.residentCompanyHistoryRepository.query(queryStr);
+    response['fundings'] = (!fundigs) ? 0 : fundigs;
+    return response;
+  }
 }
