@@ -13,6 +13,9 @@ export class Product {
   @Column({ nullable: true })
   description: string;
 
+  @Column({ default: false })
+  recurrence: boolean;
+  
   @Column({ nullable: true })
   cost: number;
 
@@ -25,11 +28,14 @@ export class Product {
   @Column({ enum: ['1', '99'], default: '1' })
   productStatus: number;
 
+  @Column("int", { array: true, nullable: true })
+  siteId: number;
+
   @CreateDateColumn({ type: "timestamp" })
-  createdAt: number;
+  createdAt: Date;
 
   @UpdateDateColumn({ type: "timestamp" })
-  modifiedAt: number;
+  modifiedAt: Date;
 }
 
 export class ProductFillableFields {
