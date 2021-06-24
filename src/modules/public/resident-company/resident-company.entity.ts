@@ -232,6 +232,7 @@ export class ResidentCompanyFillableFields {
   preferredMoveIn: number;
   status: status_enum;
   companyStatus: company_status;
+  committeeStatus: committee_status;
   companyVisibility: boolean;
   companyOnboardingStatus: boolean;
   elevatorPitch: string;

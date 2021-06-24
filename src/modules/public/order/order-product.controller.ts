@@ -50,8 +50,8 @@ export class OrderProductController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiQuery({ name: 'companyId', required: true, type: 'string' })
-  async fetchOrderProductsBetweenDates(@Query('companyId') companyId: number, @Query('startDate') startDate: string, @Query('endDate') endDate: string): Promise<any> {
-    return await this.orderProductService.fetchOrderProductsBetweenDates(startDate, endDate, companyId);
+  async fetchOrderProductsBetweenDates(@Query('companyId') companyId: number, @Query('month') month: number): Promise<any> {
+    return await this.orderProductService.fetchOrderProductsBetweenDates(month, companyId);
   }
 
 
