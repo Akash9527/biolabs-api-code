@@ -39,13 +39,13 @@ export class Mail {
 
    private async sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
       let userTxt = tenant && tenant.role && tenant.role == 3 ? 'Insight' : 'Connect';
-      let siteNamesList = ""
+      let siteNamesList = '';
 
       if (userInfo && userInfo.site_name) {
          var siteNames = userInfo.site_name.split(",")
-         await siteNames.forEach(siteName => {
-            siteNamesList += '<li>' + siteName + '</li>';
-         });
+         for(let i =0; i<siteNames.length; i++) {
+            siteNamesList += '<li>' + siteNames[i] + '</li>';
+         }
       }
 
       let data;
@@ -600,7 +600,7 @@ export class Mail {
       let authToken = token['token_type'] + ' ' + token['access_token'];
       axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
       axios.defaults.headers.post['Authorization'] = authToken;
-      axios.post(process.env.APPSETTING_MICROSOFT_EMAIL_ENDPOINT_MAIL, data)
+      await axios.post(process.env.APPSETTING_MICROSOFT_EMAIL_ENDPOINT_MAIL, data)
          .then((response) => {
             return response.data;
          })
@@ -618,6 +618,6 @@ export class Mail {
       const tokenGraphAPI = await this.getGrapAPIToken();
 
       /** Graph API Send Email implementation */
-      this.sendEmailGraphAPI(tenant, tokenGraphAPI, subject, content, userInfo);
+      await this.sendEmailGraphAPI(tenant, tokenGraphAPI, subject, content, userInfo);
    }
 }

@@ -26,7 +26,6 @@ export class CreateOrderProductDto {
   @ApiProperty({
     required: true,
   })
-  @IsNotEmpty()
   productDescription: string;
 
   @ApiProperty({
@@ -41,6 +40,18 @@ export class CreateOrderProductDto {
     nullable: true,
   })
   quantity: number;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  productId: number;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  month: number;
 
   @ApiProperty({
     required: true,
@@ -67,5 +78,11 @@ export class CreateOrderProductDto {
     nullable: true,
   })
   endDate: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  manuallyEnteredProduct: boolean;
 
 }
