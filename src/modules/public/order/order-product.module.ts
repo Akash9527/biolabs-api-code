@@ -4,13 +4,16 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '../../config';
 import { OrderProduct } from './model/order-product.entity';
+import { Product } from './model/product.entity';
 import { OrderProductController } from './order-product.controller';
 import { OrderProductService } from './order-product.service';
+import { ProductController } from './product.controller';
+import { ProductService } from './product.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      OrderProduct,
+      OrderProduct,Product
     ]),
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -32,8 +35,8 @@ import { OrderProductService } from './order-product.service';
       inject: [ConfigService],
     }),
   ],
-  controllers: [OrderProductController],
-  exports: [OrderProductService],
-  providers: [OrderProductService],
+  controllers: [OrderProductController,ProductController],
+  exports: [OrderProductService,ProductService],
+  providers: [OrderProductService,ProductService],
 })
 export class OrderProductModule {}
