@@ -36,6 +36,7 @@ export class UpdateResidentCompanyStatusPayload {
 
   @ApiProperty({
     required: false,
+    nullable: true
   })
   companyStatusChangeDate: Date;
 }

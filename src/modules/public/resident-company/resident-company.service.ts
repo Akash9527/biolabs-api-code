@@ -728,7 +728,10 @@ export class ResidentCompanyService {
 
       residentCompany.committeeStatus = payload.committeeStatus;
       residentCompany.selectionDate = payload.selectionDate;
-      residentCompany.companyStatusChangeDate = payload.companyStatusChangeDate;
+      // Checking companyStatusChangeDate is the instanceof Date, then only update.
+      if (payload.companyStatusChangeDate && payload.companyStatusChangeDate instanceof Date) {
+        residentCompany.companyStatusChangeDate = payload.companyStatusChangeDate;
+      }
       if (Number(residentCompany.companyStatus) !== 1) {
         residentCompany.companyOnboardingStatus = false;
         residentCompany.companyVisibility = false;
