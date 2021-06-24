@@ -728,8 +728,10 @@ export class ResidentCompanyService {
 
       residentCompany.committeeStatus = payload.committeeStatus;
       residentCompany.selectionDate = payload.selectionDate;
-      if (Number(residentCompany.companyStatus) !== 1)
+      if (Number(residentCompany.companyStatus) !== 1) {
+        residentCompany.companyOnboardingStatus = false;
         residentCompany.companyVisibility = false;
+      }
       this.residentCompanyRepository.update(residentCompany.id, residentCompany);
       return residentCompany;
     } else {
