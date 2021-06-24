@@ -61,8 +61,12 @@ export class ProductController {
   @Get(':name')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async fetchProducts(@Param('name') name: string): Promise<any> {
-    return await this.productService.getProducts(name);
+  async fetchProducts(@Param('name') name: string, @Request() req): Promise<any> {
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return await this.productService.getProductsByName(name, siteIdArr);
   }
 
   /**

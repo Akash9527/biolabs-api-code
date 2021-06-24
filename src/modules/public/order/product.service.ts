@@ -36,11 +36,12 @@ export class ProductService {
        * @param productName is product name
        * @return products object
        */
-    async getProducts(payloadName: string): Promise<any> {
+    async getProductsByName(payloadName: string, siteId: number[]): Promise<any> {
         return await this.productRepository
             .createQueryBuilder("product")
             .where("product.name ILike :name", { name: `%${payloadName}%` })
             .andWhere("product.productStatus=1")
+            .andWhere("product.siteId IN (:...siteId)", { siteId: [siteId] })
             .getRawMany();
     }
 
