@@ -196,6 +196,9 @@ export class ResidentCompany {
   @UpdateDateColumn({ type: 'timestamptz'})
   selectionDate: Date;
 
+  @UpdateDateColumn({nullable: true , type: 'timestamptz'})
+  companyStatusChangeDate: Date;
+
  @OneToMany(() => Notes , (notes) => notes.residentCompany)
   notes?: Notes[];
 }
