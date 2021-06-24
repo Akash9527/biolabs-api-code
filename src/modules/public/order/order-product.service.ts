@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThanOrEqual, Repository } from 'typeorm';
+import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { OrderProduct } from './model/order-product.entity';
@@ -102,7 +102,7 @@ export class OrderProductService {
       where: {
         productId: pId,
         status: 0,
-        month: MoreThanOrEqual(orderProduct.month),
+        month: MoreThan(orderProduct.month),
       }
     }).catch(err => {
       throw new HttpException({
