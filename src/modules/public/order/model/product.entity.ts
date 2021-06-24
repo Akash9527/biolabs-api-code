@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({
   name: 'product',
@@ -16,12 +16,20 @@ export class Product {
   @Column({ nullable: true })
   cost: number;
 
-  @CreateDateColumn({ type: "timestamp" })
-  createdAt: number;
-
   @Column({ nullable: false })
   createdBy: number;
 
+  @Column({ nullable: false })
+  modifiedBy: number;
+
+  @Column({ enum: ['1', '99'], default: '1' })
+  productStatus: number;
+
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt: number;
+
+  @UpdateDateColumn({ type: "timestamp" })
+  modifiedAt: number;
 }
 
 export class ProductFillableFields {

@@ -66,7 +66,5 @@ export class OrderProductFillableFields {
   startDate: number;
   endDate: number;
   quantity: number;
-  startDtNull: boolean;
-  endDtNull: boolean;
   manuallyEnteredProduct: boolean;
 }
