@@ -33,10 +33,10 @@ export class OrderProduct {
   @Column({ default: false })
   currentCharge: boolean;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ nullable: true, type: 'timestamptz' })
   startDate: Date;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ nullable: true, type: 'timestamptz' })
   endDate: Date;
 
   @CreateDateColumn({ type: "timestamp" })
@@ -53,5 +53,5 @@ export class OrderProductFillableFields {
   currentCharge: boolean;
   startDate: number;
   endDate: number;
-  quantity : number;
+  quantity: number;
 }
