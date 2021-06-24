@@ -290,7 +290,7 @@ export class ResidentCompanyService {
         const savedRc = await this.residentCompanyRepository.save(newRc);
         if (savedRc.id) {
           const historyData: any = JSON.parse(JSON.stringify(savedRc));
-          historyData.companyId = savedRc.id;
+          historyData.comnpanyId = savedRc.id;
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
         }
