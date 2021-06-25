@@ -14,7 +14,7 @@ export class AddProductDto {
     })
     @IsNotEmpty()
     recurrence: boolean;
-    
+
     @ApiProperty({
         required: true,
         nullable: false,
@@ -25,8 +25,6 @@ export class AddProductDto {
         required: false,
         nullable: true,
     })
-    @IsNotEmpty()
     description: string;
-
 
 }
