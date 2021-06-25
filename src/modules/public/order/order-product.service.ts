@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThanOrEqual, Repository } from 'typeorm';
+import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { OrderProduct } from './model/order-product.entity';
@@ -96,11 +96,13 @@ export class OrderProductService {
         message: err.message
       }, HttpStatus.BAD_REQUEST);
     });
+
+    const pId = (orderProduct.productId) ? orderProduct.productId : id;
     const futureProducts = await this.orderProductRepository.find({
       where: {
-        productId: orderProduct.id,
+        productId: pId,
         status: 0,
-        month: MoreThanOrEqual(orderProduct.month),
+        month: MoreThan(orderProduct.month),
       }
     }).catch(err => {
       throw new HttpException({
@@ -160,8 +162,9 @@ export class OrderProductService {
 
     const orderProductArray = await this.orderProductRepository.findByIds([id]);
     const orderProduct = orderProductArray[0];
+    const pId = (orderProduct.productId) ? orderProduct.productId : id;
     const deleteProducts = await this.orderProductRepository.find({
-      productName: orderProduct.productName,
+      productId: pId,
       status: 0,
       month: MoreThanOrEqual(orderProduct.month)
     });
