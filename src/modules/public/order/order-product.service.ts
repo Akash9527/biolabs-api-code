@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
@@ -20,31 +20,22 @@ export class OrderProductService {
    * @return saved order product object
    */
   async addOrderProduct(orderProduct: CreateOrderProductDto) {
-    /**
-    * ***********************setting Default Dates***********************
-    */
-    let startDate, endDate, todayDate = new Date();
 
-    // Setting StartDate
-    if (!orderProduct.startDate) {
-      startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-      orderProduct.startDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-1`;
+    const todayDate = new Date();
+    // checking StartDate
+    if (orderProduct.startDate && isNaN(Date.parse(orderProduct.startDate))) {
+      return { message: 'Prodvide correct date formate', status: 'error' };
     }
 
-    // Setting End Date
-    if (!orderProduct.endDate) {
-      endDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
-      const lastDay = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
-      orderProduct.endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${lastDay} 23:59:59`;
+    // checking End Date
+    if (orderProduct.endDate && isNaN(Date.parse(orderProduct.endDate))) {
+      return { message: 'Prodvide correct date formate', status: 'error' };
     }
 
-    /**
-     * **********************************End*************************************
-     */
-
-    if (!orderProduct.startDate || !orderProduct.endDate || ((new Date(orderProduct.startDate) < (new Date(`${todayDate.getMonth() + 1}/01/${todayDate.getFullYear()} 00:00:00`)))
-      || (new Date(orderProduct.endDate) < new Date(orderProduct.startDate)))) {
-      return { error: 'Please Select Valid Start Date and End Date' };
+    //date Validation
+    if ((orderProduct.startDate && ((new Date(orderProduct.startDate) < (new Date(`${todayDate.getMonth() + 1}/01/${todayDate.getFullYear()} 00:00:00`))) ||
+      (orderProduct.startDate && orderProduct.endDate && (new Date(orderProduct.endDate) < new Date(orderProduct.startDate)))))) {
+      return { error: 'Please Select Valid Start Date and End Date' }
     }
 
     /**
@@ -52,6 +43,12 @@ export class OrderProductService {
      */
     // Set status "0" invoice not created
     orderProduct.status = 0;
+    const orderSave = await this.orderProductRepository.save(this.orderProductRepository.create(orderProduct)).catch(err => {
+      throw new HttpException({
+        message: err.message
+      }, HttpStatus.BAD_REQUEST);
+    });
+
     if (orderProduct.recurrence) {
       /**
        * Add next 3 months Products
@@ -59,19 +56,16 @@ export class OrderProductService {
       for (let i = 1; i <= 3; i++) {
 
         let futureOrderProduct = { ...orderProduct };
-        let sDate = new Date(futureOrderProduct.startDate);
-
-        const startDT = new Date(sDate.setMonth(sDate.getMonth() + i));
-        const lastDay = new Date(startDT.getFullYear(), startDT.getMonth() + 1, 0).getDate();
-
-        futureOrderProduct.currentCharge = true;
-        futureOrderProduct.startDate = `${startDT.getFullYear()}-${startDT.getMonth() + 1}-01`;
-        futureOrderProduct.endDate = `${startDT.getFullYear()}-${startDT.getMonth() + 1}-${lastDay} 23:59:59`;
-
-        this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct));
+        futureOrderProduct.month = orderProduct.month + i;
+        futureOrderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
+        await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
+          throw new HttpException({
+            message: err.message
+          }, HttpStatus.BAD_REQUEST);
+        });
       }
     }
-    return await this.orderProductRepository.save(this.orderProductRepository.create(orderProduct));
+    return { message: 'Added successfully', status: 'success' };
   }
 
   /**
@@ -85,71 +79,63 @@ export class OrderProductService {
     /**
     * ***********************setting Default Dates***********************
     */
-    let startDate, endDate = new Date();
-
     // Setting StartDate
-    if (!payload.startDate) {
-      startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-      payload.startDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-1`;
+    if (payload.startDate && isNaN(Date.parse(payload.startDate))) {
+      return { message: 'Prodvide correct date formate', status: 'error' };
     }
 
     // Setting End Date
-    if (!payload.endDate) {
-      endDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
-      const lastDay = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
-      payload.endDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${lastDay} 23:59:59`;
+    if (payload.endDate && isNaN(Date.parse(payload.endDate))) {
+      return { message: 'Prodvide correct date formate', status: 'error' };
     }
-
-
     /**
      * **********************************End*************************************
      */
+    const orderProduct = await this.orderProductRepository.findOne(id).catch(err => {
+      throw new HttpException({
+        message: err.message
+      }, HttpStatus.BAD_REQUEST);
+    });
 
-    const orderProduct = await this.orderProductRepository.findOne(id);
-
-    const orderProductUpdate = {
-      productDescription: payload.productDescription ? payload.productDescription : orderProduct.productDescription,
-      cost: payload.cost ? payload.cost : orderProduct.cost,
-      quantity: payload.quantity ? payload.quantity : orderProduct.quantity,
-      recurrence: payload.recurrence,
-      currentCharge: payload.currentCharge,
-      startDate: new Date(payload.startDate),
-      endDate: new Date(payload.endDate)
-    }
-
-    let ed = orderProduct.endDate;
-    ed = new Date(new Date(ed.setDate(ed.getDate() + 1)).setHours(0, 0, 0, 0));
+    const pId = (orderProduct.productId) ? orderProduct.productId : id;
     const futureProducts = await this.orderProductRepository.find({
       where: {
-        productName: orderProduct.productName,
+        productId: pId,
         status: 0,
-        endDate: MoreThan(ed),
+        month: MoreThan(orderProduct.month),
       }
+    }).catch(err => {
+      throw new HttpException({
+        message: err.message
+      }, HttpStatus.BAD_REQUEST);
     });
     if (!payload.recurrence) {
       for await (const product of futureProducts) {
-        await this.orderProductRepository.delete(product.id);
+        await this.orderProductRepository.delete(product.id).catch(err => {
+          throw new HttpException({
+            message: err.message
+          }, HttpStatus.BAD_REQUEST);
+        });
       }
     } else {
       for await (const product of futureProducts) {
-
-        let futureOrderProduct = {
-          productDescription: payload.productDescription,
-          cost: payload.cost,
-          quantity: payload.quantity,
-          recurrence: payload.recurrence,
-          currentCharge: payload.currentCharge,
-          startDate: product.startDate,
-          endDate: product.endDate
-        }
-        await this.orderProductRepository.findOne(product.id);
-        await this.orderProductRepository.update(product.id, this.orderProductRepository.create(futureOrderProduct));
+        let futureOrderProduct = { ...payload };
+        futureOrderProduct.month = product.month;
+        futureOrderProduct.productId = product.productId;
+        await this.orderProductRepository.update(product.id, futureOrderProduct).catch(err => {
+          throw new HttpException({
+            message: err.message
+          }, HttpStatus.BAD_REQUEST);
+        });
       }
     }
-    return await this.orderProductRepository.update(id, this.orderProductRepository.create(orderProductUpdate));
+
+    return await this.orderProductRepository.update(id, payload).catch(err => {
+      throw new HttpException({
+        message: err.message
+      }, HttpStatus.BAD_REQUEST);
+    });
   }
-
-
 
   /**
    * @description This method will fetch the order products between given start date and end date
@@ -157,12 +143,11 @@ export class OrderProductService {
    * @param endDate 
    * @returns 
    */
-  async fetchOrderProductsBetweenDates(startDate: string, endDate: string, companyId: number) {
+  async fetchOrderProductsBetweenDates(month: number, companyId: number) {
 
     return await this.orderProductRepository.createQueryBuilder("order_product")
       .where("order_product.companyId = :companyId", { companyId: companyId })
-      .andWhere("order_product.endDate <= :endDate", { endDate: endDate + ' 23:59:59' })
-      .andWhere("order_product.startDate >= :startDate", { startDate: startDate })
+      .andWhere("order_product.month = :month", { month: month })
       .orderBy("order_product.updatedAt", 'DESC')
       .getRawMany();
 
@@ -175,11 +160,13 @@ export class OrderProductService {
    */
   async deleteOrderProduct(id: number) {
 
-    const orderProduct = await this.orderProductRepository.findByIds([id]);
+    const orderProductArray = await this.orderProductRepository.findByIds([id]);
+    const orderProduct = orderProductArray[0];
+    const pId = (orderProduct.productId) ? orderProduct.productId : id;
     const deleteProducts = await this.orderProductRepository.find({
-      productName: orderProduct[0].productName,
+      productId: pId,
       status: 0,
-      startDate: MoreThanOrEqual(orderProduct[0].startDate),
+      month: MoreThanOrEqual(orderProduct.month)
     });
     for await (const product of deleteProducts) {
       await this.orderProductRepository.delete(product.id);

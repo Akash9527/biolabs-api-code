@@ -11,6 +11,12 @@ export class OrderProduct {
   @Column({ nullable: false })
   companyId: number;
 
+  @Column({ nullable: true })
+  productId: number;
+
+  @Column({ nullable: true })
+  month: number;
+
   // Status will be "0" if invoice is not created, "1" if invoice is created. 
   @Column({ nullable: false })
   status: number;
@@ -18,7 +24,7 @@ export class OrderProduct {
   @Column({ length: 510, nullable: false })
   productName: string;
 
-  @Column({ length: 510 , nullable: true })
+  @Column({ length: 510, nullable: true })
   productDescription: string;
 
   @Column({ nullable: true })
@@ -33,10 +39,10 @@ export class OrderProduct {
   @Column({ default: false })
   currentCharge: boolean;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ nullable: true, type: 'timestamp' })
   startDate: Date;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ nullable: true, type: 'timestamp' })
   endDate: Date;
 
   @CreateDateColumn({ type: "timestamp" })
@@ -44,14 +50,21 @@ export class OrderProduct {
 
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt: number;
+
+  @Column({ default: true })
+  manuallyEnteredProduct: boolean;
 }
 
 export class OrderProductFillableFields {
   productName: string;
+  productDescription: string;
+  productId: number;
+  month: number;
   cost: number;
   recurrence: boolean;
   currentCharge: boolean;
   startDate: number;
   endDate: number;
-  quantity : number;
+  quantity: number;
+  manuallyEnteredProduct: boolean;
 }

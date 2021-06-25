@@ -32,7 +32,7 @@ export class ResidentCompanyTechnical {
   @Column({ length: 20, nullable: true })
   phone: string;
 
-  @Column({ length: 20, nullable: true })
+  @Column({ length: 255, nullable: true })
   linkedinLink: string;
 
   @Column({ length: 255, nullable: true })

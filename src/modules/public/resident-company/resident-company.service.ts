@@ -1,32 +1,32 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Like, Not, Repository } from 'typeorm';
-import { AddResidentCompanyPayload } from './add-resident-company.payload';
-
-import { ResidentCompany } from './resident-company.entity';
-import { ResidentCompanyAdvisory, ResidentCompanyAdvisoryFillableFields } from './rc-advisory.entity'
-import { ResidentCompanyDocuments, ResidentCompanyDocumentsFillableFields } from './rc-documents.entity'
-import { ResidentCompanyManagement, ResidentCompanyManagementFillableFields } from './rc-management.entity'
-import { ResidentCompanyTechnical, ResidentCompanyTechnicalFillableFields } from './rc-technical.entity'
-
-import { Site } from '../master/site.entity';
+import { EMAIL } from 'constants/email';
+import { Request } from 'express';
+import { In, Like, Repository } from 'typeorm';
+import { Mail } from '../../../utils/Mail';
+import { BiolabsSource } from '../master/biolabs-source.entity';
 import { Category } from '../master/category.entity';
 import { Funding } from '../master/funding.entity';
-import { BiolabsSource } from '../master/biolabs-source.entity';
 import { Modality } from '../master/modality.entity';
+import { Site } from '../master/site.entity';
 import { TechnologyStage } from '../master/technology-stage.entity';
-
-import { ListResidentCompanyPayload } from './list-resident-company.payload';
-import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
-import { ResidentCompanyHistory } from './resident-company-history.entity';
-import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
-import { Mail } from '../../../utils/Mail';
-import { Request } from 'express';
 import { User } from '../user';
-import { EMAIL } from 'constants/email';
-import { SearchResidentCompanyPayload } from './search-resident-company.payload';
-import { Notes } from './rc-notes.entity';
 import { AddNotesDto } from './add-notes.dto';
+import { AddResidentCompanyPayload } from './add-resident-company.payload';
+import { ListResidentCompanyPayload } from './list-resident-company.payload';
+import { ResidentCompanyAdvisory, ResidentCompanyAdvisoryFillableFields } from './rc-advisory.entity';
+import { ResidentCompanyDocuments, ResidentCompanyDocumentsFillableFields } from './rc-documents.entity';
+import { ResidentCompanyManagement, ResidentCompanyManagementFillableFields } from './rc-management.entity';
+import { Notes } from './rc-notes.entity';
+import { ResidentCompanyTechnical, ResidentCompanyTechnicalFillableFields } from './rc-technical.entity';
+import { ResidentCompanyHistory } from './resident-company-history.entity';
+import { ResidentCompany } from './resident-company.entity';
+import { SearchResidentCompanyPayload } from './search-resident-company.payload';
+import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
+import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
+
+
+
 
 @Injectable()
 export class ResidentCompanyService {
@@ -133,10 +133,20 @@ export class ResidentCompanyService {
    */
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
     if (payload.id)
-      await this.residentCompanyAdvisoryRepository.update(payload.id, payload);
+      await this.residentCompanyAdvisoryRepository.update(payload.id, payload)
+      .catch(err => {
+        throw new HttpException({
+          message: err.message + ' in advisor team'
+        }, HttpStatus.BAD_REQUEST);
+      });
     else {
       delete payload.id;
-      await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload));
+      await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload))
+      .catch(err => {
+        throw new HttpException({
+          message: err.message + ' in advisor team'
+        }, HttpStatus.BAD_REQUEST);
+      });
     }
   }
 
@@ -177,10 +187,20 @@ export class ResidentCompanyService {
    */
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
     if (payload.id)
-      await this.residentCompanyManagementRepository.update(payload.id, payload);
+      await this.residentCompanyManagementRepository.update(payload.id, payload)
+      .catch(err => {
+        throw new HttpException({
+          message: err.message + ' in Management team'
+        }, HttpStatus.BAD_REQUEST);
+      });
     else {
       delete payload.id;
-      await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload));
+      await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload))
+      .catch(err => {
+        throw new HttpException({
+          message: err.message + ' in Management team'
+        }, HttpStatus.BAD_REQUEST);
+      });
     }
   }
 
@@ -210,10 +230,20 @@ export class ResidentCompanyService {
    */
   async addResidentCompanyTechnical(payload: ResidentCompanyTechnicalFillableFields) {
     if (payload.id)
-      await this.residentCompanyTechnicalRepository.update(payload.id, payload);
+      await this.residentCompanyTechnicalRepository.update(payload.id, payload)
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in technical team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     else {
       delete payload.id;
-      await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload));
+      await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload))
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in technical team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     }
   }
 
@@ -260,7 +290,7 @@ export class ResidentCompanyService {
         const savedRc = await this.residentCompanyRepository.save(newRc);
         if (savedRc.id) {
           const historyData: any = JSON.parse(JSON.stringify(savedRc));
-          historyData.companyId = historyData.id;
+          historyData.companyId = savedRc.id;
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
         }
@@ -296,7 +326,7 @@ export class ResidentCompanyService {
       .andWhere("s.id = Any(:siteArray)", { siteArray: site })
       .groupBy('users.email')
       .getRawMany();
-    
+
     for await (const admin of siteAdmin) {
       siteAdminEmails.push({
         emailAddress: {
@@ -511,7 +541,7 @@ export class ResidentCompanyService {
   async getRcMembers(id) {
     if (id) {
       return await this.residentCompanyManagementRepository.find({
-        where: { companyId: id },
+        where: { companyId: id, status: 0 },
       });
     }
     return []
@@ -526,7 +556,7 @@ export class ResidentCompanyService {
   async getRcAdvisors(id) {
     if (id) {
       return await this.residentCompanyAdvisoryRepository.find({
-        where: { companyId: id },
+        where: { companyId: id, status: 0 },
       });
     }
     return []
@@ -541,7 +571,7 @@ export class ResidentCompanyService {
   async getRcTechnicalTeams(id) {
     if (id) {
       return await this.residentCompanyTechnicalRepository.find({
-        where: { companyId: id },
+        where: { companyId: id, status: 0 },
       });
     }
     return [];
@@ -698,8 +728,14 @@ export class ResidentCompanyService {
 
       residentCompany.committeeStatus = payload.committeeStatus;
       residentCompany.selectionDate = payload.selectionDate;
-      if (Number(residentCompany.companyStatus) !== 1)
+      // Checking companyStatusChangeDate is the instanceof Date, then only update.
+      if (payload.companyStatusChangeDate && payload.companyStatusChangeDate instanceof Date) {
+        residentCompany.companyStatusChangeDate = payload.companyStatusChangeDate;
+      }
+      if (Number(residentCompany.companyStatus) !== 1) {
+        residentCompany.companyOnboardingStatus = false;
         residentCompany.companyVisibility = false;
+      }
       this.residentCompanyRepository.update(residentCompany.id, residentCompany);
       return residentCompany;
     } else {
@@ -743,7 +779,7 @@ export class ResidentCompanyService {
       await this.residentCompanyTechnicals(companyTechnicalTeams, residentCompany.id);
 
       const historyData: any = JSON.parse(JSON.stringify(payload));
-      historyData.companyId = historyData.id;
+      historyData.companyId = residentCompany.id;
       delete historyData.id;
 
       await this.residentCompanyHistoryRepository.save(historyData);
@@ -933,5 +969,33 @@ export class ResidentCompanyService {
       return true;
     }
     return false;
+  }
+
+   /**
+   * Description: This method is used to soft delete the list(for advisors,managements,technicals).
+   * @description This method is used to soft delete the list(for advisors,managements,technicals).
+   * @param id member id
+   * @return object of affected rows
+   */
+  async softDeleteMember(id, type: string) {
+    let repo;
+    if (type == 'advisors') {
+      repo = this.residentCompanyAdvisoryRepository;
+    }
+    if (type == 'managements') {
+      repo = this.residentCompanyManagementRepository;
+    }
+    if (type == 'technicals') {
+      repo = this.residentCompanyTechnicalRepository;
+    }
+    const item = await repo.findOne({
+      where: { id: id }
+    });
+    if (item) {
+      item.status = '99';
+      return await repo.save(item);
+    } else {
+      throw new NotAcceptableException('Member with provided id not available.');
+    }
   }
 }

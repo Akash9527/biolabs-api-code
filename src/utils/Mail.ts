@@ -33,19 +33,19 @@ export class Mail {
          })
          .catch(function (error) {
             if (error)
-              return;
+               return;
          });
    }
 
    private async sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
       let userTxt = tenant && tenant.role && tenant.role == 3 ? 'Insight' : 'Connect';
-      let siteNamesList = ""
-
+      let siteNamesList = '';
+      let siteNames = [];
       if (userInfo && userInfo.site_name) {
-         var siteNames = userInfo.site_name.split(",")
-         await siteNames.forEach(siteName => {
-            siteNamesList += '<li>' + siteName + '</li>';
-         });
+         siteNames = userInfo.site_name.split(",")
+         for (let i = 0; i < siteNames.length; i++) {
+            siteNamesList += '<li>' + siteNames[i] + '</li>';
+         }
       }
 
       let data;
@@ -360,7 +360,7 @@ export class Mail {
                                                                         <tr style="border-collapse:collapse">
                                                                            <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
                                                                               <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${userInfo.userName
-                                                                              },<br><br>Welcome to BioLabs Connect!<br><br>Your account has been created and is ready for use. Please click the button below to set your password and get going.</p>
+                     },<br><br>Welcome to BioLabs Connect!<br><br>Your account has been created and is ready for use. Please click the button below to set your password and get going.</p>
                                                                            </td>
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">
@@ -432,7 +432,7 @@ export class Mail {
                },
             });
          }
-      } else if (content == 'applicationFormSubmit'){
+      } else if (content == 'applicationFormSubmit') {
          data = {
             message: {
                subject: subject,
@@ -548,7 +548,7 @@ export class Mail {
                                                                   </tr>
                                                                   <tr style="border-collapse:collapse">
                                                                      <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
-                                                                        <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">A new application from <strong>${userInfo.company_name}</strong> has been submitted to the following sites: 
+                                                                        <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">A new application from <strong>${userInfo.company_name}</strong> has been submitted to the following ${siteNames.length == 1 ? 'site' : 'sites'}: 
                                                                         <br><ul style="color=#000000;">${siteNamesList}</ul><br><br><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Please click the link below to view this application.</p>
                                                                      </td>
                                                                   </tr>
@@ -556,10 +556,10 @@ export class Mail {
                                                                   <tr style="border-collapse:collapse">
                                                                   <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
                                                                   <p href="" class="es-button msohide" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:14px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Click on:  <a href="${userInfo.origin +
-                                                              EMAIL.EMAIL_SUBMITTED_APPLICATION +
-                                                              userInfo.token
-                                                              }" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:11px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:20px;color:#167efb;word-break: break-all;">${userInfo.origin + EMAIL.EMAIL_CONFIRM_URL + userInfo.token
-                                                              }</a> </p>
+                     EMAIL.EMAIL_SUBMITTED_APPLICATION +
+                     userInfo.token
+                     }" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:11px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:20px;color:#167efb;word-break: break-all;">${userInfo.origin + EMAIL.EMAIL_CONFIRM_URL + userInfo.token
+                     }</a> </p>
                                                                </td>
                                                                   </tr>
 
@@ -600,7 +600,7 @@ export class Mail {
       let authToken = token['token_type'] + ' ' + token['access_token'];
       axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
       axios.defaults.headers.post['Authorization'] = authToken;
-      axios.post(process.env.APPSETTING_MICROSOFT_EMAIL_ENDPOINT_MAIL, data)
+      await axios.post(process.env.APPSETTING_MICROSOFT_EMAIL_ENDPOINT_MAIL, data)
          .then((response) => {
             return response.data;
          })
@@ -618,6 +618,6 @@ export class Mail {
       const tokenGraphAPI = await this.getGrapAPIToken();
 
       /** Graph API Send Email implementation */
-      this.sendEmailGraphAPI(tenant, tokenGraphAPI, subject, content, userInfo);
+      await this.sendEmailGraphAPI(tenant, tokenGraphAPI, subject, content, userInfo);
    }
 }
