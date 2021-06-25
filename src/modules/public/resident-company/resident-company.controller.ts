@@ -198,17 +198,17 @@ export class ResidentCompanyController {
   }
 
   /**
-  * @description This method returns stages of technology by siteId
+  * @description This method returns stages of technology by siteId and companyId
   * @param siteId The site id
   * @returns stages of technology
   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  @Get('stage-techonology/:siteId')
+  @Get('stage-technology/:siteId/:companyId')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getStageOfTechnology(@Param('siteId') siteId: number): Promise<any> {
-    return this.residentCompanyService.getStagesOfTechnologyBySiteId(siteId);
+  getStageOfTechnology(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getStagesOfTechnologyBySiteId(siteId, companyId);
   }
 
   /**

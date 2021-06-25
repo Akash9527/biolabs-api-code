@@ -1000,18 +1000,19 @@ export class ResidentCompanyService {
   }
 
   /**
-   * @description This method returns stages of technology by siteId
+   * @description This method returns stages of technology by siteId and companyId
    * @param siteId The Site id
+   * @param companyId The Company id
    * @returns stages of technology
    */
-  async getStagesOfTechnologyBySiteId(siteId: number) {
+  async getStagesOfTechnologyBySiteId(siteId: number, companyId: number) {
     const response = {};
     const queryStr = " SELECT rch.\"companyStage\" as \"stageId\", ts.name as \"stageName\", " +
       " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
       " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
       " FROM public.resident_company_history as rch " +
       " LEFT JOIN technology_stages as ts ON ts.id = rch.\"companyStage\" " +
-      " WHERE rch.\"site\" = \'{ " + siteId + "}\' " +
+      " WHERE rch.\"site\" = \'{ " + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
       " group by rch.\"companyStage\", ts.name, " +
       " extract(quarter from rch.\"createdAt\"), " +
       " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
@@ -1033,7 +1034,7 @@ export class ResidentCompanyService {
       " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
       " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
       " FROM public.resident_company_history as rch " +
-      " WHERE rch.\"site\" = \'{" + siteId + "}\' " +
+      " WHERE rch.\"site\" = \'{" + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
       " group by " +
       " extract(quarter from rch.\"createdAt\"), " +
       " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
