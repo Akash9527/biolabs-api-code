@@ -41,6 +41,7 @@ export class Mail {
       let userTxt = tenant && tenant.role && tenant.role == 3 ? 'Insight' : 'Connect';
       let siteNamesList = '';
       let siteNames = [];
+
       if (userInfo && userInfo.site_name) {
          siteNames = userInfo.site_name.split(",")
          for (let i = 0; i < siteNames.length; i++) {
@@ -360,7 +361,7 @@ export class Mail {
                                                                         <tr style="border-collapse:collapse">
                                                                            <td align="left" bgcolor="#fff" style="Margin:0;padding-top:20px;padding-bottom:20px;padding-left:30px;padding-right:30px">
                                                                               <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:16px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Hi ${userInfo.userName
-                     },<br><br>Welcome to BioLabs Connect!<br><br>Your account has been created and is ready for use. Please click the button below to set your password and get going.</p>
+                     },<br><br>Welcome to BioLabs ${userInfo.userRole == 3 ? 'Insight' : 'Connect'}!<br><br>Your account has been created and is ready for use. Please click the button below to set your password and get going.</p>
                                                                            </td>
                                                                         </tr>
                                                                         <tr style="border-collapse:collapse">

@@ -88,10 +88,10 @@ export class UsersService {
       token: userInformation.token,
       userName: savedUser.firstName,
       origin: req.headers['origin'],
+      userRole: payload.role
     };
     let tenant = { tenantEmail: payload.email };
     this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, 'Invite', userInfo);
-
     return savedUser;
   }
 
