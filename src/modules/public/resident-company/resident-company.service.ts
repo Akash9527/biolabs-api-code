@@ -376,6 +376,17 @@ export class ResidentCompanyService {
     if (typeof payload.committeeStatus !== 'undefined') {
       rcQuery.andWhere("resident_companies.committeeStatus = :committeeStatus", { committeeStatus: payload.committeeStatus });
     }
+
+    if (typeof payload.sortBy !== 'undefined') {
+      if (payload.sortBy == 'alpha') {
+        rcQuery.orderBy("resident_companies.companyName", "ASC");
+      }
+      if (payload.sortBy == 'date') {
+        rcQuery.orderBy("resident_companies.companyStatusChangeDate", "DESC");
+      }
+    } else {
+      rcQuery.orderBy("id", "DESC");
+    }
     if (payload.pagination) {
       let skip = 0;
       let take = 10;
@@ -387,7 +398,6 @@ export class ResidentCompanyService {
       }
       rcQuery.skip(skip).take(take)
     }
-    rcQuery.orderBy("id", "DESC");
     return await rcQuery.getRawMany();
   }
 
