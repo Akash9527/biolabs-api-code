@@ -290,7 +290,7 @@ export class ResidentCompanyService {
         const savedRc = await this.residentCompanyRepository.save(newRc);
         if (savedRc.id) {
           const historyData: any = JSON.parse(JSON.stringify(savedRc));
-          historyData.companyId = savedRc.id;
+          historyData.comnpanyId = savedRc.id;
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
         }
@@ -376,6 +376,17 @@ export class ResidentCompanyService {
     if (typeof payload.committeeStatus !== 'undefined') {
       rcQuery.andWhere("resident_companies.committeeStatus = :committeeStatus", { committeeStatus: payload.committeeStatus });
     }
+
+    if (typeof payload.sortBy !== 'undefined') {
+      if (payload.sortBy == 'alpha') {
+        rcQuery.orderBy("resident_companies.companyName", "ASC");
+      }
+      if (payload.sortBy == 'date') {
+        rcQuery.orderBy("resident_companies.companyStatusChangeDate", "DESC");
+      }
+    } else {
+      rcQuery.orderBy("id", "DESC");
+    }
     if (payload.pagination) {
       let skip = 0;
       let take = 10;
@@ -387,7 +398,6 @@ export class ResidentCompanyService {
       }
       rcQuery.skip(skip).take(take)
     }
-    rcQuery.orderBy("id", "DESC");
     return await rcQuery.getRawMany();
   }
 
@@ -997,5 +1007,50 @@ export class ResidentCompanyService {
     } else {
       throw new NotAcceptableException('Member with provided id not available.');
     }
+  }
+
+  /**
+   * @description This method returns stages of technology by siteId and companyId
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns stages of technology
+   */
+  async getStagesOfTechnologyBySiteId(siteId: number, companyId: number) {
+    const response = {};
+    const queryStr = " SELECT rch.\"companyStage\" as \"stageId\", ts.name as \"stageName\", " +
+      " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
+      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
+      " FROM public.resident_company_history as rch " +
+      " LEFT JOIN technology_stages as ts ON ts.id = rch.\"companyStage\" " +
+      " WHERE rch.\"site\" = \'{ " + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
+      " group by rch.\"companyStage\", ts.name, " +
+      " extract(quarter from rch.\"createdAt\"), " +
+      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
+      " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
+    const compResidentHistory = await this.residentCompanyHistoryRepository.query(queryStr);
+    response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
+    return response;
+  }
+
+  /**
+   * @description This method returns fundings by siteId and companyId
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns fundings
+   */
+  async getFundingBySiteIdAndCompanyId(siteId: number, companyId: number) {
+    const response = {};
+    const queryStr = " SELECT AVG(\"funding\" ::Decimal) as \"Funding\", " +
+      " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
+      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
+      " FROM public.resident_company_history as rch " +
+      " WHERE rch.\"site\" = \'{" + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
+      " group by " +
+      " extract(quarter from rch.\"createdAt\"), " +
+      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
+      " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
+    const fundigs = await this.residentCompanyHistoryRepository.query(queryStr);
+    response['fundings'] = (!fundigs) ? 0 : fundigs;
+    return response;
   }
 }
