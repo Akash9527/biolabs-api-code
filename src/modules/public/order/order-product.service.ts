@@ -173,5 +173,22 @@ export class OrderProductService {
     }
     return await this.orderProductRepository.delete(id);
   }
+  /**
+   * @description This method will fetch the all invoices based on month
+   * @param month 
+   * @returns 
+   */
+  async consolidatedInvoice(month: number, site: number) {
 
+    return await this.orderProductRepository.createQueryBuilder("order_product")
+      .addSelect("rc.companyName", 'companyName')
+      .leftJoin('resident_companies', 'rc', 'rc.id = order_product.companyId')
+      .where("rc.companyStatus = '1' ")
+      .andWhere("rc.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: site })
+      .andWhere("order_product.month = :month", { month: month })
+      .orderBy("order_product.updatedAt", 'DESC')
+      .groupBy('rc.companyName')
+      .getRawMany();
+
+  }
 }
