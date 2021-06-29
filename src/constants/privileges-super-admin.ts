@@ -36,6 +36,40 @@ export const SUPER_ADMIN_ACCESSLEVELS = {
       view: true,
       update: true,
       delete: true,
+      child: {
+        'management': {
+          name: 'Admin',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+        'sponsor': {
+          name: 'Sponsors',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+        'resident': {
+          name: 'Resident Admin',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        }
+      }
+    },
+    'invoice-waitlist': {
+      name: 'Invoice/Waitlist',
+      action: true,
+      create: true,
+      view: true,
+      update: true,
+      delete: true,
     },
     sites: {
       name: 'Sites',

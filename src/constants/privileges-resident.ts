@@ -36,6 +36,40 @@ export const RESIDENT_ACCESSLEVELS = {
       view: false,
       update: false,
       delete: false,
+      child: {
+        'management': {
+          name: 'Admin',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+        'sponsor': {
+          name: 'Sponsors',
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
+        },
+        'resident': {
+          name: 'Resident Admin',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        }
+      }
+    },
+    'invoice-waitlist': {
+      name: 'Invoice/Waitlist',
+      action: false,
+      create: false,
+      view: false,
+      update: false,
+      delete: false,
     },
     sites: {
       name: 'Sites',
