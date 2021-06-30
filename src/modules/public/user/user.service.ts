@@ -110,6 +110,7 @@ export class UsersService {
       user.phoneNumber = payload.phoneNumber;
       user.companyId = (payload.companyId) ? payload.companyId : user.companyId;
       user.userType = payload.userType;
+      user.site_id = payload.site_id;
       if (
         payload.password &&
         payload.password !== '' &&
