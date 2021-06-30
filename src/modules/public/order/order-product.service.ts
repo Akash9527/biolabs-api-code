@@ -186,7 +186,7 @@ export class OrderProductService {
       .where("rc.companyStatus = '1' ")
       .andWhere("rc.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: site })
       .andWhere("order_product.month = :month", { month: month })
-      .orderBy("order_product.updatedAt", 'DESC')
+      .orderBy("rc.companyName", 'ASC')
       .getRawMany();
 
   }
