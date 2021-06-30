@@ -789,7 +789,7 @@ export class ResidentCompanyService {
       await this.residentCompanyTechnicals(companyTechnicalTeams, residentCompany.id);
 
       const historyData: any = JSON.parse(JSON.stringify(payload));
-      historyData.companyId = residentCompany.id;
+      historyData.comnpanyId = residentCompany.id;
       delete historyData.id;
 
       await this.residentCompanyHistoryRepository.save(historyData);
