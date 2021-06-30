@@ -95,16 +95,16 @@ export const SUPER_ADMIN_ACCESSLEVELS = {
       update: true,
       delete: true,
       child: {
-        'application-form': {
-          name: 'Application Form',
+        'application-configure': {
+          name: 'Application Configuration',
           action: true,
           create: true,
           view: true,
           update: true,
           delete: true,
         },
-        'item-cost': {
-          name: 'Item Cost',
+        'configure': {
+          name: 'Cost Configuration',
           action: true,
           create: true,
           view: true,
