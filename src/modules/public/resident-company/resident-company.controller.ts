@@ -196,4 +196,33 @@ export class ResidentCompanyController {
     const member = await this.residentCompanyService.softDeleteMember(id, type);
     return member;
   }
+
+  /**
+  * @description This method returns stages of technology by siteId and companyId
+  * @param siteId The site id
+  * @returns stages of technology
+  */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('stage-technology/:siteId/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getStageOfTechnology(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getStagesOfTechnologyBySiteId(siteId, companyId);
+  }
+
+  /**
+   * @description This method returns fundings by siteId and companyId
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns fundings
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('funding/:siteId/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getFundingBySiteIdAndCompanyId(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getFundingBySiteIdAndCompanyId(siteId, companyId);
+  }
 }

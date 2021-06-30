@@ -95,16 +95,16 @@ export const SPONSOR_ACCESSLEVELS = {
       update: false,
       delete: false,
       child: {
-        'application-form': {
-          name: 'Application Form',
+        'application-configure': {
+          name: 'Application Configuration',
           action: false,
           create: false,
           view: false,
           update: false,
           delete: false,
         },
-        'item-cost': {
-          name: 'Item Cost',
+        'configure': {
+          name: 'Cost Configuration',
           action: false,
           create: false,
           view: false,
