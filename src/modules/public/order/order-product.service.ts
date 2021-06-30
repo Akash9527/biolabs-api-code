@@ -187,7 +187,6 @@ export class OrderProductService {
       .andWhere("rc.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: site })
       .andWhere("order_product.month = :month", { month: month })
       .orderBy("order_product.updatedAt", 'DESC')
-      .groupBy('rc.companyName')
       .getRawMany();
 
   }
