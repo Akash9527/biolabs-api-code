@@ -1,34 +1,22 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty } from "class-validator";
 
-export class UpdateProductDto {
+export class AddProductTypeDto {
     @ApiProperty({
         required: true,
     })
     @IsNotEmpty()
-    name: string;
-
-    @ApiProperty({
-        required: false,
-    })
-    description: string;
+    productTypeName: string;
 
     @ApiProperty({
         required: false,
         nullable: true,
     })
-    cost: number;
-
-
-    @ApiProperty({
-        required: false,
-        nullable: true,
-    })
-    recurrence: boolean;
+    createdBy: number;
 
     @ApiProperty({
         required: false,
         nullable: true,
     })
-    productTypeId: number;
+    modifiedBy: number;
 }

@@ -10,10 +10,11 @@ import { TechnologyStage } from './technology-stage.entity';
 import { MasterService } from './master.service';
 import { MasterController } from './master.controller';
 import { PassportModule } from '@nestjs/passport';
+import { ProductType } from '../order/model/product-type.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([BiolabsSource, Category, Funding, Modality, Role, Site, TechnologyStage]),
+    TypeOrmModule.forFeature([BiolabsSource, Category, Funding, Modality, Role, Site, TechnologyStage, ProductType]),
     PassportModule.register({ defaultStrategy: 'jwt' }),],
   controllers: [MasterController],
   providers: [MasterService],

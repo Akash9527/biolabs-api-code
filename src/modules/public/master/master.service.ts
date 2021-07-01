@@ -12,6 +12,7 @@ import { TechnologyStage } from './technology-stage.entity';
 import { COMPANY_STATUS } from '../../../constants/company-status';
 import { USER_TYPE } from '../../../constants/user-type';
 import { COMMITTEE_STATUS } from 'constants/committee_status';
+import { ProductType } from '../order/model/product-type.entity';
 
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
@@ -34,6 +35,8 @@ export class MasterService {
     private readonly siteRepository: Repository<Site>,
     @InjectRepository(TechnologyStage)
     private readonly technologyStageRepository: Repository<TechnologyStage>,
+    @InjectRepository(ProductType)
+    private readonly productTypeRepository: Repository<ProductType>,
   ) { }
 
   /**
@@ -49,13 +52,13 @@ export class MasterService {
     // filtering site list. Use payload.role if role is required.
     if (payload.siteIdArr) {
       payload.siteIdArr = this.parseToArray(payload.siteIdArr);
-      search = {id: In(payload.siteIdArr)};
+      search = { id: In(payload.siteIdArr) };
     }
 
     if (payload.q && payload.q != "") {
-      search = {...search, ...{ name: Like("%" + payload.q + "%"), status: '1' }};
+      search = { ...search, ...{ name: Like("%" + payload.q + "%"), status: '1' } };
     } else {
-      search = {...search, ...{ status: '1' }};
+      search = { ...search, ...{ status: '1' } };
     }
 
     if (payload.pagination) {
@@ -76,6 +79,22 @@ export class MasterService {
       skip,
       take
     });
+  }
+
+  /**
+   * Description: This method will store the Product information.
+   * @description This method will store the Product information.
+   * @return array of product object 
+   */
+  async createProductType() {
+    const productType = await this.productTypeRepository.find();
+    const ptypeData = migrationData["productTypeName"]
+    if (!productType || productType.length == 0) {
+      for (let index = 0; index < ptypeData.length; index++) {
+        const productType = ptypeData[index];
+        await this.productTypeRepository.save(this.productTypeRepository.create(productType));
+      }
+    }
   }
 
   /**
@@ -610,8 +629,8 @@ export class MasterService {
    * @description used to convert data into array
    * @param val input value
    */
-  private parseToArray(val){
-    if(typeof val === 'object'){
+  private parseToArray(val) {
+    if (typeof val === 'object') {
       return val;
     }
     return [Number(val)];
