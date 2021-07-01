@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ProductType } from '../order/model/product-type.entity';
 import { BiolabsSource } from './biolabs-source.entity';
 import { Category } from './category.entity';
 import { Funding } from './funding.entity';
@@ -11,9 +12,7 @@ import { Site } from './site.entity';
 import { TechnologyStage } from './technology-stage.entity';
 describe('MasterService', () => {
     let masterService;
-    let biolabsSources: Repository<BiolabsSource>;
-    let category: Repository<Category>;
-
+    
     beforeEach(async () => {
         const module = await Test.createTestingModule({
             providers: [
@@ -25,7 +24,8 @@ describe('MasterService', () => {
                 { provide: getRepositoryToken(Modality), useValue: {} },
                 { provide: getRepositoryToken(Role), useValue: {} },
                 { provide: getRepositoryToken(Site), useValue: {} },
-                { provide: getRepositoryToken(TechnologyStage), useValue: {} }
+                { provide: getRepositoryToken(TechnologyStage), useValue: {} },
+                { provide: getRepositoryToken(ProductType), useValue: {} }
             ]
         }).compile();
 
