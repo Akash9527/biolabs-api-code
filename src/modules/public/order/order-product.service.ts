@@ -53,7 +53,7 @@ export class OrderProductService {
       /**
        * Add next 3 months Products
        */
-      for (let i = 1; i <= 3; i++) {
+      for (let i = 1; i <= 4; i++) {
 
         let futureOrderProduct = { ...orderProduct };
         futureOrderProduct.month = orderProduct.month + i;
