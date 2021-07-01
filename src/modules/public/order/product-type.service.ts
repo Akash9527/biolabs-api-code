@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AddProductTypeDto } from './dto/AddProductType.dto';
-import { OrderProduct } from './model/order-product.entity';
 import { ProductType } from './model/product-type.entity';
 
 @Injectable()
@@ -29,6 +28,6 @@ export class ProductTypeService {
      * @returns All product type
      */
     async getProductType() {
-        return await await this.productTypeRepository.find();;
+        return await await this.productTypeRepository.find();
     }
 }
