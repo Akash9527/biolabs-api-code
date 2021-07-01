@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { ProductType } from './product-type.entity';
 
 @Entity({
   name: 'product',
@@ -15,7 +16,7 @@ export class Product {
 
   @Column({ default: false })
   recurrence: boolean;
-  
+
   @Column({ nullable: true })
   cost: number;
 
@@ -36,6 +37,9 @@ export class Product {
 
   @UpdateDateColumn({ type: "timestamp" })
   modifiedAt: Date;
+
+  @ManyToOne(() => ProductType, (productType) => productType.product, { eager: true })
+  productType: ProductType;
 }
 
 export class ProductFillableFields {

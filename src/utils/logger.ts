@@ -1,7 +1,5 @@
-/**
- * @author Akhilesh Prajapati
- */
 import { NestFactory } from '@nestjs/core';
+
 const logger = require('./loggerConfig');
 
 /**
