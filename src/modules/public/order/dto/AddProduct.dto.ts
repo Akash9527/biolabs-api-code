@@ -27,4 +27,10 @@ export class AddProductDto {
     })
     description: string;
 
+    @ApiProperty({
+        required: true,
+        nullable: false,
+    })
+    productTypeId: number;
+
 }
