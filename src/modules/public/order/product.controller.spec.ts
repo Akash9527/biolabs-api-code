@@ -5,7 +5,6 @@ import { PassportModule } from "@nestjs/passport";
 import { AddProductDto } from "./dto/AddProduct.dto";
 import { UnauthorizedException } from "@nestjs/common";
 import { HTTP_CODES } from '../../../utils/httpcode';
-import nodeMocks from 'node-mocks-http'
 import { UpdateProductDto } from "./dto/UpdateProduct.dto";
 const mockProductService = () => ({
     addProduct: jest.fn(),
@@ -60,7 +59,7 @@ describe('ProductController', () => {
         expect(productController).toBeDefined();
     });
     describe('test add product Functionality', () => {
-        const mockPayload: AddProductDto = { name: "test1", recurrence: true, cost: 120, description: "this is test 1" };
+        const mockPayload: AddProductDto = { name: "test1", recurrence: true, cost: 120, description: "this is test 1" ,productTypeId:1};
 
         it('it should call productService addProduct method', async () => {
             //check function is called or not
@@ -120,7 +119,7 @@ describe('ProductController', () => {
         });
     });
     describe('test updateProduct Functionality', () => {
-        const mockUpdatePayload: UpdateProductDto = { name: "test1", recurrence: true, cost: 100, description: "this is test 1" };
+        const mockUpdatePayload: UpdateProductDto = { name: "test1", recurrence: true, cost: 100, description: "this is test 1",productTypeId:1 };
         it('it should call productService updateProduct method', async () => {
             //check function is called or not
             await productController.updateProduct(mockProduct.id, mockUpdatePayload, req);
