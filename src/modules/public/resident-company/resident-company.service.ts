@@ -607,7 +607,7 @@ export class ResidentCompanyService {
       select("AVG(resident_companies.companySize)::numeric(10,2)", "avgTeamSize").
       addSelect("count(*)", "startUpcount").
       where("resident_companies.companyStatus = :status", { status: '1' }).
-      andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).getRawOne();
+      andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).getRawOne();
 
     const categoryStats = await this.categoryRepository.
       query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
@@ -648,7 +648,7 @@ export class ResidentCompanyService {
         select("AVG(resident_companies.companySize)::numeric(10,2)", "avg").
         addSelect("count(*)", "count").
         where("resident_companies.companyStatus = :status", { status: '1' }).
-        andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).
+        andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).
         andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
 
       const categoryStats = await this.categoryRepository.
@@ -664,12 +664,12 @@ export class ResidentCompanyService {
       // addSelect("count(*)", "newStartUps").
       // where("resident_companies.status = :status", { status: '1' }).
       // where("resident_companies.createdAt  >  '06/01/2021' ").
-      // andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).
+      // andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).
       // andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
 
       newStartUps = await this.residentCompanyRepository.
         query(" select count(*) as newStartUps FROM resident_companies " +
-          " where resident_companies.\"companyVisibility\" = true and " +
+          " where resident_companies.\"companyOnboardingStatus\" = true and " +
           + site.id + "= ANY(resident_companies.\"site\"::int[]) and" +
           " resident_companies.\"companyStatus\" = '1' and " +
           " (CURRENT_DATE - INTERVAL '3 months')  < (resident_companies.\"createdAt\") ");
