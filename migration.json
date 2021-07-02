@@ -1,5 +1,6 @@
 {
-    "roles": [{
+    "roles": [
+        {
             "name": "superadmin",
             "id": 1
         },
@@ -16,7 +17,45 @@
             "id": 4
         }
     ],
-    "sites_ful": [{
+    "productTypeName": [
+        {
+            "productTypeName": "Membership Fee",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Lab Bench",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Workstation",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Private Office",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Private Lab",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Retainer Fee",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Decontamination Fee",
+            "createdBy": 1,
+            "modifiedBy": 1
+        }
+    ],
+    "sites_ful": [
+        {
             "name": "Boston - Tufts Launchpad",
             "id": 1
         },
@@ -53,7 +92,8 @@
             "id": 9
         }
     ],
-    "sites": [{
+    "sites": [
+        {
             "name": "Tufts",
             "id": 1
         },
@@ -62,7 +102,8 @@
             "id": 2
         }
     ],
-    "fundings": [{
+    "fundings": [
+        {
             "name": "Grant funded",
             "id": 1
         },
@@ -95,7 +136,8 @@
             "id": 9999
         }
     ],
-    "modalities": [{
+    "modalities": [
+        {
             "name": "Antibody",
             "id": 1
         },
@@ -160,7 +202,8 @@
             "id": 9999
         }
     ],
-    "biolabsSources": [{
+    "biolabsSources": [
+        {
             "name": "Website",
             "id": 1
         },
@@ -181,7 +224,8 @@
             "id": 9999
         }
     ],
-    "companyStages": [{
+    "companyStages": [
+        {
             "name": "Discovery/R&D",
             "id": 1
         },
@@ -210,13 +254,16 @@
             "id": 9999
         }
     ],
-    "categories": [{
+    "categories": [
+        {
             "name": "Therapeutics (Biopharma)",
             "id": 1,
-            "subcategories": [{
+            "subcategories": [
+                {
                     "name": "Cardiovascular & Metabolism",
                     "id": 2,
-                    "subcategories": [{
+                    "subcategories": [
+                        {
                             "name": "Diabetes and related disorders",
                             "id": 3
                         },
@@ -265,7 +312,8 @@
                 {
                     "name": "Oncology",
                     "id": 13,
-                    "subcategories": [{
+                    "subcategories": [
+                        {
                             "name": "Hematological malignancies",
                             "id": 14
                         },
@@ -346,7 +394,8 @@
                 {
                     "name": "Neuroscience",
                     "id": 32,
-                    "subcategories": [{
+                    "subcategories": [
+                        {
                             "name": "Schizophrenia",
                             "id": 33
                         },
@@ -391,7 +440,8 @@
                 {
                     "name": "Infectious Diseases",
                     "id": 42,
-                    "subcategories": [{
+                    "subcategories": [
+                        {
                             "name": "HIV",
                             "id": 43
                         },
@@ -440,7 +490,8 @@
                 {
                     "name": "Immunology and Inflammation",
                     "id": 53,
-                    "subcategories": [{
+                    "subcategories": [
+                        {
                             "name": "Rheumatoid arthritis",
                             "id": 54
                         },
@@ -489,7 +540,8 @@
                 {
                     "name": "Vaccines",
                     "id": 64,
-                    "subcategories": [{
+                    "subcategories": [
+                        {
                             "name": "Pneumococcal disease",
                             "id": 65
                         },
@@ -526,7 +578,8 @@
                 {
                     "name": "Ophthalmology",
                     "id": 72,
-                    "subcategories": [{
+                    "subcategories": [
+                        {
                             "name": "Retinal vein occlusion (RVO)",
                             "id": 73
                         },
@@ -596,7 +649,8 @@
         {
             "name": "Medical Devices",
             "id": 84,
-            "subcategories": [{
+            "subcategories": [
+                {
                     "name": "Surgery",
                     "id": 85
                 },
@@ -631,7 +685,8 @@
         {
             "name": "Consumer Product",
             "id": 91,
-            "subcategories": [{
+            "subcategories": [
+                {
                     "name": "Skin Health",
                     "id": 92
                 },
@@ -669,7 +724,17 @@
     "superadmin": {
         "email": "superadmin@biolabs.io",
         "role": 1,
-        "site_id": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        "site_id": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+        ],
         "firstName": "admin",
         "lastName": "user",
         "title": "Super",
