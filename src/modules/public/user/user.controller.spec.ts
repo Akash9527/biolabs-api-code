@@ -154,41 +154,47 @@ describe('UserController', () => {
         });
     });
 
-    // describe('should test getUsers Functionality', () => {
-    //     let mockListUserPayload: ListUserPayload = {
-    //         q: "test", role: 1, pagination: true, page: 12,
-    //         limit: 4, sort: true, sortFiled: "test", sortOrder: "ASC"
-    //     };
-    //     const mockUser1 = { id: 2, ...mockUser };
-    //     const users = { mockUser, mockUser1 }
-    //     let userList;
-    //     it('it should call userService getUsers  method', async () => {
-    //         //check userService softDelete function is called or not
-    //         await userController.getUsers(mockListUserPayload);
-    //         expect(await userService.getUsers).toHaveBeenCalledWith(mockListUserPayload);
-    //     });
-    //     it('it should return users ', async () => {
-    //         userService.getUsers.mockResolvedValueOnce(users);
-    //         userList = await userController.getUsers(mockListUserPayload);
-    //         expect(Object.keys(userList).length).toBe(2);
-    //         expect(users).toBe(userList);
-    //         //check size or count size --TO-Do
-    //     });
+    describe('should test getUsers Functionality', () => {
+        let req: any = {
+            user: { site_id: [1, 2] },
+            headers: { 'x-site-id': [2] }
+        }
+        let mockListUserPayload: ListUserPayload = {
+            q: "test", role: 1, pagination: true, page: 12,
+            limit: 4, sort: true, sortFiled: "test", sortOrder: "ASC"
+        };
+        const mockUser1 = { id: 2, ...mockUser };
+        const users = { mockUser, mockUser1 }
+        let userList;
+        it('it should call userService getUsers  method', async () => {
+            //check userService getusers function is called or not
+            await userController.getUsers(mockListUserPayload,req);
+            let siteIdArr: any = req.user.site_id;
+            let site_id: any = JSON.parse(req.headers['x-site-id'].toString());
+            expect(await userService.getUsers).toHaveBeenCalledWith(mockListUserPayload,site_id);
+        });
+        it('it should return users ', async () => {
+            userService.getUsers.mockResolvedValueOnce(users);
+            userList = await userController.getUsers(mockListUserPayload,req);
+            expect(Object.keys(userList).length).toBe(2);
+            expect(users).toBe(userList);
+            //check size or count size --TO-Do
+        });
 
-    //     it('it should return null if user is deactive ', async () => {
-    //         //user1 is deactive so it return only one use
-    //         mockUser1.status = "99";
-    //         userService.getUsers.mockResolvedValueOnce(users.mockUser);
-    //         userList = await userController.getUsers(mockListUserPayload);
-    //         expect(users.mockUser).toBe(userList);
-    //     });
-    //     it('it should throw UnAuthorized Exception if user is not authorized', async () => {
-    //         userService.getUsers.mockResolvedValue(new UnauthorizedException());
-    //         const { response } = await userController.getUsers();
-    //         expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
-    //         expect(response.message).toBe('Unauthorized');
-    //     });
-    // });
+        it('it should return null if user is deactive ', async () => {
+            //user1 is deactive so it return only one use
+            mockUser1.status = "99";
+            userService.getUsers.mockResolvedValueOnce(users.mockUser);
+            userList = await userController.getUsers(mockListUserPayload,req);
+            expect(users.mockUser).toBe(userList);
+        });
+        it('it should throw UnAuthorized Exception if user is not authorized', async () => {
+            userService.getUsers.mockResolvedValue(new UnauthorizedException());
+            const { response } = await userController.getUsers(mockListUserPayload,req);
+            expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
+            expect(response.message).toBe('Unauthorized');
+        });
+    });
     describe('should test getUserById Functionality', () => {
         it('it should call userService getUserById  method', async () => {
             //check userService softDelete function is called or not
