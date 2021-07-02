@@ -1067,10 +1067,8 @@ export class ResidentCompanyService {
    * @returns started with biolabs date
    */
   async getstartedWithBiolabs(siteId: number, companyId: number) {
-    const response = {};
-    const queryStr = "SELECT min(\"createdAt\") FROM public.resident_company_history" +
-      "WHERE \"comnpanyId\" = " + companyId +
-      "AND \"site\" = \'{" + siteId + "}" +
+    const queryStr = "SELECT min(\"createdAt\")  as startWithBiolabs FROM public.resident_company_history" +
+      " WHERE \"site\" = \'{" + siteId + "}\' and \"comnpanyId\" = " + companyId +
       "AND \"companyOnboardingStatus\" = true";
     const startWithBiolab = await this.residentCompanyHistoryRepository.query(queryStr);
     return startWithBiolab;
