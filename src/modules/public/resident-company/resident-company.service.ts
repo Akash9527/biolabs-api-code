@@ -599,15 +599,15 @@ export class ResidentCompanyService {
     const graduate: any = await this.residentCompanyRepository.
       createQueryBuilder("resident_companies").
       select("count(*)", "graduate").
-      where("resident_companies.status = :status", { status: '4' }).getRawOne();
+      where("resident_companies.companyStatus = :status", { status: '4' }).getRawOne();
 
     //Get Sum of all companies and Average company size
     const stats: any = await this.residentCompanyRepository.
       createQueryBuilder("resident_companies").
       select("AVG(resident_companies.companySize)::numeric(10,2)", "avgTeamSize").
       addSelect("count(*)", "startUpcount").
-      where("resident_companies.status = :status", { status: '1' }).
-      andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).getRawOne();
+      where("resident_companies.companyStatus = :status", { status: '1' }).
+      andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).getRawOne();
 
     const categoryStats = await this.categoryRepository.
       query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
@@ -639,7 +639,7 @@ export class ResidentCompanyService {
       const graduate: any = await this.residentCompanyRepository.
         createQueryBuilder("resident_companies").
         select("count(*)", "graduate").
-        where("resident_companies.status = :status", { status: '4' }).
+        where("resident_companies.companyStatus = :status", { status: '4' }).
         andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
 
       //Get Sum of all companies and Average company size
@@ -647,8 +647,8 @@ export class ResidentCompanyService {
         createQueryBuilder("resident_companies").
         select("AVG(resident_companies.companySize)::numeric(10,2)", "avg").
         addSelect("count(*)", "count").
-        where("resident_companies.status = :status", { status: '1' }).
-        andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).
+        where("resident_companies.companyStatus = :status", { status: '1' }).
+        andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).
         andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
 
       const categoryStats = await this.categoryRepository.
@@ -664,13 +664,14 @@ export class ResidentCompanyService {
       // addSelect("count(*)", "newStartUps").
       // where("resident_companies.status = :status", { status: '1' }).
       // where("resident_companies.createdAt  >  '06/01/2021' ").
-      // andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).
+      // andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).
       // andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
 
       newStartUps = await this.residentCompanyRepository.
         query(" select count(*) as newStartUps FROM resident_companies " +
-          " where resident_companies.\"companyVisibility\" = true and " +
-          " resident_companies.\"status\" = '1' and " +
+          " where resident_companies.\"companyOnboardingStatus\" = true and " +
+          + site.id + "= ANY(resident_companies.\"site\"::int[]) and" +
+          " resident_companies.\"companyStatus\" = '1' and " +
           " (CURRENT_DATE - INTERVAL '3 months')  < (resident_companies.\"createdAt\") ");
 
       // } catch {
@@ -1012,6 +1013,7 @@ export class ResidentCompanyService {
   }
 
   /**
+   * Description: This method returns stages of technology by siteId and companyId
    * @description This method returns stages of technology by siteId and companyId
    * @param siteId The Site id
    * @param companyId The Company id
@@ -1035,6 +1037,7 @@ export class ResidentCompanyService {
   }
 
   /**
+   * Description: This method returns fundings by siteId and companyId
    * @description This method returns fundings by siteId and companyId
    * @param siteId The Site id
    * @param companyId The Company id
@@ -1054,5 +1057,20 @@ export class ResidentCompanyService {
     const fundigs = await this.residentCompanyHistoryRepository.query(queryStr);
     response['fundings'] = (!fundigs) ? 0 : fundigs;
     return response;
+  }
+
+  /**
+   * Description: This method returns started with biolabs date
+   * @description This method returns started with biolabs date
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns started with biolabs date
+   */
+  async getstartedWithBiolabs(siteId: number, companyId: number) {
+    const queryStr = "SELECT min(\"createdAt\")  as startWithBiolabs FROM public.resident_company_history" +
+      " WHERE \"site\" = \'{" + siteId + "}\' and \"comnpanyId\" = " + companyId +
+      "AND \"companyOnboardingStatus\" = true";
+    const startWithBiolab = await this.residentCompanyHistoryRepository.query(queryStr);
+    return startWithBiolab;
   }
 }

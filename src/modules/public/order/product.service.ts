@@ -23,9 +23,10 @@ export class ProductService {
    * @return saved order product object
    */
     async addProduct(payLoad: AddProductDto, req: any, siteId: number): Promise<any> {
-
-        const productType = await this.productTypeRepository.findOne(payLoad.productTypeId);
-
+        let productType = null;
+        if (payLoad.productTypeId) {
+            productType = await this.productTypeRepository.findOne(payLoad.productTypeId);
+        }
         const product = new Product();
         product.name = payLoad.name;
         product.description = payLoad.description;
@@ -89,7 +90,10 @@ export class ProductService {
        */
     async updateProduct(productId: number, payload: UpdateProductDto, req: any, siteId: number): Promise<any> {
         const product = await this.productRepository.findOne(productId);
-        const productType = await this.productTypeRepository.findOne(payload.productTypeId);
+        let productType = null;
+        if (payload.productTypeId) {
+            productType = await this.productTypeRepository.findOne(payload.productTypeId);
+        }
         if (product && (product.productStatus == 1)) {
             product.modifiedBy = req.user.id;
             product.siteId = siteId;
