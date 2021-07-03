@@ -176,6 +176,9 @@ export class ResidentCompanyHistory {
 
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt: number;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  companyStatusChangeDate: number;
 }
 
 export class ResidentCompanyHistoryFillableFields {
