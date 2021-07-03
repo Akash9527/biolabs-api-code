@@ -323,7 +323,7 @@ export class ResidentCompanyService {
       .addSelect("string_agg(s.name::text, ',')", 'siteName')
       .leftJoin('sites', 's', 's.id = Any(users.site_id)')
       .where('users.role = 2')
-      // .andWhere("s.id = Any(:siteArray)", { siteArray: site })
+      .andWhere("s.id = Any(:siteArray)", { siteArray: site })
       .groupBy('users.email')
       .getRawMany();
 
