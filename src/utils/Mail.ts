@@ -42,11 +42,12 @@ export class Mail {
       let siteNamesList = '';
       let siteNames = [];
 
-      for (let i = 0; i < userInfo.site_name.length; i++) {
-         siteNamesList += `<li> ${userInfo.site_name[i]} </li>`;
+      if (userInfo && userInfo.site_name) {
+         for (let i = 0; i < userInfo.site_name.length; i++) {
+            siteNamesList += `<li> ${userInfo.site_name[i]} </li>`;
+         }
       }
       let data;
-
       if (content == 'forgotMail') {
          data = {
             message: {
