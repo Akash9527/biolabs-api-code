@@ -316,6 +316,7 @@ export class ResidentCompanyService {
   private async sendEmailToSiteAdmin(site: any, req, companyName: string) {
     let siteAdminEmails = [];
     let userInfo;
+    let siteList = [];
 
     let siteAdmin: any = await this.userRepository
       .createQueryBuilder('users')
@@ -323,9 +324,16 @@ export class ResidentCompanyService {
       .addSelect("string_agg(s.name::text, ',')", 'siteName')
       .leftJoin('sites', 's', 's.id = Any(users.site_id)')
       .where('users.role = 2')
-      // .andWhere("s.id = Any(:siteArray)", { siteArray: site })
+      .andWhere("s.id = Any(:siteArray)", { siteArray: site })
       .groupBy('users.email')
       .getRawMany();
+
+    for await (let s of site) {
+      await this.siteRepository
+        .query(`select name as siteName from sites where id = ${s}`).then(res => {
+          siteList.push(res[0].sitename);
+        });
+    }
 
     for await (const admin of siteAdmin) {
       siteAdminEmails.push({
@@ -333,14 +341,14 @@ export class ResidentCompanyService {
           address: admin['email']
         },
       });
-      userInfo = {
-        token: req.headers.authorization,
-        company_name: companyName,
-        site_name: admin['siteName'],
-        origin: req.headers['origin'],
-      };
     }
 
+    userInfo = {
+      token: req.headers.authorization,
+      company_name: companyName,
+      site_name: siteList,
+      origin: req.headers['origin'],
+    };
     await this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, 'applicationFormSubmit', userInfo);
   }
 

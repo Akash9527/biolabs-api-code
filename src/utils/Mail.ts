@@ -43,12 +43,10 @@ export class Mail {
       let siteNames = [];
 
       if (userInfo && userInfo.site_name) {
-         siteNames = userInfo.site_name.split(",")
-         for (let i = 0; i < siteNames.length; i++) {
-            siteNamesList += '<li>' + siteNames[i] + '</li>';
+         for (let i = 0; i < userInfo.site_name.length; i++) {
+            siteNamesList += `<li> ${userInfo.site_name[i]} </li>`;
          }
       }
-
       let data;
       if (content == 'forgotMail') {
          data = {
