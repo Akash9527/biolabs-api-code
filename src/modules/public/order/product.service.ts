@@ -1,7 +1,9 @@
 import { Injectable, NotAcceptableException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { AddProductDto } from "./dto/AddProduct.dto";
 import { UpdateProductDto } from "./dto/UpdateProduct.dto";
+import { ProductType } from "./model/product-type.entity";
 import { Product } from "./model/product.entity";
 
 @Injectable()
@@ -9,7 +11,9 @@ export class ProductService {
 
     constructor(
         @InjectRepository(Product)
-        private readonly productRepository: Repository<Product>
+        private readonly productRepository: Repository<Product>,
+        @InjectRepository(ProductType)
+        private readonly productTypeRepository: Repository<ProductType>
     ) { }
 
     /**
@@ -18,7 +22,11 @@ export class ProductService {
    * @param payload object of AddOrderDto.
    * @return saved order product object
    */
-    async addProduct(payLoad, req: any, siteId: number): Promise<any> {
+    async addProduct(payLoad: AddProductDto, req: any, siteId: number): Promise<any> {
+        let productType = null;
+        if (payLoad.productTypeId) {
+            productType = await this.productTypeRepository.findOne(payLoad.productTypeId);
+        }
         const product = new Product();
         product.name = payLoad.name;
         product.description = payLoad.description;
@@ -27,6 +35,7 @@ export class ProductService {
         product.siteId = siteId;
         product.createdBy = req.user.id;
         product.modifiedBy = req.user.id;
+        product.productType = productType;
         return await this.productRepository.save(await this.productRepository.create(product));
     }
 
@@ -81,6 +90,10 @@ export class ProductService {
        */
     async updateProduct(productId: number, payload: UpdateProductDto, req: any, siteId: number): Promise<any> {
         const product = await this.productRepository.findOne(productId);
+        let productType = null;
+        if (payload.productTypeId) {
+            productType = await this.productTypeRepository.findOne(payload.productTypeId);
+        }
         if (product && (product.productStatus == 1)) {
             product.modifiedBy = req.user.id;
             product.siteId = siteId;
@@ -88,6 +101,7 @@ export class ProductService {
             product.description = payload.description;
             product.cost = payload.cost;
             product.recurrence = payload.recurrence;
+            product.productType = productType;
             return await this.productRepository.update(productId, product);
         }
         else {

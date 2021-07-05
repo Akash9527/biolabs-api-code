@@ -36,6 +36,40 @@ export const SITE_ADMIN_ACCESSLEVELS = {
       view: true,
       update: true,
       delete: true,
+      child: {
+        'management': {
+          name: 'Admin',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+        'sponsor': {
+          name: 'Sponsors',
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
+        },
+        'resident': {
+          name: 'Resident Admin',
+          action: true,
+          create: true,
+          view: false,
+          update: true,
+          delete: true,
+        }
+      }
+    },
+    'invoice-waitlist': {
+      name: 'Invoice/Waitlist',
+      action: true,
+      create: true,
+      view: true,
+      update: true,
+      delete: true,
     },
     sites: {
       name: 'Sites',
@@ -61,16 +95,16 @@ export const SITE_ADMIN_ACCESSLEVELS = {
       update: true,
       delete: true,
       child: {
-        'application-form': {
-          name: 'Application Form',
-          action: false,
-          create: false,
-          view: false,
-          update: false,
-          delete: false,
+        'application-configure': {
+          name: 'Application Configuration',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
         },
-        'item-cost': {
-          name: 'Item Cost',
+        'configure': {
+          name: 'Cost Configuration',
           action: true,
           create: true,
           view: true,

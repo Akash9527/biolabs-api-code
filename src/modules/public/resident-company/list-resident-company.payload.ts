@@ -64,4 +64,8 @@ export class ListResidentCompanyPayload {
   })
   sortOrder: string;
 
+  @ApiProperty({
+    required: false,
+  })
+  sortBy: string;
 }
