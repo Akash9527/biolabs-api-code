@@ -757,6 +757,11 @@ export class ResidentCompanyService {
         residentCompany.companyVisibility = false;
       }
       this.residentCompanyRepository.update(residentCompany.id, residentCompany);
+      const historyData: any = JSON.parse(JSON.stringify(residentCompany));
+      historyData.comnpanyId = residentCompany.id;
+      delete historyData.id;
+
+      await this.residentCompanyHistoryRepository.save(historyData);
       return residentCompany;
     } else {
       throw new NotAcceptableException(
