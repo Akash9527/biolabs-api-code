@@ -190,7 +190,7 @@ export class OrderProductService {
       + ' from resident_companies as rc'
       + ' LEFT OUTER JOIN order_product as orp on orp.\"companyId\" = rc.\"id\"'
       + ' where rc.\"site\" && ARRAY[' + site + ']::int[]'
-      + ' and orp.\"month\"=' + month + ' or orp."month" isnull'
+      + ' and (orp.\"month\"=' + month + ' or orp."month" isnull )'
       + ' and rc.\"companyStatus\" = \'1\' '
       + ' group by rc.\"companyName\", orp.\"companyId\", orp.\"productName\",'
       + ' orp.\"productDescription\", orp.\"cost\", orp.\"quantity\", '
