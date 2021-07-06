@@ -1,6 +1,5 @@
 import { Injectable, NotAcceptableException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { GreaterThanEqualsTo } from "modules/common/validator/greater-than-equals-to.validator";
 import { MoreThanOrEqual, Repository } from "typeorm";
 import { AddProductDto } from "./dto/AddProduct.dto";
 import { UpdateProductDto } from "./dto/UpdateProduct.dto";
