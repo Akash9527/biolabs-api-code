@@ -51,21 +51,25 @@ export class OrderProductService {
 
     if (orderProduct.recurrence) {
       /**
-       * Add next 3 months Products
+       * Add next 4 months Products
        */
-      for (let i = 1; i <= 4; i++) {
-
-        let futureOrderProduct = { ...orderProduct };
-        futureOrderProduct.month = orderProduct.month + i;
-        futureOrderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
-        await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
-          throw new HttpException({
-            message: err.message
-          }, HttpStatus.BAD_REQUEST);
-        });
-      }
+      orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
+      await this.addFutureOrderProducts(orderProduct, orderSave);
     }
     return { message: 'Added successfully', status: 'success' };
+  }
+
+  private async addFutureOrderProducts(orderProduct: any, orderSave: OrderProduct) {
+    for (let i = 1; i < 4; i++) {
+
+      let futureOrderProduct = { ...orderProduct };
+      futureOrderProduct.month = orderProduct.month + i;
+      await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
+        throw new HttpException({
+          message: err.message
+        }, HttpStatus.BAD_REQUEST);
+      });
+    }
   }
 
   /**
@@ -97,43 +101,48 @@ export class OrderProductService {
       }, HttpStatus.BAD_REQUEST);
     });
 
-    const pId = (orderProduct.productId) ? orderProduct.productId : id;
+    payload.productId = orderProduct.productId;
+    payload.manuallyEnteredProduct = orderProduct.manuallyEnteredProduct;
     const futureProducts = await this.orderProductRepository.find({
       where: {
-        productId: pId,
+        productId: payload.productId,
         status: 0,
-        month: MoreThan(orderProduct.month),
+        month: MoreThan(payload.month),
       }
     }).catch(err => {
       throw new HttpException({
         message: err.message
-      }, HttpStatus.BAD_REQUEST);
+      }, HttpStatus.NOT_MODIFIED);
     });
     if (!payload.recurrence) {
       for await (const product of futureProducts) {
         await this.orderProductRepository.delete(product.id).catch(err => {
           throw new HttpException({
             message: err.message
-          }, HttpStatus.BAD_REQUEST);
+          }, HttpStatus.NOT_MODIFIED);
         });
       }
     } else {
-      for await (const product of futureProducts) {
-        let futureOrderProduct = { ...payload };
-        futureOrderProduct.month = product.month;
-        futureOrderProduct.productId = product.productId;
-        await this.orderProductRepository.update(product.id, futureOrderProduct).catch(err => {
-          throw new HttpException({
-            message: err.message
-          }, HttpStatus.BAD_REQUEST);
-        });
+      if (futureProducts.length == 0) {
+        await this.addFutureOrderProducts(payload, orderProduct);
+      } else {
+        for await (const product of futureProducts) {
+          let futureOrderProduct = { ...payload };
+          futureOrderProduct.month = product.month;
+          futureOrderProduct.productId = product.productId;
+          await this.orderProductRepository.update(product.id, futureOrderProduct).catch(err => {
+            throw new HttpException({
+              message: err.message
+            }, HttpStatus.NOT_MODIFIED);
+          });
+        }
       }
     }
 
     return await this.orderProductRepository.update(id, payload).catch(err => {
       throw new HttpException({
         message: err.message
-      }, HttpStatus.BAD_REQUEST);
+      }, HttpStatus.NOT_MODIFIED);
     });
   }
 
@@ -162,9 +171,8 @@ export class OrderProductService {
 
     const orderProductArray = await this.orderProductRepository.findByIds([id]);
     const orderProduct = orderProductArray[0];
-    const pId = (orderProduct.productId) ? orderProduct.productId : id;
     const deleteProducts = await this.orderProductRepository.find({
-      productId: pId,
+      productId: orderProduct.productId,
       status: 0,
       month: MoreThanOrEqual(orderProduct.month)
     });
