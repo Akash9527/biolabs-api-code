@@ -134,19 +134,19 @@ export class ResidentCompanyService {
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
     if (payload.id)
       await this.residentCompanyAdvisoryRepository.update(payload.id, payload)
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in advisor team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in advisor team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     else {
       delete payload.id;
       await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload))
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in advisor team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in advisor team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     }
   }
 
@@ -188,19 +188,19 @@ export class ResidentCompanyService {
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
     if (payload.id)
       await this.residentCompanyManagementRepository.update(payload.id, payload)
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in Management team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in Management team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     else {
       delete payload.id;
       await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload))
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in Management team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in Management team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     }
   }
 
@@ -845,7 +845,7 @@ export class ResidentCompanyService {
       payload.q = payload.q.trim();
       // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` }); 
       //rcQuery.andWhere("(resident_companies.name LIKE :q) OR (resident_companies.companyName LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\") @@ to_tsquery(:q)) ", { q: `%${payload.q}%` });
-      rcQuery.andWhere("(LOWER(resident_companies.name) LIKE :q) OR (LOWER(resident_companies.companyName) LIKE :q) OR (LOWER(resident_companies.technology) LIKE :q) OR (LOWER(resident_companies.email) LIKE :q) OR (LOWER(resident_companies.rAndDPath) LIKE :q) OR (LOWER(resident_companies.foundedPlace) LIKE :q) OR (LOWER(resident_companies.affiliatedInstitution) LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\" || ' ' || resident_companies.\"email\" || ' ' || resident_companies.\"rAndDPath\" || ' ' || resident_companies.\"foundedPlace\" || ' ' || resident_companies.\"affiliatedInstitution\" ) @@ plainto_tsquery(:q) )", { q: `%${ payload.q.toLowerCase() }%` });
+      rcQuery.andWhere("(LOWER(resident_companies.name) LIKE :q) OR (LOWER(resident_companies.companyName) LIKE :q) OR (LOWER(resident_companies.technology) LIKE :q) OR (LOWER(resident_companies.email) LIKE :q) OR (LOWER(resident_companies.rAndDPath) LIKE :q) OR (LOWER(resident_companies.foundedPlace) LIKE :q) OR (LOWER(resident_companies.affiliatedInstitution) LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\" || ' ' || resident_companies.\"email\" || ' ' || resident_companies.\"rAndDPath\" || ' ' || resident_companies.\"foundedPlace\" || ' ' || resident_companies.\"affiliatedInstitution\" ) @@ plainto_tsquery(:q) )", { q: `%${payload.q.toLowerCase()}%` });
     }
 
     if (payload.companyStatus && payload.companyStatus.length > 0) {
@@ -998,12 +998,12 @@ export class ResidentCompanyService {
     return false;
   }
 
-   /**
-   * Description: This method is used to soft delete the list(for advisors,managements,technicals).
-   * @description This method is used to soft delete the list(for advisors,managements,technicals).
-   * @param id member id
-   * @return object of affected rows
-   */
+  /**
+  * Description: This method is used to soft delete the list(for advisors,managements,technicals).
+  * @description This method is used to soft delete the list(for advisors,managements,technicals).
+  * @param id member id
+  * @return object of affected rows
+  */
   async softDeleteMember(id, type: string) {
     let repo;
     if (type == 'advisors') {
@@ -1074,8 +1074,8 @@ export class ResidentCompanyService {
   }
 
   /**
-   * Description: This method returns started with biolabs date
-   * @description This method returns started with biolabs date
+   * Description: This method returns started with biolabs date.
+   * @description This method returns started with biolabs date.
    * @param siteId The Site id
    * @param companyId The Company id
    * @returns started with biolabs date
@@ -1086,5 +1086,25 @@ export class ResidentCompanyService {
       "AND \"companyOnboardingStatus\" = true";
     const startWithBiolab = await this.residentCompanyHistoryRepository.query(queryStr);
     return startWithBiolab;
+  }
+  /**
+ * Description: This method returns current month fee details
+ * @description This method returns current month fee details
+ * @param siteId The Site id
+ * @param companyId The Company id
+ * @returns current month fee details
+ */
+  async getFinancialFees(siteId: number, companyId: number) {
+    const currentMonth = new Date().getMonth() + 1;
+    const queryStr = "SELECT p. \"productTypeId\",SUM(o.\"cost\") FROM resident_companies as rc " +
+      "LEFT JOIN order_product as o ON o.\"companyId\" = rc.\"id\" " +
+      "LEFT JOIN product as p ON  p.id = o.\"productId\" " +
+      "where p.id = o.\"productId\" " +
+      "AND rc.\"id\" = " + companyId +
+      "AND rc.\"site\" = \'{" + siteId + "}\' " +
+      "AND o.\"month\" =  " + currentMonth +
+      "AND  p.\"productTypeId\" IN(1, 2, 5) " +
+      "group by p.\"productTypeId\" ";
+    return await this.residentCompanyHistoryRepository.query(queryStr);
   }
 }
