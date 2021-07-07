@@ -1,6 +1,6 @@
-import { Injectable, NotAcceptableException } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotAcceptableException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { MoreThanOrEqual, Repository } from "typeorm";
+import { MoreThan, MoreThanOrEqual, Repository } from "typeorm";
 import { AddProductDto } from "./dto/AddProduct.dto";
 import { UpdateProductDto } from "./dto/UpdateProduct.dto";
 import { OrderProduct } from "./model/order-product.entity";
@@ -78,7 +78,7 @@ export class ProductService {
        */
     async softDeleteProduct(id: number, req: any) {
         const product = await this.productRepository.findOne(id);
-        const month = new Date().getMonth()+2;
+        const month = new Date().getMonth() + 2;
         const orderProducts = await this.orderProductRepository.find({
             manuallyEnteredProduct: false,
             productId: id,
@@ -88,7 +88,8 @@ export class ProductService {
             product.productStatus = 99;
             product.modifiedBy = req.user.id;
             for await (const orderProduct of orderProducts) {
-                await this.orderProductRepository.delete(orderProduct.id);
+                orderProduct.manuallyEnteredProduct = true;
+                await this.orderProductRepository.update(orderProduct.id, orderProduct);
             }
             return await this.productRepository.update(id, product);
         } else {
@@ -102,12 +103,13 @@ export class ProductService {
        */
     async updateProduct(productId: number, payload: UpdateProductDto, req: any, siteId: number): Promise<any> {
         const product = await this.productRepository.findOne(productId);
-        const month = new Date().getMonth()+2;
+        const month = new Date().getMonth() + 2;
         const orderProducts = await this.orderProductRepository.find({
             manuallyEnteredProduct: false,
             productId: productId,
             month: MoreThanOrEqual(month)
         });
+        console.log('orderProducts == ',orderProducts)
         let productType = null;
         if (payload.productTypeId) {
             productType = await this.productTypeRepository.findOne(payload.productTypeId);
@@ -120,14 +122,29 @@ export class ProductService {
             product.cost = payload.cost;
             product.recurrence = payload.recurrence;
             product.productType = productType;
-
             for await (const orderProduct of orderProducts) {
-                orderProduct.productName = payload.name;
-                orderProduct.productDescription = payload.description;
-                orderProduct.cost = payload.cost;
-                await this.orderProductRepository.update(orderProduct.id, orderProduct)
+                if (!payload.recurrence) {
+                    await this.orderProductRepository.delete(orderProduct.id);
+                } else {
+                    orderProduct.productName = payload.name;
+                    orderProduct.productDescription = payload.description;
+                    orderProduct.cost = payload.cost;
+                    orderProduct.recurrence = payload.recurrence;
+                    /**
+                    * Add next 4 months Products
+                    */
+                    for (let i = 1; i <= 4; i++) {
+                        let futureOrderProduct = { ...orderProduct };
+                        futureOrderProduct.month = orderProduct.month + i;
+                        await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
+                            throw new HttpException({
+                                message: err.message
+                            }, HttpStatus.NOT_MODIFIED);
+                        });
+                    }
+                    await this.orderProductRepository.update(orderProduct.id, orderProduct);
+                }
             }
-
             return await this.productRepository.update(productId, product);
         }
         else {
