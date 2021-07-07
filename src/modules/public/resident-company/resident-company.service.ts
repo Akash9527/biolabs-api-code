@@ -1088,12 +1088,12 @@ export class ResidentCompanyService {
     return startWithBiolab;
   }
   /**
- * Description: This method returns current month fee details
- * @description This method returns current month fee details
- * @param siteId The Site id
- * @param companyId The Company id
- * @returns current month fee details
- */
+   * Description: This method returns current month fee details
+   * @description This method returns current month fee details
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns current month fee details
+   */
   async getFinancialFees(siteId: number, companyId: number) {
     const currentMonth = new Date().getMonth() + 1;
     const queryStr = "SELECT p. \"productTypeId\",SUM(o.\"cost\") FROM resident_companies as rc " +
@@ -1106,5 +1106,26 @@ export class ResidentCompanyService {
       "AND  p.\"productTypeId\" IN(1, 2, 5) " +
       "group by p.\"productTypeId\" ";
     return await this.residentCompanyHistoryRepository.query(queryStr);
+  }
+
+  /**
+   * Description: This method returns changes as feeds
+   * @description This method returns changes as feeds
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns latest feeds
+   */
+  async getFeeds(siteId: number, companyId: number) {
+    const getFeeds = await this.residentCompanyHistoryRepository.query("SELECT feeds(" + companyId + ")").catch(err => {
+      switch (err.code) {
+        case '42883':
+          throw new HttpException({
+            message: err.message + ' in getFeeds'
+          }, HttpStatus.NOT_FOUND);
+          break;
+      }
+    });
+    console.log('getFeeds for ' + companyId, getFeeds);
+    return getFeeds;
   }
 }

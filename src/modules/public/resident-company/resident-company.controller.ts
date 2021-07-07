@@ -258,4 +258,20 @@ export class ResidentCompanyController {
     getFinancialFees(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
       return this.residentCompanyService.getFinancialFees(siteId, companyId);
     }
+
+  /**
+   * Description: This method returns latest feeds.
+   * @description This method returns latest feeds.
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns current month fee details
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('feeds/:siteId/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getFeeds(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getFeeds(siteId, companyId);
+  }
 }
