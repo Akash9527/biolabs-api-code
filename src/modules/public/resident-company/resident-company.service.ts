@@ -621,7 +621,7 @@ export class ResidentCompanyService {
     const categoryStats = await this.categoryRepository.
       query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
         "where c.id = ANY(rc.industry::int[]) ) as industryCount " +
-        "FROM public.categories as c order by industryCount desc limit 3;")
+        "FROM public.categories as c order by industryCount desc limit 3;");
 
     response['companyStats'] = (!stats) ? 0 : stats;
     response['graduate'] = (!graduate) ? 0 : graduate;
@@ -1036,18 +1036,18 @@ export class ResidentCompanyService {
   async getStagesOfTechnologyBySiteId(siteId: number, companyId: number) {
     const response = {};
     const queryStr = " SELECT \"stage\", \"name\", \"quarterno\", \"quat\" " +
-                      " FROM " +
-                        " (SELECT MAX(rch.\"companyStage\") AS stage, " +
-                            "EXTRACT(quarter FROM rch.\"createdAt\") AS \"quarterno\", " +
-                            "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quat\" " +
-                            "FROM public.resident_company_history AS rch " +
-                            "WHERE rch.\"site\" = \'{ " + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
-                            "GROUP BY " +
-                            "EXTRACT(quarter FROM rch.\"createdAt\")," +
-                            "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
-                        " ) AS csg " +
-                      " LEFT JOIN technology_stages AS ts ON ts.id = csg.\"stage\" " +
-                      " ORDER BY quat";
+      " FROM " +
+      " (SELECT MAX(rch.\"companyStage\") AS stage, " +
+      "EXTRACT(quarter FROM rch.\"createdAt\") AS \"quarterno\", " +
+      "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quat\" " +
+      "FROM public.resident_company_history AS rch " +
+      "WHERE rch.\"site\" = \'{ " + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
+      "GROUP BY " +
+      "EXTRACT(quarter FROM rch.\"createdAt\")," +
+      "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
+      " ) AS csg " +
+      " LEFT JOIN technology_stages AS ts ON ts.id = csg.\"stage\" " +
+      " ORDER BY quat";
     const compResidentHistory = await this.residentCompanyHistoryRepository.query(queryStr);
     response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
     return response;

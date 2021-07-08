@@ -62,7 +62,7 @@ import { Notes } from './rc-notes.entity';
     }),
   ],
   controllers: [ResidentCompanyController],
-  exports: [ResidentCompanyService],
+  exports: [ResidentCompanyService, Mail],
   providers: [ResidentCompanyService, Mail],
 })
 export class ResidentCompanyModule {}
