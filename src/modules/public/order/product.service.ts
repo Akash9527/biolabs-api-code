@@ -89,6 +89,7 @@ export class ProductService {
             product.modifiedBy = req.user.id;
             for await (const orderProduct of orderProducts) {
                 orderProduct.manuallyEnteredProduct = true;
+                orderProduct.productId = orderProduct.id;
                 await this.orderProductRepository.update(orderProduct.id, orderProduct);
             }
             return await this.productRepository.update(id, product);
@@ -109,7 +110,6 @@ export class ProductService {
             productId: productId,
             month: MoreThanOrEqual(month)
         });
-        console.log('orderProducts == ',orderProducts)
         let productType = null;
         if (payload.productTypeId) {
             productType = await this.productTypeRepository.findOne(payload.productTypeId);
@@ -122,27 +122,58 @@ export class ProductService {
             product.cost = payload.cost;
             product.recurrence = payload.recurrence;
             product.productType = productType;
-            for await (const orderProduct of orderProducts) {
-                if (!payload.recurrence) {
-                    await this.orderProductRepository.delete(orderProduct.id);
-                } else {
-                    orderProduct.productName = payload.name;
-                    orderProduct.productDescription = payload.description;
-                    orderProduct.cost = payload.cost;
-                    orderProduct.recurrence = payload.recurrence;
-                    /**
-                    * Add next 4 months Products
-                    */
-                    for (let i = 1; i <= 4; i++) {
-                        let futureOrderProduct = { ...orderProduct };
-                        futureOrderProduct.month = orderProduct.month + i;
-                        await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
-                            throw new HttpException({
-                                message: err.message
-                            }, HttpStatus.NOT_MODIFIED);
-                        });
+            //if recurrence is false 
+            if (!payload.recurrence) {
+                for await (const orderProduct of orderProducts) {
+                    // delete future months order products 
+                    if (!payload.recurrence && (orderProduct.month != month)) {
+                        await this.orderProductRepository.delete(orderProduct.id);
                     }
-                    await this.orderProductRepository.update(orderProduct.id, orderProduct);
+                    // Update Order Product for next 1 month
+                    if (orderProduct.id) {
+                        orderProduct.productName = payload.name;
+                        orderProduct.productDescription = payload.description;
+                        orderProduct.cost = payload.cost;
+                        orderProduct.recurrence = payload.recurrence;
+                        await this.orderProductRepository.update(orderProduct.id, orderProduct);
+                    }
+                }
+            } else if (payload.recurrence) {
+                for await (const orderProduct of orderProducts) {
+                    //Update Order Product as per Product
+                    if (orderProduct.id) {
+                        orderProduct.productName = payload.name;
+                        orderProduct.productDescription = payload.description;
+                        orderProduct.cost = payload.cost;
+                        orderProduct.recurrence = payload.recurrence;
+                        await this.orderProductRepository.update(orderProduct.id, orderProduct);
+                    }
+                    //Add next 3 months invoice
+                    for (let i = 1; i < 4; i++) {
+                        //quering if orderProduct exist for future months
+                        const futureOrderProduct = await this.orderProductRepository.find({
+                            manuallyEnteredProduct: false,
+                            productId: orderProduct.productId,
+                            month: orderProduct.month + i
+                        });
+                        //if orderProduct doesn't exist for future months then add new Order Products for future months
+                        if (!futureOrderProduct || futureOrderProduct.length == 0) {
+                            let futureOrderProductObj = JSON.parse(JSON.stringify(orderProduct));
+
+                            if (futureOrderProductObj.month < 12) {
+                                futureOrderProductObj.month = futureOrderProductObj.month + i;
+                            } else {
+                                futureOrderProductObj.month = 1;
+                                futureOrderProductObj.year = futureOrderProductObj.year + 1;
+                            }
+                            delete futureOrderProductObj['id'];
+                            await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProductObj)).catch(err => {
+                                throw new HttpException({
+                                    message: err.message
+                                }, HttpStatus.NOT_IMPLEMENTED);
+                            });
+                        }
+                    }
                 }
             }
             return await this.productRepository.update(productId, product);
