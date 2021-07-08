@@ -621,7 +621,7 @@ export class ResidentCompanyService {
     const categoryStats = await this.categoryRepository.
       query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
         "where c.id = ANY(rc.industry::int[]) ) as industryCount " +
-        "FROM public.categories as c order by industryCount desc limit 3;")
+        "FROM public.categories as c order by industryCount desc limit 3;");
 
     response['companyStats'] = (!stats) ? 0 : stats;
     response['graduate'] = (!graduate) ? 0 : graduate;
