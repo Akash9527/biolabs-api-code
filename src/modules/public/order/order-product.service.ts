@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { ResidentCompany } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { OrderProduct } from './model/order-product.entity';
@@ -10,7 +12,10 @@ export class OrderProductService {
 
   constructor(
     @InjectRepository(OrderProduct)
-    private readonly orderProductRepository: Repository<OrderProduct>
+    private readonly orderProductRepository: Repository<OrderProduct>,
+    @InjectRepository(ResidentCompany)
+    private readonly residentCompanyRepository: Repository<ResidentCompany>,
+    private readonly moduleRef: ModuleRef
   ) { }
 
   /**
@@ -54,16 +59,21 @@ export class OrderProductService {
        * Add next 4 months Products
        */
       orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
-      await this.addFutureOrderProducts(orderProduct, orderSave);
+      await this.addFutureOrderProducts(orderProduct);
     }
     return { message: 'Added successfully', status: 'success' };
   }
 
-  private async addFutureOrderProducts(orderProduct: any, orderSave: OrderProduct) {
+  private async addFutureOrderProducts(orderProduct: any) {
+    let futureOrderProduct = { ...orderProduct };
     for (let i = 1; i < 4; i++) {
+      if (futureOrderProduct.month < 12) {
+        futureOrderProduct.month = futureOrderProduct.month + 1;
+      } else {
+        futureOrderProduct.month = 1;
+        futureOrderProduct.year = futureOrderProduct.year + 1;
+      }
 
-      let futureOrderProduct = { ...orderProduct };
-      futureOrderProduct.month = orderProduct.month + i;
       await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
         throw new HttpException({
           message: err.message
@@ -124,7 +134,7 @@ export class OrderProductService {
       }
     } else {
       if (futureProducts.length == 0) {
-        await this.addFutureOrderProducts(payload, orderProduct);
+        await this.addFutureOrderProducts(payload);
       } else {
         for await (const product of futureProducts) {
           let futureOrderProduct = { ...payload };
@@ -187,15 +197,18 @@ export class OrderProductService {
    * @returns 
    */
   async consolidatedInvoice(month: number, site: number) {
-
-    return await this.orderProductRepository.createQueryBuilder("order_product")
-      .addSelect("rc.companyName", 'companyName')
-      .leftJoin('resident_companies', 'rc', 'rc.id = order_product.companyId')
-      .where("rc.companyStatus = '1' ")
-      .andWhere("rc.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: site })
-      .andWhere("order_product.month = :month", { month: month })
-      .orderBy("rc.companyName", 'ASC')
-      .getRawMany();
-
+    const query = 'select rc.\"companyName\", orp.\"companyId\", orp.\"productName\",'
+      + ' orp.\"productDescription\", orp.\"cost\", orp.\"quantity\", '
+      + ' orp.\"recurrence\", orp.\"currentCharge\", orp.\"startDate\", orp.\"endDate\" '
+      + ' from resident_companies as rc'
+      + ' LEFT OUTER JOIN order_product as orp on orp.\"companyId\" = rc.\"id\"'
+      + ' where rc.\"site\" && ARRAY[' + site + ']::int[]'
+      + ' and (orp.\"month\"=' + month + ' or orp."month" isnull )'
+      + ' and rc.\"companyStatus\" = \'1\' '
+      + ' group by rc.\"companyName\", orp.\"companyId\", orp.\"productName\",'
+      + ' orp.\"productDescription\", orp.\"cost\", orp.\"quantity\", '
+      + ' orp.\"recurrence\", orp.\"currentCharge\", orp.\"startDate\", orp.\"endDate\" '
+      + ' order by rc.\"companyName\" ,  orp.\"productName\"';
+    return await this.residentCompanyRepository.query(query);
   }
 }
