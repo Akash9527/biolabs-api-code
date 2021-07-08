@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NotAcceptableException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { MoreThan, MoreThanOrEqual, Repository } from "typeorm";
+import { MoreThanOrEqual, Repository } from "typeorm";
 import { AddProductDto } from "./dto/AddProduct.dto";
 import { UpdateProductDto } from "./dto/UpdateProduct.dto";
 import { OrderProduct } from "./model/order-product.entity";

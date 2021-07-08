@@ -59,12 +59,12 @@ export class OrderProductService {
        * Add next 4 months Products
        */
       orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
-      await this.addFutureOrderProducts(orderProduct, orderSave);
+      await this.addFutureOrderProducts(orderProduct);
     }
     return { message: 'Added successfully', status: 'success' };
   }
 
-  private async addFutureOrderProducts(orderProduct: any, orderSave: OrderProduct) {
+  private async addFutureOrderProducts(orderProduct: any) {
     let futureOrderProduct = { ...orderProduct };
     for (let i = 1; i < 4; i++) {
       if (futureOrderProduct.month < 12) {
@@ -134,7 +134,7 @@ export class OrderProductService {
       }
     } else {
       if (futureProducts.length == 0) {
-        await this.addFutureOrderProducts(payload, orderProduct);
+        await this.addFutureOrderProducts(payload);
       } else {
         for await (const product of futureProducts) {
           let futureOrderProduct = { ...payload };
