@@ -65,10 +65,15 @@ export class OrderProductService {
   }
 
   private async addFutureOrderProducts(orderProduct: any, orderSave: OrderProduct) {
+    let futureOrderProduct = { ...orderProduct };
     for (let i = 1; i < 4; i++) {
+      if (futureOrderProduct.month < 12) {
+        futureOrderProduct.month = futureOrderProduct.month + 1;
+      } else {
+        futureOrderProduct.month = 1;
+        futureOrderProduct.year = futureOrderProduct.year + 1;
+      }
 
-      let futureOrderProduct = { ...orderProduct };
-      futureOrderProduct.month = orderProduct.month + i;
       await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
         throw new HttpException({
           message: err.message
