@@ -14,18 +14,23 @@ export class AddProductDto {
     })
     @IsNotEmpty()
     recurrence: boolean;
-    
+
     @ApiProperty({
         required: true,
-        nullable: true,
+        nullable: false,
     })
     cost: number;
 
     @ApiProperty({
-        required: true,
+        required: false,
+        nullable: true,
     })
-    @IsNotEmpty()
     description: string;
 
+    @ApiProperty({
+        required: true,
+        nullable: false,
+    })
+    productTypeId: number;
 
 }

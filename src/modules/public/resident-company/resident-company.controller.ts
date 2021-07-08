@@ -198,6 +198,7 @@ export class ResidentCompanyController {
   }
 
   /**
+  * Description: This method returns stages of technology by siteId and companyId
   * @description This method returns stages of technology by siteId and companyId
   * @param siteId The site id
   * @returns stages of technology
@@ -212,6 +213,7 @@ export class ResidentCompanyController {
   }
 
   /**
+   * Description: This method returns fundings by siteId and companyId
    * @description This method returns fundings by siteId and companyId
    * @param siteId The Site id
    * @param companyId The Company id
@@ -224,5 +226,52 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getFundingBySiteIdAndCompanyId(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
     return this.residentCompanyService.getFundingBySiteIdAndCompanyId(siteId, companyId);
+  }
+
+  /**
+   * Description: This method returns started with biolabs date
+   * @description This method returns started with biolabs date
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns started with biolabs date
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('startedWithBiolabs/:siteId/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getstartedWithBiolabs(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getstartedWithBiolabs(siteId, companyId);
+  }
+   /**
+   * Description: This method returns current month fee details.
+   * @description This method returns current month fee details.
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns current month fee details
+   */
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard())
+    @Get('financialfees/:siteId/:companyId')
+    @ApiResponse({ status: 200, description: 'Successful Response' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    getFinancialFees(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+      return this.residentCompanyService.getFinancialFees(siteId, companyId);
+    }
+
+  /**
+   * Description: This method returns latest feeds.
+   * @description This method returns latest feeds.
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns current month fee details
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('feeds/:siteId/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getFeeds(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getFeeds(siteId, companyId);
   }
 }

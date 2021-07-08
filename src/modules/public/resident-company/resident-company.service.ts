@@ -134,19 +134,19 @@ export class ResidentCompanyService {
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
     if (payload.id)
       await this.residentCompanyAdvisoryRepository.update(payload.id, payload)
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in advisor team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in advisor team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     else {
       delete payload.id;
       await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload))
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in advisor team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in advisor team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     }
   }
 
@@ -188,19 +188,19 @@ export class ResidentCompanyService {
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
     if (payload.id)
       await this.residentCompanyManagementRepository.update(payload.id, payload)
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in Management team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in Management team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     else {
       delete payload.id;
       await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload))
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in Management team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in Management team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     }
   }
 
@@ -316,6 +316,7 @@ export class ResidentCompanyService {
   private async sendEmailToSiteAdmin(site: any, req, companyName: string) {
     let siteAdminEmails = [];
     let userInfo;
+    let siteList = [];
 
     let siteAdmin: any = await this.userRepository
       .createQueryBuilder('users')
@@ -323,9 +324,17 @@ export class ResidentCompanyService {
       .addSelect("string_agg(s.name::text, ',')", 'siteName')
       .leftJoin('sites', 's', 's.id = Any(users.site_id)')
       .where('users.role = 2')
+      .andWhere("users.status = '1'")
       .andWhere("s.id = Any(:siteArray)", { siteArray: site })
       .groupBy('users.email')
       .getRawMany();
+
+    for await (let s of site) {
+      await this.siteRepository
+        .query(`select name as siteName from sites where id = ${s}`).then(res => {
+          siteList.push(res[0].sitename);
+        });
+    }
 
     for await (const admin of siteAdmin) {
       siteAdminEmails.push({
@@ -333,14 +342,14 @@ export class ResidentCompanyService {
           address: admin['email']
         },
       });
-      userInfo = {
-        token: req.headers.authorization,
-        company_name: companyName,
-        site_name: admin['siteName'],
-        origin: req.headers['origin'],
-      };
     }
 
+    userInfo = {
+      token: req.headers.authorization,
+      company_name: companyName,
+      site_name: siteList,
+      origin: req.headers['origin'],
+    };
     await this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, 'applicationFormSubmit', userInfo);
   }
 
@@ -376,6 +385,17 @@ export class ResidentCompanyService {
     if (typeof payload.committeeStatus !== 'undefined') {
       rcQuery.andWhere("resident_companies.committeeStatus = :committeeStatus", { committeeStatus: payload.committeeStatus });
     }
+
+    if (typeof payload.sortBy !== 'undefined') {
+      if (payload.sortBy == 'alpha') {
+        rcQuery.orderBy("resident_companies.companyName", "ASC");
+      }
+      if (payload.sortBy == 'date') {
+        rcQuery.orderBy("resident_companies.companyStatusChangeDate", "DESC");
+      }
+    } else {
+      rcQuery.orderBy("id", "DESC");
+    }
     if (payload.pagination) {
       let skip = 0;
       let take = 10;
@@ -387,7 +407,6 @@ export class ResidentCompanyService {
       }
       rcQuery.skip(skip).take(take)
     }
-    rcQuery.orderBy("id", "DESC");
     return await rcQuery.getRawMany();
   }
 
@@ -589,15 +608,15 @@ export class ResidentCompanyService {
     const graduate: any = await this.residentCompanyRepository.
       createQueryBuilder("resident_companies").
       select("count(*)", "graduate").
-      where("resident_companies.status = :status", { status: '4' }).getRawOne();
+      where("resident_companies.companyStatus = :status", { status: '4' }).getRawOne();
 
     //Get Sum of all companies and Average company size
     const stats: any = await this.residentCompanyRepository.
       createQueryBuilder("resident_companies").
       select("AVG(resident_companies.companySize)::numeric(10,2)", "avgTeamSize").
       addSelect("count(*)", "startUpcount").
-      where("resident_companies.status = :status", { status: '1' }).
-      andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).getRawOne();
+      where("resident_companies.companyStatus = :status", { status: '1' }).
+      andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).getRawOne();
 
     const categoryStats = await this.categoryRepository.
       query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
@@ -629,7 +648,7 @@ export class ResidentCompanyService {
       const graduate: any = await this.residentCompanyRepository.
         createQueryBuilder("resident_companies").
         select("count(*)", "graduate").
-        where("resident_companies.status = :status", { status: '4' }).
+        where("resident_companies.companyStatus = :status", { status: '4' }).
         andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
 
       //Get Sum of all companies and Average company size
@@ -637,8 +656,8 @@ export class ResidentCompanyService {
         createQueryBuilder("resident_companies").
         select("AVG(resident_companies.companySize)::numeric(10,2)", "avg").
         addSelect("count(*)", "count").
-        where("resident_companies.status = :status", { status: '1' }).
-        andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).
+        where("resident_companies.companyStatus = :status", { status: '1' }).
+        andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).
         andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
 
       const categoryStats = await this.categoryRepository.
@@ -654,13 +673,14 @@ export class ResidentCompanyService {
       // addSelect("count(*)", "newStartUps").
       // where("resident_companies.status = :status", { status: '1' }).
       // where("resident_companies.createdAt  >  '06/01/2021' ").
-      // andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: "true" }).
+      // andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).
       // andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
 
       newStartUps = await this.residentCompanyRepository.
         query(" select count(*) as newStartUps FROM resident_companies " +
-          " where resident_companies.\"companyVisibility\" = true and " +
-          " resident_companies.\"status\" = '1' and " +
+          " where resident_companies.\"companyOnboardingStatus\" = true and " +
+          + site.id + "= ANY(resident_companies.\"site\"::int[]) and" +
+          " resident_companies.\"companyStatus\" = '1' and " +
           " (CURRENT_DATE - INTERVAL '3 months')  < (resident_companies.\"createdAt\") ");
 
       // } catch {
@@ -737,6 +757,11 @@ export class ResidentCompanyService {
         residentCompany.companyVisibility = false;
       }
       this.residentCompanyRepository.update(residentCompany.id, residentCompany);
+      const historyData: any = JSON.parse(JSON.stringify(residentCompany));
+      historyData.comnpanyId = residentCompany.id;
+      delete historyData.id;
+
+      await this.residentCompanyHistoryRepository.save(historyData);
       return residentCompany;
     } else {
       throw new NotAcceptableException(
@@ -779,7 +804,7 @@ export class ResidentCompanyService {
       await this.residentCompanyTechnicals(companyTechnicalTeams, residentCompany.id);
 
       const historyData: any = JSON.parse(JSON.stringify(payload));
-      historyData.companyId = residentCompany.id;
+      historyData.comnpanyId = residentCompany.id;
       delete historyData.id;
 
       await this.residentCompanyHistoryRepository.save(historyData);
@@ -817,8 +842,10 @@ export class ResidentCompanyService {
     }
 
     if (payload.q && payload.q != '') {
+      payload.q = payload.q.trim();
       // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` }); 
-      rcQuery.andWhere("(resident_companies.name LIKE :q) OR (resident_companies.companyName LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\") @@ to_tsquery(:q)) ", { q: `%${payload.q}%` });
+      //rcQuery.andWhere("(resident_companies.name LIKE :q) OR (resident_companies.companyName LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\") @@ to_tsquery(:q)) ", { q: `%${payload.q}%` });
+      rcQuery.andWhere("(LOWER(resident_companies.name) LIKE :q) OR (LOWER(resident_companies.companyName) LIKE :q) OR (LOWER(resident_companies.technology) LIKE :q) OR (LOWER(resident_companies.email) LIKE :q) OR (LOWER(resident_companies.rAndDPath) LIKE :q) OR (LOWER(resident_companies.foundedPlace) LIKE :q) OR (LOWER(resident_companies.affiliatedInstitution) LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\" || ' ' || resident_companies.\"email\" || ' ' || resident_companies.\"rAndDPath\" || ' ' || resident_companies.\"foundedPlace\" || ' ' || resident_companies.\"affiliatedInstitution\" ) @@ plainto_tsquery(:q) )", { q: `%${payload.q.toLowerCase()}%` });
     }
 
     if (payload.companyStatus && payload.companyStatus.length > 0) {
@@ -971,12 +998,12 @@ export class ResidentCompanyService {
     return false;
   }
 
-   /**
-   * Description: This method is used to soft delete the list(for advisors,managements,technicals).
-   * @description This method is used to soft delete the list(for advisors,managements,technicals).
-   * @param id member id
-   * @return object of affected rows
-   */
+  /**
+  * Description: This method is used to soft delete the list(for advisors,managements,technicals).
+  * @description This method is used to soft delete the list(for advisors,managements,technicals).
+  * @param id member id
+  * @return object of affected rows
+  */
   async softDeleteMember(id, type: string) {
     let repo;
     if (type == 'advisors') {
@@ -1000,6 +1027,7 @@ export class ResidentCompanyService {
   }
 
   /**
+   * Description: This method returns stages of technology by siteId and companyId
    * @description This method returns stages of technology by siteId and companyId
    * @param siteId The Site id
    * @param companyId The Company id
@@ -1023,6 +1051,7 @@ export class ResidentCompanyService {
   }
 
   /**
+   * Description: This method returns fundings by siteId and companyId
    * @description This method returns fundings by siteId and companyId
    * @param siteId The Site id
    * @param companyId The Company id
@@ -1042,5 +1071,61 @@ export class ResidentCompanyService {
     const fundigs = await this.residentCompanyHistoryRepository.query(queryStr);
     response['fundings'] = (!fundigs) ? 0 : fundigs;
     return response;
+  }
+
+  /**
+   * Description: This method returns started with biolabs date.
+   * @description This method returns started with biolabs date.
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns started with biolabs date
+   */
+  async getstartedWithBiolabs(siteId: number, companyId: number) {
+    const queryStr = "SELECT min(\"createdAt\")  as startWithBiolabs FROM public.resident_company_history" +
+      " WHERE \"site\" = \'{" + siteId + "}\' and \"comnpanyId\" = " + companyId +
+      "AND \"companyOnboardingStatus\" = true";
+    const startWithBiolab = await this.residentCompanyHistoryRepository.query(queryStr);
+    return startWithBiolab;
+  }
+  /**
+   * Description: This method returns current month fee details
+   * @description This method returns current month fee details
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns current month fee details
+   */
+  async getFinancialFees(siteId: number, companyId: number) {
+    const currentMonth = new Date().getMonth() + 1;
+    const queryStr = "SELECT p. \"productTypeId\",SUM(o.\"cost\") FROM resident_companies as rc " +
+      "LEFT JOIN order_product as o ON o.\"companyId\" = rc.\"id\" " +
+      "LEFT JOIN product as p ON  p.id = o.\"productId\" " +
+      "where p.id = o.\"productId\" " +
+      "AND rc.\"id\" = " + companyId +
+      "AND rc.\"site\" = \'{" + siteId + "}\' " +
+      "AND o.\"month\" =  " + currentMonth +
+      "AND  p.\"productTypeId\" IN(1, 2, 5) " +
+      "group by p.\"productTypeId\" ";
+    return await this.residentCompanyHistoryRepository.query(queryStr);
+  }
+
+  /**
+   * Description: This method returns changes as feeds
+   * @description This method returns changes as feeds
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns latest feeds
+   */
+  async getFeeds(siteId: number, companyId: number) {
+    const getFeeds = await this.residentCompanyHistoryRepository.query("SELECT feeds(" + companyId + ")").catch(err => {
+      switch (err.code) {
+        case '42883':
+          throw new HttpException({
+            message: err.message + ' in getFeeds'
+          }, HttpStatus.NOT_FOUND);
+          break;
+      }
+    });
+    console.log('getFeeds for ' + companyId, getFeeds);
+    return getFeeds;
   }
 }

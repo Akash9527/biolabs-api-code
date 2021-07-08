@@ -32,7 +32,9 @@ const mockJwtService = () => ({
     sign: jest.fn()
 })
 
-const mockResidentCompanyService = () => ({})
+const mockResidentCompanyService = () => ({
+    getResidentCompany: jest.fn()
+});
 const mockUserFillable: UserFillableFields = {
     email: "testadmin@biolabs.io", password: "test@1234", role: 1, site_id: [1, 2], companyId: 1,
     firstName: "adminName", lastName: "userLast", title: "SuperAdmin", phoneNumber: "2345678902",
@@ -44,6 +46,7 @@ describe('UserService', () => {
     let userService: UsersService;
     let userRepository: Repository<User>;
     let userTokenRepository: Repository<UserToken>;
+    let residentCompanyService;
 
     beforeEach(async () => {
         const module = await Test.createTestingModule({
@@ -59,7 +62,7 @@ describe('UserService', () => {
                     {
                         findOne: jest.fn(),
                         create: jest.fn(() => mockUser),
-                        save: jest.fn(() => mockUser),
+                        save: jest.fn(),
                         createQueryBuilder: jest.fn(() =>
                         ({
                             addSelect: jest.fn().mockReturnThis(),
@@ -83,6 +86,7 @@ describe('UserService', () => {
         userService = await module.get<UsersService>(UsersService);
         userRepository = await module.get<Repository<User>>(getRepositoryToken(User));
         userTokenRepository = await module.get<Repository<UserToken>>(getRepositoryToken(UserToken));
+        residentCompanyService = await module.get<ResidentCompanyService>(ResidentCompanyService);
 
     });
     it('it should be defined', () => {
@@ -127,6 +131,54 @@ describe('UserService', () => {
             } catch (e) {
                 expect(e.response.error).toBe('Not Acceptable');
                 expect(e.response.message).toBe("User with provided email already created.")
+            }
+        });
+    });
+    describe('softDelete method', () => {
+        it('should delete data based on id', async () => {
+            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
+            jest.spyOn(userRepository, 'save').mockResolvedValueOnce(mockUser);
+            const users = await userService.softDeleteUser(mockUser.id);
+            expect(users).toBe(mockUser);
+        })
+
+        it('it should throw exception if user id is not provided  ', async () => {
+            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+            try {
+                await userService.softDeleteUser(new NotAcceptableException('User with provided id not available.'));
+            } catch (e) {
+                expect(e.response.error).toBe('Not Acceptable');
+                expect(e.response.message).toBe('User with provided id not available.');
+                expect(e.response.statusCode).toBe(406);
+            }
+        });
+    });
+    describe('getUserById method', () => {
+        it('should delete data based on id', async () => {
+            //get method
+            mockUser.status = "1";
+            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
+            // const user: User = await userService.get(mockUser.id);
+
+            // //result should not be null
+            // expect(user).not.toBeNull();
+            // //check company id is not null or undefined
+            // expect(user.companyId).not.toBeNull();
+            // expect(user.companyId).not.toBeUndefined();
+            let users = await userService.getUserById(mockUser.id);
+            expect(users).toBe(mockUser);
+
+
+        })
+
+        it('it should throw exception if user id is not provided   ', async () => {
+            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+            try {
+                await userService.getUserById(new NotAcceptableException('User with provided id not available.'));
+            } catch (e) {
+                expect(e.response.error).toBe('Not Acceptable');
+                expect(e.response.message).toBe('User with provided id not available.');
+                expect(e.response.statusCode).toBe(406);
             }
         });
     });

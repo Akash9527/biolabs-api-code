@@ -13,11 +13,12 @@ const mockMasterService = () => ({
     getModalities: jest.fn(),
     getTechnologyStages: jest.fn(),
     getCompanyStatus: jest.fn(),
-    getUserTypes: jest.fn()
+    getUserTypes: jest.fn(),
+    getCommitteeStatus: jest.fn()
 });
 const mockMasterPayLoad: MasterPayload = {
     q: "test", pagination: true, page: 12, limit: 6, sort: true, sortFiled: "test"
-    , siteIdArr: [1, 2],role:1
+    , siteIdArr: [1, 2], role: 1
 }
 describe('MasterController', () => {
 
@@ -744,6 +745,33 @@ describe('MasterController', () => {
         it('it should get UnauthorizedException', async () => {
             await masterService.getUserTypes.mockResolvedValue(new UnauthorizedException());
             const { response } = await masterController.getUserTypes();
+            expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
+            expect(response.message).toBe('Unauthorized');
+        });
+    });
+    describe('should test getCommitteeStatus Functionality', () => {
+
+        let mockCommiteeeStatus: Array<any> = [{ "id": 0, "name": "Unscheduled" }, { "id": 1, "name": "Scheduled" },
+        { "id": 2, "name": "Accepted" }, { "id": 3, "name": "Rejected" }];
+
+        it('it should call masterService getCompanyStatus method', async () => {
+            //check function is called or not
+            await masterController.getCommitteeStatus();
+            expect(await masterService.getCommitteeStatus).toHaveBeenCalled();
+            expect(await masterService.getCommitteeStatus).not.toHaveBeenCalledWith("dummy");
+        });
+        it('it should return  array of company status object', async () => {
+            await masterService.getCommitteeStatus.mockReturnValueOnce(mockCommiteeeStatus);
+            let commiteeeStatus = await masterController.getCommitteeStatus();
+            expect(commiteeeStatus).not.toBeNull();
+            expect(mockCommiteeeStatus.length).toBe(commiteeeStatus.length);
+            expect(commiteeeStatus[0]).toBe(commiteeeStatus[0]);
+            expect(commiteeeStatus[1]).toBe(commiteeeStatus[1]);
+            expect(commiteeeStatus).toBe(mockCommiteeeStatus);
+        })
+        it('it should get UnauthorizedException', async () => {
+            await masterService.getCommitteeStatus.mockResolvedValue(new UnauthorizedException());
+            const { response } = await masterController.getCommitteeStatus();
             expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
             expect(response.message).toBe('Unauthorized');
         });

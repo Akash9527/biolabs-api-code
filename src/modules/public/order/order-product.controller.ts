@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards,Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
@@ -66,5 +66,22 @@ export class OrderProductController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async deleteOrderProduct(@Param('id') id: number): Promise<any> {
     return await this.orderProductService.deleteOrderProduct(id);
+  }
+
+  /**
+  * Description: This method is used to fetch a resident company order product details of given month and year.
+  * @description This method is used to fetch a resident company order product details of given month and year.
+  */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('all-invoice')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async consolidatedInvoice(@Query('month') month: number,@Request() req): Promise<any> {
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return await this.orderProductService.consolidatedInvoice(month,siteIdArr);
   }
 }

@@ -88,10 +88,10 @@ export class UsersService {
       token: userInformation.token,
       userName: savedUser.firstName,
       origin: req.headers['origin'],
+      userRole: payload.role
     };
     let tenant = { tenantEmail: payload.email };
     this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, 'Invite', userInfo);
-
     return savedUser;
   }
 
@@ -110,6 +110,7 @@ export class UsersService {
       user.phoneNumber = payload.phoneNumber;
       user.companyId = (payload.companyId) ? payload.companyId : user.companyId;
       user.userType = payload.userType;
+      user.site_id = payload.site_id;
       if (
         payload.password &&
         payload.password !== '' &&
