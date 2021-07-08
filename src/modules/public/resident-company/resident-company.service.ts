@@ -1035,16 +1035,19 @@ export class ResidentCompanyService {
    */
   async getStagesOfTechnologyBySiteId(siteId: number, companyId: number) {
     const response = {};
-    const queryStr = " SELECT rch.\"companyStage\" as \"stageId\", ts.name as \"stageName\", " +
-      " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
-      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
-      " FROM public.resident_company_history as rch " +
-      " LEFT JOIN technology_stages as ts ON ts.id = rch.\"companyStage\" " +
-      " WHERE rch.\"site\" = \'{ " + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
-      " group by rch.\"companyStage\", ts.name, " +
-      " extract(quarter from rch.\"createdAt\"), " +
-      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
-      " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
+    const queryStr = " SELECT \"stage\", \"name\", \"quarterno\", \"quat\" " +
+                      " FROM " +
+                        " (SELECT MAX(rch.\"companyStage\") AS stage, " +
+                            "EXTRACT(quarter FROM rch.\"createdAt\") AS \"quarterno\", " +
+                            "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quat\" " +
+                            "FROM public.resident_company_history AS rch " +
+                            "WHERE rch.\"site\" = \'{ " + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
+                            "GROUP BY " +
+                            "EXTRACT(quarter FROM rch.\"createdAt\")," +
+                            "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
+                        " ) AS csg " +
+                      " LEFT JOIN technology_stages AS ts ON ts.id = csg.\"stage\" " +
+                      " ORDER BY quat";
     const compResidentHistory = await this.residentCompanyHistoryRepository.query(queryStr);
     response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
     return response;
@@ -1059,7 +1062,7 @@ export class ResidentCompanyService {
    */
   async getFundingBySiteIdAndCompanyId(siteId: number, companyId: number) {
     const response = {};
-    const queryStr = " SELECT AVG(\"funding\" ::Decimal) as \"Funding\", " +
+    const queryStr = " SELECT MAX(\"funding\" ::Decimal) as \"Funding\", " +
       " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
       " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
       " FROM public.resident_company_history as rch " +
@@ -1125,7 +1128,7 @@ export class ResidentCompanyService {
           break;
       }
     });
-    console.log('getFeeds for ' + companyId, getFeeds);
+    // console.log('getFeeds for ' + companyId, getFeeds);
     return getFeeds;
   }
 }

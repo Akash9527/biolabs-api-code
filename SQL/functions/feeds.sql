@@ -1,6 +1,6 @@
 
 -- USE below command to run the function
--- SELECT feeds(9);
+-- SELECT feeds(72);
 
 -- USE below command to check temp table anddrop
 -- select * from biolabsfeed
@@ -82,40 +82,43 @@ begin
  			INSERT INTO biolabsfeed VALUES ('Stage of technology changed to other on ' || to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."intellectualProperty" != f1."intellectualProperty" OR f1."intellectualProperty" is NULL) AND f2."intellectualProperty" is NOT NULL) then
- 			INSERT INTO biolabsfeed VALUES ('Intellectual property related to your technology changed to ' || f2."intellectualProperty" ::text || to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed VALUES ('Intellectual property related to your technology changed to ' || f2."intellectualProperty" ::text || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."otherIntellectualProperty" != f1."otherIntellectualProperty" OR f1."otherIntellectualProperty" is NULL) AND f2."otherIntellectualProperty" is NOT NULL) then
  			INSERT INTO biolabsfeed VALUES ('Intellectual property related to your technology changed to other on ' || to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."isAffiliated" != f1."isAffiliated" OR f1."isAffiliated" is NULL) AND f2."isAffiliated" is NOT NULL) then
- 			INSERT INTO biolabsfeed VALUES ('Affiliated changed to ' || f2."isAffiliated" ::text || to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed VALUES ('Affiliated changed to ' || (CASE WHEN f2."isAffiliated" = true THEN 'Yes' ELSE 'No' END) || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."affiliatedInstitution" != f1."affiliatedInstitution" OR f1."affiliatedInstitution" is NULL) AND f2."affiliatedInstitution" is NOT NULL) then
- 			INSERT INTO biolabsfeed VALUES ('Affiliated Institution changed to ' || f2."affiliatedInstitution" ::text || to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed VALUES ('Affiliated Institution changed to ' || f2."affiliatedInstitution" ::text || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."elevatorPitch" != f1."elevatorPitch" OR f1."elevatorPitch" is NULL) AND f2."elevatorPitch" is NOT NULL) then
- 			INSERT INTO biolabsfeed VALUES ('Elevator Pitch changed to ' || f2."elevatorPitch" ::text || to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed VALUES ('Elevator Pitch changed to ' || f2."elevatorPitch" ::text || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."logoOnWall" != f1."logoOnWall" OR f1."logoOnWall" is NULL) AND f2."logoOnWall" is NOT NULL) then
- 			INSERT INTO biolabsfeed VALUES ('Logo changed to ' || f2."logoOnWall" ::text || to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed VALUES ('Logo changed to ' || f2."logoOnWall" ::text || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."technologyPapersPublished" != f1."technologyPapersPublished" OR f1."technologyPapersPublished" is NULL) AND f2."technologyPapersPublished" is NOT NULL) then
- 			INSERT INTO biolabsfeed VALUES ('Published papers related to your technology changed to ' || f2."technologyPapersPublished" ::text || to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed VALUES ('Published papers related to your technology changed to ' || (CASE WHEN f2."technologyPapersPublished" = true THEN 'Yes' ELSE 'No' END) || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."patentsFiledGranted" != f1."patentsFiledGranted" OR f1."patentsFiledGranted" is NULL) AND f2."patentsFiledGranted" is NOT NULL) then
- 			INSERT INTO biolabsfeed VALUES ('Patents filed & granted changed to ' || f2."patentsFiledGranted" ::text || to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed VALUES ('Patents filed & granted changed to ' || f2."patentsFiledGranted" ::text || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
+        end if;
+		if ((f2."patentsFiledGrantedDetails" != f1."patentsFiledGrantedDetails" OR f1."patentsFiledGrantedDetails" is NULL) AND f2."patentsFiledGrantedDetails" is NOT NULL) then
+ 			INSERT INTO biolabsfeed VALUES ('Patents filed & granted changed to ' || f2."patentsFiledGrantedDetails" ::text || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."academiaPartnerships" != f1."academiaPartnerships" OR f1."academiaPartnerships" is NULL) AND f2."academiaPartnerships" is NOT NULL) then
- 			INSERT INTO biolabsfeed VALUES ('Recognized partnerships with academia changed to ' || f2."academiaPartnerships" ::text || to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed VALUES ('Recognized partnerships with academia changed to ' || (CASE WHEN f2."academiaPartnerships" = true THEN 'Yes' ELSE 'No' END) || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."academiaPartnershipDetails" != f1."academiaPartnershipDetails" OR f1."academiaPartnershipDetails" is NULL) AND f2."academiaPartnershipDetails" is NOT NULL) then
- 			INSERT INTO biolabsfeed VALUES ('Description for recognized partnerships with academia changed to ' || f2."academiaPartnershipDetails" ::text || to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed VALUES ('Description for recognized partnerships with academia changed to ' || f2."academiaPartnershipDetails" ::text || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."industryPartnerships" != f1."industryPartnerships" OR f1."industryPartnerships" is NULL) AND f2."industryPartnerships" is NOT NULL) then
- 			INSERT INTO biolabsfeed VALUES ('Recognized partnerships with industry changed to ' || f2."industryPartnerships" ::text || to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed VALUES ('Recognized partnerships with industry changed to ' || (CASE WHEN f2."industryPartnerships" = true THEN 'Yes' ELSE 'No' END) || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."industryPartnershipsDetails" != f1."industryPartnershipsDetails" OR f1."industryPartnershipsDetails" is NULL) AND f2."industryPartnershipsDetails" is NOT NULL) then
- 			INSERT INTO biolabsfeed VALUES ('Description for recognized partnerships with industry changed to ' || f2."industryPartnershipsDetails" ::text || to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed VALUES ('Description for recognized partnerships with industry changed to ' || f2."industryPartnershipsDetails" ::text || ' on ' ||  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		
         f2 := f1;
