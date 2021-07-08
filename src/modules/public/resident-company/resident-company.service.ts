@@ -834,86 +834,93 @@ export class ResidentCompanyService {
    * @return array of resident companies object
    */
   async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
-    let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
-      .where("resident_companies.status IN (:...status)", { status: [1, 0] });
+    console.log('siteIdArr --------------- ', siteIdArr);
+
+    let globalSearch = `SELECT * FROM global_search_view AS gsv`;
+    globalSearch += ` where "status" IN ('1', '0')  `;
 
     if (siteIdArr && siteIdArr.length) {
-      rcQuery.andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+      console.log('siteIdArr length --------------- ', siteIdArr.length);
+      globalSearch += ` and gsv."site" && ARRAY[` + siteIdArr + `]::int[] `;
     }
 
     if (payload.q && payload.q != '') {
       payload.q = payload.q.trim();
-      // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` }); 
-      //rcQuery.andWhere("(resident_companies.name LIKE :q) OR (resident_companies.companyName LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\") @@ to_tsquery(:q)) ", { q: `%${payload.q}%` });
-      rcQuery.andWhere("(LOWER(resident_companies.name) LIKE :q) OR (LOWER(resident_companies.companyName) LIKE :q) OR (LOWER(resident_companies.technology) LIKE :q) OR (LOWER(resident_companies.email) LIKE :q) OR (LOWER(resident_companies.rAndDPath) LIKE :q) OR (LOWER(resident_companies.foundedPlace) LIKE :q) OR (LOWER(resident_companies.affiliatedInstitution) LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\" || ' ' || resident_companies.\"email\" || ' ' || resident_companies.\"rAndDPath\" || ' ' || resident_companies.\"foundedPlace\" || ' ' || resident_companies.\"affiliatedInstitution\" ) @@ plainto_tsquery(:q) )", { q: `%${payload.q.toLowerCase()}%` });
+      globalSearch += ` and 
+      (LOWER(gsv.\"name\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"companyName\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"technology\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"email\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"rAndDPath\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"foundedPlace\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"affiliatedInstitution\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"advisoryname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (SELECT to_tsvector(
+        gsv.\"name\" || ' ' || 
+        gsv.\"companyName\" || ' ' || 
+        gsv.\"technology\" || ' ' || 
+        gsv.\"email\" || ' ' || 
+        gsv.\"rAndDPath\" || ' ' || 
+        gsv.\"foundedPlace\" || ' ' || 
+        gsv.\"affiliatedInstitution\" || ' ' ||
+        gsv.\"advisoryname\"
+      ) 
+      @@ plainto_tsquery('%${payload.q.toLowerCase()}%') )`;
     }
+    console.log('globalSearch2====', globalSearch);
 
     if (payload.companyStatus && payload.companyStatus.length > 0) {
-      rcQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: payload.companyStatus });
+      globalSearch += ` and gsv."companyStatus" = ${payload.companyStatus}`;
     }
 
     if (typeof payload.companyVisibility !== 'undefined') {
-      rcQuery.andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: payload.companyVisibility });
+      globalSearch += ` and gsv."companyVisibility" = ${payload.companyVisibility}`;
     }
 
     if (typeof payload.companyOnboardingStatus !== 'undefined') {
-      rcQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: payload.companyOnboardingStatus });
+      globalSearch += ` and gsv."companyOnboardingStatus" = ${payload.companyOnboardingStatus}`;
     }
 
     if (payload.siteIdArr && payload.siteIdArr.length > 0) {
       payload.siteIdArr = this.parseToArray(payload.siteIdArr)
-      rcQuery.andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: payload.siteIdArr });
+      globalSearch += ` and gsv."site" && ARRAY[` + payload.siteIdArr + `]::int[] `;
     }
 
     if (payload.industries && payload.industries.length > 0) {
       payload.industries = this.parseToArray(payload.industries)
-      rcQuery.andWhere("resident_companies.industry && ARRAY[:...industries]::int[]", { industries: payload.industries });
+      globalSearch += ` and gsv."industry" && ARRAY[` + payload.industries + `]::int[] `;
     }
 
     if (payload.modalities && payload.modalities.length > 0) {
       payload.modalities = this.parseToArray(payload.modalities)
-      rcQuery.andWhere("resident_companies.modality && ARRAY[:...modalities]::int[]", { modalities: payload.modalities });
+      globalSearch += ` and gsv."modality" && ARRAY[` + payload.modalities + `]::int[] `;
     }
 
     if (payload.fundingSource && payload.fundingSource.length > 0) {
       payload.fundingSource = this.parseToArray(payload.fundingSource)
-      rcQuery.andWhere("resident_companies.fundingSource && ARRAY[:...fundingSource]::int[]", { fundingSource: payload.fundingSource });
+      globalSearch += ` and gsv.\"fundingSource\" && ARRAY[` + payload.fundingSource + `]::int[] `;
     }
 
     if (payload.minFund >= 0) {
-      rcQuery.andWhere("resident_companies.funding::int >= :minFunding", { minFunding: payload.minFund });
+      globalSearch += ` and gsv."funding" ::int >= ${payload.minFund}`;
     }
 
     if (payload.maxFund >= 0) {
-      rcQuery.andWhere("resident_companies.funding::int <= :maxFunding", { maxFunding: payload.maxFund });
+      globalSearch += ` and gsv."funding" ::int <= ${payload.maxFund}`;
     }
 
     if (payload.minCompanySize >= 0) {
-      rcQuery.andWhere("resident_companies.\"companySize\"::int >= :minCompanySize", { minCompanySize: payload.minCompanySize });
+      globalSearch += ` and gsv.\"companySize\" ::int >= ${payload.minCompanySize}`;
     }
 
     if (payload.maxCompanySize >= 0) {
-      rcQuery.andWhere("resident_companies.\"companySize\"::int <= :maxCompanySize", { maxCompanySize: payload.maxCompanySize });
+      globalSearch += ` and gsv.\"companySize\" ::int <= ${payload.maxCompanySize}`;
     }
 
-    if (payload.pagination) {
-      let skip = 0;
-      let take = 10;
-      if (payload.limit) {
-        take = payload.limit;
-        if (payload.page) {
-          skip = payload.page * payload.limit;
-        }
-      }
-      rcQuery.skip(skip).take(take)
-    }
+    globalSearch += ` ORDER BY \"id\" DESC `;
+    console.log('globalSearch Final ====', globalSearch);
 
-    if (payload.sort) {
-      rcQuery.orderBy('"' + payload.sortFiled + '"', payload.sortOrder)
-    }
-
-    rcQuery.addOrderBy("id", "DESC");
-    return await rcQuery.getMany();
+    return await this.residentCompanyRepository.query(globalSearch);
   }
 
   /**
