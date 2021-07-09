@@ -834,19 +834,20 @@ export class ResidentCompanyService {
    * @return array of resident companies object
    */
   async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
-    console.log('siteIdArr --------------- ', siteIdArr);
 
     let globalSearch = `SELECT * FROM global_search_view AS gsv`;
     globalSearch += ` where "status" IN ('1', '0')  `;
 
-    if (siteIdArr && siteIdArr.length) {
-      console.log('siteIdArr length --------------- ', siteIdArr.length);
+    if (payload.siteIdArr && payload.siteIdArr.length > 0) {
+      payload.siteIdArr = this.parseToArray(payload.siteIdArr)
+      globalSearch += ` and gsv."site" && ARRAY[` + payload.siteIdArr + `]::int[] `;
+    } else if (siteIdArr && siteIdArr.length) {
       globalSearch += ` and gsv."site" && ARRAY[` + siteIdArr + `]::int[] `;
     }
 
     if (payload.q && payload.q != '') {
       payload.q = payload.q.trim();
-      globalSearch += ` and 
+      globalSearch += ` and (
       (LOWER(gsv.\"name\") LIKE '%${payload.q.toLowerCase()}%') OR
       (LOWER(gsv.\"companyName\") LIKE '%${payload.q.toLowerCase()}%') OR
       (LOWER(gsv.\"technology\") LIKE '%${payload.q.toLowerCase()}%') OR
@@ -855,6 +856,8 @@ export class ResidentCompanyService {
       (LOWER(gsv.\"foundedPlace\") LIKE '%${payload.q.toLowerCase()}%') OR
       (LOWER(gsv.\"affiliatedInstitution\") LIKE '%${payload.q.toLowerCase()}%') OR
       (LOWER(gsv.\"advisoryname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"advisorytitle\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"advisoryorg\") LIKE '%${payload.q.toLowerCase()}%') OR
       (SELECT to_tsvector(
         gsv.\"name\" || ' ' || 
         gsv.\"companyName\" || ' ' || 
@@ -863,11 +866,13 @@ export class ResidentCompanyService {
         gsv.\"rAndDPath\" || ' ' || 
         gsv.\"foundedPlace\" || ' ' || 
         gsv.\"affiliatedInstitution\" || ' ' ||
-        gsv.\"advisoryname\"
+        gsv.\"advisoryname\" || ' ' ||
+        gsv.\"advisorytitle\" || ' ' ||
+        gsv.\"advisoryorg\"
       ) 
-      @@ plainto_tsquery('%${payload.q.toLowerCase()}%') )`;
+      @@ plainto_tsquery('%${payload.q.toLowerCase()}%') )
+      )`;
     }
-    console.log('globalSearch2====', globalSearch);
 
     if (payload.companyStatus && payload.companyStatus.length > 0) {
       globalSearch += ` and gsv."companyStatus" = ${payload.companyStatus}`;
@@ -879,11 +884,6 @@ export class ResidentCompanyService {
 
     if (typeof payload.companyOnboardingStatus !== 'undefined') {
       globalSearch += ` and gsv."companyOnboardingStatus" = ${payload.companyOnboardingStatus}`;
-    }
-
-    if (payload.siteIdArr && payload.siteIdArr.length > 0) {
-      payload.siteIdArr = this.parseToArray(payload.siteIdArr)
-      globalSearch += ` and gsv."site" && ARRAY[` + payload.siteIdArr + `]::int[] `;
     }
 
     if (payload.industries && payload.industries.length > 0) {
