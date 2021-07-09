@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt';
+const {info} = require('./logger');
 
 export class Hash {
 
@@ -7,6 +8,7 @@ export class Hash {
    * @description This method will encrypt the given string.
    */
   static make(plainText) {
+    info("encrypt the given string ",__filename,"make()");
     const salt = bcrypt.genSaltSync();
     return bcrypt.hashSync(plainText, salt);
   }
@@ -16,6 +18,7 @@ export class Hash {
    * @description This method will compare the encrypted string and the plain string.
    */
   static compare(plainText, hash) {
+    info("compare the encrypted string and the plain string ",__filename,"compare()");
     return bcrypt.compareSync(plainText, hash);
   }
 }

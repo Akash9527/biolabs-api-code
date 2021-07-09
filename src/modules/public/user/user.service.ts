@@ -32,7 +32,7 @@ export class UsersService {
    * @return user object
    */
   async get(id: number) {
-    info("Getting user information by user ID :"+id);
+    info("Getting user information by user ID :"+id,__filename,"get()");
     return this.userRepository.findOne(id);
   }
 
@@ -43,7 +43,7 @@ export class UsersService {
    * @return user object
    */
   async getByEmail(email: string) {
-    info("Getting user information by user email ID :" + email);
+    info("Getting user information by user email ID :" + email,__filename,"getByEmail()");
     try {
       return await this.userRepository
         .createQueryBuilder('users')
@@ -114,6 +114,7 @@ export class UsersService {
       };
       let tenant = { tenantEmail: payload.email };
       this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, 'Invite', userInfo);
+      info("User added successfully",__filename,"addUser(");
     } catch (err) {
       error("Getting error to create the new user " +err, __filename, "addUser()");
       throw new InternalException('Getting error to create the new user',err);
@@ -150,13 +151,14 @@ export class UsersService {
         delete user.password;
       }
       await this.userRepository.update(user.id, user);
+      info("User updated successfully",__filename,"updateUser(");
       if (user.password) delete user.password;
       return await this.getUserById(user.id);
     } else {
       throw new NotAcceptableException('User with provided id not available.');
     }
   }catch(err){
-    error("Getting error to create the new user " +err, __filename, "addUser()");
+    error("Getting error to create the new user " +err, __filename, "updateUser()");
     throw new BiolabsException('Getting error in updating user',err);
   }
   }
