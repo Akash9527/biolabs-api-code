@@ -6,6 +6,8 @@ import { UpdateProductDto } from "./dto/UpdateProduct.dto";
 import { OrderProduct } from "./model/order-product.entity";
 import { ProductType } from "./model/product-type.entity";
 import { Product } from "./model/product.entity";
+const {error, warn, info,debug}=require("../../../utils/logger")
+const {ResourceNotFoundException,InternalException,BiolabsException} = require('../../common/exception/biolabs-error');
 
 @Injectable()
 export class ProductService {
@@ -26,6 +28,8 @@ export class ProductService {
    * @return saved order product object
    */
     async addProduct(payLoad: AddProductDto, req: any, siteId: number): Promise<any> {
+        info("Adding product by Name"+payLoad.name,__filename,"addProduct()")
+        try{
         let productType = null;
         if (payLoad.productTypeId) {
             productType = await this.productTypeRepository.findOne(payLoad.productTypeId);
@@ -40,6 +44,10 @@ export class ProductService {
         product.modifiedBy = req.user.id;
         product.productType = productType;
         return await this.productRepository.save(await this.productRepository.create(product));
+    }catch(err){
+        error(err.message,__filename,"addProduct()")
+        throw new NotAcceptableException('Error in adding product'+err.message);
+    }
     }
 
     /**
@@ -49,12 +57,18 @@ export class ProductService {
        * @return products object
        */
     async getProductsByName(payloadName: string, siteId: number[]): Promise<any> {
+        info("Getting products by Name:"+payloadName,__filename,"getProductsByName()")
+        try{
         return await this.productRepository
             .createQueryBuilder("product")
             .where("product.name ILike :name", { name: `%${payloadName}%` })
             .andWhere("product.productStatus=1")
             .andWhere("product.siteId IN (:...siteId)", { siteId: [siteId] })
             .getRawMany();
+        }catch(err){
+            error(err.message,__filename,"getProductsByName()")
+            throw new NotAcceptableException('Error in getting product'+err.message);
+        }
     }
 
     /**
@@ -63,12 +77,18 @@ export class ProductService {
         * @return products object
         */
     async getAllProducts(siteId: number): Promise<any> {
+        info("Getting all products by SiteID:"+siteId,__filename,"getAllProducts()")
+        try{
         return await this.productRepository
             .createQueryBuilder("product")
             .where("product.productStatus=1")
             .andWhere("product.siteId IN (:...siteId)", { siteId: [siteId] })
             .orderBy("product.modifiedAt", "DESC")
             .getRawMany();
+        }catch(err){
+            error(err.message,__filename,"getAllProducts()")
+            throw new NotAcceptableException('Error in soft deleting product'+err.message);
+        }
     }
 
     /**
@@ -77,6 +97,8 @@ export class ProductService {
        * @returns  product object with status 99
        */
     async softDeleteProduct(id: number, req: any) {
+        info("Deleting product ProductId:"+id,__filename,"softDeleteProduct()")
+        try{
         const product = await this.productRepository.findOne(id);
         const month = new Date().getMonth() + 2;
         const orderProducts = await this.orderProductRepository.find({
@@ -94,8 +116,13 @@ export class ProductService {
             }
             return await this.productRepository.update(id, product);
         } else {
+            error('Product with provided id not available.',__filename,"softDeleteProduct()")
             throw new NotAcceptableException('Product with provided id not available.');
         }
+    }catch(err){
+        error(err.message,__filename,"softDeleteProduct()")
+            throw new NotAcceptableException('Error in soft deleting product'+err.message);
+    }
     }
     /**
        * @description This method will update the products.
@@ -103,6 +130,8 @@ export class ProductService {
        * @returns  update product with  only status 1
        */
     async updateProduct(productId: number, payload: UpdateProductDto, req: any, siteId: number): Promise<any> {
+        info("Add order product ProductId:"+productId,__filename,"updateProduct()");
+        try{
         const product = await this.productRepository.findOne(productId);
         const month = new Date().getMonth() + 2;
         const orderProducts = await this.orderProductRepository.find({
@@ -168,9 +197,8 @@ export class ProductService {
                             }
                             delete futureOrderProductObj['id'];
                             await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProductObj)).catch(err => {
-                                throw new HttpException({
-                                    message: err.message
-                                }, HttpStatus.NOT_IMPLEMENTED);
+                                error(err.message,__filename,"updateProduct()")
+                                throw new InternalException(err.message);
                             });
                         }
                     }
@@ -179,8 +207,13 @@ export class ProductService {
             return await this.productRepository.update(productId, product);
         }
         else {
+            error('Product with provided id not available.',__filename,"updateProduct()")
             throw new NotAcceptableException('Product with provided id not available.');
         }
+    }catch(err){
+        error(err.message,__filename,"updateProduct()")
+            throw new NotAcceptableException('Error in update product'+err.message);
+    }
     }
 }
 
