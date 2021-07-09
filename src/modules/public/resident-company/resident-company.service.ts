@@ -1097,17 +1097,15 @@ export class ResidentCompanyService {
    * @param companyId The Company id
    * @returns current month fee details
    */
-  async getFinancialFees(siteId: number, companyId: number) {
+  async getFinancialFees(companyId: number) {
     const currentMonth = new Date().getMonth() + 1;
-    const queryStr = "SELECT p. \"productTypeId\",SUM(o.\"cost\") FROM resident_companies as rc " +
-      "LEFT JOIN order_product as o ON o.\"companyId\" = rc.\"id\" " +
-      "LEFT JOIN product as p ON  p.id = o.\"productId\" " +
+    const queryStr = "SELECT  p. \"productTypeId\",SUM(o.\"cost\" * o.\"quantity\")  From order_product as o " +
+      "INNER JOIN product as p ON  p.id =o.\"productId\" " +
       "where p.id = o.\"productId\" " +
-      "AND rc.\"id\" = " + companyId +
-      "AND rc.\"site\" = \'{" + siteId + "}\' " +
+      "AND o.\"companyId\"=" + companyId +
       "AND o.\"month\" =  " + currentMonth +
-      "AND  p.\"productTypeId\" IN(1, 2, 5) " +
-      "group by p.\"productTypeId\" ";
+      "AND p.\"productTypeId\" IN(1, 2, 5) " +
+      "group by  p.\"productTypeId\" ";
     return await this.residentCompanyHistoryRepository.query(queryStr);
   }
 
@@ -1131,4 +1129,31 @@ export class ResidentCompanyService {
     // console.log('getFeeds for ' + companyId, getFeeds);
     return getFeeds;
   }
+
+  /**
+   * Description: This method returns data to visualize timeline data on graph.
+   * @description This method returns data to visualize timeline data on graph.
+   * @param companyId The Company id.
+   * @returns timeline data.
+   */
+  async timelineAnalysis(companyId: number) {
+    const queryStr = `
+    SELECT  p."productTypeId", avg(o.quantity) as sumofquantity,
+            extract(quarter from make_date(date_part('year', CURRENT_DATE):: int, o.month, 01)) as quarterNo,
+            to_char(make_date(date_part('year', CURRENT_DATE):: int, o.month, 01), '"Q"Q.YYYY') AS quat
+    fROM
+      order_product as o
+    INNER JOIN product as p ON p.id = o."productId"
+    where
+      p.id = o."productId"
+      AND "companyId"=${companyId}
+      AND p."productTypeId" IN (2,4)
+    group by p."productTypeId",
+      extract(quarter from make_date(date_part('year', CURRENT_DATE):: int, o.month, 01)),
+      to_char(make_date(date_part('year', CURRENT_DATE):: int, o.month, 01), '"Q"Q.YYYY')
+    `;
+
+    return await this.residentCompanyHistoryRepository.query(queryStr);
+  }
+
 }

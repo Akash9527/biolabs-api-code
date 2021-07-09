@@ -252,11 +252,11 @@ export class ResidentCompanyController {
    */
     @ApiBearerAuth()
     @UseGuards(AuthGuard())
-    @Get('financialfees/:siteId/:companyId')
+    @Get('financialfees/:companyId')
     @ApiResponse({ status: 200, description: 'Successful Response' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    getFinancialFees(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
-      return this.residentCompanyService.getFinancialFees(siteId, companyId);
+    getFinancialFees(@Param('companyId') companyId: number): Promise<any> {
+      return this.residentCompanyService.getFinancialFees(companyId);
     }
 
   /**
@@ -273,5 +273,20 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getFeeds(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
     return this.residentCompanyService.getFeeds(siteId, companyId);
+  }
+
+  /**
+   * Description: This method returns data to visualize timeline data on graph.
+   * @description This method returns data to visualize timeline data on graph.
+   * @param companyId The Company id.
+   * @returns timeline data.
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('timeline/analysis/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getTimelineAnalysis(@Param('companyId') companyId: number) {
+    return this.residentCompanyService.timelineAnalysis(companyId);
   }
 }
