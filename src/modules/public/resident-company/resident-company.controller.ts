@@ -289,4 +289,18 @@ export class ResidentCompanyController {
   getTimelineAnalysis(@Param('companyId') companyId: number) {
     return this.residentCompanyService.timelineAnalysis(companyId);
   }
+  /**
+   * Description: This method returns companySize Quarterly.
+   * @description This method returns current month fee details.
+   * @param companyId The Company id
+   * @returns current month fee details.
+   */
+   @ApiBearerAuth()
+   @UseGuards(AuthGuard())
+   @Get('companysizeanalysis/:companyId')
+   @ApiResponse({ status: 200, description: 'Successful Response' })
+   @ApiResponse({ status: 401, description: 'Unauthorized' })
+   getCompanySizeQuartly(@Param('companyId') companyId: number): Promise<any> {
+     return this.residentCompanyService.getCompanySizeQuartly(companyId);
+   }
 }
