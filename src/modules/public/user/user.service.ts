@@ -11,7 +11,7 @@ import { EMAIL } from '../../../constants/email';
 import { Request } from 'express';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
 const {info,error,debug,warn} = require('../../../utils/logger');
-const {ResourceNotFoundException,InternalException,BiolabsException} = require('../../common/exceptions/biolabsError');
+const {ResourceNotFoundException,InternalException,BiolabsException} = require('../../common/exception/biolabs-error');
 
 @Injectable()
 export class UsersService {
