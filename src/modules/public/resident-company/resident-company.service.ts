@@ -827,13 +827,14 @@ export class ResidentCompanyService {
     }
     return [val];
   }
+
   /**
-   * Description: This method will return the resident companies list.
-   * @description This method will return the resident companies list.
+   * Description: This method will return the resident companies list.(not in use)
+   * @description This method will return the resident companies list.(not in use)
    * @param payload object of ListResidentCompanyPayload
    * @return array of resident companies object
    */
-  async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
+  async gloabalSearchCompaniesOld(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
       .where("resident_companies.status IN (:...status)", { status: [1, 0] });
 
@@ -914,6 +915,154 @@ export class ResidentCompanyService {
 
     rcQuery.addOrderBy("id", "DESC");
     return await rcQuery.getMany();
+  }
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
+  async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
+
+    let globalSearch = `SELECT * FROM global_search_view AS gsv`;
+    globalSearch += ` where "status" IN ('1', '0')  `;
+
+    if (payload.siteIdArr && payload.siteIdArr.length > 0) {
+      payload.siteIdArr = this.parseToArray(payload.siteIdArr)
+      globalSearch += ` and gsv."site" && ARRAY[` + payload.siteIdArr + `]::int[] `;
+    } else if (siteIdArr && siteIdArr.length) {
+      globalSearch += ` and gsv."site" && ARRAY[` + siteIdArr + `]::int[] `;
+    }
+
+    if (payload.q && payload.q != '') {
+      payload.q = payload.q.trim();
+      globalSearch += ` and (
+      (LOWER(gsv.\"name\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"companyName\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"technology\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"email\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"rAndDPath\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"foundedPlace\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"affiliatedInstitution\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"fundingsrcname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"industryname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"modalityname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"sitename\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techstagename\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"bsourcesname\") LIKE '%${payload.q.toLowerCase()}%') OR
+
+      (LOWER(gsv.\"companystatustext\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"companyvisibilitytext\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"companyonboardingtext\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"committeestatustext\") LIKE '%${payload.q.toLowerCase()}%') OR
+
+
+      (LOWER(gsv.\"advisoryname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"advisorytitle\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"advisoryorg\") LIKE '%${payload.q.toLowerCase()}%') OR
+
+      (LOWER(gsv.\"mgmtname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"mgmttitle\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"mgmtphone\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"mgmtlinkedin\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"mgmtpublications\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"mgmtffiliation\") LIKE '%${payload.q.toLowerCase()}%') OR
+
+      (LOWER(gsv.\"techname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techtitle\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techemail\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techphone\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techlinkedin\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techpublications\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (SELECT to_tsvector(
+        gsv.\"name\" || ' ' || 
+        gsv.\"companyName\" || ' ' || 
+        gsv.\"technology\" || ' ' || 
+        gsv.\"email\" || ' ' || 
+        gsv.\"rAndDPath\" || ' ' || 
+        gsv.\"foundedPlace\" || ' ' || 
+        gsv.\"affiliatedInstitution\" || ' ' ||
+        gsv.\"fundingsrcname\" || ' ' ||
+        gsv.\"industryname\" || ' ' ||
+        gsv.\"modalityname\" || ' ' ||
+        gsv.\"sitename\" || ' ' ||
+        gsv.\"techstagename\" || ' ' ||
+        gsv.\"bsourcesname\" || ' ' ||
+
+        gsv.\"companystatustext\" || ' ' ||
+        gsv.\"companyvisibilitytext\" || ' ' ||
+        gsv.\"companyonboardingtext\" || ' ' ||
+        gsv.\"committeestatustext\" || ' ' ||
+
+        gsv.\"advisoryname\" || ' ' ||
+        gsv.\"advisorytitle\" || ' ' ||
+        gsv.\"advisoryorg\" || ' ' ||
+
+        gsv.\"mgmtname\" || ' ' ||
+        gsv.\"mgmttitle\" || ' ' ||
+        gsv.\"mgmtphone\" || ' ' ||
+        gsv.\"mgmtlinkedin\" || ' ' ||
+        gsv.\"mgmtpublications\" || ' ' ||
+        gsv.\"mgmtffiliation\" || ' ' ||
+
+        gsv.\"techname\" || ' ' ||
+        gsv.\"techtitle\" || ' ' ||
+        gsv.\"techemail\" || ' ' ||
+        gsv.\"techphone\" || ' ' ||
+        gsv.\"techlinkedin\" || ' ' ||
+        gsv.\"techpublications\"
+      ) 
+      @@ plainto_tsquery('%${payload.q.toLowerCase()}%') )
+      )`;
+    }
+
+    if (payload.companyStatus && payload.companyStatus.length > 0) {
+      globalSearch += ` and gsv."companyStatus" = ${payload.companyStatus}`;
+    }
+
+    if (typeof payload.companyVisibility !== 'undefined') {
+      globalSearch += ` and gsv."companyVisibility" = ${payload.companyVisibility}`;
+    }
+
+    if (typeof payload.companyOnboardingStatus !== 'undefined') {
+      globalSearch += ` and gsv."companyOnboardingStatus" = ${payload.companyOnboardingStatus}`;
+    }
+
+    if (payload.industries && payload.industries.length > 0) {
+      payload.industries = this.parseToArray(payload.industries)
+      globalSearch += ` and gsv."industry" && ARRAY[` + payload.industries + `]::int[] `;
+    }
+
+    if (payload.modalities && payload.modalities.length > 0) {
+      payload.modalities = this.parseToArray(payload.modalities)
+      globalSearch += ` and gsv."modality" && ARRAY[` + payload.modalities + `]::int[] `;
+    }
+
+    if (payload.fundingSource && payload.fundingSource.length > 0) {
+      payload.fundingSource = this.parseToArray(payload.fundingSource)
+      globalSearch += ` and gsv.\"fundingSource\" && ARRAY[` + payload.fundingSource + `]::int[] `;
+    }
+
+    if (payload.minFund >= 0) {
+      globalSearch += ` and gsv."funding" ::int >= ${payload.minFund}`;
+    }
+
+    if (payload.maxFund >= 0) {
+      globalSearch += ` and gsv."funding" ::int <= ${payload.maxFund}`;
+    }
+
+    if (payload.minCompanySize >= 0) {
+      globalSearch += ` and gsv.\"companySize\" ::int >= ${payload.minCompanySize}`;
+    }
+
+    if (payload.maxCompanySize >= 0) {
+      globalSearch += ` and gsv.\"companySize\" ::int <= ${payload.maxCompanySize}`;
+    }
+
+    globalSearch += ` ORDER BY \"id\" DESC `;
+    // console.log('globalSearch Final ====', globalSearch);
+
+    return await this.residentCompanyRepository.query(globalSearch);
   }
 
   /**
