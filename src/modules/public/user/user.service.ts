@@ -116,8 +116,8 @@ export class UsersService {
       this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, 'Invite', userInfo);
       info("User added successfully",__filename,"addUser(");
     } catch (err) {
-      error("Getting error to create the new user " +err, __filename, "addUser()");
-      throw new InternalException('Getting error to create the new user',err);
+      error("Getting error to create the new user " + err.message, __filename, "addUser()");
+      throw new InternalException('Getting error to create the new user', err.message);
 
     }
     return savedUser;
@@ -158,8 +158,8 @@ export class UsersService {
       throw new NotAcceptableException('User with provided id not available.');
     }
   }catch(err){
-    error("Getting error to create the new user " +err, __filename, "updateUser()");
-    throw new BiolabsException('Getting error in updating user',err);
+    error("Getting error to create the new user " + err.message, __filename, "updateUser()");
+    throw new BiolabsException('Getting error in updating user', err.message);
   }
   }
 
@@ -183,8 +183,8 @@ export class UsersService {
       throw new NotAcceptableException('User with provided id not available.');
     }
   }catch(err){
-     error("Getting error in updating the user profile picture",__filename,"updateUserProfilePic()");
-     throw new BiolabsException('Getting error in updating the user profile picture');
+     error("Getting error in updating the user profile picture" +err.message,__filename,"updateUserProfilePic()");
+     throw new BiolabsException('Getting error in updating the user profile picture'+ err.message);
 
   }
   }
@@ -209,7 +209,7 @@ export class UsersService {
     }
   }catch(err){
     error("Error in soft delete user",__filename,"softDeleteUser()");
-    throw new BiolabsException('Error in soft delete user');
+    throw new BiolabsException('Error in soft delete user'+ err.message);
   }
   }
 
@@ -302,7 +302,7 @@ export class UsersService {
       }
     } catch (err) {
       error("Getting error in validating the user token",__filename,"validateToken()");
-      throw new BiolabsException('Getting error in validating the user token'+err);
+      throw new BiolabsException('Getting error in validating the user token'+ err.message);
     }
   }
 
@@ -364,7 +364,7 @@ export class UsersService {
     );
     }catch(err){
       error("Getting error in generating user token",__filename,"generateToken()");
-      throw new BiolabsException('Getting error in generating user token'+err);
+      throw new BiolabsException('Getting error in generating user token'+ err.message);
     }
 
   }
@@ -402,7 +402,7 @@ export class UsersService {
     }
   }catch(err){
     error("Getting error in forget password process or sending email",__filename,"forgotPassword()");
-    throw new BiolabsException('Getting error in forget password process');
+    throw new BiolabsException('Getting error in forget password process'+ err.message);
   }
   }
 }
