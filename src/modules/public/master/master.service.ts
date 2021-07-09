@@ -13,6 +13,8 @@ import { COMPANY_STATUS } from '../../../constants/company-status';
 import { USER_TYPE } from '../../../constants/user-type';
 import { COMMITTEE_STATUS } from 'constants/committee_status';
 import { ProductType } from '../order/model/product-type.entity';
+const {error, warn, info,debug}=require("../../../utils/logger")
+const {ResourceNotFoundException,InternalException,BiolabsException} = require('../../common/exception/biolabs-error');
 
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
@@ -46,6 +48,8 @@ export class MasterService {
    * @return array of sites object
    */
   async getSites(payload: MasterPayload) {
+    info("Getting site by Name: "+payload.q,__filename,"createSite()");
+    try{
     let search: any = {};
     let skip;
     let take;
@@ -79,6 +83,10 @@ export class MasterService {
       skip,
       take
     });
+  }catch(err){
+    error("Error in finding sites"+err.message,__filename,"getSites()");
+    throw new BiolabsException(err.message);
+  }
   }
 
   /**
@@ -87,6 +95,8 @@ export class MasterService {
    * @return array of product object 
    */
   async createProductType() {
+    info("creating product type",__filename,"createProductType()");
+    try{
     const productType = await this.productTypeRepository.find();
     const ptypeData = migrationData["productTypeName"]
     if (!productType || productType.length == 0) {
@@ -95,6 +105,10 @@ export class MasterService {
         await this.productTypeRepository.save(this.productTypeRepository.create(productType));
       }
     }
+  }catch(err){
+    error("Error in creating product type"+err.message,__filename,"createSite()");
+    throw new InternalException(err.message);
+  }
   }
 
   /**
@@ -103,6 +117,7 @@ export class MasterService {
    * @return array of site object
    */
   async createSites() {
+    info("Creating sites",__filename,"createSites()");
     const sites = this.getSites(new MasterPayload());
     let resp = {};
     return await sites.then(async data => {
@@ -117,6 +132,7 @@ export class MasterService {
       }
     }, error => {
       if (error)
+      error("Error in Creating sites",__filename,"createSites()");
         return;
     })
   }
@@ -129,11 +145,17 @@ export class MasterService {
    * @return site object
    */
   async createSite(name: string, id: number) {
+    info("Creating sites by Name: "+name,__filename,"createSite()");
+    try{
     const status: status_enum = '1';
     const payload = {
       id, name, status
     }
     return await this.siteRepository.save(this.siteRepository.create(payload));
+  }catch(err){
+    error("Error in creating site"+err.message,__filename,"createSite()");
+    throw new InternalException(err.message);
+  }
   }
 
   /**
@@ -143,6 +165,8 @@ export class MasterService {
    * @return array of roles object
    */
   async getRoles(payload: MasterPayload) {
+    info("Getting roles by Name: "+payload.q,__filename,"getRoles()")
+    try{
     let search;
     let skip;
     let take;
@@ -167,6 +191,10 @@ export class MasterService {
       skip,
       take
     });
+  }catch(err){
+    error("Error in getting roles"+err.message,__filename,"getRoles()");
+    throw new BiolabsException(err.message);
+  }
   }
 
   /**
@@ -175,6 +203,7 @@ export class MasterService {
    * @return array of role object
    */
   async createRoles() {
+    info("Creating Roles",__filename,"createRoles()");
     const roles = this.getRoles(new MasterPayload());
     let resp = {};
     return await roles.then(async data => {
@@ -189,6 +218,7 @@ export class MasterService {
       }
     }, error => {
       if (error)
+      error("Error in creating Roles",__filename,"createRoles()");
         return;
     });
   }
@@ -201,11 +231,17 @@ export class MasterService {
    * @return role object
    */
   async createRole(name: string, id: number) {
+    info("creating Role by Name"+name,__filename,"createRole()");
+    try{
     const status: status_enum = '1';
     const payload = {
       id, name, status
     }
     return await this.roleRepository.save(this.roleRepository.create(payload));
+  }catch(err){
+    error("Error in creating Role"+err.message,__filename,"createRole()");
+    throw new InternalException(err.message);
+  }
   }
 
   /**
@@ -215,6 +251,8 @@ export class MasterService {
    * @return array of categories object
    */
   async getCategories(payload: MasterPayload) {
+    info("Getting categories by Name: "+payload.q,__filename,"getCategories()");
+    try{
     let search;
     let skip;
     let take;
@@ -256,6 +294,10 @@ export class MasterService {
 
     });
     return root;
+  }catch(err){
+    error(err.message,__filename,"getCategories()");
+    throw new BiolabsException(err.message);
+  }
   }
 
   /**
@@ -264,6 +306,8 @@ export class MasterService {
    * @return array of category object
    */
   async createCategories() {
+    info("creating categories",__filename,"createCategories()");
+    try{
     const _categories = migrationData['categories'];
     // for (const _category of _categories) {
     //   await this.createCategory(_category, 0);
@@ -275,6 +319,10 @@ export class MasterService {
     );
     const categories = await Promise.all(promises);
     return categories;
+    }catch(err){
+      error("Error in creating categories"+err.message,__filename,"createCategories()");
+    throw new InternalException(err.message);
+    }
   }
 
   /**
@@ -285,6 +333,8 @@ export class MasterService {
    * @return category object
    */
   async createCategory(category: { name: string, id: number, subcategories?: [] }, parent_id: number) {
+    info("creating category",__filename,"createCategory()");
+    try{
     this.saveCategory(category.name, category.id, parent_id);
     if (('subcategories' in category) && category.subcategories.length > 0) {
       const promises = category.subcategories.map(
@@ -295,6 +345,10 @@ export class MasterService {
       const subCategories = await Promise.all(promises);
       return subCategories;
     }
+  }catch(err){
+    error("Error in creating category",__filename,"createCategory()");
+    throw new InternalException(err.message);
+  }
   }
 
   /**
@@ -306,16 +360,23 @@ export class MasterService {
    * @return category object
    */
   async saveCategory(name: string, id: number, parent_id: number) {
+    info("creating category by Name: "+name,__filename,"saveCategory()");
+    try{
     const status: status_enum = '1';
     const payload = { id: id, name: name, parent_id: parent_id, status: status }
     const checkDuplicateCategory = await this.categoryRepository.find(
       { where: { name: name, parent_id: parent_id } }
     );
     if (checkDuplicateCategory && checkDuplicateCategory.length > 0) {
+      debug("Category already existed",__filename,"saveCategory()");
       return false;
     } else {
       return await this.categoryRepository.save(payload);
     }
+  }catch(err){
+    error("Error in creating category",__filename,"saveCategory()");
+    throw new InternalException(err.message);
+  }
   }
 
   /**
@@ -325,6 +386,8 @@ export class MasterService {
    * @return array of biolabs sources object
    */
   async getBiolabsSource(payload: MasterPayload) {
+    info("Getting Biolabs Sources by Name: "+payload.q,__filename,"getBiolabsSource()");
+    try{
     let search;
     let skip;
     let take;
@@ -349,6 +412,10 @@ export class MasterService {
       skip,
       take
     });
+  }catch(err){
+    error("Error in find Biolabs source",__filename,"getBiolabsSource()");
+    throw new BiolabsException(err.message);
+  }
   }
 
   /**
@@ -357,6 +424,7 @@ export class MasterService {
    * @return array of biolabs sources object
    */
   async createBiolabsSources() {
+    info("Creating Biolabs Sources",__filename,"creatBiolabsSources()");
     const biolabsSources = this.getBiolabsSource(new MasterPayload());
     let resp = {};
     return await biolabsSources.then(async data => {
@@ -371,6 +439,7 @@ export class MasterService {
       }
     }, error => {
       if (error)
+      error("Error in creating Biolabs Sources",__filename,"createBiolabsSources()");
         return;
     });
   }
@@ -383,11 +452,17 @@ export class MasterService {
    * @return biolabs source object
    */
   async createBiolabsSource(name: string, id: number) {
+    info("creating Biolabs sources by Name"+name+" Id: "+id,__filename,"createBiolabsSource()");
+    try{
     const status: status_enum = '1';
     const payload = {
       id, name, status
     }
     return await this.biolabsSourceRepository.save(this.biolabsSourceRepository.create(payload));
+  }catch(err){
+    error("Error in Creating Biolabs sources",__filename,"createBiolabsSource()");
+    throw new InternalException(err.message);
+  }
   }
 
   /**
@@ -397,6 +472,8 @@ export class MasterService {
    * @return array of fundings object
    */
   async getFundings(payload: MasterPayload) {
+    info("Getting Fundings by Name: "+payload.q,__filename,"getFundings()");
+    try{
     let search;
     let skip;
     let take;
@@ -421,6 +498,10 @@ export class MasterService {
       skip,
       take
     });
+  }catch(err){
+    error("Error in find Fundings",__filename,"getFundings()");
+    throw new BiolabsException(err.message);
+  }
   }
 
   /**
@@ -429,6 +510,7 @@ export class MasterService {
    * @return array of fundings object
    */
   async createFundings() {
+    error("creating fundings",__filename,"createFundings()");
     const fundings = this.getFundings(new MasterPayload());
     let resp = {};
     return await fundings.then(async data => {
@@ -443,6 +525,7 @@ export class MasterService {
       }
     }, error => {
       if (error)
+      error("Error in delete Order product",__filename,"createFundings()");
         return;
     });
   }
@@ -455,11 +538,17 @@ export class MasterService {
    * @return funding object
    */
   async createFunding(name: string, id: number) {
+    info("creating fundings by Name: "+name,__filename,"createFunding()");
+    try{
     const status: status_enum = '1';
     const payload = {
       id, name, status
     }
     return await this.fundingRepository.save(this.fundingRepository.create(payload));
+  }catch(err){
+    error("Error in creating funding",__filename,"createFunding()");
+    throw new InternalException(err.message);
+  }
   }
 
   /**
@@ -469,6 +558,8 @@ export class MasterService {
    * @return array of modalities object
    */
   async getModalities(payload: MasterPayload) {
+    info("Getting modalities by Name: "+payload.q,__filename,"getModalities()");
+    try{
     let search;
     let skip;
     let take;
@@ -493,6 +584,10 @@ export class MasterService {
       skip,
       take
     });
+  }catch(err){
+    error("Error in finding modalities",__filename,"getModalities()");
+    throw new BiolabsException(err.message);
+  }
   }
 
   /**
@@ -501,6 +596,7 @@ export class MasterService {
    * @return array of modalities object
    */
   async createModalities() {
+    info("creating Modalities",__filename,"createModalities()");
     const modalities = this.getModalities(new MasterPayload());
     let resp = {};
     return await modalities.then(async data => {
@@ -515,6 +611,7 @@ export class MasterService {
       }
     }, error => {
       if (error)
+      error("Error in creating modalities",__filename,"createModalities()");
         return;
     });
   }
@@ -527,11 +624,17 @@ export class MasterService {
    * @return modality object
    */
   async createModality(name: string, id: number) {
+    info("creating modality by Name: "+name,__filename,"createModality()");
+    try{
     const status: status_enum = '1';
     const payload = {
       id, name, status
     }
     return await this.modalityRepository.save(this.modalityRepository.create(payload));
+  }catch(err){
+    error("Error in delete Order product",__filename,"createModality()");
+    throw new InternalException(err.message);
+  }
   }
 
   /**
@@ -541,6 +644,8 @@ export class MasterService {
    * @return array of technology stages object
    */
   async getTechnologyStages(payload: MasterPayload) {
+    info("Getting technology stages by Name:"+payload.q,__filename,"getTechnologyStages()");
+    try{
     let search;
     let skip;
     let take;
@@ -564,7 +669,11 @@ export class MasterService {
       where: search,
       skip,
       take
-    });
+    })
+  }catch(err){
+    error("Error in finding technology stages",__filename,"deleteOrderProduct()");
+    throw new BiolabsException(err.message);
+  }
   }
 
   /**
@@ -573,6 +682,7 @@ export class MasterService {
    * @return array of technology stages object
    */
   async createTechnologyStages() {
+    info("creating Technology Stages",__filename,"createTechnologyStages()");
     const technologyStages = this.getTechnologyStages(new MasterPayload());
     let resp = {};
     return await technologyStages.then(async data => {
@@ -587,6 +697,7 @@ export class MasterService {
       }
     }, error => {
       if (error)
+      error("Error in creating Technology stages",__filename,"createTechnologyStages()");
         return;
     });
   }
@@ -599,11 +710,17 @@ export class MasterService {
    * @return technology stages object
    */
   async createTechnologyStage(name: string, id: number) {
+    info("Creating Technology Stage by Name:"+name,__filename,"createTechnologyStage()")
+    try{
     const status: status_enum = '1';
     const payload = {
       id, name, status
     }
     return await this.technologyStageRepository.save(this.technologyStageRepository.create(payload));
+  }catch(err){
+    error("Error in creating technology stage",__filename,"createTechnologyStage()");
+    throw new InternalException(err.message);
+  }
   }
 
   /**
@@ -630,6 +747,7 @@ export class MasterService {
    * @param val input value
    */
   private parseToArray(val) {
+    info("parsing to array",__filename,"parseToArray()")
     if (typeof val === 'object') {
       return val;
     }
