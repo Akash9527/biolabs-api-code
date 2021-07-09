@@ -17,6 +17,9 @@ export class OrderProduct {
   @Column({ nullable: true })
   month: number;
 
+  @Column({ nullable: true })
+  year: number;
+
   // Status will be "0" if invoice is not created, "1" if invoice is created. 
   @Column({ nullable: false })
   status: number;
@@ -60,6 +63,7 @@ export class OrderProductFillableFields {
   productDescription: string;
   productId: number;
   month: number;
+  year: number;
   cost: number;
   recurrence: boolean;
   currentCharge: boolean;

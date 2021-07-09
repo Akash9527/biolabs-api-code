@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { ResidentCompany } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { OrderProduct } from './model/order-product.entity';
@@ -10,7 +12,10 @@ export class OrderProductService {
 
   constructor(
     @InjectRepository(OrderProduct)
-    private readonly orderProductRepository: Repository<OrderProduct>
+    private readonly orderProductRepository: Repository<OrderProduct>,
+    @InjectRepository(ResidentCompany)
+    private readonly residentCompanyRepository: Repository<ResidentCompany>,
+    private readonly moduleRef: ModuleRef
   ) { }
 
   /**
@@ -51,21 +56,30 @@ export class OrderProductService {
 
     if (orderProduct.recurrence) {
       /**
-       * Add next 3 months Products
+       * Add next 4 months Products
        */
-      for (let i = 1; i <= 4; i++) {
-
-        let futureOrderProduct = { ...orderProduct };
-        futureOrderProduct.month = orderProduct.month + i;
-        futureOrderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
-        await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
-          throw new HttpException({
-            message: err.message
-          }, HttpStatus.BAD_REQUEST);
-        });
-      }
+      orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
+      await this.addFutureOrderProducts(orderProduct);
     }
     return { message: 'Added successfully', status: 'success' };
+  }
+
+  private async addFutureOrderProducts(orderProduct: any) {
+    let futureOrderProduct = { ...orderProduct };
+    for (let i = 1; i < 4; i++) {
+      if (futureOrderProduct.month < 12) {
+        futureOrderProduct.month = futureOrderProduct.month + 1;
+      } else {
+        futureOrderProduct.month = 1;
+        futureOrderProduct.year = futureOrderProduct.year + 1;
+      }
+
+      await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
+        throw new HttpException({
+          message: err.message
+        }, HttpStatus.BAD_REQUEST);
+      });
+    }
   }
 
   /**
@@ -97,43 +111,48 @@ export class OrderProductService {
       }, HttpStatus.BAD_REQUEST);
     });
 
-    const pId = (orderProduct.productId) ? orderProduct.productId : id;
+    payload.productId = orderProduct.productId;
+    payload.manuallyEnteredProduct = orderProduct.manuallyEnteredProduct;
     const futureProducts = await this.orderProductRepository.find({
       where: {
-        productId: pId,
+        productId: payload.productId,
         status: 0,
-        month: MoreThan(orderProduct.month),
+        month: MoreThan(payload.month),
       }
     }).catch(err => {
       throw new HttpException({
         message: err.message
-      }, HttpStatus.BAD_REQUEST);
+      }, HttpStatus.NOT_MODIFIED);
     });
     if (!payload.recurrence) {
       for await (const product of futureProducts) {
         await this.orderProductRepository.delete(product.id).catch(err => {
           throw new HttpException({
             message: err.message
-          }, HttpStatus.BAD_REQUEST);
+          }, HttpStatus.NOT_MODIFIED);
         });
       }
     } else {
-      for await (const product of futureProducts) {
-        let futureOrderProduct = { ...payload };
-        futureOrderProduct.month = product.month;
-        futureOrderProduct.productId = product.productId;
-        await this.orderProductRepository.update(product.id, futureOrderProduct).catch(err => {
-          throw new HttpException({
-            message: err.message
-          }, HttpStatus.BAD_REQUEST);
-        });
+      if (futureProducts.length == 0) {
+        await this.addFutureOrderProducts(payload);
+      } else {
+        for await (const product of futureProducts) {
+          let futureOrderProduct = { ...payload };
+          futureOrderProduct.month = product.month;
+          futureOrderProduct.productId = product.productId;
+          await this.orderProductRepository.update(product.id, futureOrderProduct).catch(err => {
+            throw new HttpException({
+              message: err.message
+            }, HttpStatus.NOT_MODIFIED);
+          });
+        }
       }
     }
 
     return await this.orderProductRepository.update(id, payload).catch(err => {
       throw new HttpException({
         message: err.message
-      }, HttpStatus.BAD_REQUEST);
+      }, HttpStatus.NOT_MODIFIED);
     });
   }
 
@@ -162,9 +181,8 @@ export class OrderProductService {
 
     const orderProductArray = await this.orderProductRepository.findByIds([id]);
     const orderProduct = orderProductArray[0];
-    const pId = (orderProduct.productId) ? orderProduct.productId : id;
     const deleteProducts = await this.orderProductRepository.find({
-      productId: pId,
+      productId: orderProduct.productId,
       status: 0,
       month: MoreThanOrEqual(orderProduct.month)
     });
@@ -179,15 +197,18 @@ export class OrderProductService {
    * @returns 
    */
   async consolidatedInvoice(month: number, site: number) {
-
-    return await this.orderProductRepository.createQueryBuilder("order_product")
-      .addSelect("rc.companyName", 'companyName')
-      .leftJoin('resident_companies', 'rc', 'rc.id = order_product.companyId')
-      .where("rc.companyStatus = '1' ")
-      .andWhere("rc.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: site })
-      .andWhere("order_product.month = :month", { month: month })
-      .orderBy("rc.companyName", 'ASC')
-      .getRawMany();
-
+    const query = 'select rc.\"companyName\", rc.\"id\" as companyId, orp.\"productName\",'
+      + ' orp.\"productDescription\", orp.\"cost\", orp.\"quantity\", '
+      + ' orp.\"recurrence\", orp.\"currentCharge\", orp.\"startDate\", orp.\"endDate\" '
+      + ' from resident_companies as rc'
+      + ' LEFT OUTER JOIN order_product as orp on orp.\"companyId\" = rc.\"id\"'
+      + ' where rc.\"site\" && ARRAY[' + site + ']::int[]'
+      + ' and (orp.\"month\"=' + month + ' or orp."month" isnull )'
+      + ' and rc.\"companyStatus\" = \'1\' '
+      + ' group by rc.\"id\", rc.\"companyName\", orp.\"companyId\", orp.\"productName\",'
+      + ' orp.\"productDescription\", orp.\"cost\", orp.\"quantity\", '
+      + ' orp.\"recurrence\", orp.\"currentCharge\", orp.\"startDate\", orp.\"endDate\" '
+      + ' order by rc.\"companyName\" ,  orp.\"productName\"';
+    return await this.residentCompanyRepository.query(query);
   }
 }

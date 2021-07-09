@@ -134,19 +134,19 @@ export class ResidentCompanyService {
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
     if (payload.id)
       await this.residentCompanyAdvisoryRepository.update(payload.id, payload)
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in advisor team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in advisor team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     else {
       delete payload.id;
       await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload))
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in advisor team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in advisor team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     }
   }
 
@@ -188,19 +188,19 @@ export class ResidentCompanyService {
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
     if (payload.id)
       await this.residentCompanyManagementRepository.update(payload.id, payload)
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in Management team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in Management team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     else {
       delete payload.id;
       await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload))
-      .catch(err => {
-        throw new HttpException({
-          message: err.message + ' in Management team'
-        }, HttpStatus.BAD_REQUEST);
-      });
+        .catch(err => {
+          throw new HttpException({
+            message: err.message + ' in Management team'
+          }, HttpStatus.BAD_REQUEST);
+        });
     }
   }
 
@@ -621,7 +621,7 @@ export class ResidentCompanyService {
     const categoryStats = await this.categoryRepository.
       query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
         "where c.id = ANY(rc.industry::int[]) ) as industryCount " +
-        "FROM public.categories as c order by industryCount desc limit 3;")
+        "FROM public.categories as c order by industryCount desc limit 3;");
 
     response['companyStats'] = (!stats) ? 0 : stats;
     response['graduate'] = (!graduate) ? 0 : graduate;
@@ -827,13 +827,14 @@ export class ResidentCompanyService {
     }
     return [val];
   }
+
   /**
-   * Description: This method will return the resident companies list.
-   * @description This method will return the resident companies list.
+   * Description: This method will return the resident companies list.(not in use)
+   * @description This method will return the resident companies list.(not in use)
    * @param payload object of ListResidentCompanyPayload
    * @return array of resident companies object
    */
-  async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
+  async gloabalSearchCompaniesOld(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
       .where("resident_companies.status IN (:...status)", { status: [1, 0] });
 
@@ -845,7 +846,7 @@ export class ResidentCompanyService {
       payload.q = payload.q.trim();
       // rcQuery.andWhere("(resident_companies.name LIKE :name) OR (resident_companies.companyName LIKE :name) ", { name: `%${payload.q}%` }); 
       //rcQuery.andWhere("(resident_companies.name LIKE :q) OR (resident_companies.companyName LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\") @@ to_tsquery(:q)) ", { q: `%${payload.q}%` });
-      rcQuery.andWhere("(LOWER(resident_companies.name) LIKE :q) OR (LOWER(resident_companies.companyName) LIKE :q) OR (LOWER(resident_companies.technology) LIKE :q) OR (LOWER(resident_companies.email) LIKE :q) OR (LOWER(resident_companies.rAndDPath) LIKE :q) OR (LOWER(resident_companies.foundedPlace) LIKE :q) OR (LOWER(resident_companies.affiliatedInstitution) LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\" || ' ' || resident_companies.\"email\" || ' ' || resident_companies.\"rAndDPath\" || ' ' || resident_companies.\"foundedPlace\" || ' ' || resident_companies.\"affiliatedInstitution\" ) @@ plainto_tsquery(:q) )", { q: `%${ payload.q.toLowerCase() }%` });
+      rcQuery.andWhere("(LOWER(resident_companies.name) LIKE :q) OR (LOWER(resident_companies.companyName) LIKE :q) OR (LOWER(resident_companies.technology) LIKE :q) OR (LOWER(resident_companies.email) LIKE :q) OR (LOWER(resident_companies.rAndDPath) LIKE :q) OR (LOWER(resident_companies.foundedPlace) LIKE :q) OR (LOWER(resident_companies.affiliatedInstitution) LIKE :q) OR (SELECT to_tsvector(resident_companies.\"name\" || ' ' || resident_companies.\"companyName\" || ' ' || resident_companies.\"technology\" || ' ' || resident_companies.\"email\" || ' ' || resident_companies.\"rAndDPath\" || ' ' || resident_companies.\"foundedPlace\" || ' ' || resident_companies.\"affiliatedInstitution\" ) @@ plainto_tsquery(:q) )", { q: `%${payload.q.toLowerCase()}%` });
     }
 
     if (payload.companyStatus && payload.companyStatus.length > 0) {
@@ -914,6 +915,154 @@ export class ResidentCompanyService {
 
     rcQuery.addOrderBy("id", "DESC");
     return await rcQuery.getMany();
+  }
+  /**
+   * Description: This method will return the resident companies list.
+   * @description This method will return the resident companies list.
+   * @param payload object of ListResidentCompanyPayload
+   * @return array of resident companies object
+   */
+  async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
+
+    let globalSearch = `SELECT * FROM global_search_view AS gsv`;
+    globalSearch += ` where "status" IN ('1', '0')  `;
+
+    if (payload.siteIdArr && payload.siteIdArr.length > 0) {
+      payload.siteIdArr = this.parseToArray(payload.siteIdArr)
+      globalSearch += ` and gsv."site" && ARRAY[` + payload.siteIdArr + `]::int[] `;
+    } else if (siteIdArr && siteIdArr.length) {
+      globalSearch += ` and gsv."site" && ARRAY[` + siteIdArr + `]::int[] `;
+    }
+
+    if (payload.q && payload.q != '') {
+      payload.q = payload.q.trim();
+      globalSearch += ` and (
+      (LOWER(gsv.\"name\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"companyName\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"technology\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"email\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"rAndDPath\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"foundedPlace\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"affiliatedInstitution\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"fundingsrcname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"industryname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"modalityname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"sitename\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techstagename\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"bsourcesname\") LIKE '%${payload.q.toLowerCase()}%') OR
+
+      (LOWER(gsv.\"companystatustext\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"companyvisibilitytext\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"companyonboardingtext\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"committeestatustext\") LIKE '%${payload.q.toLowerCase()}%') OR
+
+
+      (LOWER(gsv.\"advisoryname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"advisorytitle\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"advisoryorg\") LIKE '%${payload.q.toLowerCase()}%') OR
+
+      (LOWER(gsv.\"mgmtname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"mgmttitle\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"mgmtphone\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"mgmtlinkedin\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"mgmtpublications\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"mgmtffiliation\") LIKE '%${payload.q.toLowerCase()}%') OR
+
+      (LOWER(gsv.\"techname\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techtitle\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techemail\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techphone\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techlinkedin\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (LOWER(gsv.\"techpublications\") LIKE '%${payload.q.toLowerCase()}%') OR
+      (SELECT to_tsvector(
+        gsv.\"name\" || ' ' || 
+        gsv.\"companyName\" || ' ' || 
+        gsv.\"technology\" || ' ' || 
+        gsv.\"email\" || ' ' || 
+        gsv.\"rAndDPath\" || ' ' || 
+        gsv.\"foundedPlace\" || ' ' || 
+        gsv.\"affiliatedInstitution\" || ' ' ||
+        gsv.\"fundingsrcname\" || ' ' ||
+        gsv.\"industryname\" || ' ' ||
+        gsv.\"modalityname\" || ' ' ||
+        gsv.\"sitename\" || ' ' ||
+        gsv.\"techstagename\" || ' ' ||
+        gsv.\"bsourcesname\" || ' ' ||
+
+        gsv.\"companystatustext\" || ' ' ||
+        gsv.\"companyvisibilitytext\" || ' ' ||
+        gsv.\"companyonboardingtext\" || ' ' ||
+        gsv.\"committeestatustext\" || ' ' ||
+
+        gsv.\"advisoryname\" || ' ' ||
+        gsv.\"advisorytitle\" || ' ' ||
+        gsv.\"advisoryorg\" || ' ' ||
+
+        gsv.\"mgmtname\" || ' ' ||
+        gsv.\"mgmttitle\" || ' ' ||
+        gsv.\"mgmtphone\" || ' ' ||
+        gsv.\"mgmtlinkedin\" || ' ' ||
+        gsv.\"mgmtpublications\" || ' ' ||
+        gsv.\"mgmtffiliation\" || ' ' ||
+
+        gsv.\"techname\" || ' ' ||
+        gsv.\"techtitle\" || ' ' ||
+        gsv.\"techemail\" || ' ' ||
+        gsv.\"techphone\" || ' ' ||
+        gsv.\"techlinkedin\" || ' ' ||
+        gsv.\"techpublications\"
+      ) 
+      @@ plainto_tsquery('%${payload.q.toLowerCase()}%') )
+      )`;
+    }
+
+    if (payload.companyStatus && payload.companyStatus.length > 0) {
+      globalSearch += ` and gsv."companyStatus" = ${payload.companyStatus}`;
+    }
+
+    if (typeof payload.companyVisibility !== 'undefined') {
+      globalSearch += ` and gsv."companyVisibility" = ${payload.companyVisibility}`;
+    }
+
+    if (typeof payload.companyOnboardingStatus !== 'undefined') {
+      globalSearch += ` and gsv."companyOnboardingStatus" = ${payload.companyOnboardingStatus}`;
+    }
+
+    if (payload.industries && payload.industries.length > 0) {
+      payload.industries = this.parseToArray(payload.industries)
+      globalSearch += ` and gsv."industry" && ARRAY[` + payload.industries + `]::int[] `;
+    }
+
+    if (payload.modalities && payload.modalities.length > 0) {
+      payload.modalities = this.parseToArray(payload.modalities)
+      globalSearch += ` and gsv."modality" && ARRAY[` + payload.modalities + `]::int[] `;
+    }
+
+    if (payload.fundingSource && payload.fundingSource.length > 0) {
+      payload.fundingSource = this.parseToArray(payload.fundingSource)
+      globalSearch += ` and gsv.\"fundingSource\" && ARRAY[` + payload.fundingSource + `]::int[] `;
+    }
+
+    if (payload.minFund >= 0) {
+      globalSearch += ` and gsv."funding" ::int >= ${payload.minFund}`;
+    }
+
+    if (payload.maxFund >= 0) {
+      globalSearch += ` and gsv."funding" ::int <= ${payload.maxFund}`;
+    }
+
+    if (payload.minCompanySize >= 0) {
+      globalSearch += ` and gsv.\"companySize\" ::int >= ${payload.minCompanySize}`;
+    }
+
+    if (payload.maxCompanySize >= 0) {
+      globalSearch += ` and gsv.\"companySize\" ::int <= ${payload.maxCompanySize}`;
+    }
+
+    globalSearch += ` ORDER BY \"id\" DESC `;
+    // console.log('globalSearch Final ====', globalSearch);
+
+    return await this.residentCompanyRepository.query(globalSearch);
   }
 
   /**
@@ -998,12 +1147,12 @@ export class ResidentCompanyService {
     return false;
   }
 
-   /**
-   * Description: This method is used to soft delete the list(for advisors,managements,technicals).
-   * @description This method is used to soft delete the list(for advisors,managements,technicals).
-   * @param id member id
-   * @return object of affected rows
-   */
+  /**
+  * Description: This method is used to soft delete the list(for advisors,managements,technicals).
+  * @description This method is used to soft delete the list(for advisors,managements,technicals).
+  * @param id member id
+  * @return object of affected rows
+  */
   async softDeleteMember(id, type: string) {
     let repo;
     if (type == 'advisors') {
@@ -1035,16 +1184,19 @@ export class ResidentCompanyService {
    */
   async getStagesOfTechnologyBySiteId(siteId: number, companyId: number) {
     const response = {};
-    const queryStr = " SELECT rch.\"companyStage\" as \"stageId\", ts.name as \"stageName\", " +
-      " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
-      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
-      " FROM public.resident_company_history as rch " +
-      " LEFT JOIN technology_stages as ts ON ts.id = rch.\"companyStage\" " +
-      " WHERE rch.\"site\" = \'{ " + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
-      " group by rch.\"companyStage\", ts.name, " +
-      " extract(quarter from rch.\"createdAt\"), " +
-      " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
-      " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
+    const queryStr = " SELECT \"stage\", \"name\", \"quarterno\", \"quat\" " +
+      " FROM " +
+      " (SELECT MAX(rch.\"companyStage\") AS stage, " +
+      "EXTRACT(quarter FROM rch.\"createdAt\") AS \"quarterno\", " +
+      "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quat\" " +
+      "FROM public.resident_company_history AS rch " +
+      "WHERE rch.\"site\" = \'{ " + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
+      "GROUP BY " +
+      "EXTRACT(quarter FROM rch.\"createdAt\")," +
+      "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
+      " ) AS csg " +
+      " LEFT JOIN technology_stages AS ts ON ts.id = csg.\"stage\" " +
+      " ORDER BY quat";
     const compResidentHistory = await this.residentCompanyHistoryRepository.query(queryStr);
     response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
     return response;
@@ -1059,7 +1211,7 @@ export class ResidentCompanyService {
    */
   async getFundingBySiteIdAndCompanyId(siteId: number, companyId: number) {
     const response = {};
-    const queryStr = " SELECT AVG(\"funding\" ::Decimal) as \"Funding\", " +
+    const queryStr = " SELECT MAX(\"funding\" ::Decimal) as \"Funding\", " +
       " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
       " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
       " FROM public.resident_company_history as rch " +
@@ -1074,8 +1226,8 @@ export class ResidentCompanyService {
   }
 
   /**
-   * Description: This method returns started with biolabs date
-   * @description This method returns started with biolabs date
+   * Description: This method returns started with biolabs date.
+   * @description This method returns started with biolabs date.
    * @param siteId The Site id
    * @param companyId The Company id
    * @returns started with biolabs date
@@ -1086,5 +1238,96 @@ export class ResidentCompanyService {
       "AND \"companyOnboardingStatus\" = true";
     const startWithBiolab = await this.residentCompanyHistoryRepository.query(queryStr);
     return startWithBiolab;
+  }
+  /**
+   * Description: This method returns current month fee details
+   * @description This method returns current month fee details
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns current month fee details
+   */
+  async getFinancialFees(companyId: number) {
+    const currentMonth = new Date().getMonth() + 1;
+    const queryStr = "SELECT  p. \"productTypeId\",SUM(o.\"cost\" * o.\"quantity\")  From order_product as o " +
+      "INNER JOIN product as p ON  p.id =o.\"productId\" " +
+      "where p.id = o.\"productId\" " +
+      "AND o.\"companyId\"=" + companyId +
+      "AND o.\"month\" =  " + currentMonth +
+      "AND p.\"productTypeId\" IN(1, 2, 5) " +
+      "group by  p.\"productTypeId\" ";
+    return await this.residentCompanyHistoryRepository.query(queryStr);
+  }
+
+  /**
+   * Description: This method returns changes as feeds
+   * @description This method returns changes as feeds
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns latest feeds
+   */
+  async getFeeds(siteId: number, companyId: number) {
+    const getFeeds = await this.residentCompanyHistoryRepository.query("SELECT feeds(" + companyId + ")").catch(err => {
+      switch (err.code) {
+        case '42883':
+          throw new HttpException({
+            message: err.message + ' in getFeeds'
+          }, HttpStatus.NOT_FOUND);
+          break;
+      }
+    });
+    // console.log('getFeeds for ' + companyId, getFeeds);
+    return getFeeds;
+  }
+
+  /**
+   * Description: This method returns data to visualize timeline data on graph.
+   * @description This method returns data to visualize timeline data on graph.
+   * @param companyId The Company id.
+   * @returns timeline data.
+   */
+  async timelineAnalysis(companyId: number) {
+    const queryStr = `
+    SELECT "productTypeId",  MAX("total")as sumofquantity ,
+            extract(quarter from "updatedAt")as quarterNo,
+            to_char("updatedAt", '"Q"Q.YYYY') AS quat
+    FROM
+       (SELECT  p."productTypeId",SUM(o.quantity) as total, o."updatedAt",
+          extract(quarter from o."updatedAt") as quarterNo,
+          to_char(o."updatedAt", '"Q"Q.YYYY') AS quat
+       FROM order_product as o
+    INNER JOIN product as p ON p.id = o."productId"
+            where p.id = o."productId" 
+                AND "companyId"=${companyId}
+                AND p."productTypeId" IN (2,4)
+    group by p."productTypeId" ,o."updatedAt",
+          extract(quarter from o."updatedAt"),
+          to_char(o."updatedAt", '"Q"Q.YYYY')
+        order by to_char(o."updatedAt", '"Q"Q.YYYY')) as sunTbl
+    GROUP BY extract(quarter from sunTbl."updatedAt"),
+                sunTbl."productTypeId",to_char("updatedAt", '"Q"Q.YYYY')
+                order by quat;
+    `;
+    return await this.residentCompanyHistoryRepository.query(queryStr);
+  }
+  /**
+ * Description: This method returns companySize Quarterly.
+ * @description This method returns current month fee details.
+ * @param companyId The Company id
+ * @returns current month fee details.
+ */
+  async getCompanySizeQuartly(companyId: number) {
+    const queryStr = `
+    SELECT 
+       MAX("companySize") as noOfEmployees,
+          extract(quarter from "updatedAt")as quarterNo,
+          to_char("updatedAt", '"Q"Q.YYYY') AS quat
+  FROM resident_company_history 
+         where "comnpanyId"=${companyId}
+  group by
+            extract(quarter from "updatedAt"),
+            to_char("updatedAt", '"Q"Q.YYYY')
+            order by quat;
+    `;
+    return await this.residentCompanyHistoryRepository.query(queryStr);
   }
 }

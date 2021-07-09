@@ -64,6 +64,12 @@ export class UpdateOrderProductDto {
     required: false,
     nullable: true,
   })
+  year: number;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
   manuallyEnteredProduct: boolean;
 
 }

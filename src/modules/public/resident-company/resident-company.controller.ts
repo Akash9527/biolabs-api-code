@@ -243,4 +243,64 @@ export class ResidentCompanyController {
   getstartedWithBiolabs(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
     return this.residentCompanyService.getstartedWithBiolabs(siteId, companyId);
   }
+   /**
+   * Description: This method returns current month fee details.
+   * @description This method returns current month fee details.
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns current month fee details
+   */
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard())
+    @Get('financialfees/:companyId')
+    @ApiResponse({ status: 200, description: 'Successful Response' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    getFinancialFees(@Param('companyId') companyId: number): Promise<any> {
+      return this.residentCompanyService.getFinancialFees(companyId);
+    }
+
+  /**
+   * Description: This method returns latest feeds.
+   * @description This method returns latest feeds.
+   * @param siteId The Site id
+   * @param companyId The Company id
+   * @returns current month fee details
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('feeds/:siteId/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getFeeds(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getFeeds(siteId, companyId);
+  }
+
+  /**
+   * Description: This method returns data to visualize timeline data on graph.
+   * @description This method returns data to visualize timeline data on graph.
+   * @param companyId The Company id.
+   * @returns timeline data.
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('timeline/analysis/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getTimelineAnalysis(@Param('companyId') companyId: number) {
+    return this.residentCompanyService.timelineAnalysis(companyId);
+  }
+  /**
+   * Description: This method returns companySize Quarterly.
+   * @description This method returns current month fee details.
+   * @param companyId The Company id
+   * @returns current month fee details.
+   */
+   @ApiBearerAuth()
+   @UseGuards(AuthGuard())
+   @Get('companysizeanalysis/:companyId')
+   @ApiResponse({ status: 200, description: 'Successful Response' })
+   @ApiResponse({ status: 401, description: 'Unauthorized' })
+   getCompanySizeQuartly(@Param('companyId') companyId: number): Promise<any> {
+     return this.residentCompanyService.getCompanySizeQuartly(companyId);
+   }
 }

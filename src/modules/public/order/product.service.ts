@@ -1,4 +1,4 @@
-import { Injectable, NotAcceptableException } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotAcceptableException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThanOrEqual, Repository } from "typeorm";
 import { AddProductDto } from "./dto/AddProduct.dto";
@@ -78,7 +78,7 @@ export class ProductService {
        */
     async softDeleteProduct(id: number, req: any) {
         const product = await this.productRepository.findOne(id);
-        const month = new Date().getMonth()+2;
+        const month = new Date().getMonth() + 2;
         const orderProducts = await this.orderProductRepository.find({
             manuallyEnteredProduct: false,
             productId: id,
@@ -88,7 +88,9 @@ export class ProductService {
             product.productStatus = 99;
             product.modifiedBy = req.user.id;
             for await (const orderProduct of orderProducts) {
-                await this.orderProductRepository.delete(orderProduct.id);
+                orderProduct.manuallyEnteredProduct = true;
+                orderProduct.productId = orderProduct.id;
+                await this.orderProductRepository.update(orderProduct.id, orderProduct);
             }
             return await this.productRepository.update(id, product);
         } else {
@@ -102,7 +104,7 @@ export class ProductService {
        */
     async updateProduct(productId: number, payload: UpdateProductDto, req: any, siteId: number): Promise<any> {
         const product = await this.productRepository.findOne(productId);
-        const month = new Date().getMonth()+2;
+        const month = new Date().getMonth() + 2;
         const orderProducts = await this.orderProductRepository.find({
             manuallyEnteredProduct: false,
             productId: productId,
@@ -120,14 +122,60 @@ export class ProductService {
             product.cost = payload.cost;
             product.recurrence = payload.recurrence;
             product.productType = productType;
+            //if recurrence is false 
+            if (!payload.recurrence) {
+                for await (const orderProduct of orderProducts) {
+                    // delete future months order products 
+                    if (!payload.recurrence && (orderProduct.month != month)) {
+                        await this.orderProductRepository.delete(orderProduct.id);
+                    }
+                    // Update Order Product for next 1 month
+                    if (orderProduct.id) {
+                        orderProduct.productName = payload.name;
+                        orderProduct.productDescription = payload.description;
+                        orderProduct.cost = payload.cost;
+                        orderProduct.recurrence = payload.recurrence;
+                        await this.orderProductRepository.update(orderProduct.id, orderProduct);
+                    }
+                }
+            } else if (payload.recurrence) {
+                for await (const orderProduct of orderProducts) {
+                    //Update Order Product as per Product
+                    if (orderProduct.id) {
+                        orderProduct.productName = payload.name;
+                        orderProduct.productDescription = payload.description;
+                        orderProduct.cost = payload.cost;
+                        orderProduct.recurrence = payload.recurrence;
+                        await this.orderProductRepository.update(orderProduct.id, orderProduct);
+                    }
+                    //Add next 3 months invoice
+                    for (let i = 1; i < 4; i++) {
+                        //quering if orderProduct exist for future months
+                        const futureOrderProduct = await this.orderProductRepository.find({
+                            manuallyEnteredProduct: false,
+                            productId: orderProduct.productId,
+                            month: orderProduct.month + i
+                        });
+                        //if orderProduct doesn't exist for future months then add new Order Products for future months
+                        if (!futureOrderProduct || futureOrderProduct.length == 0) {
+                            let futureOrderProductObj = JSON.parse(JSON.stringify(orderProduct));
 
-            for await (const orderProduct of orderProducts) {
-                orderProduct.productName = payload.name;
-                orderProduct.productDescription = payload.description;
-                orderProduct.cost = payload.cost;
-                await this.orderProductRepository.update(orderProduct.id, orderProduct)
+                            if (futureOrderProductObj.month < 12) {
+                                futureOrderProductObj.month = futureOrderProductObj.month + i;
+                            } else {
+                                futureOrderProductObj.month = 1;
+                                futureOrderProductObj.year = futureOrderProductObj.year + 1;
+                            }
+                            delete futureOrderProductObj['id'];
+                            await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProductObj)).catch(err => {
+                                throw new HttpException({
+                                    message: err.message
+                                }, HttpStatus.NOT_IMPLEMENTED);
+                            });
+                        }
+                    }
+                }
             }
-
             return await this.productRepository.update(productId, product);
         }
         else {
