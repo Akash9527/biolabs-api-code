@@ -216,9 +216,9 @@ export class OrderProductService {
    * @returns 
    */
   async consolidatedInvoice(month: number, site: number) {
-    info(`Consolidated Invoice by month: ${month} site: ${site}`,__filename,"consolidatedInvoice()")
     try{
-    const query = 'select rc.\"companyName\", orp.\"companyId\", orp.\"productName\",'
+    info(`Consolidated Invoice by month: ${month} site: ${site}`,__filename,"consolidatedInvoice()")
+    const query = 'select rc.\"companyName\", rc.\"id\" as companyId, orp.\"productName\",'
       + ' orp.\"productDescription\", orp.\"cost\", orp.\"quantity\", '
       + ' orp.\"recurrence\", orp.\"currentCharge\", orp.\"startDate\", orp.\"endDate\" '
       + ' from resident_companies as rc'
@@ -226,7 +226,7 @@ export class OrderProductService {
       + ' where rc.\"site\" && ARRAY[' + site + ']::int[]'
       + ' and (orp.\"month\"=' + month + ' or orp."month" isnull )'
       + ' and rc.\"companyStatus\" = \'1\' '
-      + ' group by rc.\"companyName\", orp.\"companyId\", orp.\"productName\",'
+      + ' group by rc.\"id\", rc.\"companyName\", orp.\"companyId\", orp.\"productName\",'
       + ' orp.\"productDescription\", orp.\"cost\", orp.\"quantity\", '
       + ' orp.\"recurrence\", orp.\"currentCharge\", orp.\"startDate\", orp.\"endDate\" '
       + ' order by rc.\"companyName\" ,  orp.\"productName\"';

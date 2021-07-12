@@ -1440,29 +1440,55 @@ export class ResidentCompanyService {
    */
   async timelineAnalysis(companyId: number) {
     info(`timeline analysis by companyId: ${companyId}`,__filename,"timelineAnalysis()")
-   try{
     const queryStr = `
-    SELECT  p."productTypeId", avg(o.quantity) as sumofquantity,
-            extract(quarter from make_date(date_part('year', CURRENT_DATE):: int, o.month, 01)) as quarterNo,
-            to_char(make_date(date_part('year', CURRENT_DATE):: int, o.month, 01), '"Q"Q.YYYY') AS quat
-    fROM
-      order_product as o
+    SELECT "productTypeId",  MAX("total")as sumofquantity ,
+            extract(quarter from "updatedAt")as quarterNo,
+            to_char("updatedAt", '"Q"Q.YYYY') AS quat
+    FROM
+       (SELECT  p."productTypeId",SUM(o.quantity) as total, o."updatedAt",
+          extract(quarter from o."updatedAt") as quarterNo,
+          to_char(o."updatedAt", '"Q"Q.YYYY') AS quat
+       FROM order_product as o
     INNER JOIN product as p ON p.id = o."productId"
-    where
-      p.id = o."productId"
-      AND "companyId"=${companyId}
-      AND p."productTypeId" IN (2,4)
-    group by p."productTypeId",
-      extract(quarter from make_date(date_part('year', CURRENT_DATE):: int, o.month, 01)),
-      to_char(make_date(date_part('year', CURRENT_DATE):: int, o.month, 01), '"Q"Q.YYYY')
+            where p.id = o."productId" 
+                AND "companyId"=${companyId}
+                AND p."productTypeId" IN (2,4)
+    group by p."productTypeId" ,o."updatedAt",
+          extract(quarter from o."updatedAt"),
+          to_char(o."updatedAt", '"Q"Q.YYYY')
+        order by to_char(o."updatedAt", '"Q"Q.YYYY')) as sunTbl
+    GROUP BY extract(quarter from sunTbl."updatedAt"),
+                sunTbl."productTypeId",to_char("updatedAt", '"Q"Q.YYYY')
+                order by quat;
+    `;
+    return await this.residentCompanyHistoryRepository.query(queryStr);
+  }
+  /**
+ * Description: This method returns companySize Quarterly.
+ * @description This method returns current month fee details.
+ * @param companyId The Company id
+ * @returns current month fee details.
+ */
+  async getCompanySizeQuartly(companyId: number) {
+    try {
+      const queryStr = `
+    SELECT 
+       MAX("companySize") as noOfEmployees,
+          extract(quarter from "updatedAt")as quarterNo,
+          to_char("updatedAt", '"Q"Q.YYYY') AS quat
+  FROM resident_company_history 
+         where "comnpanyId"=${companyId}
+  group by
+            extract(quarter from "updatedAt"),
+            to_char("updatedAt", '"Q"Q.YYYY')
+            order by quat;
     `;
 
-    debug(`getting timeline analysis by query: ${queryStr}`,__filename,"timelineAnalysis()")
-    return await this.residentCompanyHistoryRepository.query(queryStr);
-  }catch(err){
-   error("Getting error in find the time analysis",__filename,"timelineAnalysis()");
-   throw new BiolabsException('Getting error in find the time analysis'+err.message);
- }
+      debug(`getting companySize Quarterly: ${queryStr}`, __filename, "getCompanySizeQuartly()")
+      return await this.residentCompanyHistoryRepository.query(queryStr);
+    } catch (err) {
+      error("Getting error in find theget company size quartly", __filename, "getCompanySizeQuartly()");
+      throw new BiolabsException('Getting error in find company size quartly' + err.message);
+    }
   }
-
 }
