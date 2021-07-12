@@ -198,9 +198,8 @@ export class OrderProductService {
    */
   async consolidatedInvoice(month: number, site: number) {
     const query = `select 
-                    rc."id", 
+                    rc."id" as companyid, 
                     rc."companyName", 
-                    orp."companyId", 
                     orp."month", 
                     orp."productName", 
                     orp."productDescription", 
@@ -237,8 +236,7 @@ export class OrderProductService {
                     and rc."companyStatus" = '1' 
                   group by 
                     rc."id", 
-                    rc."companyName", 
-                    orp."companyId", 
+                    rc."companyName",
                     orp."month", 
                     orp."productName", 
                     orp."productDescription", 
