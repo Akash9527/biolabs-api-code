@@ -780,6 +780,9 @@ export class ResidentCompanyService {
       where: { id: payload.id }
     });
     let historyData: any = JSON.parse(JSON.stringify(residentCompany));
+    // removing dates for history data
+    delete historyData.createdAt;
+    delete historyData.updatedAt;
     // Not needed anymore because we are saving multiple instance of same application based on siteId
     // const residentCompanyEmailChk: any = await this.residentCompanyRepository.findOne({
     //   where: { id: Not(payload.id), email: payload.email }
