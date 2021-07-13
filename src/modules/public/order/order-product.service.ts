@@ -199,6 +199,7 @@ export class OrderProductService {
   async consolidatedInvoice(month: number, site: number) {
     const query = `select 
                     rc."id" as companyid, 
+                    orp.id as orderId,
                     rc."companyName", 
                     orp."month", 
                     orp."productName", 
@@ -212,7 +213,8 @@ export class OrderProductService {
                   from 
                     resident_companies as rc 
                     LEFT JOIN (
-                      select 
+                      select
+                        orpd.id,
                         orpd."companyId", 
                         orpd."productName", 
                         orpd."month", 
@@ -236,6 +238,7 @@ export class OrderProductService {
                     and rc."companyStatus" = '1' 
                   group by 
                     rc."id", 
+                    orp."id",
                     rc."companyName",
                     orp."month", 
                     orp."productName", 

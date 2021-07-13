@@ -760,7 +760,6 @@ export class ResidentCompanyService {
       const historyData: any = JSON.parse(JSON.stringify(residentCompany));
       historyData.comnpanyId = residentCompany.id;
       delete historyData.id;
-
       await this.residentCompanyHistoryRepository.save(historyData);
       return residentCompany;
     } else {
@@ -780,6 +779,10 @@ export class ResidentCompanyService {
     const residentCompany: any = await this.residentCompanyRepository.findOne({
       where: { id: payload.id }
     });
+    let historyData: any = JSON.parse(JSON.stringify(residentCompany));
+    // removing dates for history data
+    delete historyData.createdAt;
+    delete historyData.updatedAt;
     // Not needed anymore because we are saving multiple instance of same application based on siteId
     // const residentCompanyEmailChk: any = await this.residentCompanyRepository.findOne({
     //   where: { id: Not(payload.id), email: payload.email }
@@ -803,10 +806,9 @@ export class ResidentCompanyService {
       await this.residentCompanyAdvisors(companyAdvisors, residentCompany.id);
       await this.residentCompanyTechnicals(companyTechnicalTeams, residentCompany.id);
 
-      const historyData: any = JSON.parse(JSON.stringify(payload));
+      historyData = { ...historyData, ...payload };
       historyData.comnpanyId = residentCompany.id;
       delete historyData.id;
-
       await this.residentCompanyHistoryRepository.save(historyData);
       return await this.getResidentCompany(residentCompany.id);
     } else {
