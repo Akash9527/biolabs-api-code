@@ -1250,7 +1250,7 @@ export class ResidentCompanyService {
    */
   async getFinancialFees(companyId: number) {
     const currentMonth = new Date().getMonth() + 1;
-    const queryStr = "SELECT  p. \"productTypeId\",SUM(o.\"cost\" * o.\"quantity\")  From order_product as o " +
+    const queryStr = "SELECT  p. \"productTypeId\",SUM(calculate_prorating(o.\"cost\",o.\"month\",o.\"startDate\",o.\"endDate\",o.\"quantity\",o.\"currentCharge\",o.\"year\"))  From order_product as o " +
       "INNER JOIN product as p ON  p.id =o.\"productId\" " +
       "where p.id = o.\"productId\" " +
       "AND o.\"companyId\"=" + companyId +
