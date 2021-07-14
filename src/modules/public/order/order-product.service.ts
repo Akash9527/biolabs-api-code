@@ -217,20 +217,62 @@ export class OrderProductService {
    */
   async consolidatedInvoice(month: number, site: number) {
     try{
-    info(`Consolidated Invoice by month: ${month} site: ${site}`,__filename,"consolidatedInvoice()")
-    const query = 'select rc.\"companyName\", rc.\"id\" as companyId, orp.\"productName\",'
-      + ' orp.\"productDescription\", orp.\"cost\", orp.\"quantity\", '
-      + ' orp.\"recurrence\", orp.\"currentCharge\", orp.\"startDate\", orp.\"endDate\" '
-      + ' from resident_companies as rc'
-      + ' LEFT OUTER JOIN order_product as orp on orp.\"companyId\" = rc.\"id\"'
-      + ' where rc.\"site\" && ARRAY[' + site + ']::int[]'
-      + ' and (orp.\"month\"=' + month + ' or orp."month" isnull )'
-      + ' and rc.\"companyStatus\" = \'1\' '
-      + ' group by rc.\"id\", rc.\"companyName\", orp.\"companyId\", orp.\"productName\",'
-      + ' orp.\"productDescription\", orp.\"cost\", orp.\"quantity\", '
-      + ' orp.\"recurrence\", orp.\"currentCharge\", orp.\"startDate\", orp.\"endDate\" '
-      + ' order by rc.\"companyName\" ,  orp.\"productName\"';
-      debug(`query: ${query}`,__filename,"consolidatedInvoice()")
+      info(`Consolidated Invoice by month: ${month} site: ${site}`,__filename,"consolidatedInvoice()");
+    const query = `select 
+                    rc."id" as companyid, 
+                    orp.id as orderId,
+                    rc."companyName", 
+                    orp."month", 
+                    orp."productName", 
+                    orp."productDescription", 
+                    orp."cost", 
+                    orp."quantity", 
+                    orp."recurrence", 
+                    orp."currentCharge", 
+                    orp."startDate", 
+                    orp."endDate" 
+                  from 
+                    resident_companies as rc 
+                    LEFT JOIN (
+                      select
+                        orpd.id,
+                        orpd."companyId", 
+                        orpd."productName", 
+                        orpd."month", 
+                        orpd."productDescription", 
+                        orpd."cost", 
+                        orpd."quantity", 
+                        orpd."recurrence", 
+                        orpd."currentCharge", 
+                        orpd."startDate", 
+                        orpd."endDate" 
+                      from 
+                        order_product as orpd 
+                      where 
+                        (
+                          orpd."month" = ${month} 
+                          or orpd."month" isnull
+                        )
+                    ) as orp on orp."companyId" = rc."id" 
+                  where 
+                    rc."site" && ARRAY[${site}] :: int[] 
+                    and rc."companyStatus" = '1' 
+                  group by 
+                    rc."id", 
+                    orp."id",
+                    rc."companyName",
+                    orp."month", 
+                    orp."productName", 
+                    orp."productDescription", 
+                    orp."cost", 
+                    orp."quantity", 
+                    orp."recurrence", 
+                    orp."currentCharge", 
+                    orp."startDate", 
+                    orp."endDate" 
+                  order by 
+                    rc."companyName", 
+                    orp."productName"`;
     return await this.residentCompanyRepository.query(query);
     }catch(err){
       error("Error in find consolidated Invoice",__filename,"consolidatedInvoice()");

@@ -828,7 +828,6 @@ export class ResidentCompanyService {
       const historyData: any = JSON.parse(JSON.stringify(residentCompany));
       historyData.comnpanyId = residentCompany.id;
       delete historyData.id;
-
       await this.residentCompanyHistoryRepository.save(historyData);
       debug("Resident company updated successfully",__filename,"updateResidentCompanyStatus()")
       return residentCompany;
@@ -855,6 +854,10 @@ export class ResidentCompanyService {
     const residentCompany: any = await this.residentCompanyRepository.findOne({
       where: { id: payload.id }
     });
+    let historyData: any = JSON.parse(JSON.stringify(residentCompany));
+    // removing dates for history data
+    delete historyData.createdAt;
+    delete historyData.updatedAt;
     // Not needed anymore because we are saving multiple instance of same application based on siteId
     // const residentCompanyEmailChk: any = await this.residentCompanyRepository.findOne({
     //   where: { id: Not(payload.id), email: payload.email }
@@ -878,10 +881,9 @@ export class ResidentCompanyService {
       await this.residentCompanyAdvisors(companyAdvisors, residentCompany.id);
       await this.residentCompanyTechnicals(companyTechnicalTeams, residentCompany.id);
 
-      const historyData: any = JSON.parse(JSON.stringify(payload));
+      historyData = { ...historyData, ...payload };
       historyData.comnpanyId = residentCompany.id;
       delete historyData.id;
-
       await this.residentCompanyHistoryRepository.save(historyData);
       debug("Resident company updated successfully",__filename,"updateResidentCompany()")
       return await this.getResidentCompany(residentCompany.id);
@@ -1391,7 +1393,7 @@ export class ResidentCompanyService {
     info(`get financial fees by companyId: ${companyId}`,__filename,"getFinancialFees()")
     try{
     const currentMonth = new Date().getMonth() + 1;
-    const queryStr = "SELECT  p. \"productTypeId\",SUM(o.\"cost\" * o.\"quantity\")  From order_product as o " +
+    const queryStr = "SELECT  p. \"productTypeId\",SUM(calculate_prorating(o.\"cost\",o.\"month\",o.\"startDate\",o.\"endDate\",o.\"quantity\",o.\"currentCharge\",o.\"year\"))  From order_product as o " +
       "INNER JOIN product as p ON  p.id =o.\"productId\" " +
       "where p.id = o.\"productId\" " +
       "AND o.\"companyId\"=" + companyId +
