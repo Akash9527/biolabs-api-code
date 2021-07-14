@@ -1287,6 +1287,7 @@ export class ResidentCompanyService {
    * @param companyId The Company id.
    * @returns timeline data.
    */
+
   async timelineAnalysis(companyId: number) {
     const queryStr = `
     SELECT "productTypeId",  MAX("total")as sumofquantity ,
@@ -1317,6 +1318,7 @@ export class ResidentCompanyService {
  * @param companyId The Company id
  * @returns current month fee details.
  */
+
   async getCompanySizeQuartly(companyId: number) {
     const queryStr = `
     SELECT 
