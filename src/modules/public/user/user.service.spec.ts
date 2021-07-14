@@ -202,7 +202,6 @@ describe('UserService', () => {
             jest.spyOn(userTokenRepository, 'findOne').mockResolvedValue(mockUserToken);
             jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
             let users = await userService.validateToken(mockUserToken.token);
-            console.log(users);
 
         })
         
@@ -211,7 +210,6 @@ describe('UserService', () => {
              try {
                  await userService.validateToken(null);
              } catch (e) {
-                 console.log(e);
                  expect(e.response.error).toBe('Not Acceptable');
                 expect(e.response.message).toBe('Token is invalid.');
                  expect(e.response.statusCode).toBe(406);
