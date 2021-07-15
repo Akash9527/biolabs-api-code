@@ -1464,6 +1464,11 @@ order by quat;
       spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
       spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
 
+      residentCompany.companyStage = payload.companyStage;
+      residentCompany.funding = payload.funding;
+      residentCompany.fundingSource = payload.fundingSource;
+      residentCompany.companySize = payload.companySize;
+      await this.residentCompanyRepository.update(residentCompany.id, residentCompany);
       await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj);
     } catch {
       response['status'] = 'error';
