@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EMAIL } from 'constants/email';
 import { In, Like, Repository } from 'typeorm';
 import { Mail } from '../../../utils/Mail';
+import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
 import { Item } from '../entity/item.entity';
 import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
 import { MembershipChangeEnum } from '../enum/membership-change-enum';
@@ -300,7 +301,7 @@ export class ResidentCompanyService {
           await this.residentCompanyHistoryRepository.save(historyData);
 
           /** Create waitlist entry while saving Resident Company */
-          await this.addResidentCompanyDataInWaitlist(savedRc, req);
+          await this.addResidentCompanyDataInWaitlist(savedRc);
         }
       }
       await this.sendEmailToSiteAdmin(sites, req, payload.companyName);
@@ -1346,24 +1347,22 @@ export class ResidentCompanyService {
    * @param savedRc
    * @param req
    */
-  private async addResidentCompanyDataInWaitlist(savedRc: any, @Request() req) {
-    console.log(' req.user.id  ==== ', req.user.id);
+  private async addResidentCompanyDataInWaitlist(savedRc: any) {
     const PLAN_CHANGE_SUMMARY_INITIAL_VALUE = 'See Notes';
     const REQUEST_NOTES_INITIAL_VALUE = 'When would you like to join BioLabs?, What equipment and facilities do you plan to primarily use onsite?**';
     const maxPriorityOrder: number = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
       return result;
     });
-    console.log('maxPriorityOrder ==== ', maxPriorityOrder);
     let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
     let items: Item[];
     spaceChangeWaitlistObj.residentCompany = savedRc;
     spaceChangeWaitlistObj.items = items;
     spaceChangeWaitlistObj.desiredStartDate = null;
     spaceChangeWaitlistObj.planChangeSummary = PLAN_CHANGE_SUMMARY_INITIAL_VALUE;
-    spaceChangeWaitlistObj.requestedBy = req.user.id;
+    spaceChangeWaitlistObj.requestedBy = savedRc.name;
     spaceChangeWaitlistObj.requestStatus = RequestStatusEnum.Open;
     spaceChangeWaitlistObj.fulfilledOn = null;
-    spaceChangeWaitlistObj.isRequestInternal = false;
+    spaceChangeWaitlistObj.isRequestInternal = true;
     spaceChangeWaitlistObj.requestNotes = REQUEST_NOTES_INITIAL_VALUE;
     spaceChangeWaitlistObj.internalNotes = null;
     spaceChangeWaitlistObj.siteNotes = null;
@@ -1390,5 +1389,69 @@ export class ResidentCompanyService {
     } else {
       return 0;
     }
+  }
+
+  /**
+   * @description BIOL-275: Add an entry of space change wait list
+   * @param payload
+   * @param req
+   * @returns
+   */
+  public async addToSpaceChangeWaitList(payload: AddSpaceChangeWaitlistDto, @Request() req): Promise<any> {
+    const residentCompany: ResidentCompany = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
+      return result;
+    });
+    let response = {};
+    if (residentCompany == null) {
+      response['status'] = 'Error';
+      response['message'] = 'Resident Company not found by id: ' + payload.residentCompanyId;
+      return response;
+    }
+
+    const maxPriorityOrder: number = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
+      return result;
+    });
+    try {
+      const spaceChangeWaitlistObj = new SpaceChangeWaitlist();
+      spaceChangeWaitlistObj.residentCompany = residentCompany;
+      spaceChangeWaitlistObj.items = payload.items;
+      spaceChangeWaitlistObj.desiredStartDate = payload.desiredStartDate;
+      spaceChangeWaitlistObj.planChangeSummary = payload.planChangeSummary;
+      spaceChangeWaitlistObj.requestedBy = residentCompany.name;
+      spaceChangeWaitlistObj.requestStatus = payload.requestStatus;
+      spaceChangeWaitlistObj.fulfilledOn = payload.fulfilledOn;
+      spaceChangeWaitlistObj.isRequestInternal = payload.isRequestInternal;
+      spaceChangeWaitlistObj.requestNotes = payload.requestNotes;
+      spaceChangeWaitlistObj.internalNotes = payload.internalNotes;
+      spaceChangeWaitlistObj.siteNotes = payload.siteNotes;
+      spaceChangeWaitlistObj.priorityOrder = maxPriorityOrder;
+
+      let siteIdArr = req.user.site_id;
+      // if (req.headers['x-site-id']) {
+      //   siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+      // }
+      spaceChangeWaitlistObj.site = siteIdArr;
+      spaceChangeWaitlistObj.membershipChange = payload.membershipChange;
+      spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
+      spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
+
+      await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj);
+    } catch {
+      response['status'] = 'error';
+      response['message'] = 'Could not add item in space change wait list';
+    }
+
+    response['status'] = 'Success';
+    response['message'] = 'Operation Successful';
+    return response;
+  }
+
+  /**
+   * @description BIOL-275: fetch a resident company by id from db
+   * @param residentCompanyId 
+   * @returns 
+   */
+  private async fetchResidentCompanyById(residentCompanyId: number) {
+    return await this.residentCompanyRepository.findOne(residentCompanyId);
   }
 }

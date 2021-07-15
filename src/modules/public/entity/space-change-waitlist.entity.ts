@@ -27,7 +27,7 @@ export class SpaceChangeWaitlist {
   planChangeSummary: string;
 
   @Column({ nullable: false })
-  requestedBy: number;
+  requestedBy: string;
 
   @Column({ nullable: false, default: 0 })
   requestStatus: RequestStatusEnum;

@@ -7,6 +7,7 @@ import { UpdateResidentCompanyStatusPayload } from './update-resident-company-st
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 import { AddNotesDto } from './add-notes.dto';
+import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
 
 @Controller('api/resident-company')
 @ApiTags('Resident Company')
@@ -303,4 +304,23 @@ export class ResidentCompanyController {
    getCompanySizeQuartly(@Param('companyId') companyId: number): Promise<any> {
      return this.residentCompanyService.getCompanySizeQuartly(companyId);
    }
+
+  /**
+  * @description BIOL-275: Add space waitlist entry
+  * @param payload
+  * @param req
+  * @returns
+  */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Post("/addspacechangewaitlist")
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiHeader({
+    name: 'x-site-id',
+    description: 'Selected site ids array',
+  })
+  async addSpaceChangeWaitlist(@Body() payload: AddSpaceChangeWaitlistDto, @Request() req) {
+    return await this.residentCompanyService.addToSpaceChangeWaitList(payload, req);
+  }
 }

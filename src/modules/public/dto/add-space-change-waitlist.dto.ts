@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsNumber, Min } from "class-validator";
+import { Item } from "../entity/item.entity";
+import { MembershipChangeEnum } from "../enum/membership-change-enum";
 import { RequestStatusEnum } from "../enum/request-status-enum";
 
 export class AddSpaceChangeWaitlistDto {
@@ -8,11 +10,14 @@ export class AddSpaceChangeWaitlistDto {
     @IsNotEmpty()
     residentCompanyId: number;
 
+    @ApiProperty({ description: 'Items', required: true, nullable: false })
+    @IsNotEmpty()
+    items: Item[];
+
     @ApiProperty({ description: 'Desired start date of plan', required: false, nullable: true })
     desiredStartDate: number;
 
     @ApiProperty({ description: 'Plan change summary', required: false, nullable: true, default: 'See Notes' })
-    @IsNotEmpty()
     planChangeSummary: string;
 
     @ApiProperty({ description: 'Request status', default: 0, required: true, nullable: false })
@@ -27,10 +32,21 @@ export class AddSpaceChangeWaitlistDto {
     isRequestInternal: boolean;
 
     @ApiProperty({ description: 'Request notes', required: false, nullable: true })
-    @IsNotEmpty()
     requestNotes: string;
 
     @ApiProperty({ description: 'Internal notes', required: false, nullable: true })
-    @IsNotEmpty()
     internalNotes: string;
+
+    @ApiProperty({ description: 'Site notes', required: false, nullable: true })
+    siteNotes: string;
+
+    @ApiProperty({ description: 'Membership change', required: true, nullable: false })
+    @IsNotEmpty()
+    membershipChange: MembershipChangeEnum;
+
+    @ApiProperty({ description: 'Request Graduate Date', required: false, nullable: true })
+    requestGraduateDate: number;
+
+    @ApiProperty({ description: 'Market place', required: false, nullable: true })
+    marketPlace: boolean;
 }
