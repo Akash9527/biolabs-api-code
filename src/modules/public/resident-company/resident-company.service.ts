@@ -1483,4 +1483,27 @@ order by quat;
   private async fetchResidentCompanyById(residentCompanyId: number) {
     return await this.residentCompanyRepository.findOne(residentCompanyId);
   }
+
+  /**
+   * @description BIOL-275: GET spacechange wait list by status
+   * @param statusArr
+   * @returns
+   */
+  public async getSpaceChangeWaitList(statusArr: number[]): Promise<any> {
+    const response = {};
+    let array: number[] = new Array();
+    if (statusArr.length == 1) {
+      array.push(statusArr[0]);
+    } else {
+      array = statusArr;
+    }
+
+    let spaceChangeWaitlist: any = await this.spaceChangeWaitlistRepository
+      .createQueryBuilder("space_change_waitlist")
+      .select("space_change_waitlist.*")
+      .where("space_change_waitlist.requestStatus IN (:...status)", { status: array })
+      .getRawMany();
+    response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
+    return response;
+  }
 }

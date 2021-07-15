@@ -323,4 +323,18 @@ export class ResidentCompanyController {
   async addSpaceChangeWaitlist(@Body() payload: AddSpaceChangeWaitlistDto, @Request() req) {
     return await this.residentCompanyService.addToSpaceChangeWaitList(payload, req);
   }
+
+  /**
+   * @description BIOL-275: Get space change waitlist by status
+   * @param status
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('/getspacechangewaitlist/param?')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getSpaceChangeWaitlist(@Query('status') status: number[]): Promise<any> {
+    return this.residentCompanyService.getSpaceChangeWaitList(status);
+  }
 }
