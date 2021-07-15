@@ -49,4 +49,22 @@ export class AddSpaceChangeWaitlistDto {
 
     @ApiProperty({ description: 'Market place', required: false, nullable: true })
     marketPlace: boolean;
+
+    @ApiProperty({ description: 'Company Stage of Development', required: false, nullable: true })
+    @Min(1)
+    companyStage: number;
+
+    @ApiProperty({ description: 'Funding to date', required: false, nullable: true })
+    @IsNotEmpty()
+    @Min(0)
+    funding: string;
+
+    @ApiProperty({ description: 'Funding Source', required: false, nullable: true })
+    @IsNotEmpty()
+    @Min(1, { each: true })
+    fundingSource: number[];
+
+    @ApiProperty({ description: 'Total Company Size', required: false, nullable: true })
+    companySize: number;
+
 }
