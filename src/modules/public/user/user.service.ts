@@ -68,11 +68,6 @@ export class UsersService {
     info("Creating a new biolabs user",__filename,"create()");
     const user = await this.getByEmail(payload.email);
 
-    if (user == null) {
-      debug("User with email is not fonund , email :" + payload.email,__filename,"create()");
-      throw new ResourceNotFoundException('user', payload);
-    }
-
     if (user) {
       debug("User with provided email already created",__filename,"create()");
       throw new NotAcceptableException('User with provided email already created.',
