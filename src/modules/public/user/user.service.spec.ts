@@ -40,7 +40,7 @@ const mockUserFillable: UserFillableFields = {
     firstName: "adminName", lastName: "userLast", title: "SuperAdmin", phoneNumber: "2345678902",
     status: '1', userType: '1', imageUrl: "admin.jpg"
 }
-const mockUserToken = { token: "moke token", userName: "adminName", origin: "req.headers['origin'] " }
+const mockUserToken: UserToken = { id: 1, user_id: 1, token: "mockToken", status: "1", createdAt: 2021, updatedAt: 2021 };
 var req: Request;
 describe('UserService', () => {
     let userService: UsersService;
@@ -63,6 +63,7 @@ describe('UserService', () => {
                         findOne: jest.fn(),
                         create: jest.fn(() => mockUser),
                         save: jest.fn(),
+                        update: jest.fn(),
                         createQueryBuilder: jest.fn(() =>
                         ({
                             addSelect: jest.fn().mockReturnThis(),
@@ -76,7 +77,8 @@ describe('UserService', () => {
                     provide: getRepositoryToken(UserToken), useValue: {
                         find: jest.fn(),
                         create: jest.fn(),
-                        save: jest.fn(() => mockUser),
+                        save: jest.fn(),
+                        findOne: jest.fn(),
                     }
                 },
 
@@ -158,17 +160,8 @@ describe('UserService', () => {
             //get method
             mockUser.status = "1";
             jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
-            // const user: User = await userService.get(mockUser.id);
-
-            // //result should not be null
-            // expect(user).not.toBeNull();
-            // //check company id is not null or undefined
-            // expect(user.companyId).not.toBeNull();
-            // expect(user.companyId).not.toBeUndefined();
             let users = await userService.getUserById(mockUser.id);
             expect(users).toBe(mockUser);
-
-
         })
 
         it('it should throw exception if user id is not provided   ', async () => {
@@ -181,6 +174,47 @@ describe('UserService', () => {
                 expect(e.response.statusCode).toBe(406);
             }
         });
+    });
+    describe('updateUserProfilePic method', () => {
+        it('should updateUserProfilePic data based on id', async () => {
+            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
+            let users = await userService.updateUserProfilePic(mockUser.id);
+            expect(users).not.toBeNull();
+            delete users.password;
+            users.imageUrl = mockUserFillable.imageUrl;
+            userRepository.update(users.id, users);
+            expect(users.imageUrl).toBe(mockUser.imageUrl);
+        })
+
+        it('it should throw exception if user id is not provided   ', async () => {
+            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+            try {
+                await userService.updateUserProfilePic(new NotAcceptableException('User with provided id not available.'));
+            } catch (e) {
+                expect(e.response.error).toBe('Not Acceptable');
+                expect(e.response.message).toBe('User with provided id not available.');
+                expect(e.response.statusCode).toBe(406);
+            }
+        });
+    });
+    describe('validateToken method', () => {
+        it('should validateToken data based on tokenid', async () => {
+            jest.spyOn(userTokenRepository, 'findOne').mockResolvedValue(mockUserToken);
+            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
+            let users = await userService.validateToken(mockUserToken.token);
+
+        })
+        
+        it('it should throw exception if Token is invalid  ', async () => {
+            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+             try {
+                 await userService.validateToken(null);
+             } catch (e) {
+                 expect(e.response.error).toBe('Not Acceptable');
+                expect(e.response.message).toBe('Token is invalid.');
+                 expect(e.response.statusCode).toBe(406);
+             }
+         });
     });
 });
 

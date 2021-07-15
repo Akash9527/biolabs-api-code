@@ -59,7 +59,7 @@ describe('ProductController', () => {
         expect(productController).toBeDefined();
     });
     describe('test add product Functionality', () => {
-        const mockPayload: AddProductDto = { name: "test1", recurrence: true, cost: 120, description: "this is test 1" ,productTypeId:1};
+        const mockPayload: AddProductDto = { name: "test1", recurrence: true, cost: 120, description: "this is test 1", productTypeId: 1 };
 
         it('it should call productService addProduct method', async () => {
             //check function is called or not
@@ -87,6 +87,40 @@ describe('ProductController', () => {
             expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
             expect(response.message).toBe('Unauthorized');
         });
+    });
+    describe('test fetchALLProducts Functionality', () => {
+
+        it('it should call productService fetchALLProducts method', async () => {
+            //check function is called or not
+            await productController.fetchALLProducts(req);
+            siteIdArr = req.user.site_id;
+            siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+            if (siteIdArr.length > 0) {
+                expect(await productService.getAllProducts).toHaveBeenCalledWith(siteIdArr);
+            }
+
+        });
+        it('it should return  product object ', async () => {
+            const mockProduct2 = {
+                "name": "testProduct2",
+                "description": "this is test 1",
+                "recurrence": true,
+                "cost": 120,
+                "createdBy": 1,
+                "modifiedBy": 1,
+                "siteId": [2],
+                "id": 2,
+                "productStatus": 1,
+                "createdAt": "2021-06-25T11:37:56.653Z",
+                "modifiedAt": "2021-06-25T11:37:56.653Z"
+            }
+            let fetchProducts: Array<any> = [{ mockProduct, mockProduct2 }];
+            siteIdArr = req.user.site_id;
+            siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+            await productService.getAllProducts.mockResolvedValueOnce(fetchProducts);
+
+        });
+
     });
     describe('test delete product Functionality', () => {
         it('it should call productService deleteProduct method', async () => {
@@ -119,7 +153,7 @@ describe('ProductController', () => {
         });
     });
     describe('test updateProduct Functionality', () => {
-        const mockUpdatePayload: UpdateProductDto = { name: "test1", recurrence: true, cost: 100, description: "this is test 1",productTypeId:1 };
+        const mockUpdatePayload: UpdateProductDto = { name: "test1", recurrence: true, cost: 100, description: "this is test 1", productTypeId: 1 };
         it('it should call productService updateProduct method', async () => {
             //check function is called or not
             await productController.updateProduct(mockProduct.id, mockUpdatePayload, req);
