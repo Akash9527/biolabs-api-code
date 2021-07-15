@@ -37,7 +37,7 @@ export class AuthService {
     await this.masterService.createBiolabsSources();
     await this.masterService.createCategories();
     await this.masterService.createTechnologyStages();
-    await this.masterService.createProductType();
+    await this.masterService.createCategories();
     await this.createSuperAdmin();
   }
 
@@ -46,7 +46,7 @@ export class AuthService {
    * @description This method creates the default super admin with all site access.
    * @return user object with token info
    */
-  private async createSuperAdmin() {
+  public async createSuperAdmin() {
     const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
     if (!superAdmin) {
       await this.userService.create(migrationData['superadmin']);
