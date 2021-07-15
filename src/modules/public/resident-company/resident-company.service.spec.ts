@@ -26,6 +26,7 @@ import { ListResidentCompanyPayload } from './list-resident-company.payload';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
+import { query } from "winston";
 
 const mockCompany: any= {id:1};
 const mockAddResidentCompany: AddResidentCompanyPayload={
@@ -81,28 +82,49 @@ describe('ResidentCompanyService', () => {
                     andWhere:jest.fn().mockReturnThis(),
                     getRawOne:jest.fn().mockReturnThis(),
                     orderBy:jest.fn().mockReturnThis(),
+                    addOrderBy:jest.fn().mockReturnThis(),
                     skip:jest.fn().mockReturnThis(),
                     take:jest.fn().mockReturnThis(),
-                    getRawMany:jest.fn().mockReturnThis()
+                    getMany:jest.fn().mockReturnThis(),
+                    getRawMany:jest.fn().mockReturnThis(),
+                    query:jest.fn()
                 })),
                 find:jest.fn(),
                 findOne: jest.fn(),
                 create: jest.fn(() => mockRC),
                 save: jest.fn(),
+                query:jest.fn()
             }},
-            {provide:getRepositoryToken(ResidentCompanyHistory),useValue:{find:jest.fn(),findOne:jest.fn()}},
-            {provide:getRepositoryToken(ResidentCompanyAdvisory),useValue:{find:jest.fn(),findOne:jest.fn()}},
-            {provide:getRepositoryToken(ResidentCompanyDocuments),useValue:{find:jest.fn(),findOne:jest.fn()}},
-            {provide:getRepositoryToken(ResidentCompanyManagement),useValue:{find:jest.fn(),findOne:jest.fn()}},
-            {provide:getRepositoryToken(ResidentCompanyTechnical),useValue:{find:jest.fn(),findOne:jest.fn()}},
-            {provide:getRepositoryToken(Site),useValue:{find:jest.fn(),findOne:jest.fn()}},
-            {provide:getRepositoryToken(BiolabsSource),useValue:{find:jest.fn(),findOne:jest.fn()}},
-            {provide:getRepositoryToken(Category),useValue:{find:jest.fn(),findOne:jest.fn(),query:jest.fn().mockReturnThis()}},
-            {provide:getRepositoryToken(Funding),useValue:{find:jest.fn(),findOne:jest.fn()}},
-            {provide:getRepositoryToken(Modality),useValue:{find:jest.fn(),findOne:jest.fn()}},
-            {provide:getRepositoryToken(TechnologyStage),useValue:{find:jest.fn(),findOne:jest.fn()}},
-            {provide:getRepositoryToken(User),useValue:{find:jest.fn(),findOne:jest.fn()}},
-            {provide:getRepositoryToken(Notes),useValue:{find:jest.fn(),findOne:jest.fn()}},
+            {provide:getRepositoryToken(ResidentCompanyHistory),useValue:{find:jest.fn(),findOne:jest.fn(),save:jest.fn(),query:jest.fn()}},
+            {provide:getRepositoryToken(ResidentCompanyAdvisory),useValue:{find:jest.fn(),findOne:jest.fn(),save:jest.fn(),query:jest.fn()}},
+            {provide:getRepositoryToken(ResidentCompanyDocuments),useValue:{find:jest.fn(),findOne:jest.fn(),save:jest.fn(),query:jest.fn()}},
+            {provide:getRepositoryToken(ResidentCompanyManagement),useValue:{find:jest.fn(),findOne:jest.fn(),save:jest.fn(),query:jest.fn()}},
+            {provide:getRepositoryToken(ResidentCompanyTechnical),useValue:{find:jest.fn(),findOne:jest.fn(),save:jest.fn(),query:jest.fn()}},
+            {provide:getRepositoryToken(Site),useValue:{find:jest.fn(),findOne:jest.fn(),save:jest.fn(),query:jest.fn()}},
+            {provide:getRepositoryToken(BiolabsSource),useValue:{find:jest.fn(),findOne:jest.fn(),save:jest.fn(),query:jest.fn()}},
+            {provide:getRepositoryToken(Category),useValue:{find:jest.fn(),findOne:jest.fn(),query:jest.fn().mockReturnThis(),save:jest.fn()}},
+            {provide:getRepositoryToken(Funding),useValue:{find:jest.fn(),findOne:jest.fn(),save:jest.fn(),query:jest.fn()}},
+            {provide:getRepositoryToken(Modality),useValue:{find:jest.fn(),findOne:jest.fn(),save:jest.fn(),query:jest.fn()}},
+            {provide:getRepositoryToken(TechnologyStage),useValue:{find:jest.fn(),findOne:jest.fn(),save:jest.fn(),query:jest.fn()}},
+            {provide:getRepositoryToken(User),useValue:{find:jest.fn(),findOne:jest.fn(),save:jest.fn(),query:jest.fn()}},
+            {provide:getRepositoryToken(Notes),useValue:{find:jest.fn(),findOne:jest.fn(),query:jest.fn(),save:jest.fn(),createQueryBuilder: jest.fn(() =>
+              ({
+                  addSelect: jest.fn().mockReturnThis(),
+                  where: jest.fn().mockReturnThis(),
+                  setParameter: jest.fn().mockReturnThis(),
+                  getOne: jest.fn().mockReturnThis(),
+                  leftJoin:jest.fn().mockReturnThis(),
+                  select:jest.fn().mockReturnThis(),
+                  andWhere:jest.fn().mockReturnThis(),
+                  getRawOne:jest.fn().mockReturnThis(),
+                  orderBy:jest.fn().mockReturnThis(),
+                  addOrderBy:jest.fn().mockReturnThis(),
+                  skip:jest.fn().mockReturnThis(),
+                  take:jest.fn().mockReturnThis(),
+                  getMany:jest.fn().mockReturnThis(),
+                  getRawMany:jest.fn().mockReturnThis(),
+                  query:jest.fn()
+              }))}},
             {provide:Notes,useValue:{}},
             ],
             imports: [PassportModule.register({ defaultStrategy: 'jwt' })
@@ -339,5 +361,242 @@ describe('getResidentCompany method', () => {
     let result=await residentCompanyService.getResidentCompany(mockRC.id)
        expect(result).not.toBeNull();
    })
+});
+
+describe('gloabalSearchCompaniesOld method', () => {
+  let mockSearchPayload:SearchResidentCompanyPayload={q:"test",role:1,pagination:true,page:1,limit:10,
+  companyStatus:"1",companyVisibility:true,companyOnboardingStatus:true,siteIdArr:[1,2],industries:[1,2],modalities:[1,2],
+fundingSource:[1,2],minFund:1,maxFund:1000,minCompanySize:1,maxCompanySize:100,sort:true,sortFiled:"",sortOrder:"ASC"}
+
+   it('should return array of old global resident companies', async () => {
+    residentCompanyRepository.createQueryBuilder("resident_companies")
+    .where("resident_companies.status IN (:...status)", { status: [1, 0] });
+    // jest.spyOn(residentCompanyService, 'gloabalSearchCompaniesOld').mockResolvedValueOnce(mockRC);
+    let result=await residentCompanyService.gloabalSearchCompaniesOld(mockSearchPayload,[1,2])
+       expect(result).not.toBeNull();
+   })
+});
+
+describe('gloabalSearchCompanies method', () => {
+  let mockSearchPayload:SearchResidentCompanyPayload={q:"test",role:1,pagination:true,page:1,limit:10,
+  companyStatus:"1",companyVisibility:true,companyOnboardingStatus:true,siteIdArr:[1,2],industries:[1,2],modalities:[1,2],
+fundingSource:[1,2],minFund:1,maxFund:1000,minCompanySize:1,maxCompanySize:100,sort:true,sortFiled:"",sortOrder:"ASC"}
+
+   it('should return array of global resident companies', async () => {
+    let result=await residentCompanyService.gloabalSearchCompaniesOld(mockSearchPayload,[1,2])
+       expect(result).not.toBeNull();
+   })
+});
+
+// describe('getNoteById method', () => {
+//   let mockNotes= {id: 1,createdBy: 1,status:"1",createdAt:1626134400,notesStatus:1,notes:"Test"};
+//    it('should return object of note', async () => {
+//     // jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(mockNotes);
+//     let result=await residentCompanyService.getResidentCompany(mockRC.id)
+//        expect(result).toBe(mockNotes);
+//    })
+// });
+
+describe('getNoteByCompanyId method', () => {
+  let mockSites: Array<any> = [{ "id": 2, "name": "Ipsen" }, { "id": 1, "name": "Tufts" }];
+  let mockNotes:Notes= {id: 1,createdBy: 1,createdAt:new Date(),residentCompany:new ResidentCompany(),notesStatus:1,notes:"Test"};
+   it('should return object of Note', async () => {
+    notesRepository
+      .createQueryBuilder('notes')
+      .select('notes.id', 'id')
+      .addSelect("notes.createdAt", 'createdAt')
+      .addSelect("notes.notes", "notes")
+      .addSelect("usr.firstName", "firstname")
+      .addSelect("usr.lastName", "lastname")
+      .leftJoin('users', 'usr', 'usr.id = notes.createdBy')
+      .where('notes.notesStatus = 1')
+      .andWhere("notes.residentCompanyId = :residentCompanyId", { residentCompanyId: 1 })
+      .orderBy("notes.createdAt", "DESC")
+      .getRawMany();
+    jest.spyOn(siteRepository, 'find').mockResolvedValueOnce(mockSites);
+    let result=await residentCompanyService.getResidentCompanyForSponsorBySite()
+       expect(result).not.toBeNull();
+   })
+});
+
+
+describe('softDeleteNote method', () => {
+  let mockNotes:Notes= {id: 1,createdBy: 1,createdAt:new Date(),residentCompany:new ResidentCompany(),notesStatus:1,notes:"Test"};
+  it('should delete data based on id', async () => {
+      jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(mockNotes);
+      jest.spyOn(notesRepository, 'save').mockResolvedValueOnce(mockNotes);
+      const notes = await residentCompanyService.softDeleteNote(mockNotes.id);
+      expect(notes).toBe(mockNotes);
+  })
+
+  it('it should throw exception if note id is not provided  ', async () => {
+      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+      try {
+          await residentCompanyService.softDeleteNote(new NotAcceptableException('User with provided id not available.'));
+      } catch (e) {
+          expect(e.response.error).toBe('Not Acceptable');
+          // expect(e.response.message).toBe('User with provided id not available.');
+          expect(e.response.statusCode).toBe(406);
+      }
+  });
+});
+
+describe('softDeleteMember method', () => {
+  let mockRcAdvisors:ResidentCompanyAdvisory={"id": 1,"companyId":1,"name": "Antibody","title":"Test","status":"0","organization":"1","createdAt":1600000,"updatedAt":16000000};
+  it('should delete data based on id', async () => {
+      jest.spyOn(residentCompanyAdvisoryRepository, 'findOne').mockResolvedValueOnce(mockRcAdvisors);
+      // jest.spyOn(residentCompanyManagementRepository, 'findOne').mockResolvedValueOnce(mockRcMembers);
+      // jest.spyOn(residentCompanyTechnicalRepository, 'findOne').mockResolvedValueOnce(mockRcTechnicalTeams);
+      jest.spyOn(residentCompanyAdvisoryRepository, 'save').mockResolvedValueOnce(mockRcAdvisors);
+      // jest.spyOn(residentCompanyManagementRepository, 'save').mockResolvedValueOnce(mockRcMembers);
+      // jest.spyOn(residentCompanyTechnicalRepository, 'save').mockResolvedValueOnce(mockRcTechnicalTeams);
+      const notes = await residentCompanyService.softDeleteMember(1,"advisors");
+      expect(notes).toBe(mockRcAdvisors);
+  })
+
+  it('it should throw exception if member id is not provided  ', async () => {
+      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+      try {
+          await residentCompanyService.softDeleteNote(new NotAcceptableException('Member with provided id not available.'));
+      } catch (e) {
+          expect(e.response.error).toBe('Not Acceptable');
+          // expect(e.response.message).toBe('User with provided id not available.');
+          expect(e.response.statusCode).toBe(406);
+      }
+  });
+});
+
+describe('getStagesOfTechnologyBySiteId method', () => {
+  let mockStagesOfTechnologies={stagesOfTechnology:0}
+
+   it('should return object', async () => {
+    const queryStr = " SELECT \"stage\", \"name\", \"quarterno\", \"quat\" " +
+      " FROM " +
+      " (SELECT MAX(rch.\"companyStage\") AS stage, " +
+      "EXTRACT(quarter FROM rch.\"createdAt\") AS \"quarterno\", " +
+      "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quat\" " +
+      "FROM public.resident_company_history AS rch " +
+      "WHERE rch.\"site\" = \'{ " + 1 + "}\' and rch.\"comnpanyId\" = " + 1 +
+      "GROUP BY " +
+      "EXTRACT(quarter FROM rch.\"createdAt\")," +
+      "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
+      " ) AS csg " +
+      " LEFT JOIN technology_stages AS ts ON ts.id = csg.\"stage\" " +
+      " ORDER BY quat";
+    residentCompanyHistoryRepository.query(queryStr);
+    // jest.spyOn(residentCompanyService, 'gloabalSearchCompaniesOld').mockResolvedValueOnce(mockRC);
+    let result=await residentCompanyService.getStagesOfTechnologyBySiteId(1,1)
+      //  expect(result).toBe(mockStagesOfTechnologies);
+      expect(result).not.toBeNull()
+   })
+});
+
+describe('getFundingBySiteIdAndCompanyId method', () => {
+  let mockfundings={fundings:0}
+
+   it('should return object', async () => {
+    const queryStr = " SELECT MAX(\"funding\" ::Decimal) as \"Funding\", " +
+    " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
+    " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
+    " FROM public.resident_company_history as rch " +
+    " WHERE rch.\"site\" = \'{" + 1 + "}\' and rch.\"comnpanyId\" = " + 1 +
+    " group by " +
+    " extract(quarter from rch.\"createdAt\"), " +
+    " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
+    " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
+    residentCompanyHistoryRepository.query(queryStr);
+    let result=await residentCompanyService.getFundingBySiteIdAndCompanyId(1,1)
+      expect(result).not.toBeNull()
+   })
+});
+
+describe('getstartedWithBiolabs method', () => {
+
+   it('should return object', async () => {
+    const queryStr = "SELECT min(\"createdAt\")  as startWithBiolabs FROM public.resident_company_history" +
+    " WHERE \"site\" = \'{" + 1 + "}\' and \"comnpanyId\" = " + 1 +
+    "AND \"companyOnboardingStatus\" = true";
+    residentCompanyHistoryRepository.query(queryStr);
+    let result=await residentCompanyService.getstartedWithBiolabs(1,1)
+      expect(result).not.toBeNull()
+   })
+});
+
+describe('getFinancialFees method', () => {
+
+  it('should return array of financial fees', async () => {
+    const currentMonth = new Date().getMonth() + 1;
+   const queryStr = "SELECT  p. \"productTypeId\",SUM(calculate_prorating(o.\"cost\",o.\"month\",o.\"startDate\",o.\"endDate\",o.\"quantity\",o.\"currentCharge\",o.\"year\"))  From order_product as o " +
+   "INNER JOIN product as p ON  p.id =o.\"productId\" " +
+   "where p.id = o.\"productId\" " +
+   "AND o.\"companyId\"=" + 1 +
+   "AND o.\"month\" =  " + currentMonth +
+   "AND p.\"productTypeId\" IN(1, 2, 5) " +
+   "group by  p.\"productTypeId\" ";
+   residentCompanyHistoryRepository.query(queryStr);
+   let result=await residentCompanyService.getFinancialFees(1)
+     expect(result).not.toBeNull()
+  })
+});
+
+// describe('getFeeds method', () => {
+
+//   it('should return array of feeds', async () => {
+//    let result=await residentCompanyService.getFeeds(1,1)
+//      expect(result).not.toBeNull()
+//   })
+// });
+
+describe('timelineAnalysis method', () => {
+
+  it('should return array of timeline history', async () => {
+    const currentMonth = new Date().getMonth() + 1;
+   const queryStr = `
+   SELECT "productTypeId",  MAX("total")as sumofquantity ,
+           extract(quarter from "updatedAt")as quarterNo,
+           to_char("updatedAt", '"Q"Q.YYYY') AS quat
+   FROM
+      (SELECT  p."productTypeId",SUM(o.quantity) as total, o."updatedAt",
+         extract(quarter from o."updatedAt") as quarterNo,
+         to_char(o."updatedAt", '"Q"Q.YYYY') AS quat
+      FROM order_product as o
+   INNER JOIN product as p ON p.id = o."productId"
+           where p.id = o."productId" 
+               AND "companyId"=${1}
+               AND p."productTypeId" IN (2,4)
+   group by p."productTypeId" ,o."updatedAt",
+         extract(quarter from o."updatedAt"),
+         to_char(o."updatedAt", '"Q"Q.YYYY')
+       order by to_char(o."updatedAt", '"Q"Q.YYYY')) as sunTbl
+   GROUP BY extract(quarter from sunTbl."updatedAt"),
+               sunTbl."productTypeId",to_char("updatedAt", '"Q"Q.YYYY')
+               order by quat;
+   `;
+   residentCompanyHistoryRepository.query(queryStr);
+   let result=await residentCompanyService.timelineAnalysis(1)
+     expect(result).not.toBeNull()
+  })
+});
+
+describe('getCompanySizeQuartly method', () => {
+
+  it('should return array of resident company history', async () => {
+    const currentMonth = new Date().getMonth() + 1;
+   const queryStr = `
+   SELECT 
+      MAX("companySize") as noOfEmployees,
+         extract(quarter from "updatedAt")as quarterNo,
+         to_char("updatedAt", '"Q"Q.YYYY') AS quat
+ FROM resident_company_history 
+        where "comnpanyId"=${1}
+ group by
+           extract(quarter from "updatedAt"),
+           to_char("updatedAt", '"Q"Q.YYYY')
+           order by quat;
+   `;
+   residentCompanyHistoryRepository.query(queryStr);
+   let result=await residentCompanyService.getCompanySizeQuartly(1)
+     expect(result).not.toBeNull()
+  })
 });
 });
