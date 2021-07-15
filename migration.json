@@ -1,0 +1,745 @@
+{
+    "roles": [
+        {
+            "name": "superadmin",
+            "id": 1
+        },
+        {
+            "name": "siteadmin",
+            "id": 2
+        },
+        {
+            "name": "sponsor",
+            "id": 3
+        },
+        {
+            "name": "resident",
+            "id": 4
+        }
+    ],
+    "productTypeName": [
+        {
+            "productTypeName": "Membership Fee",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Lab Bench",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Workstation",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Private Office",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Private Lab",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Retainer Fee",
+            "createdBy": 1,
+            "modifiedBy": 1
+        },
+        {
+            "productTypeName": "Decontamination Fee",
+            "createdBy": 1,
+            "modifiedBy": 1
+        }
+    ],
+    "sites_ful": [
+        {
+            "name": "Boston - Tufts Launchpad",
+            "id": 1
+        },
+        {
+            "name": "Cambridge - Ipsen Innovation Center",
+            "id": 2
+        },
+        {
+            "name": "New York - NYU Langone",
+            "id": 3
+        },
+        {
+            "name": "North Carolina - Durham",
+            "id": 4
+        },
+        {
+            "name": "Los Angeles - The Lundquist Institute",
+            "id": 5
+        },
+        {
+            "name": "Princeton - Princeton Innovation Center BioLabs",
+            "id": 6
+        },
+        {
+            "name": "Philadelphia - BioLabs at CIC",
+            "id": 7
+        },
+        {
+            "name": "San Diego - Campus Point and Towne Center",
+            "id": 8
+        },
+        {
+            "name": "North Texas - BioLabs at Pegasus Park",
+            "id": 9
+        }
+    ],
+    "sites": [
+        {
+            "name": "Tufts",
+            "id": 1
+        },
+        {
+            "name": "Ipsen",
+            "id": 2
+        }
+    ],
+    "fundings": [
+        {
+            "name": "Grant funded",
+            "id": 1
+        },
+        {
+            "name": "Self-funded",
+            "id": 2
+        },
+        {
+            "name": "Angel Investors(including friends and family)",
+            "id": 3
+        },
+        {
+            "name": "Seed-Funding",
+            "id": 4
+        },
+        {
+            "name": "VC Series A",
+            "id": 5
+        },
+        {
+            "name": "VC Series B or beyond",
+            "id": 6
+        },
+        {
+            "name": "Public Company",
+            "id": 7
+        },
+        {
+            "name": "Other",
+            "id": 9999
+        }
+    ],
+    "modalities": [
+        {
+            "name": "Antibody",
+            "id": 1
+        },
+        {
+            "name": "Antisense oligonucleotide/siRNA",
+            "id": 2
+        },
+        {
+            "name": "Cell therapy",
+            "id": 3
+        },
+        {
+            "name": "Computational drug discovery",
+            "id": 4
+        },
+        {
+            "name": "Drug delivery",
+            "id": 5
+        },
+        {
+            "name": "Gene therapy",
+            "id": 6
+        },
+        {
+            "name": "Live microbiota",
+            "id": 7
+        },
+        {
+            "name": "mRNA",
+            "id": 8
+        },
+        {
+            "name": "Protein/peptide",
+            "id": 9
+        },
+        {
+            "name": "Radiopharmaceutical",
+            "id": 10
+        },
+        {
+            "name": "Small molecule",
+            "id": 11
+        },
+        {
+            "name": "Synthetic biology",
+            "id": 12
+        },
+        {
+            "name": "Tissue engineering",
+            "id": 13
+        },
+        {
+            "name": "Vaccine",
+            "id": 14
+        },
+        {
+            "name": "Biosynthetics",
+            "id": 15
+        },
+        {
+            "name": "Other",
+            "id": 9999
+        }
+    ],
+    "biolabsSources": [
+        {
+            "name": "Website",
+            "id": 1
+        },
+        {
+            "name": "Online search",
+            "id": 2
+        },
+        {
+            "name": "Event",
+            "id": 3
+        },
+        {
+            "name": "Referral",
+            "id": 4
+        },
+        {
+            "name": "Other",
+            "id": 9999
+        }
+    ],
+    "companyStages": [
+        {
+            "name": "Discovery/R&D",
+            "id": 1
+        },
+        {
+            "name": "Proof-of-principal/Validation",
+            "id": 2
+        },
+        {
+            "name": "Pre-clinical",
+            "id": 3
+        },
+        {
+            "name": "Clinical",
+            "id": 4
+        },
+        {
+            "name": "Manufacturing",
+            "id": 5
+        },
+        {
+            "name": "Public",
+            "id": 6
+        },
+        {
+            "name": "Other",
+            "id": 9999
+        }
+    ],
+    "categories": [
+        {
+            "name": "Therapeutics (Biopharma)",
+            "id": 1,
+            "subcategories": [
+                {
+                    "name": "Cardiovascular & Metabolism",
+                    "id": 2,
+                    "subcategories": [
+                        {
+                            "name": "Diabetes and related disorders",
+                            "id": 3
+                        },
+                        {
+                            "name": "Chronic Kidney Disease (CKD)",
+                            "id": 4
+                        },
+                        {
+                            "name": "Cardiovascular Disease (CVD)",
+                            "id": 5
+                        },
+                        {
+                            "name": "NAFLD, NASH, or cirrhosis",
+                            "id": 6
+                        },
+                        {
+                            "name": "Obesity",
+                            "id": 7
+                        },
+                        {
+                            "name": "Cachexia",
+                            "id": 8
+                        },
+                        {
+                            "name": "Atherosclerosis and vascular diseases",
+                            "id": 9
+                        },
+                        {
+                            "name": "Dyslipidemia",
+                            "id": 10
+                        },
+                        {
+                            "name": "Cardiac arrhythmias and associated disorders",
+                            "id": 11
+                        },
+                        {
+                            "name": "Pulmonary hypertension",
+                            "id": 12
+                        },
+                        {
+                            "name": "Other",
+                            "id": 29999
+                        }
+                    ]
+                },
+                {
+                    "name": "Oncology",
+                    "id": 13,
+                    "subcategories": [
+                        {
+                            "name": "Hematological malignancies",
+                            "id": 14
+                        },
+                        {
+                            "name": "Chronic lymphocytic leukemia (CLL)",
+                            "id": 15
+                        },
+                        {
+                            "name": "Mantle cell lymphoma (MCL)",
+                            "id": 16
+                        },
+                        {
+                            "name": "Prostate cancer",
+                            "id": 17
+                        },
+                        {
+                            "name": "Lung Cancer",
+                            "id": 18
+                        },
+                        {
+                            "name": "Pancreatic cancer",
+                            "id": 19
+                        },
+                        {
+                            "name": "GI stromal tumors",
+                            "id": 20
+                        },
+                        {
+                            "name": "Breast cancer",
+                            "id": 21
+                        },
+                        {
+                            "name": "Renal cell carcinoma",
+                            "id": 22
+                        },
+                        {
+                            "name": "Kidney cancer",
+                            "id": 23
+                        },
+                        {
+                            "name": "Ovarian cancer",
+                            "id": 24
+                        },
+                        {
+                            "name": "Bladder cancer",
+                            "id": 25
+                        },
+                        {
+                            "name": "Liver cancer",
+                            "id": 26
+                        },
+                        {
+                            "name": "Melanoma",
+                            "id": 27
+                        },
+                        {
+                            "name": "Bone metastasis",
+                            "id": 28
+                        },
+                        {
+                            "name": "SEGA tumors",
+                            "id": 29
+                        },
+                        {
+                            "name": "Neuroendocrine tumors",
+                            "id": 30
+                        },
+                        {
+                            "name": "Glioblastoma",
+                            "id": 31
+                        },
+                        {
+                            "name": "Other",
+                            "id": 139999
+                        }
+                    ]
+                },
+                {
+                    "name": "Neuroscience",
+                    "id": 32,
+                    "subcategories": [
+                        {
+                            "name": "Schizophrenia",
+                            "id": 33
+                        },
+                        {
+                            "name": "Major Depressive Disorder (MDD)",
+                            "id": 34
+                        },
+                        {
+                            "name": "Alzheimer’s Disease",
+                            "id": 35
+                        },
+                        {
+                            "name": "Spinal muscular atrophy",
+                            "id": 36
+                        },
+                        {
+                            "name": "Huntington’s disease",
+                            "id": 37
+                        },
+                        {
+                            "name": "Autism or Autism Spectrum Disorder",
+                            "id": 38
+                        },
+                        {
+                            "name": "Parkinson’s disease",
+                            "id": 39
+                        },
+                        {
+                            "name": "Down syndrome",
+                            "id": 40
+                        },
+                        {
+                            "name": "Multiple sclerosis",
+                            "id": 41
+                        },
+                        {
+                            "name": "Other",
+                            "id": 329999
+                        }
+                    ]
+                },
+                {
+                    "name": "Infectious Diseases",
+                    "id": 42,
+                    "subcategories": [
+                        {
+                            "name": "HIV",
+                            "id": 43
+                        },
+                        {
+                            "name": "Tuberculosis (TB)",
+                            "id": 44
+                        },
+                        {
+                            "name": "Respiratory Syncytial Virus (RSV)",
+                            "id": 45
+                        },
+                        {
+                            "name": "Hepatitis B",
+                            "id": 46
+                        },
+                        {
+                            "name": "Global health crisis pathogens Ebola, Zika, Dengue, SARS-COV2",
+                            "id": 47
+                        },
+                        {
+                            "name": "Malaria",
+                            "id": 48
+                        },
+                        {
+                            "name": "Multi-drug Resistant Bacteria",
+                            "id": 49
+                        },
+                        {
+                            "name": "Influenza",
+                            "id": 50
+                        },
+                        {
+                            "name": "Cryptosporidiosis",
+                            "id": 51
+                        },
+                        {
+                            "name": "Kinetoplastid diseases",
+                            "id": 52
+                        },
+                        {
+                            "name": "Other",
+                            "id": 429999
+                        }
+                    ]
+                },
+                {
+                    "name": "Immunology and Inflammation",
+                    "id": 53,
+                    "subcategories": [
+                        {
+                            "name": "Rheumatoid arthritis",
+                            "id": 54
+                        },
+                        {
+                            "name": "Psoriatic arthritis",
+                            "id": 55
+                        },
+                        {
+                            "name": "Lupus",
+                            "id": 56
+                        },
+                        {
+                            "name": "Ulcerative colitis",
+                            "id": 57
+                        },
+                        {
+                            "name": "Crohn’s disease",
+                            "id": 58
+                        },
+                        {
+                            "name": "NAFLD, NASH, or cirrhosis",
+                            "id": 59
+                        },
+                        {
+                            "name": "Atopic dermatitis",
+                            "id": 60
+                        },
+                        {
+                            "name": "Psoriasis",
+                            "id": 61
+                        },
+                        {
+                            "name": "Vitiligo",
+                            "id": 62
+                        },
+                        {
+                            "name": "Alopecia areata",
+                            "id": 63
+                        },
+                        {
+                            "name": "Other",
+                            "id": 539999
+                        }
+                    ]
+                },
+                {
+                    "name": "Vaccines",
+                    "id": 64,
+                    "subcategories": [
+                        {
+                            "name": "Pneumococcal disease",
+                            "id": 65
+                        },
+                        {
+                            "name": "Meningococcal disease",
+                            "id": 66
+                        },
+                        {
+                            "name": "Influenza",
+                            "id": 67
+                        },
+                        {
+                            "name": "Coronavirus",
+                            "id": 68
+                        },
+                        {
+                            "name": "Dengue",
+                            "id": 69
+                        },
+                        {
+                            "name": "Cancer",
+                            "id": 70
+                        },
+                        {
+                            "name": "Group B streptococcus",
+                            "id": 71
+                        },
+                        {
+                            "name": "Other",
+                            "id": 649999
+                        }
+                    ]
+                },
+                {
+                    "name": "Ophthalmology",
+                    "id": 72,
+                    "subcategories": [
+                        {
+                            "name": "Retinal vein occlusion (RVO)",
+                            "id": 73
+                        },
+                        {
+                            "name": "Age-related macular degeneration (AMD)",
+                            "id": 74
+                        },
+                        {
+                            "name": "Diabetic eye disease",
+                            "id": 75
+                        },
+                        {
+                            "name": "Cataracts",
+                            "id": 76
+                        },
+                        {
+                            "name": "Conjunctivitis",
+                            "id": 77
+                        },
+                        {
+                            "name": "Dry Eye Disease",
+                            "id": 78
+                        },
+                        {
+                            "name": "Glaucoma",
+                            "id": 79
+                        },
+                        {
+                            "name": "Macular Edema",
+                            "id": 80
+                        },
+                        {
+                            "name": "Myopia",
+                            "id": 81
+                        },
+                        {
+                            "name": "Ocular disease",
+                            "id": 82
+                        },
+                        {
+                            "name": "Retinal Diseases",
+                            "id": 83
+                        },
+                        {
+                            "name": "Other",
+                            "id": 729999
+                        }
+                    ]
+                },
+                {
+                    "name": "Rare diseases",
+                    "id": 98,
+                    "subcategories": []
+                },
+                {
+                    "name": "Genetic diseases",
+                    "id": 99,
+                    "subcategories": []
+                },
+                {
+                    "name": "Other",
+                    "id": 19999,
+                    "subcategories": []
+                }
+            ]
+        },
+        {
+            "name": "Medical Devices",
+            "id": 84,
+            "subcategories": [
+                {
+                    "name": "Surgery",
+                    "id": 85
+                },
+                {
+                    "name": "Vision Care",
+                    "id": 86
+                },
+                {
+                    "name": "Orthopedics",
+                    "id": 87
+                },
+                {
+                    "name": "Cardiovascular & Specialty Solutions",
+                    "id": 88
+                },
+                {
+                    "name": "Other",
+                    "id": 849999
+                }
+            ]
+        },
+        {
+            "name": "Diagnostics/Biomarkers",
+            "id": 89,
+            "subcategories": []
+        },
+        {
+            "name": "Lab/Research Tools",
+            "id": 90,
+            "subcategories": []
+        },
+        {
+            "name": "Consumer Product",
+            "id": 91,
+            "subcategories": [
+                {
+                    "name": "Skin Health",
+                    "id": 92
+                },
+                {
+                    "name": "Self Care",
+                    "id": 93
+                },
+                {
+                    "name": "Other",
+                    "id": 919999
+                }
+            ]
+        },
+        {
+            "name": "Digital Health",
+            "id": 94,
+            "subcategories": []
+        },
+        {
+            "name": "Agriculture",
+            "id": 95,
+            "subcategories": []
+        },
+        {
+            "name": "Veterinary Medicine",
+            "id": 96,
+            "subcategories": []
+        },
+        {
+            "name": "Advanced Materials",
+            "id": 97,
+            "subcategories": []
+        }
+    ],
+    "superadmin": {
+        "email": "superadmin@biolabs.io",
+        "role": 1,
+        "site_id": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+        ],
+        "firstName": "admin",
+        "lastName": "user",
+        "title": "Super",
+        "phoneNumber": "",
+        "password": "biolabs",
+        "status": "1"
+    }
+}
