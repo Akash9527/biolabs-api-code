@@ -15,7 +15,7 @@ export class Item {
     itemName: string;
 
     @Column({ nullable: false })
-    createdQty: number;
+    currentQty: number;
 
     @Column({ nullable: false })
     desiredQty: number;
