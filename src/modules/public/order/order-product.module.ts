@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Mail } from 'utils/Mail';
 import { ConfigModule, ConfigService } from '../../config';
+import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
 import { BiolabsSource } from '../master/biolabs-source.entity';
 import { Category } from '../master/category.entity';
 import { Funding } from '../master/funding.entity';
@@ -41,7 +42,8 @@ import { ProductService } from './product.service';
       Site,
       TechnologyStage,
       User,
-      Notes
+      Notes,
+      SpaceChangeWaitlist
     ]),
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),

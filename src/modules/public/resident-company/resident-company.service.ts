@@ -1,9 +1,12 @@
-import { HttpException, HttpStatus, Injectable, NotAcceptableException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotAcceptableException, Request } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EMAIL } from 'constants/email';
-import { Request } from 'express';
 import { In, Like, Repository } from 'typeorm';
 import { Mail } from '../../../utils/Mail';
+import { Item } from '../entity/item.entity';
+import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
+import { MembershipChangeEnum } from '../enum/membership-change-enum';
+import { RequestStatusEnum } from '../enum/request-status-enum';
 import { BiolabsSource } from '../master/biolabs-source.entity';
 import { Category } from '../master/category.entity';
 import { Funding } from '../master/funding.entity';
@@ -59,6 +62,8 @@ export class ResidentCompanyService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Notes)
     private readonly notesRepository: Repository<Notes>,
+    @InjectRepository(SpaceChangeWaitlist)
+    private readonly spaceChangeWaitlistRepository: Repository<SpaceChangeWaitlist>,
     private readonly mail: Mail,
   ) { }
   /**
@@ -293,6 +298,9 @@ export class ResidentCompanyService {
           historyData.comnpanyId = savedRc.id;
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
+
+          /** Create waitlist entry while saving Resident Company */
+          await this.addResidentCompanyDataInWaitlist(savedRc, req);
         }
       }
       await this.sendEmailToSiteAdmin(sites, req, payload.companyName);
@@ -1331,5 +1339,56 @@ export class ResidentCompanyService {
             order by quat;
     `;
     return await this.residentCompanyHistoryRepository.query(queryStr);
+  }
+
+  /**
+   * @description Create waitlist entry while saving Resident Company
+   * @param savedRc
+   * @param req
+   */
+  private async addResidentCompanyDataInWaitlist(savedRc: any, @Request() req) {
+    console.log(' req.user.id  ==== ', req.user.id);
+    const PLAN_CHANGE_SUMMARY_INITIAL_VALUE = 'See Notes';
+    const REQUEST_NOTES_INITIAL_VALUE = 'When would you like to join BioLabs?, What equipment and facilities do you plan to primarily use onsite?**';
+    const maxPriorityOrder: number = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
+      return result;
+    });
+    console.log('maxPriorityOrder ==== ', maxPriorityOrder);
+    let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
+    let items: Item[];
+    spaceChangeWaitlistObj.residentCompany = savedRc;
+    spaceChangeWaitlistObj.items = items;
+    spaceChangeWaitlistObj.desiredStartDate = null;
+    spaceChangeWaitlistObj.planChangeSummary = PLAN_CHANGE_SUMMARY_INITIAL_VALUE;
+    spaceChangeWaitlistObj.requestedBy = req.user.id;
+    spaceChangeWaitlistObj.requestStatus = RequestStatusEnum.Open;
+    spaceChangeWaitlistObj.fulfilledOn = null;
+    spaceChangeWaitlistObj.isRequestInternal = false;
+    spaceChangeWaitlistObj.requestNotes = REQUEST_NOTES_INITIAL_VALUE;
+    spaceChangeWaitlistObj.internalNotes = null;
+    spaceChangeWaitlistObj.siteNotes = null;
+    spaceChangeWaitlistObj.priorityOrder = maxPriorityOrder;
+    spaceChangeWaitlistObj.site = savedRc.site;
+    spaceChangeWaitlistObj.membershipChange = MembershipChangeEnum.UpdateMembership;
+    spaceChangeWaitlistObj.requestGraduateDate = null;
+    spaceChangeWaitlistObj.marketPlace = null;
+
+    await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj);
+  }
+
+  /**
+   * @description Fetch max value of priority order from space_change_waitlist table
+   * @returns
+   */
+  private async fetchMaxPriorityOrderOfWaitlist(): Promise<number> {
+    let maxPriorityOrder: any = await this.spaceChangeWaitlistRepository
+      .createQueryBuilder(`space_change_waitlist`)
+      .select(`MAX(space_change_waitlist.priorityOrder)`, `max`)
+      .getRawOne();
+    if (maxPriorityOrder && (maxPriorityOrder.max != null || maxPriorityOrder.max == 0)) {
+      return maxPriorityOrder.max + 1;
+    } else {
+      return 0;
+    }
   }
 }
