@@ -244,21 +244,21 @@ export class ResidentCompanyController {
   getstartedWithBiolabs(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
     return this.residentCompanyService.getstartedWithBiolabs(siteId, companyId);
   }
-   /**
-   * Description: This method returns current month fee details.
-   * @description This method returns current month fee details.
-   * @param siteId The Site id
-   * @param companyId The Company id
-   * @returns current month fee details
-   */
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard())
-    @Get('financialfees/:companyId')
-    @ApiResponse({ status: 200, description: 'Successful Response' })
-    @ApiResponse({ status: 401, description: 'Unauthorized' })
-    getFinancialFees(@Param('companyId') companyId: number): Promise<any> {
-      return this.residentCompanyService.getFinancialFees(companyId);
-    }
+  /**
+  * Description: This method returns current month fee details.
+  * @description This method returns current month fee details.
+  * @param siteId The Site id
+  * @param companyId The Company id
+  * @returns current month fee details
+  */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('financialfees/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getFinancialFees(@Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getFinancialFees(companyId);
+  }
 
   /**
    * Description: This method returns latest feeds.
@@ -296,14 +296,14 @@ export class ResidentCompanyController {
    * @param companyId The Company id
    * @returns current month fee details.
    */
-   @ApiBearerAuth()
-   @UseGuards(AuthGuard())
-   @Get('companysizeanalysis/:companyId')
-   @ApiResponse({ status: 200, description: 'Successful Response' })
-   @ApiResponse({ status: 401, description: 'Unauthorized' })
-   getCompanySizeQuartly(@Param('companyId') companyId: number): Promise<any> {
-     return this.residentCompanyService.getCompanySizeQuartly(companyId);
-   }
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('companysizeanalysis/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getCompanySizeQuartly(@Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getCompanySizeQuartly(companyId);
+  }
 
   /**
   * @description BIOL-275: Add space waitlist entry
@@ -334,7 +334,21 @@ export class ResidentCompanyController {
   @Get('/getspacechangewaitlist/param?')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getSpaceChangeWaitlist(@Query('status') status: number[]): Promise<any> {
+  async getSpaceChangeWaitlist(@Query('status') status: number[]): Promise<any> {
     return this.residentCompanyService.getSpaceChangeWaitList(status);
+  }
+
+  /**
+   * @description BIOL-275: Get items for space change waitlist by siteId and companyId
+   * @param status
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('/items/:siteId/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getItemsForSpaceChangeWaitlist(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getSpaceChangeWaitlistItems(siteId, companyId);
   }
 }

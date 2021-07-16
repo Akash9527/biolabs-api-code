@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, Min } from "class-validator";
-import { Item } from "../entity/item.entity";
+import { IsEmpty, IsNotEmpty, IsNumber, Min } from "class-validator";
 import { MembershipChangeEnum } from "../enum/membership-change-enum";
 import { RequestStatusEnum } from "../enum/request-status-enum";
+import { ItemDto } from "./item.dto";
 
 export class AddSpaceChangeWaitlistDto {
 
@@ -10,9 +10,8 @@ export class AddSpaceChangeWaitlistDto {
     @IsNotEmpty()
     residentCompanyId: number;
 
-    @ApiProperty({ description: 'Items', required: true, nullable: false })
-    @IsNotEmpty()
-    items: Item[];
+    @ApiProperty({ description: 'Items', required: false, nullable: true })
+    items: ItemDto[];
 
     @ApiProperty({ description: 'Desired start date of plan', required: false, nullable: true })
     desiredStartDate: number;

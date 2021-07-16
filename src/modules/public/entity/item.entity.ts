@@ -11,6 +11,9 @@ export class Item {
     @ManyToOne(() => SpaceChangeWaitlist, (spaceChangeWaitlist) => spaceChangeWaitlist.items, { eager: true })
     spaceChangeWaitlist: SpaceChangeWaitlist;
 
+    @Column({ nullable: false })
+    productTypeId: number;
+
     @Column({ length: 510, nullable: false })
     itemName: string;
 
