@@ -1289,26 +1289,55 @@ export class ResidentCompanyService {
    */
 
   async timelineAnalysis(companyId: number) {
+    // const queryStr = `
+    // SELECT "productTypeId",  MAX("total")as sumofquantity ,
+    //         extract(quarter from "updatedAt")as quarterNo,
+    //         to_char("updatedAt", '"Q"Q.YYYY') AS quat
+    // FROM
+    //    (SELECT  p."productTypeId",SUM(o.quantity) as total, o."updatedAt",
+    //       extract(quarter from o."updatedAt") as quarterNo,
+    //       to_char(o."updatedAt", '"Q"Q.YYYY') AS quat
+    //    FROM order_product as o
+    // INNER JOIN product as p ON p.id = o."productId"
+    //         where p.id = o."productId" 
+    //             AND "companyId"=${companyId}
+    //             AND p."productTypeId" IN (2,4)
+    // group by p."productTypeId" ,o."updatedAt",
+    //       extract(quarter from o."updatedAt"),
+    //       to_char(o."updatedAt", '"Q"Q.YYYY')
+    //     order by to_char(o."updatedAt", '"Q"Q.YYYY')) as sunTbl
+    // GROUP BY extract(quarter from sunTbl."updatedAt"),
+    //             sunTbl."productTypeId",to_char("updatedAt", '"Q"Q.YYYY')
+    //             order by quat;
+    // `;
     const queryStr = `
-    SELECT "productTypeId",  MAX("total")as sumofquantity ,
-            extract(quarter from "updatedAt")as quarterNo,
-            to_char("updatedAt", '"Q"Q.YYYY') AS quat
+    SELECT
+      "productTypeId",
+      MAX("total") as sumofquantity,
+      -- month, year,
+      -- TO_DATE(year ::text || '-' || month ::text || '-' || '01','YYYY-MM-DD'),
+      extract(quarter from TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD')) as quarterNo,
+      to_char(TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD'), '"Q"Q.YYYY') AS quat
     FROM
-       (SELECT  p."productTypeId",SUM(o.quantity) as total, o."updatedAt",
-          extract(quarter from o."updatedAt") as quarterNo,
-          to_char(o."updatedAt", '"Q"Q.YYYY') AS quat
-       FROM order_product as o
-    INNER JOIN product as p ON p.id = o."productId"
-            where p.id = o."productId" 
-                AND "companyId"=${companyId}
-                AND p."productTypeId" IN (2,4)
-    group by p."productTypeId" ,o."updatedAt",
-          extract(quarter from o."updatedAt"),
-          to_char(o."updatedAt", '"Q"Q.YYYY')
-        order by to_char(o."updatedAt", '"Q"Q.YYYY')) as sunTbl
-    GROUP BY extract(quarter from sunTbl."updatedAt"),
-                sunTbl."productTypeId",to_char("updatedAt", '"Q"Q.YYYY')
-                order by quat;
+      (SELECT
+          p."productTypeId", SUM(o.quantity) as total,
+          o.month,o.year
+        fROM
+          order_product as o
+          INNER JOIN product as p ON p.id = o."productId"
+        where
+          p.id = o."productId"
+          AND "companyId" =${companyId}
+          AND p."productTypeId" IN (2, 4)
+        group by
+          p."productTypeId",o.month, o.year
+      ) as sub1
+    GROUP BY
+  sub1."productTypeId",
+  --  sub1.month,sub1.year,
+   extract(quarter from TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD')),
+   to_char(TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD'), '"Q"Q.YYYY')
+order by quat;
     `;
     return await this.residentCompanyHistoryRepository.query(queryStr);
   }

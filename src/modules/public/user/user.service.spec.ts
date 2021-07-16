@@ -202,7 +202,10 @@ describe('UserService', () => {
             jest.spyOn(userTokenRepository, 'findOne').mockResolvedValue(mockUserToken);
             jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
             let users = await userService.validateToken(mockUserToken.token);
-
+            expect(users).not.toBeNull();
+            if (users.status == '1' || users.status == '0'){
+                return users;
+            }       
         })
         
         it('it should throw exception if Token is invalid  ', async () => {
