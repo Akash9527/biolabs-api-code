@@ -8,28 +8,30 @@ import { OrderProduct, OrderProductFillableFields } from './model/order-product.
 import { AddProductDto } from './dto/AddProduct.dto';
 import { NotAcceptableException } from '@nestjs/common';
 import { UpdateProductDto } from './dto/UpdateProduct.dto';
-
+const req: any = {
+    user: { id: 1 }
+}
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 const createMockRepository = <T = any>(): MockRepository<T> => ({
     find: jest.fn(),
     findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
-    update:jest.fn(),
-    delete:jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
     createQueryBuilder: jest.fn(() => ({
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
         getRawMany: jest.fn(),
-        orderBy:jest.fn().mockReturnThis()
+        orderBy: jest.fn().mockReturnThis()
     })),
 })
 
 describe('Product Service', () => {
     let productService;
-    let productRepository;
+    let productRepository: MockRepository;
     let productTypeRepository: MockRepository;
-    let orderProductRepository;
+    let orderProductRepository: MockRepository;
 
     beforeEach(async () => {
         const module = await Test.createTestingModule({
@@ -54,7 +56,7 @@ describe('Product Service', () => {
     describe('product service', () => {
         describe('should add/create product', () => {
             it('should add/create product', async () => {
-
+                let siteId = 1;
                 const mockProduct = {
                     id: 1,
                     productTypeName: 'New',
@@ -64,25 +66,32 @@ describe('Product Service', () => {
                     modifiedAt: new Date(),
                 } as ProductType;
 
-                const productTypeDto = {
+                const payLoad = {
                     name: 'new',
                     recurrence: true,
                     cost: 100,
                     description: 'new product launch',
-                    productTypeId: 1,
+                    productTypeId: mockProduct.id,
                 } as AddProductDto;
 
-                productTypeRepository.findOne.mockReturnValue(mockProduct);
-                await productRepository.create.mockReturnValue(productTypeDto);
-                await productRepository.save.mockReturnValue(productTypeDto);
-                expect(productTypeRepository.findOne).not.toHaveBeenCalled();
-                expect(productRepository.create).not.toHaveBeenCalled();
-                expect(productRepository.create).not.toHaveBeenCalled();
-                const product = await productService.addProduct(productTypeDto, { user: { id: 1 } }, 1);
-                expect(productTypeRepository.findOne).toHaveBeenCalled();
-                expect(productRepository.create).toHaveBeenCalled();
-                expect(productRepository.create).toHaveBeenCalled();
-                expect(product).toMatchObject(productTypeDto);
+                if (payLoad.productTypeId) {
+                    productTypeRepository.findOne.mockReturnValue(mockProduct);
+                }
+
+                const product = new Product();
+                product.name = payLoad.name;
+                product.description = payLoad.description;
+                product.recurrence = payLoad.recurrence;
+                product.cost = payLoad.cost;
+                product.siteId = siteId;
+                product.createdBy = req.user.id;
+                product.modifiedBy = req.user.id;
+                product.productType = mockProduct;
+                await productRepository.create.mockReturnValue(payLoad);
+                jest.spyOn(productRepository, 'save').mockResolvedValueOnce(product);
+                const products = await productService.addProduct(payLoad, req, siteId);
+                expect(products).not.toBeNull();
+                expect(product).toMatchObject(products);
             });
         });
         describe('should get all products', () => {
@@ -93,7 +102,7 @@ describe('Product Service', () => {
         describe('should get all products', () => {
 
             it('should get all products', async () => {
-                let siteId=1;
+                let siteId = 1;
                 const products = [
                     {
                         id: 1,
@@ -113,14 +122,14 @@ describe('Product Service', () => {
                     }
                 ];
 
-                 productRepository
-                .createQueryBuilder("product")
-                .where("product.productStatus=1")
-                .andWhere("product.siteId IN (:...siteId)", { siteId: [siteId] })
-                .orderBy("product.modifiedAt", "DESC")
-                .getRawMany();
-                jest.spyOn(productService,"getAllProducts").mockResolvedValueOnce(products)
-                let  dbProduct = await productService.getAllProducts(siteId);
+                productRepository
+                    .createQueryBuilder("product")
+                    .where("product.productStatus=1")
+                    .andWhere("product.siteId IN (:...siteId)", { siteId: [siteId] })
+                    .orderBy("product.modifiedAt", "DESC")
+                    .getRawMany();
+                jest.spyOn(productService, "getAllProducts").mockResolvedValueOnce(products)
+                let dbProduct = await productService.getAllProducts(siteId);
                 expect(dbProduct).not.toBeNull();
                 expect(dbProduct).toBe(products);
 
@@ -158,7 +167,15 @@ describe('Product Service', () => {
         describe('should delete product data based on id', () => {
 
             it('should delete product data based on id', async () => {
-                const product:Product =
+                const mockProductType: ProductType = {
+                    "productTypeName": "TestProduct",
+                    "createdBy": 1,
+                    "modifiedBy": 1,
+                    "id": 1,
+                    "createdAt": new Date("2021-07-14"),
+                    "modifiedAt": new Date("2021-07-14")
+                }
+                let product: Product =
                 {
                     id: 1,
                     name: 'Product One',
@@ -166,18 +183,43 @@ describe('Product Service', () => {
                     modifiedBy: 11,
                     createdAt: new Date(),
                     modifiedAt: new Date(),
-                    description:"",
-                    cost:5,
-                    productStatus:1,
-                    siteId:1,
-                    productType:new ProductType,
-                    recurrence:false
+                    description: "",
+                    cost: 5,
+                    productStatus: 1,
+                    siteId: 1,
+                    productType: new ProductType(),
+                    recurrence: false
                 };
-
+                const orderProducts = [{
+                    id: 1,
+                    productName: "string",
+                    productDescription: "string",
+                    productId: 1,
+                    month: 1,
+                    year: 12,
+                    cost: 100,
+                    recurrence: true,
+                    currentCharge: true,
+                    startDate: 100,
+                    endDate: 1000,
+                    quantity: 1,
+                    manuallyEnteredProduct: true
+                }];
                 jest.spyOn(productRepository, 'findOne').mockResolvedValueOnce(product);
+
+                jest.spyOn(orderProductRepository, 'find').mockResolvedValueOnce(orderProducts);
+                if (product) {
+                    product.productStatus = 99;
+                    product.modifiedBy = req.user.id;
+                    for await (const orderProduct of orderProducts) {
+                        jest.spyOn(orderProductRepository, 'update').mockResolvedValueOnce(orderProduct);
+                    }
+                }
                 jest.spyOn(productRepository, 'update').mockResolvedValueOnce(product);
-                let result=await productService.softDeleteProduct(product.id, { user: { id: 1 } });
-                expect(result).toBe(Product)
+                let result = await productService.softDeleteProduct(product.id, req, product.siteId);
+                expect(await productRepository.findOne).toHaveBeenCalledWith(product.id);
+                expect(result).not.toBeNull();
+                expect(result).toBe(product);
             });
 
             it('it should throw exception if product id is not provided   ', async () => {
@@ -193,18 +235,23 @@ describe('Product Service', () => {
         });
 
         describe('should update product', () => {
-            const mockProduct = {
+            let product: Product =
+            {
                 id: 1,
-                productTypeName: 'New product',
+                name: 'Product One',
                 createdBy: 11,
                 modifiedBy: 11,
                 createdAt: new Date(),
                 modifiedAt: new Date(),
-                productStatus:1,
-                recurrence:true
-            } as ProductType;
+                description: "",
+                cost: 5,
+                productStatus: 1,
+                siteId: 1,
+                productType: new ProductType(),
+                recurrence: false
+            };
 
-            const productTypeDto = {
+            const payload = {
                 id: 1,
                 name: 'new',
                 recurrence: true,
@@ -213,8 +260,9 @@ describe('Product Service', () => {
                 productTypeId: 1,
             } as UpdateProductDto;
 
-             const orderProduct=[{
-                productName: "string",
+            const orderProduct = [{
+                id: 1,
+                productName: 'New product',
                 productDescription: "string",
                 productId: 1,
                 month: 1,
@@ -225,39 +273,63 @@ describe('Product Service', () => {
                 startDate: 100,
                 endDate: 1000,
                 quantity: 1,
-                manuallyEnteredProduct: true
-              }];
-
+                manuallyEnteredProduct: true,
+                status: 1,
+            }];
+            const month = new Date().getMonth() + 2;
             it('should update the product data based on id and recurrence as true', async () => {
-            
-                jest.spyOn(productRepository, 'findOne').mockResolvedValueOnce(mockProduct);
-                await productTypeRepository.find.mockReturnValue(productTypeDto);
+                jest.spyOn(productRepository, 'findOne').mockResolvedValueOnce(product);
+                await productTypeRepository.find.mockReturnValue(payload);
                 await orderProductRepository.find.mockReturnValue(orderProduct);
-                const product = await productService.updateProduct(mockProduct.id,productTypeDto, { user: { id: 1 } }, 1);
-                expect(productTypeRepository.findOne).toHaveBeenCalled();
-                expect(orderProductRepository.update).toHaveBeenCalled();
-                expect(orderProductRepository.delete).toHaveBeenCalled();
-                expect(product).toMatchObject(productTypeDto);
+
+                for await (const orderProducts of orderProduct) {
+                    // Update Order Product for next 1 month
+                    if (orderProducts.id) {
+                        orderProducts.productName = payload.name;
+                        orderProducts.productDescription = payload.description;
+                        orderProducts.cost = payload.cost;
+                        orderProducts.recurrence = payload.recurrence;
+                        await orderProductRepository.update(orderProducts.id, orderProducts);
+                    }
+                }
+                jest.spyOn(productRepository, 'update').mockResolvedValueOnce(orderProduct);
+                const products = await productService.updateProduct(product.id, payload, req, 1);
+                expect(products).not.toBeNull();
+                expect(products).toBe(orderProduct);
 
             });
 
             it('should update the product data based on id and recurrence as false', async () => {
-                orderProduct[0].recurrence= false as boolean;
-                jest.spyOn(productRepository, 'findOne').mockResolvedValueOnce(mockProduct);
-                await productTypeRepository.find.mockReturnValue(productTypeDto);
+                payload.recurrence = false as boolean;
+                orderProduct[0].recurrence = false as boolean;
+                jest.spyOn(productRepository, 'findOne').mockResolvedValueOnce(product);
+                await productTypeRepository.find.mockReturnValue(payload);
                 await orderProductRepository.find.mockReturnValue(orderProduct);
-                const product = await productService.updateProduct(mockProduct.id,productTypeDto, { user: { id: 1 } }, 1);
-                expect(productTypeRepository.findOne).toHaveBeenCalled();
-                expect(orderProductRepository.update).toHaveBeenCalled();
-                expect(orderProductRepository.delete).toHaveBeenCalled();
-                expect(product).toMatchObject(productTypeDto);
 
+                for await (const orderProducts of orderProduct) {
+                    // delete future months order products 
+                    if (!payload.recurrence && (orderProducts.month != month)) {
+                        await orderProductRepository.delete(orderProducts.id);
+                    }
+                    // Update Order Product for next 1 month
+                    if (orderProducts.id) {
+                        orderProducts.productName = payload.name;
+                        orderProducts.productDescription = payload.description;
+                        orderProducts.cost = payload.cost;
+                        orderProducts.recurrence = payload.recurrence;
+                        await orderProductRepository.update(orderProducts.id, orderProducts);
+                    }
+                }
+                jest.spyOn(productRepository, 'update').mockResolvedValueOnce(orderProduct);
+                const products = await productService.updateProduct(product.id, payload, req, 1);
+                expect(products).not.toBeNull();
+                expect(products).toBe(orderProduct);
             });
 
             it('it should throw exception if product id is not provided   ', async () => {
-                jest.spyOn(productRepository, 'findOne').mockResolvedValueOnce(null);
+                jest.spyOn(productRepository, 'update').mockResolvedValueOnce('Product with provided id not available.');
                 try {
-                    await productService.softDeleteProduct(new NotAcceptableException('Product with provided id not available.'));
+                    await productService.updateProduct(product.id, payload, req, 1);
                 } catch (e) {
                     expect(e.response.error).toBe('Not Acceptable');
                     expect(e.response.message).toBe('Product with provided id not available.');
@@ -267,4 +339,4 @@ describe('Product Service', () => {
         });
     });
 
-})
+});
