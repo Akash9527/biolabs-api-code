@@ -10,7 +10,6 @@ import { Mail } from '../../../utils/Mail';
 import { EMAIL } from '../../../constants/email';
 import { Request } from 'express';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
-import { stringify } from 'node:querystring';
 const {info,error,debug,warn} = require('../../../utils/logger');
 const {ResourceNotFoundException,InternalException,BiolabsException} = require('../../common/exception/biolabs-error');
 
@@ -106,7 +105,7 @@ export class UsersService {
       this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, 'Invite', userInfo);
       info("User added successfully",__filename,"addUser(");
     } catch (err) {
-      console.log("error in adding user :::::::::"+ stringify(err));
+      console.log(err)
       error("Getting error to create the new user " + err.message, __filename, "addUser()");
       throw new InternalException('Getting error to create the new user', err.message);
 
