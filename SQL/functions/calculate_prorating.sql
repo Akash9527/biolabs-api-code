@@ -3,7 +3,7 @@
 -- DROP FUNCTION public.calculate_prorating(numeric, integer, timestamp with time zone, timestamp with time zone, integer, boolean, integer);
 
 CREATE OR REPLACE FUNCTION public.calculate_prorating(
-	item_cost numeric,
+	item_cost double precision,
 	selected_month integer,
 	start_date timestamp with time zone,
 	end_date timestamp with time zone,
