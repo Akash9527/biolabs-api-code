@@ -15,10 +15,13 @@ const createMockRepository = <T = any>(): MockRepository<T> => ({
     findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
+    update:jest.fn(),
+    delete:jest.fn(),
     createQueryBuilder: jest.fn(() => ({
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
-        getRawMany: jest.fn().mockReturnThis()
+        getRawMany: jest.fn(),
+        orderBy:jest.fn().mockReturnThis()
     })),
 })
 
@@ -89,38 +92,39 @@ describe('Product Service', () => {
         });
         describe('should get all products', () => {
 
-            // it('should get all products', async () => {
-            //     let siteId=1;
-            //     const products = [
-            //         {
-            //             id: 1,
-            //             productTypeName: 'Product One',
-            //             createdBy: 11,
-            //             modifiedBy: 11,
-            //             createdAt: new Date(),
-            //             modifiedAt: new Date(),
-            //         },
-            //         {
-            //             id: 2,
-            //             productTypeName: 'Product Two',
-            //             createdBy: 22,
-            //             modifiedBy: 22,
-            //             createdAt: new Date(),
-            //             modifiedAt: new Date(),
-            //         }
-            //     ];
+            it('should get all products', async () => {
+                let siteId=1;
+                const products = [
+                    {
+                        id: 1,
+                        productTypeName: 'Product One',
+                        createdBy: 11,
+                        modifiedBy: 11,
+                        createdAt: new Date(),
+                        modifiedAt: new Date(),
+                    },
+                    {
+                        id: 2,
+                        productTypeName: 'Product Two',
+                        createdBy: 22,
+                        modifiedBy: 22,
+                        createdAt: new Date(),
+                        modifiedAt: new Date(),
+                    }
+                ];
 
-            //      productRepository
-            //     .createQueryBuilder("product")
-            //     .where("product.productStatus=1")
-            //     .andWhere("product.siteId IN (:...siteId)", { siteId: [siteId] })
-            //     .orderBy("product.modifiedAt", "DESC")
-            //     .getRawMany();
-            //     let  dbProduct = await productService.getAllProducts(siteId);
-            //     //expect(dbProduct).not.toBeNull();
-            //     //expect(dbProduct).toBe(products);
+                 productRepository
+                .createQueryBuilder("product")
+                .where("product.productStatus=1")
+                .andWhere("product.siteId IN (:...siteId)", { siteId: [siteId] })
+                .orderBy("product.modifiedAt", "DESC")
+                .getRawMany();
+                jest.spyOn(productService,"getAllProducts").mockResolvedValueOnce(products)
+                let  dbProduct = await productService.getAllProducts(siteId);
+                expect(dbProduct).not.toBeNull();
+                expect(dbProduct).toBe(products);
 
-            // });
+            });
         });
 
         describe('should get product by name', () => {
@@ -154,19 +158,26 @@ describe('Product Service', () => {
         describe('should delete product data based on id', () => {
 
             it('should delete product data based on id', async () => {
-                const product =
+                const product:Product =
                 {
                     id: 1,
-                    productTypeName: 'Product One',
+                    name: 'Product One',
                     createdBy: 11,
                     modifiedBy: 11,
                     createdAt: new Date(),
                     modifiedAt: new Date(),
+                    description:"",
+                    cost:5,
+                    productStatus:1,
+                    siteId:1,
+                    productType:new ProductType,
+                    recurrence:false
                 };
 
                 jest.spyOn(productRepository, 'findOne').mockResolvedValueOnce(product);
-                await productService.softDeleteProduct(product.id, { user: { id: 1 } });
-                expect(productService.softDeleteProduct).toHaveBeenCalled();
+                jest.spyOn(productRepository, 'update').mockResolvedValueOnce(product);
+                let result=await productService.softDeleteProduct(product.id, { user: { id: 1 } });
+                expect(result).toBe(Product)
             });
 
             it('it should throw exception if product id is not provided   ', async () => {
