@@ -624,8 +624,8 @@ export class Mail {
       await this.sendEmailGraphAPI(tenant, tokenGraphAPI, subject, content, userInfo);
 
       }catch(err){
-         error("Error in sending email...",__filename,"sendEmail");
-         throw new BiolabsException("Error in sending email... "+err); 
+         error("Error in sending email..."+err,__filename,"sendEmail");
+        // throw new BiolabsException("Error in sending email... "+err); 
       }
 
    }
