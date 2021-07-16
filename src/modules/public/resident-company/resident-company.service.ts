@@ -1524,6 +1524,8 @@ order by quat;
     let spaceChangeWaitlist: any = await this.spaceChangeWaitlistRepository
       .createQueryBuilder("space_change_waitlist")
       .select("space_change_waitlist.*")
+      .addSelect("rc.companyName", "residentCompanyName")
+      .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
       .where("space_change_waitlist.requestStatus IN (:...status)", { status: array })
       .getRawMany();
     response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
