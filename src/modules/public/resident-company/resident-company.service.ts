@@ -422,6 +422,30 @@ export class ResidentCompanyService {
   }
 
   /**
+   * Description: This method will return a resident company by id.
+   * @description This method will return a resident company by id.
+   * @param payload an id of ResidentCompany
+   * @return an objecdt of ResidentCompany
+   */
+   public async getResidentCompanySpecificFieldsById(residentCompanyId: number) {
+    let response = {};
+    let residentCompanyObj = await this.fetchResidentCompanyById(residentCompanyId);
+    if (residentCompanyObj) {
+      response['residentCompanyId'] = residentCompanyObj.id;
+      response['companyStageOfDevelopment'] = residentCompanyObj.companyStage;
+      response['fundingToDate'] =  residentCompanyObj.funding;
+      response['fundingSource'] = residentCompanyObj.fundingSource;
+      response['TotalCompanySize'] = residentCompanyObj.companySize;
+      response['canWeShareYourDataWithSponsorsEtc'] = residentCompanyObj.shareYourProfile;
+      return response;
+    } else {
+      throw new NotAcceptableException(
+        'Resident Company not found by id: ' + residentCompanyId,
+      );
+    }
+  }
+
+  /**
    * Description: This method will return the resident companies list.
    * @description This method will return the resident companies list.
    * @param payload object of ListResidentCompanyPayload
@@ -1508,7 +1532,8 @@ order by quat;
   }
 
   /**
-   * @description BIOL-275: GET spacechange wait list by status
+   * Description: BIOL-275 GET spacechange wait list by status.
+   * @description GET spacechange wait list by status.
    * @param statusArr
    * @returns
    */
@@ -1517,10 +1542,29 @@ order by quat;
     let spaceChangeWaitlist: any = await this.spaceChangeWaitlistRepository
       .createQueryBuilder("space_change_waitlist")
       .select("space_change_waitlist.*")
+      .addSelect("rc.companyName", "residentCompanyName")
+      .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
       .where("space_change_waitlist.requestStatus IN (:...status)", { status: statusArr })
       .andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr })
       .getRawMany();
     response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
+    return response;
+  }
+
+  /**
+   * @description BIOL-275: GET spacechange wait list by id
+   * @param statusArr
+   * @returns
+   */
+   public async getSpaceChangeWaitListById(id: number): Promise<any> {
+    const response = {};
+
+    let spaceChangeWaitlistObj: any = await this.spaceChangeWaitlistRepository.findOne(id);
+    if(spaceChangeWaitlistObj) {
+      return spaceChangeWaitlistObj;
+    }
+    response['status'] = 'error';
+    response['message'] = 'Space-Change-Wait-List not found by id: ' + id;
     return response;
   }
 
