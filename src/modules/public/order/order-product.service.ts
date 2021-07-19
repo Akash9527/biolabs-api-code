@@ -57,15 +57,14 @@ export class OrderProductService {
     /**
      * BIOL-292
      */
-    orderSave.groupId = orderSave.id;
-    await this.orderProductRepository.update(orderSave.id,orderSave);
+    orderProduct.groupId = orderSave.id;
+    orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
+    await this.orderProductRepository.update(orderSave.id,orderProduct);
 
     if (orderProduct.recurrence) {
       /**
        * Add next 4 months Products
        */
-      orderProduct.groupId = orderSave.id;
-      orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
       await this.addFutureOrderProducts(orderProduct);
     }
     return { message: 'Added successfully', status: 'success' };
@@ -120,6 +119,7 @@ export class OrderProductService {
 
     payload.groupId = orderProduct.groupId;
     payload.manuallyEnteredProduct = orderProduct.manuallyEnteredProduct;
+    payload.productId = orderProduct.productId;
     const futureProducts = await this.orderProductRepository.find({
       where: {
         groupId: payload.groupId,
