@@ -31,7 +31,9 @@ const mockUser: User = {
 const mockJwtService = () => ({
     sign: jest.fn()
 })
-
+const mockMailService = () => ({
+    sendEmail: jest.fn()
+});
 const mockResidentCompanyService = () => ({
     getResidentCompany: jest.fn()
 });
@@ -41,20 +43,32 @@ const mockUserFillable: UserFillableFields = {
     status: '1', userType: '1', imageUrl: "admin.jpg"
 }
 const mockUserToken: UserToken = { id: 1, user_id: 1, token: "mockToken", status: "1", createdAt: 2021, updatedAt: 2021 };
-var req: Request;
+const req: any = {
+    user: { id: 1 },
+    headers: ['origin']
+}
+const userInfo = {
+    token: mockUserToken.token,
+    userName: mockUser.firstName,
+    origin: req.headers['origin'],
+    userRole: mockUserFillable.role
+};
 describe('UserService', () => {
     let userService: UsersService;
     let userRepository: Repository<User>;
     let userTokenRepository: Repository<UserToken>;
     let residentCompanyService;
+    let jwtService;
+    let mailService;
 
     beforeEach(async () => {
         const module = await Test.createTestingModule({
             imports: [PassportModule.register({ defaultStrategy: 'jwt' })
             ],
             providers: [
-                Mail, UsersService,
+                UsersService,
                 { provide: JwtService, useFactory: mockJwtService },
+                { provide: Mail, useFactory: mockMailService },
                 { provide: ResidentCompanyService, useFactory: mockResidentCompanyService },
                 {
                     provide: getRepositoryToken(User),
@@ -79,6 +93,7 @@ describe('UserService', () => {
                         create: jest.fn(),
                         save: jest.fn(),
                         findOne: jest.fn(),
+                        update: jest.fn(),
                     }
                 },
 
@@ -86,6 +101,8 @@ describe('UserService', () => {
         }).compile();
 
         userService = await module.get<UsersService>(UsersService);
+        mailService = await module.get<Mail>(Mail);
+        jwtService = await module.get<JwtService>(JwtService);
         userRepository = await module.get<Repository<User>>(getRepositoryToken(User));
         userTokenRepository = await module.get<Repository<UserToken>>(getRepositoryToken(UserToken));
         residentCompanyService = await module.get<ResidentCompanyService>(ResidentCompanyService);
@@ -112,6 +129,26 @@ describe('UserService', () => {
             expect(result).not.toBeNull();
         });
     });
+    describe('generate Token  method', () => {
+        it('it should called generateToken  method ', async () => {
+            let token = "Token";
+            const mockToken: UserToken[] = [{ id: 1, user_id: 1, token: "mockToken", status: "1", createdAt: 2021, updatedAt: 2021 }];
+
+            jest.spyOn(jwtService, "sign").mockResolvedValue(token);
+            const tokenData = { user_id: mockUser.id, token: token };
+            jest.spyOn(userTokenRepository, "find").mockResolvedValue(mockToken);
+            if (mockToken) {
+                mockToken[0].user_id = mockUser.id;
+                mockToken[0].status = "99";
+            }
+            mockUserToken.user_id = tokenData.user_id;
+            mockUserToken.token = tokenData.token;
+            jest.spyOn(userTokenRepository, 'save').mockResolvedValueOnce(mockUserToken);
+            let ans = await userService.generateToken(mockUser);
+            expect(ans).not.toBeNull();
+            expect(ans).toBe(mockUserToken);
+        });
+    });
     describe('create method', () => {
         it('should create user if email already not exist', async () => {
             mockUserFillable.email = "admin@gmail.com";
@@ -133,6 +170,47 @@ describe('UserService', () => {
             } catch (e) {
                 expect(e.response.error).toBe('Not Acceptable');
                 expect(e.response.message).toBe("User with provided email already created.")
+            }
+        });
+    });
+    describe('adduser method', () => {
+        let tenant = { tenantEmail: mockUserFillable.email };
+        it('should adduser data ', async () => {
+            userRepository.createQueryBuilder('users')
+                .addSelect("users.email")
+                .addSelect("users.password")
+                .where('users.email = :email')
+                .setParameter('email', mockUserFillable.email)
+                .getOne();
+
+            jest.spyOn(userService, 'generateToken').mockResolvedValueOnce(mockUserToken);
+            
+            jest.spyOn(userRepository, 'save').mockResolvedValueOnce(mockUser);
+            mockUserFillable.email = "Testbio@gmail.com";
+            await userService.addUser(mockUserFillable, req);
+            mailService.sendEmail(tenant, "EMAIL.SUBJECT_INVITE_USER", 'Invite', userInfo);
+
+
+        })
+
+        it('it should throw exception if user id is not provided  ', async () => {
+            jest.spyOn(userService, 'getByEmail').mockResolvedValueOnce(null);
+            try {
+                await userService.addUser(mockUserFillable, req);
+            } catch (e) {
+                expect(e.response.error).toBe('Not Acceptable');
+                expect(e.response.message).toBe("User with provided email already created.");
+                expect(e.response.statusCode).toBe(406);
+            }
+        });
+        it('it should throw exception if user id is not provided  ', async () => {
+            jest.spyOn(userService, 'getByEmail').mockRejectedValueOnce(new NotAcceptableException("User with provided email already created."));
+            try {
+                await userService.addUser(mockUserFillable, req);
+            } catch (e) {
+                expect(e.response.error).toBe('Not Acceptable');
+                expect(e.response.message).toBe("User with provided email already created.");
+                expect(e.response.statusCode).toBe(406);
             }
         });
     });
@@ -203,21 +281,71 @@ describe('UserService', () => {
             jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
             let users = await userService.validateToken(mockUserToken.token);
             expect(users).not.toBeNull();
-            if (users.status == '1' || users.status == '0'){
+            if (users.status == '1' || users.status == '0') {
                 return users;
-            }       
+            }
         })
-        
+
         it('it should throw exception if Token is invalid  ', async () => {
-            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
-             try {
-                 await userService.validateToken(null);
-             } catch (e) {
-                 expect(e.response.error).toBe('Not Acceptable');
+            jest.spyOn(userRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Token is invalid.'));
+            try {
+                await userService.validateToken(null);
+            } catch (e) {
+                expect(e.response.error).toBe('Not Acceptable');
                 expect(e.response.message).toBe('Token is invalid.');
-                 expect(e.response.statusCode).toBe(406);
-             }
-         });
+                expect(e.response.statusCode).toBe(406);
+            }
+        });
+    });
+    describe('setNewPassword method', () => {
+        const mockPasswordPayload = {
+            token: "mockToken", password: "biolabsAdmin",
+            passwordConfirmation: "biolabsAdmin"
+        };
+        const mockUserSetPass: User = {
+            id: 1,
+            role: 1,
+            site_id: [1, 2],
+            companyId: 1,
+            email: "testadmin@biolabs.io",
+            firstName: "adminName",
+            lastName: "userLast",
+            title: "SuperAdmin",
+            phoneNumber: "2345678902",
+            status: '1',
+            imageUrl: "",
+            userType: '1',
+            password: "test@1234",
+            createdAt: 12,
+            updatedAt: 12,
+            toJSON: null
+        }
+
+        it('should  set setNewPassword ', async () => {
+            jest.spyOn(userTokenRepository, 'findOne').mockResolvedValue(mockUserToken);
+            jest.spyOn(userService, 'get').mockResolvedValueOnce(mockUserSetPass);
+            mockUserSetPass.password = mockPasswordPayload.password;
+            mockUserSetPass.status = '1';
+            jest.spyOn(userRepository, 'save').mockResolvedValueOnce(mockUserSetPass);
+            mockUserToken.status = '99';
+            jest.spyOn(userTokenRepository, 'save').mockResolvedValueOnce(mockUserToken);
+            let newUser = await userService.setNewPassword(mockPasswordPayload);
+            expect(newUser).not.toBeNull();
+            expect(newUser.password).toEqual(mockUserSetPass.password);
+            expect(newUser).toEqual(mockUserSetPass);
+        })
+
+        it('it should throw exception if Token is invalid  ', async () => {
+            jest.spyOn(userRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Token is invalid.'));
+            try {
+                await userService.setNewPassword(mockPasswordPayload);
+            } catch (e) {
+                expect(e.response.error).toBe('Not Acceptable');
+                expect(e.response.message).toBe('Token is invalid.');
+                expect(e.response.statusCode).toBe(406);
+            }
+        });
+
     });
 });
 
