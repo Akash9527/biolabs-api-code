@@ -16,6 +16,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
  */
 type status_enum = '-1' | '0' | '1' | '99';
 type company_status = '0' | '1' | '2' | '3' | '4' | '5';
+type committee_status = '0' | '1' | '2' | '3';
 
 @Entity({
   name: 'resident_company_history',
@@ -135,11 +136,17 @@ export class ResidentCompanyHistory {
   @Column({ default: null })
   logoOnLicensedSpace: boolean;
 
-  @Column({ default: null })
-  bioLabsAssistanceNeeded: boolean;
+  @Column({ length: 500, default: null })
+  bioLabsAssistanceNeeded: string;
 
   @Column({ default: null })
   technologyPapersPublished: boolean;
+
+  @Column({ default: null })
+  technologyPapersPublishedLinkCount: number;
+
+  @Column({ length: 100, default: null })
+  technologyPapersPublishedLink: string;
 
   @Column({ default: null })
   patentsFiledGranted: boolean;
@@ -171,11 +178,29 @@ export class ResidentCompanyHistory {
   @Column({ length: 510, default: null, nullable: true })
   equipmentOnsite: string;
 
+  @Column({ length: 510, default: null, nullable: true })
+  website: string;
+
+  @Column({ length: 110, default: null, nullable: true })
+  foundersBusinessIndustryName:string;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt: number;
 
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt: number;
+
+  @Column({ length: 255, nullable: true })
+  pitchdeck: string;
+
+  @Column({ length: 255, nullable: true })
+  logoImgUrl: string;
+
+  @Column({nullable:true})
+  committeeStatus: committee_status;
+
+  @UpdateDateColumn({ type: 'timestamptz'})
+  selectionDate: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
   companyStatusChangeDate: number;
@@ -212,13 +237,15 @@ export class ResidentCompanyHistoryFillableFields {
   preferredMoveIn: number;
   status: status_enum;
   companyStatus: company_status;
+  committeeStatus: committee_status;
   companyVisibility: boolean;
   companyOnboardingStatus: boolean;
   elevatorPitch: string;
   logoOnWall: boolean;
   logoOnLicensedSpace: boolean;
-  bioLabsAssistanceNeeded: boolean;
+  bioLabsAssistanceNeeded: string;
   technologyPapersPublished: boolean;
+  technologyPapersPublishedLink: string;
   patentsFiledGranted: boolean;
   patentsFiledGrantedDetails: string;
   foundersBusinessIndustryBefore: boolean;
@@ -230,4 +257,9 @@ export class ResidentCompanyHistoryFillableFields {
   shareYourProfile: boolean;
   equipmentOnsite: string;
   companySize: number;
+  website: string;
+  foundersBusinessIndustryName: string;
+  pitchdeck : string;
+  logoImgUrl : string;
+  technologyPapersPublishedLinkCount : number;
 }
