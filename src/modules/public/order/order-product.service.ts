@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
+import { equals } from 'class-validator';
 import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { ResidentCompany } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
@@ -181,10 +182,12 @@ export class OrderProductService {
 
     const orderProductArray = await this.orderProductRepository.findByIds([id]);
     const orderProduct = orderProductArray[0];
+    const pid = (orderProduct.manuallyEnteredProduct) ? orderProduct.id : orderProduct.productId;
     const deleteProducts = await this.orderProductRepository.find({
-      productId: orderProduct.productId,
+      productId: pid,
       status: 0,
-      month: MoreThanOrEqual(orderProduct.month)
+      month: MoreThanOrEqual(orderProduct.month),
+      year: orderProduct.year
     });
     for await (const product of deleteProducts) {
       await this.orderProductRepository.delete(product.id);
