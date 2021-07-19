@@ -1512,19 +1512,13 @@ order by quat;
    * @param statusArr
    * @returns
    */
-  public async getSpaceChangeWaitList(statusArr: number[]): Promise<any> {
+  public async getSpaceChangeWaitList(statusArr: number[],siteIdArr:number[]): Promise<any> {
     const response = {};
-    let array: number[] = new Array();
-    if (statusArr.length == 1) {
-      array.push(statusArr[0]);
-    } else {
-      array = statusArr;
-    }
-
     let spaceChangeWaitlist: any = await this.spaceChangeWaitlistRepository
       .createQueryBuilder("space_change_waitlist")
       .select("space_change_waitlist.*")
-      .where("space_change_waitlist.requestStatus IN (:...status)", { status: array })
+      .where("space_change_waitlist.requestStatus IN (:...status)", { status: statusArr })
+      .andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr })
       .getRawMany();
     response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
     return response;

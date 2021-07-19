@@ -334,8 +334,12 @@ export class ResidentCompanyController {
   @Get('/getspacechangewaitlist/param?')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getSpaceChangeWaitlist(@Query('status') status: number[]): Promise<any> {
-    return this.residentCompanyService.getSpaceChangeWaitList(status);
+  async getSpaceChangeWaitlist(@Query('status') status: number[], @Request() req): Promise<any> {
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return this.residentCompanyService.getSpaceChangeWaitList(status, siteIdArr);
   }
 
   /**
