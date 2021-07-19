@@ -10,6 +10,10 @@ import { JwtService } from '@nestjs/jwt';
 import { ResidentCompanyService } from '../resident-company';
 import { NotAcceptableException } from '@nestjs/common';
 import { Request } from 'express';
+import { UpdateUserPayload } from './update-user.payload';
+import { ListUserPayload } from './list-user.payload';
+import { log } from 'winston';
+import { AddUserPayload } from './add-user.payload';
 const mockUser: User = {
     id: 1,
     role: 1,
@@ -83,7 +87,12 @@ describe('UserService', () => {
                             addSelect: jest.fn().mockReturnThis(),
                             where: jest.fn().mockReturnThis(),
                             setParameter: jest.fn().mockReturnThis(),
-                            getOne: jest.fn()
+                            getOne: jest.fn(),
+                            andWhere: jest.fn().mockReturnThis(),
+                            skip: jest.fn().mockReturnThis(),
+                            take: jest.fn().mockReturnThis(),
+                            addOrderBy: jest.fn().mockReturnThis(),
+                            getMany: jest.fn()
                         })),
                     }
                 },
@@ -173,36 +182,9 @@ describe('UserService', () => {
             }
         });
     });
+
     describe('adduser method', () => {
-        let tenant = { tenantEmail: mockUserFillable.email };
-        it('should adduser data ', async () => {
-            userRepository.createQueryBuilder('users')
-                .addSelect("users.email")
-                .addSelect("users.password")
-                .where('users.email = :email')
-                .setParameter('email', mockUserFillable.email)
-                .getOne();
 
-            jest.spyOn(userService, 'generateToken').mockResolvedValueOnce(mockUserToken);
-            
-            jest.spyOn(userRepository, 'save').mockResolvedValueOnce(mockUser);
-            mockUserFillable.email = "Testbio@gmail.com";
-            await userService.addUser(mockUserFillable, req);
-            mailService.sendEmail(tenant, "EMAIL.SUBJECT_INVITE_USER", 'Invite', userInfo);
-
-
-        })
-
-        it('it should throw exception if user id is not provided  ', async () => {
-            jest.spyOn(userService, 'getByEmail').mockResolvedValueOnce(null);
-            try {
-                await userService.addUser(mockUserFillable, req);
-            } catch (e) {
-                expect(e.response.error).toBe('Not Acceptable');
-                expect(e.response.message).toBe("User with provided email already created.");
-                expect(e.response.statusCode).toBe(406);
-            }
-        });
         it('it should throw exception if user id is not provided  ', async () => {
             jest.spyOn(userService, 'getByEmail').mockRejectedValueOnce(new NotAcceptableException("User with provided email already created."));
             try {
@@ -212,6 +194,212 @@ describe('UserService', () => {
                 expect(e.response.message).toBe("User with provided email already created.");
                 expect(e.response.statusCode).toBe(406);
             }
+        });
+
+    });
+    describe('Update method', () => {
+        let payload: UpdateUserPayload = {
+            userType: '1', companyId: 1, firstName: "adminName", lastName: "userLast",
+            title: "SuperAdmin", phoneNumber: "2345678902", site_id: [1],
+            password: "test@1234", passwordConfirmation: "test@1234", id: 1
+        };
+        it('should update user data ', async () => {
+
+            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
+            if (mockUser) {
+                mockUser.firstName = payload.firstName;
+                mockUser.lastName = payload.lastName;
+                mockUser.title = payload.title;
+                mockUser.phoneNumber = payload.phoneNumber;
+                mockUser.companyId = (payload.companyId) ? payload.companyId : mockUser.companyId;
+                mockUser.userType = payload.userType;
+                mockUser.site_id = payload.site_id;
+                await userRepository.update(mockUser.id, mockUser);
+                jest.spyOn(userService, 'getUserById').mockResolvedValueOnce(mockUser);
+                const updateUser = await userService.updateUser(payload);
+                expect(updateUser).not.toBeNull();
+                expect(updateUser.firstName).toEqual(mockUser.firstName);
+                expect(updateUser.userType).toEqual(mockUser.userType);
+                expect(updateUser).toBe(mockUser);
+            }
+        })
+
+        it('it should throw exception if user id is not provided   ', async () => {
+            jest.spyOn(userService, 'getUserById').mockRejectedValueOnce(new NotAcceptableException('User with provided id not available.'));
+            try {
+                await userService.updateUser(payload);
+            } catch (e) {
+                expect(e.response.error).toBe('Not Acceptable');
+                expect(e.response.message).toBe('User with provided id not available.');
+                expect(e.response.statusCode).toBe(406);
+            }
+        });
+    });
+    describe('getUsers method', () => {
+        let payload: ListUserPayload = {
+            q: "test", role: 1, pagination: true, page: 12,
+            limit: 4, sort: true, sortFiled: "test", sortOrder: "ASC"
+        };
+        it('should update user data ', async () => {
+            userRepository.createQueryBuilder("users")
+                .where("users.status IN (:...status)", { status: [1, 0] })
+                .andWhere("users.site_id && ARRAY[:...siteIdArr]::int[]", { siteIdArr: mockUser.site_id });
+            await userService.getUsers(payload, mockUser.site_id);
+
+        });
+
+        describe('updateUserProfilePic method', () => {
+            it('should updateUserProfilePic data based on id', async () => {
+                jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
+                let users = await userService.updateUserProfilePic(mockUser.id);
+                expect(users).not.toBeNull();
+                delete users.password;
+                users.imageUrl = mockUserFillable.imageUrl;
+                userRepository.update(users.id, users);
+                expect(users.imageUrl).toBe(mockUser.imageUrl);
+            })
+
+            it('it should throw exception if user id is not provided   ', async () => {
+                jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+                try {
+                    await userService.updateUserProfilePic(new NotAcceptableException('User with provided id not available.'));
+                } catch (e) {
+                    expect(e.response.error).toBe('Not Acceptable');
+                    expect(e.response.message).toBe('User with provided id not available.');
+                    expect(e.response.statusCode).toBe(406);
+                }
+            });
+        });
+        describe('getUserById method', () => {
+            let mockResidentCompany = {
+                "id": 1,
+                "email": "ipsen@mailinator.com",
+                "name": "Ipsen",
+                "companyName": "ipsenTest",
+            }
+            it('should getUserById data based on id', async () => {
+                jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
+                if (mockUser) {
+                    if (mockUser.companyId) {
+                        jest.spyOn(residentCompanyService, "getResidentCompany").mockResolvedValueOnce(mockResidentCompany);
+                    }
+                }
+                const users = await userService.getUserById(mockUser.id);
+                expect(users).not.toBeNull();
+                expect(users.companyId).toEqual(mockUser.companyId);
+                expect(users).toBe(mockUser);
+            })
+
+            it('it should throw exception if user id is not provided   ', async () => {
+                jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+                try {
+                    await userService.getUserById(new NotAcceptableException('User with provided id not available.'));
+                } catch (e) {
+                    expect(e.response.error).toBe('Not Acceptable');
+                    expect(e.response.message).toBe('User with provided id not available.');
+                    expect(e.response.statusCode).toBe(406);
+                }
+            });
+        });
+        describe('validateToken method', () => {
+            it('should validateToken data based on tokenid', async () => {
+                jest.spyOn(userTokenRepository, 'findOne').mockResolvedValue(mockUserToken);
+                jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
+                let users = await userService.validateToken(mockUserToken.token);
+                expect(users).not.toBeNull();
+            })
+            it('it should throw exception if Token is invalid  ', async () => {
+                jest.spyOn(userRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Token is invalid.'));
+                try {
+                    await userService.validateToken(mockUserToken.token);
+                } catch (e) {
+                    expect(e.response.error).toBe('Not Acceptable');
+                    expect(e.response.message).toBe('Token is invalid.');
+                    expect(e.response.statusCode).toBe(406);
+                }
+            });
+        });
+        describe('setNewPassword method', () => {
+            const mockPasswordPayload = {
+                token: "mockToken", password: "biolabsAdmin",
+                passwordConfirmation: "biolabsAdmin"
+            };
+            const mockUserSetPass: User = {
+                id: 1,
+                role: 1,
+                site_id: [1, 2],
+                companyId: 1,
+                email: "testadmin@biolabs.io",
+                firstName: "adminName",
+                lastName: "userLast",
+                title: "SuperAdmin",
+                phoneNumber: "2345678902",
+                status: '1',
+                imageUrl: "",
+                userType: '1',
+                password: "test@1234",
+                createdAt: 12,
+                updatedAt: 12,
+                toJSON: null
+            }
+
+            it('should  set setNewPassword ', async () => {
+                jest.spyOn(userTokenRepository, 'findOne').mockResolvedValue(mockUserToken);
+                jest.spyOn(userService, 'get').mockResolvedValueOnce(mockUserSetPass);
+                mockUserSetPass.password = mockPasswordPayload.password;
+                mockUserSetPass.status = '1';
+                jest.spyOn(userRepository, 'save').mockResolvedValueOnce(mockUserSetPass);
+                mockUserToken.status = '99';
+                jest.spyOn(userTokenRepository, 'save').mockResolvedValueOnce(mockUserToken);
+                let newUser = await userService.setNewPassword(mockPasswordPayload);
+                expect(newUser).not.toBeNull();
+                expect(newUser.password).toEqual(mockUserSetPass.password);
+                expect(newUser).toEqual(mockUserSetPass);
+            })
+
+            it('it should throw exception if Token is invalid  ', async () => {
+                jest.spyOn(userTokenRepository, 'save').mockRejectedValueOnce(new NotAcceptableException('Token is invalid.'));
+                try {
+                    await userService.setNewPassword(mockPasswordPayload);
+                } catch (e) {
+                    expect(e.response.error).toBe('Not Acceptable');
+                    expect(e.response.message).toBe('Token is invalid.');
+                    expect(e.response.statusCode).toBe(406);
+                }
+            });
+
+        });
+        describe('forgotPassword method', () => {
+            let payload: UserFillableFields = {
+                email: "test@biolabs.io", role: 1, companyId: 1, site_id: [1], firstName: "adminName", lastName: "userLast",
+                imageUrl: "eadzfxdsz", title: "SuperAdmin", phoneNumber: "2345678902", userType: '1',
+                password: "test@1234",
+                status: '1'
+            };
+            it('should  forgotPassword ', async () => {
+                jest.spyOn(userService, 'getByEmail').mockResolvedValueOnce(mockUser);
+                if (mockUser) {
+                    jest.spyOn(userService, 'generateToken').mockResolvedValueOnce(mockUserToken);
+                };
+                let tenant = { tenantEmail: payload.email, role: payload.role };
+                let newUser = await userService.forgotPassword(payload, req);
+                expect(newUser).not.toBeNull();
+                expect(newUser).toBeTruthy();
+            })
+
+
+            it('it should throw exception if Token is invalid  ', async () => {
+                jest.spyOn(userRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException(
+                    'User with provided email already created.'));
+                try {
+                    await userService.forgotPassword(payload, req);
+                } catch (e) {
+                    expect(e.response.error).toBe('Not Acceptable');
+                    expect(e.response.message).toBe('User with provided email already created.');
+                    expect(e.response.statusCode).toBe(406);
+                }
+            });
+
         });
     });
     describe('softDelete method', () => {
@@ -232,120 +420,6 @@ describe('UserService', () => {
                 expect(e.response.statusCode).toBe(406);
             }
         });
-    });
-    describe('getUserById method', () => {
-        it('should delete data based on id', async () => {
-            //get method
-            mockUser.status = "1";
-            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
-            let users = await userService.getUserById(mockUser.id);
-            expect(users).toBe(mockUser);
-        })
-
-        it('it should throw exception if user id is not provided   ', async () => {
-            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
-            try {
-                await userService.getUserById(new NotAcceptableException('User with provided id not available.'));
-            } catch (e) {
-                expect(e.response.error).toBe('Not Acceptable');
-                expect(e.response.message).toBe('User with provided id not available.');
-                expect(e.response.statusCode).toBe(406);
-            }
-        });
-    });
-    describe('updateUserProfilePic method', () => {
-        it('should updateUserProfilePic data based on id', async () => {
-            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
-            let users = await userService.updateUserProfilePic(mockUser.id);
-            expect(users).not.toBeNull();
-            delete users.password;
-            users.imageUrl = mockUserFillable.imageUrl;
-            userRepository.update(users.id, users);
-            expect(users.imageUrl).toBe(mockUser.imageUrl);
-        })
-
-        it('it should throw exception if user id is not provided   ', async () => {
-            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
-            try {
-                await userService.updateUserProfilePic(new NotAcceptableException('User with provided id not available.'));
-            } catch (e) {
-                expect(e.response.error).toBe('Not Acceptable');
-                expect(e.response.message).toBe('User with provided id not available.');
-                expect(e.response.statusCode).toBe(406);
-            }
-        });
-    });
-    describe('validateToken method', () => {
-        it('should validateToken data based on tokenid', async () => {
-            jest.spyOn(userTokenRepository, 'findOne').mockResolvedValue(mockUserToken);
-            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
-            let users = await userService.validateToken(mockUserToken.token);
-            expect(users).not.toBeNull();
-            if (users.status == '1' || users.status == '0') {
-                return users;
-            }
-        })
-
-        it('it should throw exception if Token is invalid  ', async () => {
-            jest.spyOn(userRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Token is invalid.'));
-            try {
-                await userService.validateToken(null);
-            } catch (e) {
-                expect(e.response.error).toBe('Not Acceptable');
-                expect(e.response.message).toBe('Token is invalid.');
-                expect(e.response.statusCode).toBe(406);
-            }
-        });
-    });
-    describe('setNewPassword method', () => {
-        const mockPasswordPayload = {
-            token: "mockToken", password: "biolabsAdmin",
-            passwordConfirmation: "biolabsAdmin"
-        };
-        const mockUserSetPass: User = {
-            id: 1,
-            role: 1,
-            site_id: [1, 2],
-            companyId: 1,
-            email: "testadmin@biolabs.io",
-            firstName: "adminName",
-            lastName: "userLast",
-            title: "SuperAdmin",
-            phoneNumber: "2345678902",
-            status: '1',
-            imageUrl: "",
-            userType: '1',
-            password: "test@1234",
-            createdAt: 12,
-            updatedAt: 12,
-            toJSON: null
-        }
-
-        it('should  set setNewPassword ', async () => {
-            jest.spyOn(userTokenRepository, 'findOne').mockResolvedValue(mockUserToken);
-            jest.spyOn(userService, 'get').mockResolvedValueOnce(mockUserSetPass);
-            mockUserSetPass.password = mockPasswordPayload.password;
-            mockUserSetPass.status = '1';
-            jest.spyOn(userRepository, 'save').mockResolvedValueOnce(mockUserSetPass);
-            mockUserToken.status = '99';
-            jest.spyOn(userTokenRepository, 'save').mockResolvedValueOnce(mockUserToken);
-            let newUser = await userService.setNewPassword(mockPasswordPayload);
-            expect(newUser).not.toBeNull();
-            expect(newUser.password).toEqual(mockUserSetPass.password);
-            expect(newUser).toEqual(mockUserSetPass);
-        })
-
-        it('it should throw exception if Token is invalid  ', async () => {
-            jest.spyOn(userRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Token is invalid.'));
-            try {
-                await userService.setNewPassword(mockPasswordPayload);
-            } catch (e) {
-                expect(e.response.error).toBe('Not Acceptable');
-                expect(e.response.message).toBe('Token is invalid.');
-                expect(e.response.statusCode).toBe(406);
-            }
-        });
-
     });
 });
 
