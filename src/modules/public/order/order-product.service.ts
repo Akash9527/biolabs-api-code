@@ -54,12 +54,17 @@ export class OrderProductService {
         message: err.message
       }, HttpStatus.BAD_REQUEST);
     });
+    /**
+     * BIOL-292
+     */
+    orderProduct.groupId = orderSave.id;
+    orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
+    await this.orderProductRepository.update(orderSave.id,orderProduct);
 
     if (orderProduct.recurrence) {
       /**
        * Add next 4 months Products
        */
-      orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
       await this.addFutureOrderProducts(orderProduct);
     }
     return { message: 'Added successfully', status: 'success' };
@@ -74,7 +79,7 @@ export class OrderProductService {
         futureOrderProduct.month = 1;
         futureOrderProduct.year = futureOrderProduct.year + 1;
       }
-
+      futureOrderProduct.groupId = orderProduct.groupId;
       await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
         throw new HttpException({
           message: err.message
@@ -112,13 +117,14 @@ export class OrderProductService {
       }, HttpStatus.BAD_REQUEST);
     });
 
-    payload.productId = orderProduct.productId;
+    payload.groupId = orderProduct.groupId;
     payload.manuallyEnteredProduct = orderProduct.manuallyEnteredProduct;
+    payload.productId = orderProduct.productId;
     const futureProducts = await this.orderProductRepository.find({
       where: {
-        productId: payload.productId,
+        groupId: payload.groupId,
         status: 0,
-        month: MoreThan(payload.month),
+        id: MoreThan(orderProduct.id)
       }
     }).catch(err => {
       throw new HttpException({
@@ -140,7 +146,7 @@ export class OrderProductService {
         for await (const product of futureProducts) {
           let futureOrderProduct = { ...payload };
           futureOrderProduct.month = product.month;
-          futureOrderProduct.productId = product.productId;
+          futureOrderProduct.groupId = product.groupId;
           await this.orderProductRepository.update(product.id, futureOrderProduct).catch(err => {
             throw new HttpException({
               message: err.message
@@ -182,12 +188,10 @@ export class OrderProductService {
 
     const orderProductArray = await this.orderProductRepository.findByIds([id]);
     const orderProduct = orderProductArray[0];
-    const pid = (orderProduct.manuallyEnteredProduct) ? orderProduct.id : orderProduct.productId;
     const deleteProducts = await this.orderProductRepository.find({
-      productId: pid,
+      groupId: orderProduct.groupId,
       status: 0,
-      month: MoreThanOrEqual(orderProduct.month),
-      year: orderProduct.year
+      id: MoreThan(orderProduct.id)
     });
     for await (const product of deleteProducts) {
       await this.orderProductRepository.delete(product.id);
