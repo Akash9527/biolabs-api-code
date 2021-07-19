@@ -17,7 +17,7 @@ export class Product {
   @Column({ default: false })
   recurrence: boolean;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: "float" })
   cost: number;
 
   @Column({ nullable: false })
