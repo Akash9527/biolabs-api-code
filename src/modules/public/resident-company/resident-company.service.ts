@@ -1544,7 +1544,7 @@ order by quat;
       .select("space_change_waitlist.*")
       .addSelect("rc.companyName", "residentCompanyName")
       .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
-      .where("space_change_waitlist.requestStatus IN (:...status)", { status: statusArr })
+      .where("space_change_waitlist.requestStatus IN (:...status)", { status: [statusArr] })
       .andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr })
       .getRawMany();
     response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
@@ -1564,7 +1564,7 @@ order by quat;
       return spaceChangeWaitlistObj;
     }
     response['status'] = 'error';
-    response['message'] = 'Space-Change-Wait-List not found by id: ' + id;
+    response['message'] = 'Space Change Waitlist not found by id: ' + id;
     return response;
   }
 
