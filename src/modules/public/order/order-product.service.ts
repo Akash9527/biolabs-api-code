@@ -235,6 +235,7 @@ export class OrderProductService {
                           orpd."month" = ${month} 
                           or orpd."month" isnull
                         )
+                        and orpd."currentCharge" = true
                     ) as orp on orp."companyId" = rc."id" 
                   where 
                     rc."site" && ARRAY[${site}] :: int[] 
