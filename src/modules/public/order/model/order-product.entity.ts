@@ -30,7 +30,7 @@ export class OrderProduct {
   @Column({ length: 510, nullable: true })
   productDescription: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: "float"})
   cost: number;
 
   @Column({ nullable: true })
