@@ -4,6 +4,7 @@ import { EMAIL } from 'constants/email';
 import { In, Like, Repository } from 'typeorm';
 import { Mail } from '../../../utils/Mail';
 import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
+import { ItemDto } from '../dto/item.dto';
 import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
 import { Item } from '../entity/item.entity';
 import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
@@ -68,7 +69,8 @@ export class ResidentCompanyService {
     private readonly spaceChangeWaitlistRepository: Repository<SpaceChangeWaitlist>,
     @InjectRepository(Item)
     private readonly itemRepository: Repository<Item>,
-    private readonly mail: Mail
+    private readonly mail: Mail,
+    private readonly productTypeService: ProductTypeService
   ) { }
   /**
    * Description: This method will get the resident company by id.
@@ -1409,9 +1411,13 @@ order by quat;
     const maxPriorityOrder: number = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
       return result;
     });
+
+    let productTypes: any = await this.productTypeService.getProductType().then((result) => {
+      return result;
+    });
+
     let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
     spaceChangeWaitlistObj.residentCompany = savedRc;
-    spaceChangeWaitlistObj.items = null;
     spaceChangeWaitlistObj.desiredStartDate = null;
     spaceChangeWaitlistObj.planChangeSummary = PLAN_CHANGE_SUMMARY_INITIAL_VALUE;
     spaceChangeWaitlistObj.requestedBy = savedRc.name;
@@ -1427,7 +1433,20 @@ order by quat;
     spaceChangeWaitlistObj.requestGraduateDate = null;
     spaceChangeWaitlistObj.marketPlace = null;
 
-    await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj);
+    const resp = await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj);
+
+    if (productTypes) {
+      for (let index = 0; index < productTypes.length; index++) {
+        let item: Item = new Item();
+        item.productTypeId = productTypes[index].id;
+        item.itemName = productTypes[index].productTypeName;
+        item.currentQty = 0;
+        item.desiredQty = 0;
+        item.spaceChangeWaitlist = resp;
+        item.spaceChangeWaitlist_id = resp.id;
+        await this.itemRepository.save(this.itemRepository.create(item));
+      }
+    }
   }
 
   /**
