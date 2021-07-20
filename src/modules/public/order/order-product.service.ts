@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
+import { equals } from 'class-validator';
 import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { ResidentCompany } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
@@ -59,12 +60,17 @@ export class OrderProductService {
       error(err.message,__filename,"addOrderProducts()");
       throw new InternalException(err.message);
     });
+    /**
+     * BIOL-292
+     */
+    orderProduct.groupId = orderSave.id;
+    orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
+    await this.orderProductRepository.update(orderSave.id,orderProduct);
 
     if (orderProduct.recurrence) {
       /**
        * Add next 4 months Products
        */
-      orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
       await this.addFutureOrderProducts(orderProduct);
     }
     return { message: 'Added successfully', status: 'success' };
@@ -84,7 +90,7 @@ export class OrderProductService {
         futureOrderProduct.month = 1;
         futureOrderProduct.year = futureOrderProduct.year + 1;
       }
-
+      futureOrderProduct.groupId = orderProduct.groupId;
       await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProduct)).catch(err => {
         error(err.message,__filename,"addFutureOrderProducts()")
         throw new InternalException(err.message);
@@ -123,13 +129,14 @@ export class OrderProductService {
       throw new BiolabsException(err.message);
     });
     debug(`order product: ${orderProduct.productId}`,__filename,"updateOrderProduct()");
-    payload.productId = orderProduct.productId;
+    payload.groupId = orderProduct.groupId;
     payload.manuallyEnteredProduct = orderProduct.manuallyEnteredProduct;
+    payload.productId = orderProduct.productId;
     const futureProducts = await this.orderProductRepository.find({
       where: {
-        productId: payload.productId,
+        groupId: payload.groupId,
         status: 0,
-        month: MoreThan(payload.month),
+        id: MoreThan(orderProduct.id)
       }
     }).catch(err => {
       error(err.message,__filename,"updateOrderProduct()")
@@ -149,7 +156,7 @@ export class OrderProductService {
         for await (const product of futureProducts) {
           let futureOrderProduct = { ...payload };
           futureOrderProduct.month = product.month;
-          futureOrderProduct.productId = product.productId;
+          futureOrderProduct.groupId = product.groupId;
           await this.orderProductRepository.update(product.id, futureOrderProduct).catch(err => {
             error(err.message,__filename,"updateOrderProduct()");
             throw new InternalException(err.message);
@@ -197,9 +204,9 @@ export class OrderProductService {
     const orderProduct = orderProductArray[0];
     debug(`order product: ${orderProduct.productId}`)
     const deleteProducts = await this.orderProductRepository.find({
-      productId: orderProduct.productId,
+      groupId: orderProduct.groupId,
       status: 0,
-      month: MoreThanOrEqual(orderProduct.month)
+      id: MoreThan(orderProduct.id)
     });
     for await (const product of deleteProducts) {
       await this.orderProductRepository.delete(product.id);
@@ -253,6 +260,7 @@ export class OrderProductService {
                           orpd."month" = ${month} 
                           or orpd."month" isnull
                         )
+                        and orpd."currentCharge" = true
                     ) as orp on orp."companyId" = rc."id" 
                   where 
                     rc."site" && ARRAY[${site}] :: int[] 
