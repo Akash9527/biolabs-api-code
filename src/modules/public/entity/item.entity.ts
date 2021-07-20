@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { SpaceChangeWaitlist } from './space-change-waitlist.entity';
 
 @Entity({
@@ -8,7 +8,11 @@ export class Item {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => SpaceChangeWaitlist, (spaceChangeWaitlist) => spaceChangeWaitlist.items, { eager: true })
+    @Column()
+    spaceChangeWaitlist_id: number;
+
+    @ManyToOne(() => SpaceChangeWaitlist, (spaceChangeWaitlist) => spaceChangeWaitlist.items)
+    @JoinColumn({ name: 'spaceChangeWaitlist_id', referencedColumnName: 'id' })
     spaceChangeWaitlist: SpaceChangeWaitlist;
 
     @Column({ nullable: false })

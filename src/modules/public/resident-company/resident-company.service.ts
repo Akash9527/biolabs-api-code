@@ -1498,6 +1498,8 @@ order by quat;
       spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
       spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
 
+      const resp = await this.spaceChangeWaitlistRepository.save(this.spaceChangeWaitlistRepository.create(spaceChangeWaitlistObj));
+
       let itemArr: Item[] = [];
       for (let itemDto of payload.items) {
         let itemObj: Item = new Item();
@@ -1506,16 +1508,8 @@ order by quat;
         itemObj.itemName = itemDto.itemName;
         itemObj.currentQty = itemDto.currentQty;
         itemObj.desiredQty = itemDto.desiredQty;
-        itemObj.spaceChangeWaitlist = spaceChangeWaitlistObj;
-        itemArr.push(itemObj);
-      }
-      // spaceChangeWaitlistObj.items = Object.assign([], itemArr);
-      spaceChangeWaitlistObj.items = itemArr;
-      const resp = await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj);
-
-      for (let item of itemArr) {
-        item.spaceChangeWaitlist = resp;
-        await this.itemRepository.save(item);
+        itemObj.spaceChangeWaitlist = resp;
+        await this.itemRepository.save(this.itemRepository.create(itemObj));
       }
 
       residentCompany.companyStage = payload.companyStage;
@@ -1571,7 +1565,7 @@ order by quat;
   public async getSpaceChangeWaitListById(id: number): Promise<any> {
     const response = {};
 
-    let spaceChangeWaitlistObj: any = await this.spaceChangeWaitlistRepository.findOne(id);
+    let spaceChangeWaitlistObj: any = await this.spaceChangeWaitlistRepository.findOne(id, { relations: ['items'] });
     if (spaceChangeWaitlistObj) {
       return spaceChangeWaitlistObj;
     }
