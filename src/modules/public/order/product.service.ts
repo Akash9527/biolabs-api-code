@@ -166,6 +166,7 @@ export class ProductService {
                                 futureOrderProductObj.month = 1;
                                 futureOrderProductObj.year = futureOrderProductObj.year + 1;
                             }
+                            futureOrderProductObj.groupId =  orderProduct.groupId;
                             delete futureOrderProductObj['id'];
                             await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProductObj)).catch(err => {
                                 throw new HttpException({
