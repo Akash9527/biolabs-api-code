@@ -188,12 +188,14 @@ describe('Order Product Service', () => {
             recurrence: true,
             year: 2000,
             month: 12,
-            quantity: 1
+            quantity: 1,
+            groupId :1
         } as UpdateOrderProductDto;
         const orderProducts = [{ orderProductDto }];
         it('should update order product', async () => {
             // orderProductRepository.findOne.mockReturnValue(orderProductDto);
             jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(orderProductDto);
+            jest.spyOn(orderProductRepository, 'find').mockResolvedValueOnce(orderProducts);
             jest.spyOn(orderProductRepository, 'create').mockResolvedValueOnce(orderProductDto);
             jest.spyOn(orderProductRepository, 'save').mockResolvedValueOnce(orderProductDto);
             if (!orderProductDto.recurrence) {
