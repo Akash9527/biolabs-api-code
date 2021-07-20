@@ -143,6 +143,9 @@ describe('Order Product Service', () => {
             jest.spyOn(orderProductRepository, 'create').mockResolvedValueOnce(orderProductDto);
             jest.spyOn(orderProductRepository, 'save').mockResolvedValueOnce(orderProductDto);
             const product = await orderProductService.addOrderProduct(orderProductDto);
+            expect(product).not.toBeNull();
+            expect(product.message).toEqual("Added successfully");
+            expect(product.status).toEqual("success");
         });
 
         it('should validate the start date', async () => {
@@ -203,7 +206,8 @@ describe('Order Product Service', () => {
                 }
             }
             jest.spyOn(orderProductRepository, 'update').mockResolvedValueOnce(orderProductDto);
-            await orderProductService.updateOrderProduct(id, orderProductDto);
+            let product = await orderProductService.updateOrderProduct(id, orderProductDto);
+            expect(product).not.toBeNull();           
         })
 
         it('should update order product with recurence false', async () => {
@@ -218,7 +222,9 @@ describe('Order Product Service', () => {
                 }
             }
             jest.spyOn(orderProductRepository, 'update').mockResolvedValueOnce(orderProductDto);
-            await orderProductService.updateOrderProduct(id, orderProductDto);
+            let product =await orderProductService.updateOrderProduct(id, orderProductDto);
+            expect(product).not.toBeNull();
+            expect(product).toMatchObject(orderProductDto);
         })
        
         it('should validate the start date', async () => {
@@ -246,12 +252,12 @@ describe('Order Product Service', () => {
                     productName: 'new',
                     productId: 1,
                     productDescription: 'new product launch',
-                    startDate: "end date",
+                    startDate: "2021-07-16",
                     status: 1,
                     companyId: 1,
                     cost: 100,
                     currentCharge: true,
-                    endDate: "end date",
+                    endDate: "2021-07-16",
                     manuallyEnteredProduct: true,
                     recurrence: true,
                     year: 2000,
@@ -277,22 +283,26 @@ describe('Order Product Service', () => {
                     productName: 'new',
                     productId: 1,
                     productDescription: 'new product launch',
-                    startDate: "end date",
-                    status: 1,
+                    startDate:  new Date().toISOString().slice(0, 10),
+                    status: 0,
                     companyId: 1,
                     cost: 100,
                     currentCharge: true,
-                    endDate: "end date",
+                    endDate:  new Date().toISOString().slice(0, 10),
                     manuallyEnteredProduct: true,
                     recurrence: true,
                     year: 2000,
                     month: 12,
-                    quantity: 1
+                    quantity: 1,
+                    groupId:1,
+                    id:1
                 }
             ]
             jest.spyOn(orderProductRepository, "findByIds").mockResolvedValueOnce(mockOrderProduct);
             jest.spyOn(orderProductRepository, "find").mockResolvedValueOnce(mockOrderProduct);
-            jest.spyOn(orderProductRepository, "delete").mockResolvedValueOnce(mockOrderProduct[0]);
+            for await (const order of mockOrderProduct) {
+                jest.spyOn(orderProductRepository, 'delete').mockResolvedValueOnce(order);
+            }
             let dbOrderProduct = await orderProductService.deleteOrderProduct(1);
             expect(dbOrderProduct).not.toBeNull();
         });
@@ -316,11 +326,11 @@ describe('Order Product Service', () => {
                 month: 12,
                 quantity: 1
             }
-            jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(mockOreProduct);
             jest.spyOn(orderProductRepository, 'create').mockResolvedValueOnce(mockOreProduct);
             jest.spyOn(orderProductRepository, 'save').mockResolvedValueOnce(mockOreProduct);
-            const product = await orderProductService.addFutureOrderProducts(mockOreProduct);
-            //expect(product).toMatchObject(mockOreProduct);
+            const dbOrderProduct = await orderProductService.addFutureOrderProducts(mockOreProduct);
+            expect(dbOrderProduct).not.toBeNull();
+           // expect(dbOrderProduct).toBe(mockOreProduct);
         });
     });
 

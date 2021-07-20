@@ -36,43 +36,84 @@ describe('MasterService', () => {
             providers: [
                 MasterService,
 
-                { provide: getRepositoryToken(BiolabsSource), useValue: {
-                        find:jest.fn(),
-                } },
-                { provide: getRepositoryToken(Category), useValue: {
-                        find:jest.fn(),
-                } },
-                { provide: getRepositoryToken(Funding), useValue: {
-                        find:jest.fn(),
-                } },
-                { provide: getRepositoryToken(Modality), useValue: {
-                        find:jest.fn(),
-                } },
-                { provide: getRepositoryToken(Role), useValue: {
-                        find:jest.fn(),
-                } },
-                { provide: getRepositoryToken(Site), useValue: {
-                        find:jest.fn(),
-                } },
-                { provide: getRepositoryToken(TechnologyStage), useValue: {
-                        find:jest.fn(),
-                } },
-                { provide: getRepositoryToken(ProductType), useValue: {
-                        find:jest.fn(),
-                } },
-                
+                {
+                    provide: getRepositoryToken(BiolabsSource), useValue: {
+                        find: jest.fn(),
+                        create: jest.fn(),
+                        save: jest.fn(),
+                        findOne: jest.fn()
+                    }
+                },
+                {
+                    provide: getRepositoryToken(Category), useValue: {
+                        find: jest.fn(),
+                        create: jest.fn(),
+                        save: jest.fn(),
+                        findOne: jest.fn()
+                    }
+                },
+                {
+                    provide: getRepositoryToken(Funding), useValue: {
+                        find: jest.fn(),
+                        create: jest.fn(),
+                        save: jest.fn(),
+                        findOne: jest.fn()
+                    }
+                },
+                {
+                    provide: getRepositoryToken(Modality), useValue: {
+                        find: jest.fn(),
+                        create: jest.fn(),
+                        save: jest.fn(),
+                        findOne: jest.fn()
+                    }
+                },
+                {
+                    provide: getRepositoryToken(Role), useValue: {
+                        find: jest.fn(),
+                        create: jest.fn(),
+                        save: jest.fn(),
+                        findOne: jest.fn()
+                    }
+                },
+                {
+                    provide: getRepositoryToken(Site), useValue: {
+                        find: jest.fn(),
+                        create: jest.fn(),
+                        save: jest.fn(),
+                        findOne: jest.fn()
+                    }
+                },
+                {
+                    provide: getRepositoryToken(TechnologyStage), useValue: {
+                        find: jest.fn(),
+                        create: jest.fn(),
+                        save: jest.fn(),
+                        findOne: jest.fn()
+
+                    }
+                },
+                {
+                    provide: getRepositoryToken(ProductType), useValue: {
+                        find: jest.fn(),
+                        create: jest.fn(),
+                        save: jest.fn(),
+                        findOne: jest.fn()
+                    }
+                },
+
             ]
         }).compile();
 
         masterService = await module.get<MasterService>(MasterService);
         siteRepository = await module.get<Repository<Site>>(getRepositoryToken(Site));
-        roleRepository=await module.get<Repository<Role>>(getRepositoryToken(Role));
-        categoryRepository=await module.get<Repository<Category>>(getRepositoryToken(Category));
-        fundingRepository=await module.get<Repository<Funding>>(getRepositoryToken(Funding));
-        modalityRepository=await module.get<Repository<Modality>>(getRepositoryToken(Modality));
-        technologyStageRepository=await module.get<Repository<TechnologyStage>>(getRepositoryToken(TechnologyStage));
-        biolabsSourceRepository=await module.get<Repository<BiolabsSource>>(getRepositoryToken(BiolabsSource));
-        productTypeRepository=await module.get<Repository<ProductType>>(getRepositoryToken(ProductType));
+        roleRepository = await module.get<Repository<Role>>(getRepositoryToken(Role));
+        categoryRepository = await module.get<Repository<Category>>(getRepositoryToken(Category));
+        fundingRepository = await module.get<Repository<Funding>>(getRepositoryToken(Funding));
+        modalityRepository = await module.get<Repository<Modality>>(getRepositoryToken(Modality));
+        technologyStageRepository = await module.get<Repository<TechnologyStage>>(getRepositoryToken(TechnologyStage));
+        biolabsSourceRepository = await module.get<Repository<BiolabsSource>>(getRepositoryToken(BiolabsSource));
+        productTypeRepository = await module.get<Repository<ProductType>>(getRepositoryToken(ProductType));
 
     });
     it('should be defined', () => {
@@ -92,7 +133,7 @@ describe('MasterService', () => {
         })
     });
 
-    
+
     describe('should test getRoles Functionality', () => {
         let mockRoles: Array<any> = [{ "id": 1, "name": "superadmin" }, { "id": 2, "name": "siteadmin" },
         { "id": 3, "name": "sponsor" }, { "id": 4, "name": "resident" }];
@@ -107,7 +148,7 @@ describe('MasterService', () => {
         })
     });
 
-    
+
     describe('should test getCategories Functionality', () => {
         let mockCategories: Array<any> = [{
             "id": 1,
@@ -579,7 +620,7 @@ describe('MasterService', () => {
             // expect(categories).toBe(mockCategories);
         })
     });
-    
+
     describe('should test getBiolabsSource Functionality', () => {
         let mockbiolabsSource: Array<any> = [{ "id": 1, "name": "Website" }, { "id": 2, "name": "Online search" },
         { "id": 3, "name": "Event" }, { "id": 4, "name": "Referral" }, { "id": 9999, "name": "Other" }];
@@ -615,7 +656,7 @@ describe('MasterService', () => {
         })
     });
 
-    
+
     describe('should test getTechnologyStages Functionality', () => {
 
         let mockTechnologyStages: Array<any> = [
@@ -633,7 +674,7 @@ describe('MasterService', () => {
             expect(technologyStages).toBe(mockTechnologyStages);
         })
     });
-    
+
     describe('should test getFundings Functionality', () => {
 
         let mockfundings: Array<any> = [{ "id": 1, "name": "Grant funded" }, { "id": 2, "name": "Self-funded" },
@@ -651,14 +692,14 @@ describe('MasterService', () => {
             expect(fundings).toBe(mockfundings);
         })
     });
-    
+
     describe('should test getCompanyStatus Functionality', () => {
 
         let mockCompanyStatus: Array<any> = [{ "id": 0, "name": "Applied" }, { "id": 1, "name": "Accepted" },
         { "id": 2, "name": "On Hold" }, { "id": 3, "name": "Rejected" }, { "id": 4, "name": "Graduated" }];
 
         it('it should return  array of company status object', async () => {
-            
+
             let companyStatus = await masterService.getCompanyStatus();
             expect(companyStatus).not.toBeNull();
             expect(mockCompanyStatus.length).toBe(companyStatus.length);
@@ -683,7 +724,7 @@ describe('MasterService', () => {
             // expect(userTypes).toBe(mockUserTypes);
         })
     });
-    
+
     describe('should test getCommitteeStatus Functionality', () => {
 
         let mockCommiteeeStatus: Array<any> = [{ "id": 0, "name": "Unscheduled" }, { "id": 1, "name": "Scheduled" },
@@ -699,4 +740,101 @@ describe('MasterService', () => {
             // expect(commiteeeStatus).toBe(mockCommiteeeStatus);
         })
     });
+
+    describe('should test Technology Stage Functionality', () => {
+        let mockTechnologyStage = { "id": 2, "name": "tech1" } as TechnologyStage;
+        it('it should return Technology Stage object', async () => {
+            jest.spyOn(technologyStageRepository, 'create').mockResolvedValueOnce(mockTechnologyStage);
+            jest.spyOn(technologyStageRepository, 'save').mockResolvedValueOnce(mockTechnologyStage);
+            let dbTtechnologyStage = await masterService.createTechnologyStage(mockTechnologyStage.name, mockTechnologyStage.id);
+            expect(dbTtechnologyStage).not.toBeNull();
+            expect(dbTtechnologyStage).toBe(dbTtechnologyStage);
+            expect(dbTtechnologyStage).toMatchObject(dbTtechnologyStage);
+        })
+    });
+
+    describe('should test modality Functionality', () => {
+        let mockModility = { "id": 2, "name": "modility" } as Modality;
+        it('it should return modality object', async () => {
+            jest.spyOn(modalityRepository, 'create').mockResolvedValueOnce(mockModility);
+            jest.spyOn(modalityRepository, 'save').mockResolvedValueOnce(mockModility);
+            let dbModility = await masterService.createModality(mockModility.name, mockModility.id);
+            expect(dbModility).not.toBeNull();
+            expect(dbModility).toBe(mockModility);
+            expect(dbModility).toMatchObject(mockModility);
+        })
+    });
+
+    describe('should test fundings Functionality', () => {
+        let mockfundings = { "id": 2, "name": "fudings" } as Funding;
+        it('it should return fundings object', async () => {
+            jest.spyOn(fundingRepository, 'create').mockResolvedValueOnce(mockfundings);
+            jest.spyOn(fundingRepository, 'save').mockResolvedValueOnce(mockfundings);
+            let dbFundings = await masterService.createFunding(mockfundings.name, mockfundings.id);
+            expect(dbFundings).not.toBeNull();
+            expect(dbFundings).toBe(mockfundings);
+            expect(dbFundings).toMatchObject(mockfundings);
+        })
+    });
+    
+    describe('should test role Functionality', () => {
+        let mockRole = { "id": 2, "name": "role" } as Role;
+        it('it should return role object', async () => {
+            jest.spyOn(roleRepository, 'create').mockResolvedValueOnce(mockRole);
+            jest.spyOn(roleRepository, 'save').mockResolvedValueOnce(mockRole);
+            let dbRole= await masterService.createRole(mockRole.name, mockRole.id);
+            expect(dbRole).not.toBeNull();
+            expect(dbRole).toBe(mockRole);
+            expect(dbRole).toMatchObject(mockRole);
+        })
+    });
+
+    describe('should test biolabs source Functionality', () => {
+        let mockbiolabsSource = { "id": 2, "name": "source" } as BiolabsSource;
+        it('it should return source object', async () => {
+            jest.spyOn(biolabsSourceRepository,'create').mockResolvedValueOnce(mockbiolabsSource);
+            jest.spyOn(biolabsSourceRepository, 'save').mockResolvedValueOnce(mockbiolabsSource);
+            let dbBiolabsSource = await masterService.createBiolabsSource(mockbiolabsSource.name, mockbiolabsSource.id);
+            expect(dbBiolabsSource).not.toBeNull();
+            expect(dbBiolabsSource).toBe(mockbiolabsSource);
+            expect(dbBiolabsSource).toMatchObject(mockbiolabsSource);
+        })
+    });
+
+    describe('should test site Functionality', () => {
+        let mockSite = {"id":2,"name":"Category","status":"1"};
+        it('it should return site object', async () => {
+            jest.spyOn(siteRepository,'create').mockResolvedValueOnce(mockSite);
+            jest.spyOn(siteRepository, 'save').mockResolvedValueOnce(mockSite);
+            let dbSite = await masterService.createSite(mockSite.name, mockSite.id);
+            expect(dbSite).not.toBeNull();
+            expect(dbSite).toBe(mockSite);
+            expect(dbSite).toMatchObject(mockSite);
+        })
+    });
+
+    
+    describe('should test Category Functionality', () => {
+        let mockCategory = { "id": 2, "name": "Category","parent_id":1 } as Category;
+        it('it should return Category object', async () => {
+            jest.spyOn(categoryRepository,'find').mockResolvedValueOnce(mockCategory);
+            jest.spyOn(categoryRepository, 'save').mockResolvedValueOnce(mockCategory);
+            let dbCategory = await masterService.saveCategory(mockCategory.name, mockCategory.id,mockCategory.parent_id);
+            expect(dbCategory).not.toBeNull();
+            expect(dbCategory).toBe(mockCategory);
+            expect(dbCategory).toMatchObject(mockCategory);
+        });
+
+        it('it should return Category object', async () => {
+
+            let technologyStages = await masterService.getTechnologyStages(mockMasterPayLoad);
+            jest.spyOn(categoryRepository,'find').mockResolvedValueOnce(mockCategory);
+            jest.spyOn(categoryRepository, 'save').mockResolvedValueOnce(mockCategory);
+            let dbCategory = await masterService.saveCategory(mockCategory.name, mockCategory.id,mockCategory.parent_id);
+            expect(dbCategory).not.toBeNull();
+            expect(dbCategory).toBe(mockCategory);
+            expect(dbCategory).toMatchObject(mockCategory);
+        });
+    });
+ 
 });
