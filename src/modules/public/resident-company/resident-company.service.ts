@@ -1544,12 +1544,16 @@ order by quat;
    */
   public async getSpaceChangeWaitListByStatusAndSiteId(statusArr: number[], siteIdArr: number[]): Promise<any> {
     const response = {};
+    let status: number[] = [];
+    for (let index = 0; index < statusArr.length; index++) {
+      status.push(Number(statusArr[index]));
+    }
     let spaceChangeWaitlist: any = await this.spaceChangeWaitlistRepository
       .createQueryBuilder("space_change_waitlist")
       .select("space_change_waitlist.*")
       .addSelect("rc.companyName", "residentCompanyName")
       .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
-      .where("space_change_waitlist.requestStatus IN (:...status)", { status: [statusArr] })
+      .where("space_change_waitlist.requestStatus IN (:...status)", { status: status })
       .andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr })
       .orderBy("space_change_waitlist.priorityOrder", "ASC")
       .getRawMany();
