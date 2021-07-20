@@ -4,6 +4,7 @@ import { EMAIL } from 'constants/email';
 import { In, Like, Repository } from 'typeorm';
 import { Mail } from '../../../utils/Mail';
 import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
+import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
 import { Item } from '../entity/item.entity';
 import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
 import { MembershipChangeEnum } from '../enum/membership-change-enum';
@@ -427,13 +428,13 @@ export class ResidentCompanyService {
    * @param payload an id of ResidentCompany
    * @return an objecdt of ResidentCompany
    */
-   public async getResidentCompanySpecificFieldsById(residentCompanyId: number) {
+  public async getResidentCompanySpecificFieldsById(residentCompanyId: number) {
     let response = {};
     let residentCompanyObj = await this.fetchResidentCompanyById(residentCompanyId);
     if (residentCompanyObj) {
       response['residentCompanyId'] = residentCompanyObj.id;
       response['companyStageOfDevelopment'] = residentCompanyObj.companyStage;
-      response['fundingToDate'] =  residentCompanyObj.funding;
+      response['fundingToDate'] = residentCompanyObj.funding;
       response['fundingSource'] = residentCompanyObj.fundingSource;
       response['TotalCompanySize'] = residentCompanyObj.companySize;
       response['canWeShareYourDataWithSponsorsEtc'] = residentCompanyObj.shareYourProfile;
@@ -1434,9 +1435,12 @@ order by quat;
    * @returns
    */
   private async fetchMaxPriorityOrderOfWaitlist(): Promise<number> {
+    const REQUEST_STATUS_OPEN: number = 0;
     let maxPriorityOrder: any = await this.spaceChangeWaitlistRepository
       .createQueryBuilder(`space_change_waitlist`)
       .select(`MAX(space_change_waitlist.priorityOrder)`, `max`)
+      .where('space_change_waitlist.requestStatus = :requestStatus')
+      .setParameter('requestStatus', REQUEST_STATUS_OPEN)
       .getRawOne();
     if (maxPriorityOrder && (maxPriorityOrder.max != null || maxPriorityOrder.max == 0)) {
       return maxPriorityOrder.max + 1;
@@ -1452,6 +1456,7 @@ order by quat;
    * @returns
    */
   public async addToSpaceChangeWaitList(payload: AddSpaceChangeWaitlistDto, @Request() req): Promise<any> {
+    const APPROVED_DENIED_PRIORITY_ORDER: number = -1;
     const residentCompany: ResidentCompany = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
       return result;
     });
@@ -1462,9 +1467,15 @@ order by quat;
       return response;
     }
 
-    const maxPriorityOrder: number = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
-      return result;
-    });
+    let maxPriorityOrder: number;
+    if (payload.requestStatus == 0) {
+      maxPriorityOrder = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
+        return result;
+      });
+    } else {
+      maxPriorityOrder = APPROVED_DENIED_PRIORITY_ORDER;
+    }
+
     try {
       let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
       spaceChangeWaitlistObj.residentCompany = residentCompany;
@@ -1537,7 +1548,7 @@ order by quat;
    * @param statusArr
    * @returns
    */
-  public async getSpaceChangeWaitList(statusArr: number[],siteIdArr:number[]): Promise<any> {
+  public async getSpaceChangeWaitListByStatusAndSiteId(statusArr: number[], siteIdArr: number[]): Promise<any> {
     const response = {};
     let spaceChangeWaitlist: any = await this.spaceChangeWaitlistRepository
       .createQueryBuilder("space_change_waitlist")
@@ -1546,6 +1557,7 @@ order by quat;
       .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
       .where("space_change_waitlist.requestStatus IN (:...status)", { status: [statusArr] })
       .andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr })
+      .orderBy("space_change_waitlist.priorityOrder", "ASC")
       .getRawMany();
     response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
     return response;
@@ -1556,11 +1568,11 @@ order by quat;
    * @param statusArr
    * @returns
    */
-   public async getSpaceChangeWaitListById(id: number): Promise<any> {
+  public async getSpaceChangeWaitListById(id: number): Promise<any> {
     const response = {};
 
     let spaceChangeWaitlistObj: any = await this.spaceChangeWaitlistRepository.findOne(id);
-    if(spaceChangeWaitlistObj) {
+    if (spaceChangeWaitlistObj) {
       return spaceChangeWaitlistObj;
     }
     response['status'] = 'error';
@@ -1599,6 +1611,35 @@ order by quat;
 
     const items = await this.residentCompanyHistoryRepository.query(queryStr);
     response['items'] = (!items) ? 0 : items;
+    return response;
+  }
+
+  /**
+   * Description: Updates the priority order of Open space change wait list.
+   * @description Updates the priority order of Open space change wait list.
+   * @param payload UpdateWaitlistPriorityOrderDto
+   * @returns response with status and message fields
+   */
+  public async updateSpaceChangeWaitlistPriorityOrder(payload: UpdateWaitlistPriorityOrderDto) {
+    let response = {};
+    try {
+      // Should check arraylength whether it is equal to the number of records with request status = 0 present in db
+      if (payload && payload.spaceChangeWaitlistIds.length > 0) {
+        for (let index = 0; index < payload.spaceChangeWaitlistIds.length; index++) {
+          let obj = await this.spaceChangeWaitlistRepository.findOne(payload.spaceChangeWaitlistIds[index]);
+          obj.priorityOrder = index;
+          await this.spaceChangeWaitlistRepository.update(payload.spaceChangeWaitlistIds[index], obj);
+        }
+        response['status'] = 'Success';
+        response['message'] = 'Priority Order updated successfully';
+      } else {
+        response['status'] = 'Not acceptable';
+        response['message'] = 'Please provide proper Space Change Waitlist ids';
+      }
+    } catch (error) {
+      response['status'] = 'Fail';
+      response['message'] = 'Could not update Priority Order';
+    }
     return response;
   }
 }

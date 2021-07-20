@@ -8,6 +8,7 @@ import { UpdateResidentCompanyPayload } from './update-resident-company.payload'
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 import { AddNotesDto } from './add-notes.dto';
 import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
+import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
 
 @Controller('api/resident-company')
 @ApiTags('Resident Company')
@@ -326,7 +327,7 @@ export class ResidentCompanyController {
   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  @Post("/addspacechangewaitlist")
+  @Post("/spacechangewaitlist")
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiHeader({
@@ -345,7 +346,7 @@ export class ResidentCompanyController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  @Get('/getspacechangewaitlist/param?')
+  @Get('/spacechangewaitlist/param?')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getSpaceChangeWaitlist(@Query('status') status: number[], @Request() req): Promise<any> {
@@ -353,7 +354,7 @@ export class ResidentCompanyController {
     if (req.headers['x-site-id']) {
       siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     }
-    return this.residentCompanyService.getSpaceChangeWaitList(status, siteIdArr);
+    return this.residentCompanyService.getSpaceChangeWaitListByStatusAndSiteId(status, siteIdArr);
   }
 
   /**
@@ -364,7 +365,7 @@ export class ResidentCompanyController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  @Get('/getspacechangewaitlist/:id')
+  @Get('/spacechangewaitlist/:id')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getSpaceChangeWaitlistById(@Param('id') id: number): Promise<any> {
@@ -378,10 +379,24 @@ export class ResidentCompanyController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  @Get('/items/:siteId/:companyId')
+  @Get('/spacechangewaitlist/items/:siteId/:companyId')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getItemsForSpaceChangeWaitlist(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
     return this.residentCompanyService.getSpaceChangeWaitlistItems(siteId, companyId);
+  }
+
+  /**
+   * Updates the priority order of Open space change wait list.
+   * @description Updates the priority order of Open space change wait list.
+   * @param payload it is a request body contains new order of Space Change Waitlist Ids.
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Put('/spacechangewaitlist/priorityorder')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateWaitlistPriorityOrder(@Body() payload: UpdateWaitlistPriorityOrderDto): Promise<any> {
+    return this.residentCompanyService.updateSpaceChangeWaitlistPriorityOrder(payload);
   }
 }
