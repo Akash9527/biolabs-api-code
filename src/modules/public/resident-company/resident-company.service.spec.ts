@@ -1,17 +1,15 @@
 import { Repository } from "typeorm";
-import { UserToken } from "../user/user-token.entity";
 import { ResidentCompany } from "./resident-company.entity";
 import { ResidentCompanyService } from "./resident-company.service";
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { HttpException, HttpStatus, NotAcceptableException } from '@nestjs/common';
-import { Request } from 'express';
 import { PassportModule } from "@nestjs/passport";
 import { ResidentCompanyHistory } from "./resident-company-history.entity";
 import { ResidentCompanyDocuments, ResidentCompanyDocumentsFillableFields } from "./rc-documents.entity";
-import { ResidentCompanyAdvisory } from "./rc-advisory.entity";
+import { ResidentCompanyAdvisory, ResidentCompanyAdvisoryFillableFields } from "./rc-advisory.entity";
 import { ResidentCompanyManagement, ResidentCompanyManagementFillableFields } from "./rc-management.entity";
-import { ResidentCompanyTechnical } from "./rc-technical.entity";
+import { ResidentCompanyTechnical, ResidentCompanyTechnicalFillableFields } from "./rc-technical.entity";
 import { Site } from "../master/site.entity";
 import { BiolabsSource } from "../master/biolabs-source.entity";
 import { Category } from "../master/category.entity";
@@ -25,8 +23,7 @@ import { AddResidentCompanyPayload } from './add-resident-company.payload';
 import { ListResidentCompanyPayload } from './list-resident-company.payload';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
-import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
-import { query } from "winston";
+import { AddNotesDto } from "./add-notes.dto";
 
 const mockCompany: any = { id: 1 };
 const mockAddResidentCompany: AddResidentCompanyPayload = {
@@ -49,7 +46,7 @@ const mockRC: ResidentCompany = {
   utilizeLab: 0, expect12MonthsUtilizeLab: 0, industry: ["95"], modality: ["3"], equipmentOnsite: "Tech World",
   preferredMoveIn: 1, otherIndustries: {}, otherModality: {}, "status": "1", companySize: 20,
   "companyStatus": "1",
-  "companyVisibility": false,
+  "companyVisibility": true,
   "companyOnboardingStatus": true,
   "elevatorPitch": null,
   "logoOnWall": null,
@@ -71,8 +68,8 @@ const mockRC: ResidentCompany = {
   "foundersBusinessIndustryName": null,
   "createdAt": 2021,
   "updatedAt": 2021,
-  "pitchdeck": null,
-  "logoImgUrl": null,
+  "pitchdeck": "pitchDeck.img",
+  "logoImgUrl": "logoimgurl.img",
   "committeeStatus": null,
   "selectionDate": new Date("2021-07-05T18:30:00.000Z"),
   "companyStatusChangeDate": 2021,
@@ -81,12 +78,22 @@ const mockResidentDocument: ResidentCompanyDocuments = {
   id: 1, company_id: 1, doc_type: "Document", name: "ResidentDocument",
   link: "residentDocumentLink", status: '1', createdAt: 2021, updatedAt: 2021
 }
-const mockResidentManagement = {
+const mockResidentManagement: ResidentCompanyManagement = {
   id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
   title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management",
   academicAffiliation: "Test", joiningAsMember: true, mainExecutivePOC: true,
   laboratoryExecutivePOC: true, invoicingExecutivePOC: true, createdAt: 2021, updatedAt: 2021,
 }
+const mockResidentAdvisory: ResidentCompanyAdvisory = {
+  id: 1, name: "ResidentCompanyAdvisor", status: '1', title: "ResidentCompanyAdvisor",
+  organization: "Tesla", companyId: 1, createdAt: 2021, updatedAt: 2021
+}
+const mockResidentTechnical: ResidentCompanyTechnical = {
+  id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
+  title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management", joiningAsMember: true,
+  laboratoryExecutivePOC: true, invoicingExecutivePOC: true, emergencyExecutivePOC: true, createdAt: 2021, updatedAt: 2021,
+}
+const mockNotes: Notes = { id: 1, createdBy: 1, createdAt: new Date(), residentCompany: new ResidentCompany(), notesStatus: 1, notes: "this is note 1" };
 describe('ResidentCompanyService', () => {
   let residentCompanyService: ResidentCompanyService;
   let residentCompanyRepository: Repository<ResidentCompany>;
@@ -132,11 +139,39 @@ describe('ResidentCompanyService', () => {
             findOne: jest.fn(),
             create: jest.fn(() => mockRC),
             save: jest.fn(),
-            query: jest.fn()
+            query: jest.fn(),
+            update: jest.fn()
           }
         },
-        { provide: getRepositoryToken(ResidentCompanyHistory), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn() } },
-        { provide: getRepositoryToken(ResidentCompanyAdvisory), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn() } },
+        {
+          provide: getRepositoryToken(ResidentCompanyHistory), useValue: {
+            find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn(() => {
+              return {
+                catch: jest.fn(),
+              }
+            }),
+          }
+        },
+        {
+          provide: getRepositoryToken(ResidentCompanyAdvisory), useValue: {
+            create: jest.fn(() => mockResidentAdvisory),
+            find: jest.fn(), findOne: jest.fn(),
+            save: jest.fn(() => {
+              return {
+                catch: jest.fn(),
+              }
+            }), query: jest.fn(() => {
+              return {
+                catch: jest.fn(),
+              }
+            }),
+            update: jest.fn(() => {
+              return {
+                catch: jest.fn(),
+              }
+            })
+          }
+        },
         { provide: getRepositoryToken(ResidentCompanyDocuments), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn(), create: jest.fn(() => mockResidentDocument) } },
         {
           provide: getRepositoryToken(ResidentCompanyManagement), useValue: {
@@ -145,12 +180,28 @@ describe('ResidentCompanyService', () => {
                 catch: jest.fn(),
               }
             }), query: jest.fn(),
-            update: jest.fn(() =>
-              () => mockResidentManagement
-            ), create: jest.fn(() => mockResidentManagement)
+            update: jest.fn(() => {
+              return {
+                catch: jest.fn(),
+              }
+            }), create: jest.fn(() => mockResidentManagement)
           }
         },
-        { provide: getRepositoryToken(ResidentCompanyTechnical), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn() } },
+        {
+          provide: getRepositoryToken(ResidentCompanyTechnical), useValue: {
+            find: jest.fn(), findOne: jest.fn(), save: jest.fn(() => {
+              return {
+                catch: jest.fn(),
+              }
+            }), query: jest.fn(),
+            update: jest.fn(() => {
+              return {
+                catch: jest.fn(),
+              }
+            }), create: jest.fn(() => mockResidentTechnical)
+          }
+        },
+
         { provide: getRepositoryToken(Site), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn() } },
         { provide: getRepositoryToken(BiolabsSource), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn() } },
         { provide: getRepositoryToken(Category), useValue: { find: jest.fn(), findOne: jest.fn(), query: jest.fn().mockReturnThis(), save: jest.fn() } },
@@ -160,23 +211,17 @@ describe('ResidentCompanyService', () => {
         { provide: getRepositoryToken(User), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn() } },
         {
           provide: getRepositoryToken(Notes), useValue: {
-            find: jest.fn(), findOne: jest.fn(), query: jest.fn(), save: jest.fn(), createQueryBuilder: jest.fn(() =>
+            find: jest.fn(), findOne: jest.fn(), query: jest.fn(),
+            create: jest.fn(() => mockNotes),
+            save: jest.fn(), createQueryBuilder: jest.fn(() =>
             ({
-              addSelect: jest.fn().mockReturnThis(),
-              where: jest.fn().mockReturnThis(),
-              setParameter: jest.fn().mockReturnThis(),
-              getOne: jest.fn().mockReturnThis(),
-              leftJoin: jest.fn().mockReturnThis(),
               select: jest.fn().mockReturnThis(),
+              addSelect: jest.fn().mockReturnThis(),
+              leftJoin: jest.fn().mockReturnThis(),
+              where: jest.fn().mockReturnThis(),
               andWhere: jest.fn().mockReturnThis(),
-              getRawOne: jest.fn().mockReturnThis(),
               orderBy: jest.fn().mockReturnThis(),
-              addOrderBy: jest.fn().mockReturnThis(),
-              skip: jest.fn().mockReturnThis(),
-              take: jest.fn().mockReturnThis(),
-              getMany: jest.fn().mockReturnThis(),
               getRawMany: jest.fn().mockReturnThis(),
-              query: jest.fn()
             }))
           }
         },
@@ -250,7 +295,52 @@ describe('ResidentCompanyService', () => {
       }
     });
   });
+  describe('updateResidentCompanyImg method', () => {
+    let payload = {
+      id: 1,
+      imageUrl: "logoimgurl.img",
+      fileType: "logo"
+    }
+    const companyId = payload.id;
+    it('should return resident company object when fileType is logo', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(mockRC);
+      if (mockRC) {
+        if (payload.fileType == 'logo') {
+          mockRC.logoImgUrl = payload.imageUrl;
+          await residentCompanyRepository.update(companyId, mockRC);
+        }
+      }
+      let result = await residentCompanyService.updateResidentCompanyImg(payload);
+      expect(result).not.toBeNull();
+      expect(result.logoImgUrl).toEqual(mockRC.logoImgUrl);
+      expect(result).toBe(mockRC);
+    });
+    it('should return resident company object when fileType is pitchdeck', async () => {
+      payload.fileType = "pitchdeck";
+      payload.imageUrl = "pitchDeck.img";
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(mockRC);
+      if (mockRC) {
+        if (payload.fileType == 'pitchdeck') {
+          mockRC.pitchdeck = payload.imageUrl;
+          await residentCompanyRepository.update(companyId, mockRC);
+        }
+      }
+      let result = await residentCompanyService.updateResidentCompanyImg(payload);
+      expect(result).not.toBeNull();
+      expect(result.logoImgUrl).toEqual(mockRC.logoImgUrl);
+      expect(result).toBe(mockRC);
 
+    });
+    it('should throw exception if company with provided id not available.', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(null);
+      try {
+        await residentCompanyService.updateResidentCompanyImg(new NotAcceptableException("resident company with provided id not available."));
+      } catch (e) {
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe("resident company with provided id not available.")
+      }
+    });
+  });
   describe('getResidentCompanies method', () => {
     let siteIdArr: Array<any> = [1, 2]
     let mockRecidentCompanies: Array<any> = [{
@@ -291,38 +381,73 @@ describe('ResidentCompanyService', () => {
       expect(result).toBe(mockResidentDocument);
     })
   });
-  // describe('addResidentCompanyManagement method', () => {
-  //   let payload: ResidentCompanyManagementFillableFields = {
-  //     id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
-  //     title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management",
-  //     academicAffiliation: "Test", joiningAsMember: true, mainExecutivePOC: true,
-  //     laboratoryExecutivePOC: true, invoicingExecutivePOC: true
-  //   }
-  //   it('should return   resident companies management object', async () => {
+  describe('addResidentCompanyAdvisor method', () => {
+    let payload: ResidentCompanyAdvisoryFillableFields = {
+      id: 1,
+      name: "ResidentCompanyAdvisor",
+      status: '1',
+      title: "ResidentCompanyAdvisor",
+      organization: "Tesla",
+      companyId: 1
+    }
+    it('should return resident companies document object if payload id is available', async () => {
+      if (payload.id)
+        await residentCompanyAdvisoryRepository.update(payload.id, payload);
+      let result = await residentCompanyService.addResidentCompanyAdvisor(payload);
+      expect(result).not.toBeNull();
+    })
+    it('should  save and return resident companies document object if payload id is not available', async () => {
+      payload.id = null;
+      delete payload.id;
+      await residentCompanyAdvisoryRepository.save(residentCompanyAdvisoryRepository.create(payload))
+      let result = await residentCompanyService.addResidentCompanyAdvisor(payload);
+      expect(result).not.toBeNull();
+    })
+  });
 
+  describe('addResidentCompanyManagement method', () => {
+    let payload: ResidentCompanyManagementFillableFields = {
+      id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
+      title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management",
+      academicAffiliation: "Test", joiningAsMember: true, mainExecutivePOC: true,
+      laboratoryExecutivePOC: true, invoicingExecutivePOC: true
+    }
+    it('should return   resident companies management object', async () => {
+      if (payload.id) {
+        await residentCompanyManagementRepository.update(payload.id, payload);
+      }
+      let result = await residentCompanyService.addResidentCompanyManagement(payload);
+      expect(result).not.toBeNull();
+    })
+    it('should return   resident companies management object', async () => {
+      payload.id = null;
+      delete payload.id;
+      await residentCompanyManagementRepository.save(payload);
 
-  //     if (payload.id) {
-  //       await residentCompanyManagementRepository.update(payload.id, payload)
-  //       .catch(err => {
-  //         throw new HttpException({
-  //           message: err.message + ' in technical team'
-  //         }, HttpStatus.BAD_REQUEST);
-  //       });
-  //     }
-
-
-  //     // else {
-  //     //   delete payload.id;
-  //     //   await residentCompanyManagementRepository.save(payload);
-
-  //     // }
-  //     //   // delete payload.id;
-  //     // jest.spyOn(residentCompanyManagementRepository, 'save').mockResolvedValueOnce(payload);
-  //     let result = await residentCompanyService.addResidentCompanyManagement(payload);
-  //     console.log(result);
-  //     // expect(result).toBe(mockResidentManagement);
-  //   })
-  // });
+      let result = await residentCompanyService.addResidentCompanyManagement(payload);
+      expect(result).not.toBeNull();
+    })
+  });
+  describe('addResidentCompanyTechnical method', () => {
+    let payload: ResidentCompanyTechnicalFillableFields = {
+      id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
+      title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management",
+      joiningAsMember: true, mainExecutivePOC: true, laboratoryExecutivePOC: true, invoicingExecutivePOC: true
+    }
+    it('should return resident companies technical object if payload id is available', async () => {
+      if (payload.id)
+        await residentCompanyTechnicalRepository.update(payload.id, payload);
+      let result = await residentCompanyService.addResidentCompanyTechnical(payload);
+      expect(result).not.toBeNull();
+    })
+    it('should  save and return resident companies technical object if payload id is not available', async () => {
+      payload.id = null;
+      delete payload.id;
+      await residentCompanyTechnicalRepository.save(residentCompanyTechnicalRepository.create(payload))
+      let result = await residentCompanyService.addResidentCompanyTechnical(payload);
+      expect(result).not.toBeNull();
+    })
+  });
   describe('getResidentCompaniesBkp method', () => {
     let mockRecidentCompanies: Array<any> = [{
       name: "Biolabs", email: "elon@space.com", companyName: "tesla", site: [2, 1], biolabsSources: 1, otherBiolabsSources: "",
@@ -356,9 +481,9 @@ describe('ResidentCompanyService', () => {
         query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
           "where c.id = ANY(rc.industry::int[]) ) as industryCount " +
           "FROM public.categories as c order by industryCount desc limit 3;")
-      jest.spyOn(residentCompanyService, 'getResidentCompanyForSponsor').mockResolvedValueOnce(mockRecidentCompanies);
-      let result = await residentCompanyService.getResidentCompanyForSponsor()
-      expect(result).toBe(mockRecidentCompanies);
+      //jest.spyOn(residentCompanyService, 'getResidentCompanyForSponsor').mockResolvedValueOnce(mockRecidentCompanies);
+      let result = await residentCompanyService.getResidentCompanyForSponsor();
+      expect(result).not.toBeNull();
     })
   });
 
@@ -404,7 +529,7 @@ describe('ResidentCompanyService', () => {
   describe('getRcBiolabsSources method', () => {
     let mockRcBiolabsSources: BiolabsSource = { "id": 1, "name": "Website", "status": "1", "createdAt": 1626134400, "updatedAt": 1626134400 };
     it('should return array of resident company biolabs sources', async () => {
-      jest.spyOn(biolabsSourceRepository, 'findOne').mockResolvedValueOnce(mockRcBiolabsSources);
+      jest.spyOn(biolabsSourceRepository, 'findOne').mockResolvedValue(mockRcBiolabsSources);
       let result = await residentCompanyService.getRcBiolabsSources([1, 2])
       expect(result).toBe(mockRcBiolabsSources);
     })
@@ -425,7 +550,7 @@ describe('ResidentCompanyService', () => {
     let mockRcMembers: Array<any> = [{ "id": 1, "companyId": 1, "name": "Antibody", "title": "Test", "email": "test@biolabs.in", "phone": "999999999", "linkedinLink": "testlink.in", "status": "0" }];
     it('should return array of resident company Members', async () => {
       jest.spyOn(residentCompanyManagementRepository, 'find').mockResolvedValueOnce(mockRcMembers);
-      let result = await residentCompanyService.getRcModalities(1)
+      let result = await residentCompanyService.getRcMembers(1)
       expect(result).not.toBeNull();
     })
   });
@@ -433,8 +558,10 @@ describe('ResidentCompanyService', () => {
   describe('getRcAdvisors method', () => {
     let mockRcAdvisors: Array<any> = [{ "id": 1, "companyId": 1, "name": "TestName", "title": "Test1", "organization": "biolabs", "status": "1", "createdAt": "2021-07-08 13:24:22.972671" }];
     it('should return array of resident company Advisors', async () => {
-      jest.spyOn(residentCompanyAdvisoryRepository, 'find').mockResolvedValueOnce(mockRcAdvisors);
-      let result = await residentCompanyService.getRcModalities(1)
+      if (1) {
+        jest.spyOn(residentCompanyAdvisoryRepository, 'find').mockResolvedValueOnce(mockRcAdvisors);
+      }
+      let result = await residentCompanyService.getRcAdvisors(1)
       expect(result).not.toBeNull();
     })
   });
@@ -443,12 +570,12 @@ describe('ResidentCompanyService', () => {
     let mockRcTechnicalTeams: Array<any> = [{ "id": 1, "companyId": 1, "name": "TestName", "title": "Test1", "email": "test1@biolabs.in", "phone": "9999955555", "linkedinLink": "testlink1.in", "status": "0" }];
     it('should return array of resident company Technical teams', async () => {
       jest.spyOn(residentCompanyTechnicalRepository, 'find').mockResolvedValueOnce(mockRcTechnicalTeams);
-      let result = await residentCompanyService.getRcModalities(1)
+      let result = await residentCompanyService.getRcTechnicalTeams(1)
       expect(result).not.toBeNull();
     })
   });
 
-  describe('getResidentCompanyForSponsor method', () => {
+  describe('getResidentCompanyForSponsorBySite method', () => {
     let mockRCSponsers: Array<any> = [{ "newStartUps": 0, "site": 0, "graduate": 0, "companyStats": 0, "categoryStats": 0 }];
     let mockRecidentCompanies = { companyStats: 0, graduate: 0, categoryStats: 0 }
     it('should return array of Resident companies for Sponser', async () => {
@@ -469,18 +596,63 @@ describe('ResidentCompanyService', () => {
           "where c.id = ANY(rc.industry::int[]) and " + 1 + " = ANY(rc.site::int[])  ) as industryCount " +
           " FROM public.categories as c order by industryCount desc limit 3;");
       jest.spyOn(residentCompanyService, 'getResidentCompanyForSponsorBySite').mockResolvedValueOnce(mockRCSponsers);
-      let result = await residentCompanyService.getResidentCompanyForSponsorBySite()
+      let result = await residentCompanyService.getResidentCompanyForSponsorBySite();
       expect(result).toBe(mockRCSponsers);
     })
   });
 
   describe('getResidentCompany method', () => {
-    let mockRC = { "id": 1, "name": "Antibody", "status": "1", "createdAt": "2021-07-08 13:24:22.972671" };
     it('should return array of resident companies', async () => {
-      jest.spyOn(residentCompanyService, 'getResidentCompany').mockResolvedValueOnce(mockRC);
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
       let result = await residentCompanyService.getResidentCompany(mockRC.id)
       expect(result).not.toBeNull();
     })
+    it('should throw exception if company with provided id not available.', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(null);
+      try {
+        await residentCompanyService.getResidentCompany(new NotAcceptableException(
+          'Company with provided id not available.'));
+      } catch (e) {
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe("Company with provided id not available.")
+      }
+    });
+  });
+  describe('updateResidentCompanyStatus method', () => {
+    let payload: UpdateResidentCompanyStatusPayload = {
+      "companyId": 3,
+      "companyStatus": "1",
+      "companyVisibility": true,
+      "companyOnboardingStatus": true,
+      "committeeStatus": "2",
+      "selectionDate": new Date("2021-07-14"),
+      "companyStatusChangeDate": new Date("2021-07-14")
+    };
+    it('should return array of resident companies', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
+      let result = await residentCompanyService.updateResidentCompanyStatus(payload)
+      expect(result).not.toBeNull();
+    })
+    it('should return array of resident companies', async () => {
+      mockRC.companyStatus = '2';
+      if (Number(mockRC.companyStatus) !== 1) {
+        mockRC.companyOnboardingStatus = false;
+        mockRC.companyVisibility = false;
+        jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
+      }
+      let result = await residentCompanyService.updateResidentCompanyStatus(payload)
+      expect(result).not.toBeNull();
+    })
+    it('should throw exception if company with provided id not available.', async () => {
+      jest.spyOn(residentCompanyRepository, 'update').mockRejectedValueOnce(new NotAcceptableException(
+        'Company with provided id not available.'))
+      try {
+        await residentCompanyService.updateResidentCompanyStatus(payload);
+      } catch (e) {
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe("Company with provided id not available.")
+      }
+    });
   });
 
   describe('gloabalSearchCompaniesOld method', () => {
@@ -512,18 +684,17 @@ describe('ResidentCompanyService', () => {
     })
   });
 
-  // describe('getNoteById method', () => {
-  //   let mockNotes= {id: 1,createdBy: 1,status:"1",createdAt:1626134400,notesStatus:1,notes:"Test"};
-  //    it('should return object of note', async () => {
-  //     // jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(mockNotes);
-  //     let result=await residentCompanyService.getResidentCompany(mockRC.id)
-  //        expect(result).toBe(mockNotes);
-  //    })
-  // });
+  describe('getNoteById method', () => {
+    let mockNotes: Notes = { id: 1, createdBy: 1, createdAt: new Date(), residentCompany: new ResidentCompany(), notesStatus: 1, notes: "Test" };
+    it('should return object of note', async () => {
+      jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(mockNotes);
+      let result = await residentCompanyService.getNoteById(mockNotes.id);
+      expect(result).not.toBeNull();
+      expect(result).toBe(mockNotes);
+    })
+  });
 
   describe('getNoteByCompanyId method', () => {
-    let mockSites: Array<any> = [{ "id": 2, "name": "Ipsen" }, { "id": 1, "name": "Tufts" }];
-    let mockNotes: Notes = { id: 1, createdBy: 1, createdAt: new Date(), residentCompany: new ResidentCompany(), notesStatus: 1, notes: "Test" };
     it('should return object of Note', async () => {
       notesRepository
         .createQueryBuilder('notes')
@@ -537,22 +708,34 @@ describe('ResidentCompanyService', () => {
         .andWhere("notes.residentCompanyId = :residentCompanyId", { residentCompanyId: 1 })
         .orderBy("notes.createdAt", "DESC")
         .getRawMany();
-      jest.spyOn(siteRepository, 'find').mockResolvedValueOnce(mockSites);
-      let result = await residentCompanyService.getResidentCompanyForSponsorBySite()
+      let result = await residentCompanyService.getNoteByCompanyId(mockRC.id);
       expect(result).not.toBeNull();
     })
   });
-
-
+  describe('addNote method', () => {
+    const req: any = {
+      user: { site_id: [1, 2], role: 1 }
+    };
+    const payload: AddNotesDto = { "companyId": 1, "notes": "this is note 1" };
+    it('should add note data ', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
+      const note = new Notes();
+      note.createdBy = req.user.id;
+      note.notes = payload.notes;
+      note.residentCompany = mockRC;
+      jest.spyOn(notesRepository, 'save').mockResolvedValueOnce(mockNotes);
+      const notes = await residentCompanyService.addNote(payload, req);
+      expect(notes).not.toBeNull();
+      expect(notes).toBe(mockNotes);
+    })
+  });
   describe('softDeleteNote method', () => {
-    let mockNotes: Notes = { id: 1, createdBy: 1, createdAt: new Date(), residentCompany: new ResidentCompany(), notesStatus: 1, notes: "Test" };
     it('should delete data based on id', async () => {
       jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(mockNotes);
       jest.spyOn(notesRepository, 'save').mockResolvedValueOnce(mockNotes);
       const notes = await residentCompanyService.softDeleteNote(mockNotes.id);
       expect(notes).toBe(mockNotes);
     })
-
     it('it should throw exception if note id is not provided  ', async () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
       try {
@@ -579,12 +762,12 @@ describe('ResidentCompanyService', () => {
     })
 
     it('it should throw exception if member id is not provided  ', async () => {
-      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+      jest.spyOn(residentCompanyAdvisoryRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Member with provided id not available.'));
       try {
-        await residentCompanyService.softDeleteNote(new NotAcceptableException('Member with provided id not available.'));
+        await residentCompanyService.softDeleteMember(1, "advisors");
       } catch (e) {
         expect(e.response.error).toBe('Not Acceptable');
-        // expect(e.response.message).toBe('User with provided id not available.');
+        expect(e.response.message).toBe('Member with provided id not available.');
         expect(e.response.statusCode).toBe(406);
       }
     });
@@ -633,6 +816,14 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull()
     })
   });
+  describe('getFeeds method', () => {
+    let companyId = 1;
+    it('should return object', async () => {
+      residentCompanyHistoryRepository.query("SELECT feeds(" + companyId + ")");
+      let result = await residentCompanyService.getFeeds(1, 1);
+      expect(result).not.toBeNull();
+    })
+  });
 
   describe('getstartedWithBiolabs method', () => {
 
@@ -662,15 +853,6 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull()
     })
   });
-
-  // describe('getFeeds method', () => {
-
-  //   it('should return array of feeds', async () => {
-  //    let result=await residentCompanyService.getFeeds(1,1)
-  //      expect(result).not.toBeNull()
-  //   })
-  // });
-
   describe('timelineAnalysis method', () => {
 
     it('should return array of timeline history', async () => {
