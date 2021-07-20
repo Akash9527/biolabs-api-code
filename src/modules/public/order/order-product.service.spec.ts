@@ -6,7 +6,7 @@ import { OrderProductService } from './order-product.service';
 import { ResidentCompany } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
-import { HttpException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 const createMockRepository = <T = any>(): MockRepository<T> => ({
@@ -53,14 +53,34 @@ describe('Order Product Service', () => {
                             getRawMany: jest.fn().mockReturnThis(),
                             query: jest.fn()
                         })),
-                        find: jest.fn(),
-                        findOne: jest.fn(),
+                        find: jest.fn(() => {
+                            return {
+                                catch: jest.fn(),
+                            }
+                        }),
+                        findOne: jest.fn(() => {
+                            return {
+                                catch: jest.fn(),
+                            }
+                        }),
                         findByIds: jest.fn(),
-                        save: jest.fn(),
+                        save: jest.fn(() => {
+                            return {
+                                catch: jest.fn(),
+                            }
+                        }),
                         query: jest.fn(),
                         create: jest.fn(),
-                        delete: jest.fn()
-
+                        delete: jest.fn(() => {
+                            return {
+                                catch: jest.fn(),
+                            }
+                        }),
+                        update: jest.fn(() => {
+                            return {
+                                catch: jest.fn(),
+                            }
+                        }),
                     }
                 },
                 {
@@ -119,11 +139,10 @@ describe('Order Product Service', () => {
             quantity: 1
         } as CreateOrderProductDto;
         it('should add/create order product', async () => {
-            // jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(orderProductDto);
-            // jest.spyOn(orderProductRepository, 'create').mockResolvedValueOnce(orderProductDto);
-            // jest.spyOn(orderProductRepository, 'save').mockResolvedValueOnce(orderProductDto);
-            //  const product = await orderProductService.addOrderProduct(orderProductDto);
-            //console.log("product:::::::::::::::::::::::::::::::::::::::::::::::"+JSON.stringify(product));
+            jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(orderProductDto);
+            jest.spyOn(orderProductRepository, 'create').mockResolvedValueOnce(orderProductDto);
+            jest.spyOn(orderProductRepository, 'save').mockResolvedValueOnce(orderProductDto);
+            const product = await orderProductService.addOrderProduct(orderProductDto);
         });
 
         it('should validate the start date', async () => {
@@ -171,17 +190,22 @@ describe('Order Product Service', () => {
             month: 12,
             quantity: 1
         } as UpdateOrderProductDto;
+        const orderProducts = [{ orderProductDto }];
         it('should update order product', async () => {
             // orderProductRepository.findOne.mockReturnValue(orderProductDto);
-            // await orderProductRepository.create.mockReturnValue(orderProductDto);
-            // await orderProductRepository.save.mockReturnValue(orderProductDto);
-            // expect(orderProductRepository.findOne).not.toHaveBeenCalled();
-            // const product = await orderProductService.updateOrderProduct(id,orderProductDto);
-            // console.log("product"+product)
-            // expect(orderProductRepository.create).not.toHaveBeenCalled();
-            // expect(orderProductRepository.save).not.toHaveBeenCalled();
-            // expect(product).toMatchObject(orderProductDto);
-        });
+            jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(orderProductDto);
+            jest.spyOn(orderProductRepository, 'create').mockResolvedValueOnce(orderProductDto);
+            jest.spyOn(orderProductRepository, 'save').mockResolvedValueOnce(orderProductDto);
+            if (!orderProductDto.recurrence) {
+                for await (const product of orderProducts) {
+                    jest.spyOn(orderProductRepository, 'delete').mockResolvedValueOnce(product);
+                }
+            }
+            jest.spyOn(orderProductRepository, 'update').mockResolvedValueOnce(orderProductDto);
+            await orderProductService.updateOrderProduct(id, orderProductDto);
+
+        })
+       
         it('should validate the start date', async () => {
             orderProductDto.startDate = "start date";
             orderProductDto.endDate = "end date"
@@ -277,11 +301,11 @@ describe('Order Product Service', () => {
                 month: 12,
                 quantity: 1
             }
-            // jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(mockOreProduct);
-            // jest.spyOn(orderProductRepository, 'create').mockResolvedValueOnce(mockOreProduct);
-            // jest.spyOn(orderProductRepository, 'save').mockResolvedValueOnce(mockOreProduct);
-            // const product = await orderProductService.addFutureOrderProducts(mockOreProduct);
-            // expect(product).toMatchObject(mockOreProduct);
+            jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(mockOreProduct);
+            jest.spyOn(orderProductRepository, 'create').mockResolvedValueOnce(mockOreProduct);
+            jest.spyOn(orderProductRepository, 'save').mockResolvedValueOnce(mockOreProduct);
+            const product = await orderProductService.addFutureOrderProducts(mockOreProduct);
+            //expect(product).toMatchObject(mockOreProduct);
         });
     });
 
