@@ -12,6 +12,12 @@ export class Site {
   @Column({ length: 255 })
   name: string;
 
+  @Column({ length: 255, nullable: true })
+  longName: string;
+
+  @Column({ length: 255, nullable: true })
+  standardizedAddress: string;
+
   @Column({ length: 255, enum: ['-1', '0', '1', '99'] })
   status: status_enum;
 

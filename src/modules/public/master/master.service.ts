@@ -73,7 +73,7 @@ export class MasterService {
     }
 
     return await this.siteRepository.find({
-      select: ["id", "name"],
+      select: ["id", "name", "longName", "standardizedAddress"],
       where: search,
       order: { ['name']: 'ASC' },
       skip,
@@ -104,12 +104,13 @@ export class MasterService {
    */
   async createSites() {
     const sites = this.getSites(new MasterPayload());
+    // await this.siteRepository.delete({}); //delete all the entries first
     let resp = {};
     return await sites.then(async data => {
       const _sites = migrationData['sites'];
       for (const _site of _sites) {
         if (!data.find(r => r.name == _site.name)) {
-          resp[_site.name] = await this.createSite(_site.name, _site.id);
+          resp[_site.name] = await this.createSite(_site.name, _site.id, _site.longName, _site.standardizedAddress);
         }
         if (_site.name == _site[_site.length - 1]) {
           return resp;
@@ -128,10 +129,10 @@ export class MasterService {
    * @param id number
    * @return site object
    */
-  async createSite(name: string, id: number) {
+  async createSite(name: string, id: number, longName: string, standardizedAddress: string) {
     const status: status_enum = '1';
     const payload = {
-      id, name, status
+      id, name, status, longName, standardizedAddress
     }
     return await this.siteRepository.save(this.siteRepository.create(payload));
   }

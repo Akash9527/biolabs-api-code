@@ -95,11 +95,21 @@
     "sites": [
         {
             "name": "Tufts",
+            "longName": "Tufts Launchpad",
+            "standardizedAddress": "75 Kneeland St, 14th Floor Boston, MA 02111",
             "id": 1
         },
         {
             "name": "Ipsen",
+            "longName": "Ipsen Innovation Cente",
+            "standardizedAddress": "650 E Kendall St 2nd Floor, Cambridge, MA 02142",
             "id": 2
+        },
+        {
+            "name": "Eisai",
+            "longName": "Eisai Innovation Center BioLabs",
+            "standardizedAddress": "35 Cambridge Park Drive, Cambridge, MA 02140 2nd Floor",
+            "id": 3
         }
     ],
     "fundings": [
