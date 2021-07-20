@@ -1517,6 +1517,9 @@ order by quat;
       residentCompany.fundingSource = payload.fundingSource;
       residentCompany.companySize = payload.companySize;
       await this.residentCompanyRepository.update(residentCompany.id, residentCompany);
+
+      /** Update Resident Company history */
+      this.updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload, residentCompany);
     } catch {
       response['status'] = 'error';
       response['message'] = 'Could not add item in space change wait list';
@@ -1525,6 +1528,23 @@ order by quat;
     response['status'] = 'Success';
     response['message'] = 'Operation Successful';
     return response;
+  }
+
+  /**
+   * Description: Update Resident Company History after saving record in space_change_waitlist table.
+   * @description Update Resident Company History after saving record in space_change_waitlist table.
+   * @param payload ResidentCompany history data
+   * @param residentCompany ResidentCompany object
+   */
+  private async updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload: any, residentCompany: ResidentCompany) {
+    let historyData: any = JSON.parse(JSON.stringify(residentCompany));
+    historyData.companyStage = payload.companyStage;
+    historyData.funding = payload.funding;
+    historyData.fundingSource = payload.fundingSource;
+    historyData.companySize = payload.companySize;
+    historyData.comnpanyId = residentCompany.id;
+    delete historyData.id;
+    await this.residentCompanyHistoryRepository.save(historyData);
   }
 
   /**
