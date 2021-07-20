@@ -379,11 +379,15 @@ export class ResidentCompanyController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  @Get('/spacechangewaitlist/items/:siteId/:companyId')
+  @Get('/spacechangewaitlist/items/:companyId')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getItemsForSpaceChangeWaitlist(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
-    return this.residentCompanyService.getSpaceChangeWaitlistItems(siteId, companyId);
+  async getItemsForSpaceChangeWaitlist(@Param('companyId') companyId: number, @Request() req): Promise<any> {
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return this.residentCompanyService.getSpaceChangeWaitlistItems(siteIdArr, companyId);
   }
 
   /**

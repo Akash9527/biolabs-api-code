@@ -1623,7 +1623,7 @@ order by quat;
    * @param companyId id of Company
    * @returns list of items
    */
-  public async getSpaceChangeWaitlistItems(siteId: number, companyId: number) {
+  public async getSpaceChangeWaitlistItems(siteId: number[], companyId: number) {
     const response = {};
     const queryStr = `
     SELECT 
@@ -1638,7 +1638,7 @@ order by quat;
                  pt.id as product_type_id 
           FROM product as pr
           JOIN product_type as pt on pt.id = pr."productTypeId"
-          WHERE "siteId" = '{${siteId}}'
+          WHERE "siteId" && ARRAY[` + siteId + `]::int[]
                 ) as tb
           on tb.pid = op."productId"
       WHERE op."manuallyEnteredProduct" = false
