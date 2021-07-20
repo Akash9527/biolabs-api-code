@@ -193,7 +193,6 @@ describe('Order Product Service', () => {
         } as UpdateOrderProductDto;
         const orderProducts = [{ orderProductDto }];
         it('should update order product', async () => {
-            // orderProductRepository.findOne.mockReturnValue(orderProductDto);
             jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(orderProductDto);
             jest.spyOn(orderProductRepository, 'find').mockResolvedValueOnce(orderProducts);
             jest.spyOn(orderProductRepository, 'create').mockResolvedValueOnce(orderProductDto);
@@ -205,7 +204,21 @@ describe('Order Product Service', () => {
             }
             jest.spyOn(orderProductRepository, 'update').mockResolvedValueOnce(orderProductDto);
             await orderProductService.updateOrderProduct(id, orderProductDto);
+        })
 
+        it('should update order product with recurence false', async () => {
+            orderProductDto.recurrence=false;
+            jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(orderProductDto);
+            jest.spyOn(orderProductRepository, 'find').mockResolvedValueOnce(orderProducts);
+            jest.spyOn(orderProductRepository, 'create').mockResolvedValueOnce(orderProductDto);
+            jest.spyOn(orderProductRepository, 'save').mockResolvedValueOnce(orderProductDto);
+            if (!orderProductDto.recurrence) {
+                for await (const product of orderProducts) {
+                    jest.spyOn(orderProductRepository, 'delete').mockResolvedValueOnce(product);
+                }
+            }
+            jest.spyOn(orderProductRepository, 'update').mockResolvedValueOnce(orderProductDto);
+            await orderProductService.updateOrderProduct(id, orderProductDto);
         })
        
         it('should validate the start date', async () => {
