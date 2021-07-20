@@ -33,6 +33,9 @@ export class OrderProduct {
   @Column({ nullable: true, type: "float"})
   cost: number;
 
+  @Column({ nullable: true})
+  groupId: number;
+
   @Column({ nullable: true })
   quantity: number;
 

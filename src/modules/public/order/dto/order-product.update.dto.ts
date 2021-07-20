@@ -28,6 +28,12 @@ export class UpdateOrderProductDto {
     required: false,
     nullable: true,
   })
+  groupId: number;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
   recurrence: boolean;
 
   @ApiProperty({
