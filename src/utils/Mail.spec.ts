@@ -3,11 +3,11 @@ import { Mail } from "../utils/Mail";
 
 describe('PasswordTransformer', () => {
     let mail;
-    let tenant: any = {};
-    let token: any = {};
-    let subject: string;
-    let content: string;
-    let userInfo: any = {}
+    let tenant: any = {"tenantEmail":"test@biolabs.io","officialEmail":"test@biolabs.io","role":"test"};
+    let token: any = {"token_type":"token_type","access_token":"access_token"};
+    let subject: string="Biolabs mail";
+    let content: string="test message";
+    let userInfo: any = {"userName":"test","origin":"tets-origin","token":"100000000"}
     beforeEach(async () => {
         const module = await Test.createTestingModule({
             providers: [
@@ -52,6 +52,8 @@ describe('PasswordTransformer', () => {
 
     it('should test sendEmail method ', () => {
         mail.sendEmail(tenant, subject, content, userInfo);
+       // expect(mail.getGrapAPIToken).toHaveBeenCalled();
+        //expect(mail.sendEmailGraphAPI).toHaveBeenCalledWith(tenant, token, subject, content, userInfo);
     });
 
 });
