@@ -7,6 +7,7 @@ import { ResidentCompany } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { Product } from './model/product.entity';
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 const createMockRepository = <T = any>(): MockRepository<T> => ({
@@ -27,6 +28,7 @@ const createMockRepository = <T = any>(): MockRepository<T> => ({
 describe('Order Product Service', () => {
     let orderProductService;
     let orderProductRepository;
+    let productRepository;
     let residentCompanyRepository: Repository<ResidentCompany>;
 
     beforeEach(async () => {
@@ -108,6 +110,32 @@ describe('Order Product Service', () => {
                         save: jest.fn(),
                         query: jest.fn()
                     }
+                },
+                {
+                    provide: getRepositoryToken(Product), useValue: {
+                        createQueryBuilder: jest.fn(() =>
+                        ({
+                            addSelect: jest.fn().mockReturnThis(),
+                            where: jest.fn().mockReturnThis(),
+                            setParameter: jest.fn().mockReturnThis(),
+                            getOne: jest.fn().mockReturnThis(),
+                            leftJoin: jest.fn().mockReturnThis(),
+                            select: jest.fn().mockReturnThis(),
+                            andWhere: jest.fn().mockReturnThis(),
+                            getRawOne: jest.fn().mockReturnThis(),
+                            orderBy: jest.fn().mockReturnThis(),
+                            addOrderBy: jest.fn().mockReturnThis(),
+                            skip: jest.fn().mockReturnThis(),
+                            take: jest.fn().mockReturnThis(),
+                            getMany: jest.fn().mockReturnThis(),
+                            getRawMany: jest.fn().mockReturnThis(),
+                            query: jest.fn()
+                        })),
+                        find: jest.fn(),
+                        findOne: jest.fn(),
+                        save: jest.fn(),
+                        query: jest.fn()
+                    }
                 }
             ]
         }).compile();
@@ -115,6 +143,7 @@ describe('Order Product Service', () => {
         orderProductService = await module.get<OrderProductService>(OrderProductService);
         residentCompanyRepository = await module.get<Repository<ResidentCompany>>(getRepositoryToken(ResidentCompany));
         orderProductRepository = await module.get<MockRepository>(getRepositoryToken(OrderProduct));
+        productRepository = await module.get<MockRepository>(getRepositoryToken(Product));
     });
 
     it('should be defined', () => {
@@ -192,7 +221,8 @@ describe('Order Product Service', () => {
             year: 2000,
             month: 12,
             quantity: 1,
-            groupId :1
+            groupId :1,
+            productTypeId:1
         } as UpdateOrderProductDto;
         const orderProducts = [{ orderProductDto }];
         it('should update order product', async () => {
