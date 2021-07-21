@@ -1,15 +1,21 @@
-import { HttpException, HttpStatus, Injectable, NotAcceptableException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotAcceptableException, Request } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EMAIL } from 'constants/email';
-import { Request } from 'express';
 import { In, Like, Repository } from 'typeorm';
 import { Mail } from '../../../utils/Mail';
+import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
+import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
+import { Item } from '../entity/item.entity';
+import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
+import { MembershipChangeEnum } from '../enum/membership-change-enum';
+import { RequestStatusEnum } from '../enum/request-status-enum';
 import { BiolabsSource } from '../master/biolabs-source.entity';
 import { Category } from '../master/category.entity';
 import { Funding } from '../master/funding.entity';
 import { Modality } from '../master/modality.entity';
 import { Site } from '../master/site.entity';
 import { TechnologyStage } from '../master/technology-stage.entity';
+import { ProductTypeService } from '../order/product-type.service';
 import { User } from '../user';
 import { AddNotesDto } from './add-notes.dto';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
@@ -24,8 +30,6 @@ import { ResidentCompany } from './resident-company.entity';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
-
-
 
 
 @Injectable()
@@ -59,7 +63,12 @@ export class ResidentCompanyService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Notes)
     private readonly notesRepository: Repository<Notes>,
+    @InjectRepository(SpaceChangeWaitlist)
+    private readonly spaceChangeWaitlistRepository: Repository<SpaceChangeWaitlist>,
+    @InjectRepository(Item)
+    private readonly itemRepository: Repository<Item>,
     private readonly mail: Mail,
+    private readonly productTypeService: ProductTypeService
   ) { }
   /**
    * Description: This method will get the resident company by id.
@@ -293,6 +302,9 @@ export class ResidentCompanyService {
           historyData.comnpanyId = savedRc.id;
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
+
+          /** Create waitlist entry while saving Resident Company */
+          await this.addResidentCompanyDataInWaitlist(savedRc);
         }
       }
       await this.sendEmailToSiteAdmin(sites, req, payload.companyName);
@@ -408,6 +420,30 @@ export class ResidentCompanyService {
       rcQuery.skip(skip).take(take)
     }
     return await rcQuery.getRawMany();
+  }
+
+  /**
+   * Description: This method will return a resident company by id.
+   * @description This method will return a resident company by id.
+   * @param payload an id of ResidentCompany
+   * @return an objecdt of ResidentCompany
+   */
+  public async getResidentCompanySpecificFieldsById(residentCompanyId: number) {
+    let response = {};
+    let residentCompanyObj = await this.fetchResidentCompanyById(residentCompanyId);
+    if (residentCompanyObj) {
+      response['residentCompanyId'] = residentCompanyObj.id;
+      response['companyStageOfDevelopment'] = residentCompanyObj.companyStage;
+      response['fundingToDate'] = residentCompanyObj.funding;
+      response['fundingSource'] = residentCompanyObj.fundingSource;
+      response['TotalCompanySize'] = residentCompanyObj.companySize;
+      response['canWeShareYourDataWithSponsorsEtc'] = residentCompanyObj.shareYourProfile;
+      return response;
+    } else {
+      throw new NotAcceptableException(
+        'Resident Company not found by id: ' + residentCompanyId,
+      );
+    }
   }
 
   /**
@@ -1362,5 +1398,279 @@ order by quat;
             order by quat;
     `;
     return await this.residentCompanyHistoryRepository.query(queryStr);
+  }
+
+  /**
+   * @description Create waitlist entry while saving Resident Company
+   * @param savedRc
+   * @param req
+   */
+  private async addResidentCompanyDataInWaitlist(savedRc: any) {
+    const PLAN_CHANGE_SUMMARY_INITIAL_VALUE = 'See Notes';
+    const REQUEST_NOTES_INITIAL_VALUE = 'When would you like to join BioLabs?, What equipment and facilities do you plan to primarily use onsite?**';
+    const maxPriorityOrder: number = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
+      return result;
+    });
+
+    let productTypes: any = await this.productTypeService.getProductType().then((result) => {
+      return result;
+    });
+
+    let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
+    spaceChangeWaitlistObj.residentCompany = savedRc;
+    spaceChangeWaitlistObj.desiredStartDate = null;
+    spaceChangeWaitlistObj.planChangeSummary = PLAN_CHANGE_SUMMARY_INITIAL_VALUE;
+    spaceChangeWaitlistObj.requestedBy = savedRc.name;
+    spaceChangeWaitlistObj.requestStatus = RequestStatusEnum.Open;
+    spaceChangeWaitlistObj.fulfilledOn = null;
+    spaceChangeWaitlistObj.isRequestInternal = true;
+    spaceChangeWaitlistObj.requestNotes = REQUEST_NOTES_INITIAL_VALUE;
+    spaceChangeWaitlistObj.internalNotes = null;
+    spaceChangeWaitlistObj.siteNotes = null;
+    spaceChangeWaitlistObj.priorityOrder = maxPriorityOrder;
+    spaceChangeWaitlistObj.site = savedRc.site;
+    spaceChangeWaitlistObj.membershipChange = MembershipChangeEnum.UpdateMembership;
+    spaceChangeWaitlistObj.requestGraduateDate = null;
+    spaceChangeWaitlistObj.marketPlace = null;
+
+    const resp = await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj);
+
+    if (productTypes) {
+      for (let index = 0; index < productTypes.length; index++) {
+        let item: Item = new Item();
+        item.productTypeId = productTypes[index].id;
+        item.itemName = productTypes[index].productTypeName;
+        item.currentQty = 0;
+        item.desiredQty = 0;
+        item.spaceChangeWaitlist = resp;
+        item.spaceChangeWaitlist_id = resp.id;
+        await this.itemRepository.save(this.itemRepository.create(item));
+      }
+    }
+  }
+
+  /**
+   * @description Fetch max value of priority order from space_change_waitlist table
+   * @returns
+   */
+  private async fetchMaxPriorityOrderOfWaitlist(): Promise<number> {
+    const REQUEST_STATUS_OPEN = 0;
+    let maxPriorityOrder: any = await this.spaceChangeWaitlistRepository
+      .createQueryBuilder(`space_change_waitlist`)
+      .select(`MAX(space_change_waitlist.priorityOrder)`, `max`)
+      .where('space_change_waitlist.requestStatus = :requestStatus')
+      .setParameter('requestStatus', REQUEST_STATUS_OPEN)
+      .getRawOne();
+    if (maxPriorityOrder && (maxPriorityOrder.max != null || maxPriorityOrder.max == 0)) {
+      return maxPriorityOrder.max + 1;
+    } else {
+      return 0;
+    }
+  }
+
+  /**
+   * @description BIOL-275: Add an entry of space change wait list
+   * @param payload
+   * @param req
+   * @returns
+   */
+  public async addToSpaceChangeWaitList(payload: AddSpaceChangeWaitlistDto, @Request() req): Promise<any> {
+    const APPROVED_DENIED_PRIORITY_ORDER = -1;
+    const residentCompany: ResidentCompany = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
+      return result;
+    });
+    let response = {};
+    if (residentCompany == null) {
+      response['status'] = 'Error';
+      response['message'] = 'Resident Company not found by id: ' + payload.residentCompanyId;
+      return response;
+    }
+
+    let maxPriorityOrder: number;
+    if (payload.requestStatus == 0) {
+      maxPriorityOrder = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
+        return result;
+      });
+    } else {
+      maxPriorityOrder = APPROVED_DENIED_PRIORITY_ORDER;
+    }
+
+    try {
+      let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
+      spaceChangeWaitlistObj.residentCompany = residentCompany;
+      spaceChangeWaitlistObj.desiredStartDate = payload.desiredStartDate;
+      spaceChangeWaitlistObj.planChangeSummary = payload.planChangeSummary;
+      spaceChangeWaitlistObj.requestedBy = residentCompany.name;
+      spaceChangeWaitlistObj.requestStatus = payload.requestStatus;
+      spaceChangeWaitlistObj.fulfilledOn = payload.fulfilledOn;
+      spaceChangeWaitlistObj.isRequestInternal = payload.isRequestInternal;
+      spaceChangeWaitlistObj.requestNotes = payload.requestNotes;
+      spaceChangeWaitlistObj.internalNotes = payload.internalNotes;
+      spaceChangeWaitlistObj.siteNotes = payload.siteNotes;
+      spaceChangeWaitlistObj.priorityOrder = maxPriorityOrder;
+      let siteIdArr = req.user.site_id;
+      // if (req.headers['x-site-id']) {
+      //   siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+      // }
+      spaceChangeWaitlistObj.site = siteIdArr;
+      spaceChangeWaitlistObj.membershipChange = payload.membershipChange;
+      spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
+      spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
+
+      const resp = await this.spaceChangeWaitlistRepository.save(this.spaceChangeWaitlistRepository.create(spaceChangeWaitlistObj));
+
+      for (let itemDto of payload.items) {
+        let itemObj: Item = new Item();
+
+        itemObj.productTypeId = itemDto.productTypeId;
+        itemObj.itemName = itemDto.itemName;
+        itemObj.currentQty = itemDto.currentQty;
+        itemObj.desiredQty = itemDto.desiredQty;
+        itemObj.spaceChangeWaitlist = resp;
+        await this.itemRepository.save(this.itemRepository.create(itemObj));
+      }
+
+      residentCompany.companyStage = payload.companyStage;
+      residentCompany.funding = payload.funding;
+      residentCompany.fundingSource = payload.fundingSource;
+      residentCompany.companySize = payload.companySize;
+      await this.residentCompanyRepository.update(residentCompany.id, residentCompany);
+
+      /** Update Resident Company history */
+      this.updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload, residentCompany);
+    } catch {
+      response['status'] = 'error';
+      response['message'] = 'Could not add item in space change wait list';
+    }
+
+    response['status'] = 'Success';
+    response['message'] = 'Operation Successful';
+    return response;
+  }
+
+  /**
+   * Description: Update Resident Company History after saving record in space_change_waitlist table.
+   * @description Update Resident Company History after saving record in space_change_waitlist table.
+   * @param payload ResidentCompany history data
+   * @param residentCompany ResidentCompany object
+   */
+  private async updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload: any, residentCompany: ResidentCompany) {
+    let historyData: any = JSON.parse(JSON.stringify(residentCompany));
+    historyData.companyStage = payload.companyStage;
+    historyData.funding = payload.funding;
+    historyData.fundingSource = payload.fundingSource;
+    historyData.companySize = payload.companySize;
+    historyData.comnpanyId = residentCompany.id;
+    delete historyData.id;
+    await this.residentCompanyHistoryRepository.save(historyData);
+  }
+
+  /**
+   * @description BIOL-275: fetch a resident company by id from db
+   * @param residentCompanyId 
+   * @returns 
+   */
+  private async fetchResidentCompanyById(residentCompanyId: number) {
+    return await this.residentCompanyRepository.findOne(residentCompanyId);
+  }
+
+  /**
+   *  Description: BIOL-275 GET spacechange waitlist by status, siteId and companyId.
+   * @description GET spacechange waitlist by status, siteId and companyId.
+   * @param statusArr array of status (0,1,2)
+   * @param siteIdArr array of siteId
+   * @param companyId id if the company
+   * @returns list of Space Change Waitlist
+   */
+  public async getSpaceChangeWaitListByStatusSiteIdAndCompanyId(statusArr: number[], siteIdArr: number[], companyId: number): Promise<any> {
+    let response = {};
+    let status: number[] = [];
+    for (let index = 0; index < statusArr.length; index++) {
+      status.push(Number(statusArr[index]));
+    }
+
+    let waitlistQuery = await this.spaceChangeWaitlistRepository.createQueryBuilder("space_change_waitlist")
+      .select("space_change_waitlist.*")
+      .addSelect("rc.companyName", "residentCompanyName")
+      .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
+      .where("space_change_waitlist.requestStatus IN (:...status)", { status: status });
+
+    if (siteIdArr && siteIdArr.length) {
+      waitlistQuery.andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+    }
+    if (companyId && companyId != undefined && companyId > 0) {
+      waitlistQuery.andWhere("space_change_waitlist.residentCompanyId = :residentCompanyId", { residentCompanyId: companyId });
+    }
+    waitlistQuery.orderBy("space_change_waitlist.priorityOrder", "ASC");
+    let spaceChangeWaitlist: any = await waitlistQuery.getRawMany();
+    response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
+    return response;
+  }
+
+  /**
+   * @description BIOL-275: GET spacechange waitlist by id
+   * @param statusArr
+   * @returns
+   */
+  public async getSpaceChangeWaitListById(id: number): Promise<any> {
+    const response = {};
+
+    let spaceChangeWaitlistObj: any = await this.spaceChangeWaitlistRepository.findOne(id, { relations: ['items'] });
+    if (spaceChangeWaitlistObj) {
+      return spaceChangeWaitlistObj;
+    }
+    response['status'] = 'error';
+    response['message'] = 'Space Change Waitlist not found by id: ' + id;
+    return response;
+  }
+
+  /**
+   * @description Get items for waitlist
+   * @param companyId id of Company
+   * @returns list of items
+   */
+  public async getSpaceChangeWaitlistItems(companyId: number) {
+    const response = {};
+    const month = new Date().getMonth() + 2; // Getting next month from currect date
+    const queryStr = `
+      select pt.id as "productTypeId", COUNT(op."productTypeId"), pt."productTypeName"
+      from product_type as pt
+      Left Join (select "productTypeId" from order_product where "companyId" = ${companyId} and month = ${month} ) as op
+      on pt.id = op."productTypeId"
+      group by op."productTypeId", pt."productTypeName", pt.id
+    `;
+
+    const items = await this.residentCompanyHistoryRepository.query(queryStr);
+    response['items'] = (!items) ? 0 : items;
+    return response;
+  }
+
+  /**
+   * Description: Updates the priority order of Open space change wait list.
+   * @description Updates the priority order of Open space change wait list.
+   * @param payload UpdateWaitlistPriorityOrderDto
+   * @returns response with status and message fields
+   */
+  public async updateSpaceChangeWaitlistPriorityOrder(payload: UpdateWaitlistPriorityOrderDto) {
+    let response = {};
+    try {
+      // Should check arraylength whether it is equal to the number of records with request status = 0 present in db
+      if (payload && payload.spaceChangeWaitlistIds.length > 0) {
+        for (let index = 0; index < payload.spaceChangeWaitlistIds.length; index++) {
+          let obj = await this.spaceChangeWaitlistRepository.findOne(payload.spaceChangeWaitlistIds[index]);
+          obj.priorityOrder = index;
+          await this.spaceChangeWaitlistRepository.update(payload.spaceChangeWaitlistIds[index], obj);
+        }
+        response['status'] = 'Success';
+        response['message'] = 'Priority Order updated successfully';
+      } else {
+        response['status'] = 'Not acceptable';
+        response['message'] = 'Please provide proper Space Change Waitlist ids';
+      }
+    } catch (error) {
+      response['status'] = 'Fail';
+      response['message'] = 'Could not update Priority Order';
+    }
+    return response;
   }
 }

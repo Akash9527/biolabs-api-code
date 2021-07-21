@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { } from '@nestjs/core';
 
 const logger = require('./loggerConfig');
 
