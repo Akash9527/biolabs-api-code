@@ -54,62 +54,36 @@
             "modifiedBy": 1
         }
     ],
-    "sites_ful": [
-        {
-            "name": "Boston - Tufts Launchpad",
-            "id": 1
-        },
-        {
-            "name": "Cambridge - Ipsen Innovation Center",
-            "id": 2
-        },
-        {
-            "name": "New York - NYU Langone",
-            "id": 3
-        },
-        {
-            "name": "North Carolina - Durham",
-            "id": 4
-        },
-        {
-            "name": "Los Angeles - The Lundquist Institute",
-            "id": 5
-        },
-        {
-            "name": "Princeton - Princeton Innovation Center BioLabs",
-            "id": 6
-        },
-        {
-            "name": "Philadelphia - BioLabs at CIC",
-            "id": 7
-        },
-        {
-            "name": "San Diego - Campus Point and Towne Center",
-            "id": 8
-        },
-        {
-            "name": "North Texas - BioLabs at Pegasus Park",
-            "id": 9
-        }
-    ],
     "sites": [
         {
+            "id": 1,
             "name": "Tufts",
             "longName": "Tufts Launchpad",
             "standardizedAddress": "75 Kneeland St, 14th Floor Boston, MA 02111",
-            "id": 1
+            "colorCode": "#6baecf",
+            "googleMapUrl": "https://goo.gl/maps/J6KRZNuGFrWkk7iG6",
+            "siteMapBoxImgUrl": "",
+            "status": "1"
         },
         {
+            "id": 2,
             "name": "Ipsen",
             "longName": "Ipsen Innovation Cente",
             "standardizedAddress": "650 E Kendall St 2nd Floor, Cambridge, MA 02142",
-            "id": 2
+            "colorCode": "#26294a",
+            "googleMapUrl": "https://goo.gl/maps/PuKw7cvjxKxsApNN7",
+            "siteMapBoxImgUrl": "",
+            "status": "1"
         },
         {
+            "id": 3,
             "name": "Eisai",
             "longName": "Eisai Innovation Center BioLabs",
             "standardizedAddress": "35 Cambridge Park Drive, Cambridge, MA 02140 2nd Floor",
-            "id": 3
+            "colorCode": "#d80c8c",
+            "googleMapUrl": "https://goo.gl/maps/fvAQF8sMtykEk76Z8",
+            "siteMapBoxImgUrl": "",
+            "status": "1"
         }
     ],
     "fundings": [

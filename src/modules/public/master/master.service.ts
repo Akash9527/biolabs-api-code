@@ -1,18 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { COMMITTEE_STATUS } from 'constants/committee_status';
+import { diff } from 'json-diff';
 import { In, Like, Repository } from 'typeorm';
-import { MasterPayload } from './master.payload';
+import { COMPANY_STATUS } from '../../../constants/company-status';
+import { USER_TYPE } from '../../../constants/user-type';
+import { ProductType } from '../order/model/product-type.entity';
 import { BiolabsSource } from './biolabs-source.entity';
 import { Category } from './category.entity';
 import { Funding } from './funding.entity';
+import { MasterPayload } from './master.payload';
 import { Modality } from './modality.entity';
 import { Role } from './role.entity';
 import { Site } from './site.entity';
 import { TechnologyStage } from './technology-stage.entity';
-import { COMPANY_STATUS } from '../../../constants/company-status';
-import { USER_TYPE } from '../../../constants/user-type';
-import { COMMITTEE_STATUS } from 'constants/committee_status';
-import { ProductType } from '../order/model/product-type.entity';
 
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
@@ -73,7 +74,6 @@ export class MasterService {
     }
 
     return await this.siteRepository.find({
-      select: ["id", "name", "longName", "standardizedAddress"],
       where: search,
       order: { ['name']: 'ASC' },
       skip,
@@ -103,38 +103,33 @@ export class MasterService {
    * @return array of site object
    */
   async createSites() {
-    const sites = this.getSites(new MasterPayload());
-    // await this.siteRepository.delete({}); //delete all the entries first
+    const _sites = migrationData['sites'];
     let resp = {};
-    return await sites.then(async data => {
-      const _sites = migrationData['sites'];
-      for (const _site of _sites) {
-        if (!data.find(r => r.name == _site.name)) {
-          resp[_site.name] = await this.createSite(_site.name, _site.id, _site.longName, _site.standardizedAddress);
-        }
-        if (_site.name == _site[_site.length - 1]) {
-          return resp;
-        }
-      }
-    }, error => {
-      if (error)
-        return;
-    })
+    for (const _site of _sites) {
+      resp[_site.name] = await this.createSite(_site);
+    }
+    return resp;
   }
 
   /**
    * Description: This method will store the site.
    * @description This method will store the site.
-   * @param name string
-   * @param id number
+   * @param site site data object
    * @return site object
    */
-  async createSite(name: string, id: number, longName: string, standardizedAddress: string) {
-    const status: status_enum = '1';
-    const payload = {
-      id, name, status, longName, standardizedAddress
+  async createSite(_site: Site) {
+    const existingSite = await this.siteRepository.findOne(_site.id);
+    if (existingSite) {
+      delete existingSite.createdAt;
+      delete existingSite.updatedAt;
     }
-    return await this.siteRepository.save(this.siteRepository.create(payload));
+    // Will compare 2 json and get the difference
+    const changes = diff(existingSite, _site);
+    if (existingSite && changes) {
+      return await this.siteRepository.update(_site.id, _site);
+    } else if (!existingSite) {
+      return await this.siteRepository.save(this.siteRepository.create(_site));
+    }
   }
 
   /**
