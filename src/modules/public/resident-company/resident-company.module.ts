@@ -22,6 +22,9 @@ import { ResidentCompanyHistory } from './resident-company-history.entity';
 import { User } from '../user';
 import { Mail } from '../../../utils/Mail';
 import { Notes } from './rc-notes.entity';
+import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
+import { OrderProductModule } from '../order';
+import { Item } from '../entity/item.entity';
 
 @Module({
   imports: [
@@ -39,9 +42,12 @@ import { Notes } from './rc-notes.entity';
       Site,
       TechnologyStage,
       User,
-      Notes
+      Notes,
+      SpaceChangeWaitlist,
+      Item
     ]),
     ConfigModule,
+    OrderProductModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
 
     JwtModule.registerAsync({

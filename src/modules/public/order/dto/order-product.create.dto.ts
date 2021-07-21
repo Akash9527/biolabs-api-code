@@ -45,6 +45,12 @@ export class CreateOrderProductDto {
     required: true,
     nullable: true,
   })
+  productTypeId: number;
+
+  @ApiProperty({
+    required: true,
+    nullable: true,
+  })
   groupId: number;
 
   @ApiProperty({
