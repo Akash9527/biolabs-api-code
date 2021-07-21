@@ -25,6 +25,10 @@ import { SearchResidentCompanyPayload } from './search-resident-company.payload'
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { AddNotesDto } from "./add-notes.dto";
 import { UpdateResidentCompanyPayload } from "./update-resident-company.payload";
+import { Item } from "../entity/item.entity";
+import { SpaceChangeWaitlist } from "../entity/space-change-waitlist.entity";
+import { ProductType } from "../order/model/product-type.entity";
+import { ProductTypeService } from "../order/product-type.service";
 
 const mockCompany: any = { id: 1 };
 const mockAddResidentCompany: AddResidentCompanyPayload = {
@@ -110,7 +114,7 @@ const mockResidentTechnical: ResidentCompanyTechnical = {
   title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management", joiningAsMember: true,
   laboratoryExecutivePOC: true, invoicingExecutivePOC: true, emergencyExecutivePOC: true, createdAt: 2021, updatedAt: 2021,
 }
-const mockUpdateResidentCompanyPayload: UpdateResidentCompanyPayload = {
+const mock: UpdateResidentCompanyPayload = {
       "id": 1, "email": "yestest@gmail.com", "name": "New Vision", "companyName": "NewVisionTest",
       "site": [1], "biolabsSources": 4, "otherBiolabsSources": "", "technology": "wrsdfcersdgsfd",
       "rAndDPath": "r R&D path & commerciali", "startDate": 1625097600,
@@ -149,9 +153,9 @@ describe('ResidentCompanyService', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [ResidentCompanyService, Mail,
+      providers: [ResidentCompanyService, Mail,ProductTypeService,
         {
-          provide: getRepositoryToken(ResidentCompany), useValue: {
+          provide:  getRepositoryToken(ResidentCompany), useValue: {
             createQueryBuilder: jest.fn(() =>
             ({
               select: jest.fn().mockReturnThis(),
@@ -171,7 +175,7 @@ describe('ResidentCompanyService', () => {
             })),
             find: jest.fn(),
             findOne: jest.fn(),
-            create: jest.fn(() => mockRC),
+            create: jest.fn(),
             save: jest.fn(),
             query: jest.fn(),
             update: jest.fn()
@@ -188,7 +192,7 @@ describe('ResidentCompanyService', () => {
         },
         {
           provide: getRepositoryToken(ResidentCompanyAdvisory), useValue: {
-            create: jest.fn(() => mockResidentAdvisory),
+            create: jest.fn(),
             find: jest.fn(), findOne: jest.fn(),
             save: jest.fn(() => {
               return {
@@ -206,7 +210,7 @@ describe('ResidentCompanyService', () => {
             })
           }
         },
-        { provide: getRepositoryToken(ResidentCompanyDocuments), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn(), create: jest.fn(() => mockResidentDocument) } },
+        { provide: getRepositoryToken(ResidentCompanyDocuments), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn(), create: jest.fn() } },
         {
           provide: getRepositoryToken(ResidentCompanyManagement), useValue: {
             find: jest.fn(), findOne: jest.fn(), save: jest.fn(() => {
@@ -218,7 +222,7 @@ describe('ResidentCompanyService', () => {
               return {
                 catch: jest.fn(),
               }
-            }), create: jest.fn(() => mockResidentManagement)
+            }), create: jest.fn()
           }
         },
         {
@@ -232,7 +236,7 @@ describe('ResidentCompanyService', () => {
               return {
                 catch: jest.fn(),
               }
-            }), create: jest.fn(() => mockResidentTechnical)
+            }), create: jest.fn()
           }
         },
 
@@ -246,7 +250,7 @@ describe('ResidentCompanyService', () => {
         {
           provide: getRepositoryToken(Notes), useValue: {
             find: jest.fn(), findOne: jest.fn(), query: jest.fn(),
-            create: jest.fn(() => mockNotes),
+            create: jest.fn(),
             save: jest.fn(), createQueryBuilder: jest.fn(() =>
             ({
               select: jest.fn().mockReturnThis(),
@@ -260,6 +264,9 @@ describe('ResidentCompanyService', () => {
           }
         },
         { provide: Notes, useValue: {} },
+        { provide: getRepositoryToken(SpaceChangeWaitlist), useValue: {  }},
+        { provide: getRepositoryToken(Item), useValue: {  } },
+        { provide: getRepositoryToken(ProductType), useValue: {  } },
       ],
       imports: [PassportModule.register({ defaultStrategy: 'jwt' })
       ],
@@ -440,13 +447,12 @@ describe('ResidentCompanyService', () => {
       if (companyMembers.length > 0) {
         for (let i = 0; i < companyMembers.length; i++) {
           companyMember = companyMembers[i];
-          //companyMember.companyId = mockUpdateResidentCompanyPayload.id;
           jest.spyOn(residentCompanyService, 'checkEmptyVal').mockReturnValue(true);
           // jest.spyOn(residentCompanyDocumentsRepository, 'save').mockResolvedValueOnce(mockResidentDocument);
-          // jest.spyOn(residentCompanyService, 'addResidentCompanyManagement').mockReturnValue(mockResidentDocument);
+          // let result = await residentCompanyService.addResidentCompanyDocument(companyMember);
         }
       }
-      await residentCompanyService.residentCompanyManagements(mockUpdateResidentCompanyPayload.companyMembers,mockUpdateResidentCompanyPayload.id);
+      await residentCompanyService.residentCompanyManagements([], companyMember.companyId);
     });
   });
   describe('addResidentCompanyAdvisor method', () => {
@@ -846,7 +852,11 @@ describe('ResidentCompanyService', () => {
     let mockRcAdvisors: ResidentCompanyAdvisory = { "id": 1, "companyId": 1, "name": "Antibody", "title": "Test", "status": "0", "organization": "1", "createdAt": 1600000, "updatedAt": 16000000 };
     it('should delete data based on id', async () => {
       jest.spyOn(residentCompanyAdvisoryRepository, 'findOne').mockResolvedValueOnce(mockRcAdvisors);
+      // jest.spyOn(residentCompanyManagementRepository, 'findOne').mockResolvedValueOnce(mockRcMembers);
+      // jest.spyOn(residentCompanyTechnicalRepository, 'findOne').mockResolvedValueOnce(mockRcTechnicalTeams);
       jest.spyOn(residentCompanyAdvisoryRepository, 'save').mockResolvedValueOnce(mockRcAdvisors);
+      // jest.spyOn(residentCompanyManagementRepository, 'save').mockResolvedValueOnce(mockRcMembers);
+      // jest.spyOn(residentCompanyTechnicalRepository, 'save').mockResolvedValueOnce(mockRcTechnicalTeams);
       const notes = await residentCompanyService.softDeleteMember(1, "advisors");
       expect(notes).toBe(mockRcAdvisors);
     })
@@ -855,40 +865,6 @@ describe('ResidentCompanyService', () => {
       jest.spyOn(residentCompanyAdvisoryRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Member with provided id not available.'));
       try {
         await residentCompanyService.softDeleteMember(1, "advisors");
-      } catch (e) {
-        expect(e.response.error).toBe('Not Acceptable');
-        expect(e.response.message).toBe('Member with provided id not available.');
-        expect(e.response.statusCode).toBe(406);
-      }
-    });
-    it('should delete data based on id', async () => {
-      jest.spyOn(residentCompanyManagementRepository, 'findOne').mockResolvedValueOnce(mockResidentManagement);
-      jest.spyOn(residentCompanyManagementRepository, 'save').mockResolvedValueOnce(mockResidentManagement);
-      const notes = await residentCompanyService.softDeleteMember(1, "managements");
-      expect(notes).toBe(mockResidentManagement);
-    })
-
-    it('it should throw exception if member id is not provided  ', async () => {
-      jest.spyOn(residentCompanyManagementRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Member with provided id not available.'));
-      try {
-        await residentCompanyService.softDeleteMember(1, "managements");
-      } catch (e) {
-        expect(e.response.error).toBe('Not Acceptable');
-        expect(e.response.message).toBe('Member with provided id not available.');
-        expect(e.response.statusCode).toBe(406);
-      }
-    });
-    it('should delete data based on id', async () => {
-      jest.spyOn(residentCompanyTechnicalRepository, 'findOne').mockResolvedValueOnce(mockResidentTechnical);
-      jest.spyOn(residentCompanyTechnicalRepository, 'save').mockResolvedValueOnce(mockResidentTechnical);
-      const notes = await residentCompanyService.softDeleteMember(1, "technicals");
-      expect(notes).toBe(mockResidentTechnical);
-    })
-
-    it('it should throw exception if member id is not provided  ', async () => {
-      jest.spyOn(residentCompanyTechnicalRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Member with provided id not available.'));
-      try {
-        await residentCompanyService.softDeleteMember(1, "technicals");
       } catch (e) {
         expect(e.response.error).toBe('Not Acceptable');
         expect(e.response.message).toBe('Member with provided id not available.');
@@ -956,7 +932,7 @@ describe('ResidentCompanyService', () => {
         " WHERE \"site\" = \'{" + 1 + "}\' and \"comnpanyId\" = " + 1 +
         "AND \"companyOnboardingStatus\" = true";
       residentCompanyHistoryRepository.query(queryStr);
-      let result = await residentCompanyService.getstartedWithBiolabs(1, 1);
+      let result = await residentCompanyService.getstartedWithBiolabs(1, 1)
       expect(result).not.toBeNull()
     })
   });
@@ -1030,16 +1006,16 @@ describe('ResidentCompanyService', () => {
     })
   });
   describe('checkEmptyVal method', () => {
-    const data: any = {
+    let data: any = {
       id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
       title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management",
       academicAffiliation: "Test", joiningAsMember: true, mainExecutivePOC: true,
-      laboratoryExecutivePOC: true, invoicingExecutivePOC: true,emergencyExecutivePOC:true
+      laboratoryExecutivePOC: true, invoicingExecutivePOC: true
     }
-    let type = "managements";
+
     it("should check if type advisors should not be null", async () => {
       {
-      
+        let type = "advisors";
         if (type == 'advisors' && (data.name || data.title || data.organization)) {
           return true;
         }
@@ -1048,7 +1024,7 @@ describe('ResidentCompanyService', () => {
     });
     it("should check if type managements should not be null", async () => {
 
-      type = "managements";
+      let type = "managements";
       if (type == 'managements' &&
         (data.email || data.emergencyExecutivePOC || data.invoicingExecutivePOC || data.joiningAsMember
           || data.laboratoryExecutivePOC || data.linkedinLink || data.name || data.phone || data.publications || data.title)) {
@@ -1059,7 +1035,7 @@ describe('ResidentCompanyService', () => {
 
     });
     it("should check if type technicals should not be null", async () => {
-       type = "technicals";
+      let type = "technicals";
       if (type == 'technicals' &&
         (data.email || data.emergencyExecutivePOC || data.invoicingExecutivePOC || data.joiningAsMember
           || data.laboratoryExecutivePOC || data.linkedinLink || data.name || data.phone || data.publications || data.title)) {

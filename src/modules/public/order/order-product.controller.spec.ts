@@ -1,12 +1,12 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { UnauthorizedException } from "@nestjs/common";
-import { HTTP_CODES } from '../../../utils/httpcode';
-import { CreateOrderProductDto } from './dto/order-product.create.dto';
-import { UpdateOrderProductDto } from './dto/order-product.update.dto';
-import { OrderProductService } from './order-product.service';
 import { OrderProductController } from './order-product.controller';
 import { PassportModule } from "@nestjs/passport";
 import { OrderProduct } from "./model/order-product.entity";
+import { OrderProductService } from ".";
+import { HTTP_CODES } from '../../../utils/httpcode';
+import { UnauthorizedException } from "@nestjs/common";
+import { CreateOrderProductDto } from "./dto/order-product.create.dto";
+import { UpdateOrderProductDto } from "./dto/order-product.update.dto";
 const mockorderProductService = () => ({
     addOrderProduct: jest.fn(),
     updateOrderProduct: jest.fn(),
@@ -20,7 +20,7 @@ const mockOrderProduct: OrderProduct = {
     startDate: new Date("2021-08-2"), endDate: new Date("2021-08-18"),
     month: 7, year: 2021, quantity: 10, cost: 90, recurrence: true,
     currentCharge: true, status: 1, manuallyEnteredProduct: false, productId: 10,
-    createdAt: 2021, updatedAt: 2021
+    createdAt: 2021, updatedAt: 2021, productTypeId: 1, groupId: 1
 }
 describe('OrderProductController', () => {
     let orderProductController;
@@ -47,7 +47,7 @@ describe('OrderProductController', () => {
         let mockCreateOrderProductPayload: CreateOrderProductDto = {
             companyId: 1, productName: 'TestProduct', productDescription: 'This is TestProduct 1',
             startDate: '2021-08-02', endDate: '2021-08-18',
-            month: 7, year: 2021, quantity: 10, cost: 90, recurrence: true,
+            month: 7, year: 2021, quantity: 10, cost: 90, recurrence: true, groupId: 1, productTypeId: 1,
             currentCharge: true, status: 1, manuallyEnteredProduct: false, productId: 10
         };
         it('it should called orderProductService addOrderProduct method ', async () => {
@@ -76,7 +76,7 @@ describe('OrderProductController', () => {
             productName: 'TestProduct', productDescription: 'This is TestProduct 1',
             startDate: '2021-08-02', endDate: '2021-08-18',
             month: 7, year: 2021, quantity: 20, cost: 100, recurrence: true,
-            currentCharge: true, manuallyEnteredProduct: false, productId: 10,
+            currentCharge: true, manuallyEnteredProduct: false, productId: 10, groupId: 1, productTypeId: 1
         };
         it('it should called orderProductService updateOrderProduct method ', async () => {
             expect(mockUpdateOrderProductPayload).not.toBe(null);
@@ -103,7 +103,7 @@ describe('OrderProductController', () => {
     describe('should test fetchOrderProductsBetweenDates Functionality', () => {
         it('it should called orderProductService fetchOrderProductsBetweenDates method ', async () => {
             await orderProductController.fetchOrderProductsBetweenDates(mockOrderProduct.companyId, mockOrderProduct.month);
-            expect(await orderProductService.fetchOrderProductsBetweenDates).toHaveBeenCalledWith( mockOrderProduct.month,mockOrderProduct.companyId);
+            expect(await orderProductService.fetchOrderProductsBetweenDates).toHaveBeenCalledWith(mockOrderProduct.month, mockOrderProduct.companyId);
         });
         it('it should return  orderProduct object  based on month and Company Id ', async () => {
             const mockOrderProduct2 = {
@@ -116,7 +116,7 @@ describe('OrderProductController', () => {
             }
             let fetchOrderProducts: Array<any> = [{ mockOrderProduct, mockOrderProduct2 }];
             await orderProductService.fetchOrderProductsBetweenDates.mockResolvedValueOnce(fetchOrderProducts);
-            let orderProducts=await orderProductController.fetchOrderProductsBetweenDates(mockOrderProduct.companyId, mockOrderProduct.month);
+            let orderProducts = await orderProductController.fetchOrderProductsBetweenDates(mockOrderProduct.companyId, mockOrderProduct.month);
             expect(orderProducts).not.toBeNull();
             expect(orderProducts.length).toBe(fetchOrderProducts.length);
         });
@@ -162,7 +162,7 @@ describe('OrderProductController', () => {
             }
             let consolidatedProducts: Array<any> = [{ mockOrderProduct, mockOrderProduct2 }];
             await orderProductService.consolidatedInvoice.mockResolvedValueOnce(consolidatedProducts);
-            let orderProducts=await orderProductController.consolidatedInvoice(mockOrderProduct.month, req);
+            let orderProducts = await orderProductController.consolidatedInvoice(mockOrderProduct.month, req);
             expect(orderProducts).not.toBeNull();
             expect(orderProducts.length).toBe(consolidatedProducts.length);
         });
