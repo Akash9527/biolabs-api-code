@@ -1473,14 +1473,21 @@ order by quat;
    * @returns
    */
   public async addToSpaceChangeWaitList(payload: AddSpaceChangeWaitlistDto, @Request() req): Promise<any> {
+    const COULD_NOT_SAVE_SPACE_CHANGE_WAITLIST_ERR_MSG = "Could not save Space Change Waitlist record";
+    const COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG = "Could not update Resident Company record";
+    const COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG = "Could not update Resident Company History record";
+    const ERROR_IN_FETCHING_MAX_PRIORITY_ORDER_ERR_MSG = "Error while fetching Max Priority Order to set in new Space Change Waitlist record";
     const APPROVED_DENIED_PRIORITY_ORDER = -1;
-    const residentCompany: ResidentCompany = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
+
+    let residentCompany: any = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
       return result;
     });
+
     let response = {};
     if (residentCompany == null) {
       response['status'] = 'Error';
       response['message'] = 'Resident Company not found by id: ' + payload.residentCompanyId;
+      response['body'] = {}
       return response;
     }
 
@@ -1488,6 +1495,12 @@ order by quat;
     if (payload.requestStatus == 0) {
       maxPriorityOrder = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
         return result;
+      }).catch(err => {
+        throw new HttpException({
+          status: "Error",
+          message: ERROR_IN_FETCHING_MAX_PRIORITY_ORDER_ERR_MSG,
+          body: err
+        }, HttpStatus.INTERNAL_SERVER_ERROR);
       });
     } else {
       maxPriorityOrder = APPROVED_DENIED_PRIORITY_ORDER;
@@ -1507,15 +1520,26 @@ order by quat;
       spaceChangeWaitlistObj.siteNotes = payload.siteNotes;
       spaceChangeWaitlistObj.priorityOrder = maxPriorityOrder;
       let siteIdArr = req.user.site_id;
-      // if (req.headers['x-site-id']) {
-      //   siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
-      // }
       spaceChangeWaitlistObj.site = siteIdArr;
       spaceChangeWaitlistObj.membershipChange = payload.membershipChange;
       spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
       spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
 
-      const resp = await this.spaceChangeWaitlistRepository.save(this.spaceChangeWaitlistRepository.create(spaceChangeWaitlistObj));
+      const resp = await this.spaceChangeWaitlistRepository.save(this.spaceChangeWaitlistRepository.create(spaceChangeWaitlistObj))
+        .catch(err => {
+          throw new HttpException({
+            status: 'Error1',
+            message: COULD_NOT_SAVE_SPACE_CHANGE_WAITLIST_ERR_MSG,
+            body: err
+          }, HttpStatus.BAD_REQUEST);
+        });
+
+      if (resp == null) {
+        response['status'] = 'Error';
+        response['message'] = COULD_NOT_SAVE_SPACE_CHANGE_WAITLIST_ERR_MSG;
+        response['message'] = {};
+        return response;
+      }
 
       for (let itemDto of payload.items) {
         let itemObj: Item = new Item();
@@ -1532,15 +1556,29 @@ order by quat;
       residentCompany.funding = payload.funding;
       residentCompany.fundingSource = payload.fundingSource;
       residentCompany.companySize = payload.companySize;
-      await this.residentCompanyRepository.update(residentCompany.id, residentCompany);
+      await this.residentCompanyRepository.update(residentCompany.id, residentCompany)
+        .catch(err => {
+          throw new HttpException({
+            status: "Error",
+            message: COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG,
+            body: err
+          }, HttpStatus.INTERNAL_SERVER_ERROR);
+        });
 
       /** Update Resident Company history */
-      this.updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload, residentCompany);
-    } catch {
-      response['status'] = 'error';
-      response['message'] = 'Could not add item in space change wait list';
+      this.updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload, residentCompany).catch(err => {
+        throw new HttpException({
+          status: "Error",
+          message: COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG,
+          body: err
+        }, HttpStatus.INTERNAL_SERVER_ERROR);
+      });
+    } catch (error) {
+      response['status'] = 'Error2';
+      response['message'] = error.message;
+      response['body'] = error;
+      return response;
     }
-
     response['status'] = 'Success';
     response['message'] = 'Operation Successful';
     return response;
