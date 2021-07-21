@@ -1,8 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
-import { equals } from 'class-validator';
-import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { ResidentCompany } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';

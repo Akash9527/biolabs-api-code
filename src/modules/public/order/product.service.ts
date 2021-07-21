@@ -78,7 +78,6 @@ export class ProductService {
        */
     async softDeleteProduct(id: number, req: any) {
         const product = await this.productRepository.findOne(id);
-        const month = new Date().getMonth() + 2;
         const orderProducts = await this.orderProductRepository.find({
             manuallyEnteredProduct: false,
             productId: id,
