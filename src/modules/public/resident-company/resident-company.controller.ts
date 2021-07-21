@@ -334,7 +334,7 @@ export class ResidentCompanyController {
     name: 'x-site-id',
     description: 'Selected site ids array',
   })
-  async addSpaceChangeWaitlist(@Body() payload: AddSpaceChangeWaitlistDto, @Request() req) {
+  async addSpaceChangeWaitlist(@Body() payload: AddSpaceChangeWaitlistDto, @Request() req): Promise<any> {
     return await this.residentCompanyService.addToSpaceChangeWaitList(payload, req);
   }
 
