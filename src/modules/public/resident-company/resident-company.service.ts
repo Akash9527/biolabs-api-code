@@ -1596,7 +1596,7 @@ order by quat;
     if (siteIdArr && siteIdArr.length) {
       waitlistQuery.andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
     }
-    if (companyId && companyId != 0 && companyId != undefined) {
+    if (companyId && companyId != undefined && companyId > 0) {
       waitlistQuery.andWhere("space_change_waitlist.residentCompanyId = :residentCompanyId", { residentCompanyId: companyId });
     }
     waitlistQuery.orderBy("space_change_waitlist.priorityOrder", "ASC");
@@ -1631,11 +1631,11 @@ order by quat;
     const response = {};
     const month = new Date().getMonth() + 2; // Getting next month from currect date
     const queryStr = `
-    select op."productTypeId", COUNT(*), pt."productTypeName"
-    from product_type as pt
-    Left Join (select "productTypeId" from order_product where "companyId" = ${companyId} and month = ${month} ) as op
-    on pt.id = op."productTypeId"
-    group by op."productTypeId", pt."productTypeName"
+      select pt.id as "productTypeId", COUNT(op."productTypeId"), pt."productTypeName"
+      from product_type as pt
+      Left Join (select "productTypeId" from order_product where "companyId" = ${companyId} and month = ${month} ) as op
+      on pt.id = op."productTypeId"
+      group by op."productTypeId", pt."productTypeName", pt.id
     `;
 
     const items = await this.residentCompanyHistoryRepository.query(queryStr);
