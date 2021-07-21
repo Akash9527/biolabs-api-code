@@ -34,4 +34,13 @@ export class ProductTypeService {
         info("Getting product Type",__filename,"addProductType()")
         return await await this.productTypeRepository.find();
     }
+
+    /**
+     * Get a product type entity by id
+     * @param productTypeId id of ProductType entity
+     * @returns a ProductType entity
+     */
+    public async getProductTypeById(productTypeId: number) {
+        return await this.productTypeRepository.findOne(productTypeId);
+    }
 }

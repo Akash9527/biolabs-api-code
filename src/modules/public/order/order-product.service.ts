@@ -1,15 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
-import { equals } from 'class-validator';
-import { MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { ResidentCompany } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { OrderProduct } from './model/order-product.entity';
+import { Product } from './model/product.entity';
 const {error, warn, info,debug}=require("../../../utils/logger")
 const {ResourceNotFoundException,InternalException,BiolabsException} = require('../../common/exception/biolabs-error');
-
 
 @Injectable()
 export class OrderProductService {
@@ -17,6 +16,8 @@ export class OrderProductService {
   constructor(
     @InjectRepository(OrderProduct)
     private readonly orderProductRepository: Repository<OrderProduct>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
     @InjectRepository(ResidentCompany)
     private readonly residentCompanyRepository: Repository<ResidentCompany>,
     private readonly moduleRef: ModuleRef
@@ -65,7 +66,9 @@ export class OrderProductService {
      */
     orderProduct.groupId = orderSave.id;
     orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
-    await this.orderProductRepository.update(orderSave.id,orderProduct);
+    const product = await this.productRepository.findOne(orderProduct.productId);
+    orderProduct.productTypeId = (product) ? product.productType.id : null;
+    await this.orderProductRepository.update(orderSave.id, orderProduct);
 
     if (orderProduct.recurrence) {
       /**
@@ -129,6 +132,9 @@ export class OrderProductService {
       throw new BiolabsException(err.message);
     });
     debug(`order product: ${orderProduct.productId}`,__filename,"updateOrderProduct()");
+    const product = await this.productRepository.findOne(orderProduct.productId);
+    payload.productTypeId = (product) ? product.productType.id : null;
+
     payload.groupId = orderProduct.groupId;
     payload.manuallyEnteredProduct = orderProduct.manuallyEnteredProduct;
     payload.productId = orderProduct.productId;
