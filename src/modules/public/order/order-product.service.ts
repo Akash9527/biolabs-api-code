@@ -7,6 +7,7 @@ import { ResidentCompany } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { OrderProduct } from './model/order-product.entity';
+import { Product } from './model/product.entity';
 
 @Injectable()
 export class OrderProductService {
@@ -14,6 +15,8 @@ export class OrderProductService {
   constructor(
     @InjectRepository(OrderProduct)
     private readonly orderProductRepository: Repository<OrderProduct>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
     @InjectRepository(ResidentCompany)
     private readonly residentCompanyRepository: Repository<ResidentCompany>,
     private readonly moduleRef: ModuleRef
@@ -59,7 +62,9 @@ export class OrderProductService {
      */
     orderProduct.groupId = orderSave.id;
     orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
-    await this.orderProductRepository.update(orderSave.id,orderProduct);
+    const product = await this.productRepository.findOne(orderProduct.productId);
+    orderProduct.productTypeId = (product) ? product.productType.id : null;
+    await this.orderProductRepository.update(orderSave.id, orderProduct);
 
     if (orderProduct.recurrence) {
       /**
@@ -116,6 +121,10 @@ export class OrderProductService {
         message: err.message
       }, HttpStatus.BAD_REQUEST);
     });
+
+
+    const product = await this.productRepository.findOne(orderProduct.productId);
+    payload.productTypeId = (product) ? product.productType.id : null;
 
     payload.groupId = orderProduct.groupId;
     payload.manuallyEnteredProduct = orderProduct.manuallyEnteredProduct;

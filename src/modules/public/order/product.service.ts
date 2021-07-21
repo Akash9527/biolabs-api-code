@@ -82,7 +82,6 @@ export class ProductService {
         const orderProducts = await this.orderProductRepository.find({
             manuallyEnteredProduct: false,
             productId: id,
-            month: MoreThanOrEqual(month)
         });
         if (product) {
             product.productStatus = 99;
@@ -108,7 +107,7 @@ export class ProductService {
         const orderProducts = await this.orderProductRepository.find({
             manuallyEnteredProduct: false,
             productId: productId,
-            month: MoreThanOrEqual(month)
+            month: MoreThanOrEqual(month),
         });
         let productType = null;
         if (payload.productTypeId) {
@@ -135,6 +134,7 @@ export class ProductService {
                         orderProduct.productDescription = payload.description;
                         orderProduct.cost = payload.cost;
                         orderProduct.recurrence = payload.recurrence;
+                        orderProduct.productTypeId = payload.productTypeId;
                         await this.orderProductRepository.update(orderProduct.id, orderProduct);
                     }
                 }
@@ -146,8 +146,11 @@ export class ProductService {
                         orderProduct.productDescription = payload.description;
                         orderProduct.cost = payload.cost;
                         orderProduct.recurrence = payload.recurrence;
+                        orderProduct.productTypeId = payload.productTypeId;
                         await this.orderProductRepository.update(orderProduct.id, orderProduct);
                     }
+
+                    const futureDateEndMonth = (new Date()).getMonth() + 5;
                     //Add next 3 months invoice
                     for (let i = 1; i < 4; i++) {
                         //quering if orderProduct exist for future months
@@ -157,7 +160,7 @@ export class ProductService {
                             month: orderProduct.month + i
                         });
                         //if orderProduct doesn't exist for future months then add new Order Products for future months
-                        if (!futureOrderProduct || futureOrderProduct.length == 0) {
+                        if ((!futureOrderProduct || futureOrderProduct.length == 0) && ((orderProduct.month + i) <= futureDateEndMonth)) {
                             let futureOrderProductObj = JSON.parse(JSON.stringify(orderProduct));
 
                             if (futureOrderProductObj.month < 12) {
@@ -166,7 +169,8 @@ export class ProductService {
                                 futureOrderProductObj.month = 1;
                                 futureOrderProductObj.year = futureOrderProductObj.year + 1;
                             }
-                            futureOrderProductObj.groupId =  orderProduct.groupId;
+                            futureOrderProductObj.groupId = orderProduct.groupId;
+                            futureOrderProductObj.productTypeId = payload.productTypeId;
                             delete futureOrderProductObj['id'];
                             await this.orderProductRepository.save(this.orderProductRepository.create(futureOrderProductObj)).catch(err => {
                                 throw new HttpException({
