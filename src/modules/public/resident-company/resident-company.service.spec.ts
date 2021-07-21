@@ -110,6 +110,24 @@ const mockResidentTechnical: ResidentCompanyTechnical = {
   title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management", joiningAsMember: true,
   laboratoryExecutivePOC: true, invoicingExecutivePOC: true, emergencyExecutivePOC: true, createdAt: 2021, updatedAt: 2021,
 }
+const mockUpdateResidentCompanyPayload: UpdateResidentCompanyPayload = {
+      "id": 1, "email": "yestest@gmail.com", "name": "New Vision", "companyName": "NewVisionTest",
+      "site": [1], "biolabsSources": 4, "otherBiolabsSources": "", "technology": "wrsdfcersdgsfd",
+      "rAndDPath": "r R&D path & commerciali", "startDate": 1625097600,
+      "foundedPlace": "etsfgve", "companyStage": 4, "otherCompanyStage": "", "funding": "12", "fundingSource": [2, 7],
+      "otherFundingSource": "", "intellectualProperty": 3,
+      "otherIntellectualProperty": "", "isAffiliated": false, "affiliatedInstitution": "",
+      "noOfFullEmp": 13, "empExpect12Months": 13, "utilizeLab": 13, "expect12MonthsUtilizeLab": 13,
+      "industry": ['94,95, 96, 97'], "otherIndustries": {}, "modality": ['6, 7, 8,9, 10, 11'],
+      "otherModality": {}, "preferredMoveIn": 4, "equipmentOnsite": "TestNew", "elevatorPitch": "string",
+      "companySize": 20, "logoOnWall": true, "logoOnLicensedSpace": true, "bioLabsAssistanceNeeded": "string",
+      "technologyPapersPublished": true, "technologyPapersPublishedLinkCount": 0, "technologyPapersPublishedLink": "string",
+      "patentsFiledGranted": true, "patentsFiledGrantedDetails": "newvision", "foundersBusinessIndustryBefore": true,
+      "academiaPartnerships": true, "academiaPartnershipDetails": "ersdf", "industryPartnerships": true,
+      "industryPartnershipsDetails": "string", "newsletters": true, "shareYourProfile": true,
+      "website": "string", "companyMembers": [], "companyAdvisors": [],
+      "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV"
+    };
 const mockNotes: Notes = { id: 1, createdBy: 1, createdAt: new Date(), residentCompany: new ResidentCompany(), notesStatus: 1, notes: "this is note 1" };
 describe('ResidentCompanyService', () => {
   let residentCompanyService: ResidentCompanyService;
@@ -415,6 +433,22 @@ describe('ResidentCompanyService', () => {
       expect(result).toBe(mockResidentDocument);
     })
   });
+  describe('residentCompanyManagements method', () => {
+    let companyMembers = [1, 2, 3];
+    let companyMember: any = { companyId: 1 }
+    it('should return resident companies document object', async () => {
+      if (companyMembers.length > 0) {
+        for (let i = 0; i < companyMembers.length; i++) {
+          companyMember = companyMembers[i];
+          //companyMember.companyId = mockUpdateResidentCompanyPayload.id;
+          jest.spyOn(residentCompanyService, 'checkEmptyVal').mockReturnValue(true);
+          // jest.spyOn(residentCompanyDocumentsRepository, 'save').mockResolvedValueOnce(mockResidentDocument);
+          // jest.spyOn(residentCompanyService, 'addResidentCompanyManagement').mockReturnValue(mockResidentDocument);
+        }
+      }
+      await residentCompanyService.residentCompanyManagements(mockUpdateResidentCompanyPayload.companyMembers,mockUpdateResidentCompanyPayload.id);
+    });
+  });
   describe('addResidentCompanyAdvisor method', () => {
     let payload: ResidentCompanyAdvisoryFillableFields = {
       id: 1,
@@ -695,34 +729,26 @@ describe('ResidentCompanyService', () => {
       }
     });
   });
-  describe('updateResidentCompany method', () => {
-    const payload: UpdateResidentCompanyPayload = {
-      "id": 1, "email": "yestest@gmail.com", "name": "New Vision", "companyName": "NewVisionTest",
-      "site": [1], "biolabsSources": 4, "otherBiolabsSources": "", "technology": "wrsdfcersdgsfd",
-      "rAndDPath": "r R&D path & commerciali", "startDate": 1625097600,
-      "foundedPlace": "etsfgve", "companyStage": 4, "otherCompanyStage": "", "funding": "12", "fundingSource": [2, 7],
-      "otherFundingSource": "", "intellectualProperty": 3,
-      "otherIntellectualProperty": "", "isAffiliated": false, "affiliatedInstitution": "",
-      "noOfFullEmp": 13, "empExpect12Months": 13, "utilizeLab": 13, "expect12MonthsUtilizeLab": 13,
-      "industry": ['94,95, 96, 97'], "otherIndustries": {}, "modality": ['6, 7, 8,9, 10, 11'],
-      "otherModality": {}, "preferredMoveIn": 4, "equipmentOnsite": "TestNew", "elevatorPitch": "string",
-      "companySize": 20, "logoOnWall": true, "logoOnLicensedSpace": true, "bioLabsAssistanceNeeded": "string",
-      "technologyPapersPublished": true, "technologyPapersPublishedLinkCount": 0, "technologyPapersPublishedLink": "string",
-      "patentsFiledGranted": true, "patentsFiledGrantedDetails": "newvision", "foundersBusinessIndustryBefore": true,
-      "academiaPartnerships": true, "academiaPartnershipDetails": "ersdf", "industryPartnerships": true,
-      "industryPartnershipsDetails": "string", "newsletters": true, "shareYourProfile": true,
-      "website": "string", "companyMembers": [], "companyAdvisors": [],
-      "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV"
-    };
-    it('should return array of resident companies', async () => {
-    //   jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
-    //   if (mockRC) {
-    //     jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
-    //   }
-    //   let result = await residentCompanyService.updateResidentCompany(payload);
-    //  console.log(result);
-    })
-  });
+  // describe('updateResidentCompany method', () => {
+  //   
+  //   let residentCompany: any = {
+  //     id: 1, name: "Biolabs", email: "elon@space.com", companyName: "tesla", site: [2, 1], biolabsSources: 1, otherBiolabsSources: "",
+  //     technology: "Tech World", rAndDPath: "Tech World", startDate: 1626134400, foundedPlace: "Tech World", companyStage: 1,
+  //     otherCompanyStage: "", funding: "1", fundingSource: [1], otherFundingSource: "", intellectualProperty: 1,
+  //     otherIntellectualProperty: "", isAffiliated: false, affiliatedInstitution: "", noOfFullEmp: 0, empExpect12Months: 0,
+  //     utilizeLab: 0, expect12MonthsUtilizeLab: 0, industry: ["95"], modality: ["3"], equipmentOnsite: "Tech World",
+  //     preferredMoveIn: 1, otherIndustries: {}, otherModality: {}, "status": "1", companySize: 20
+  //   }
+  //   it('should return array of resident companies', async () => {
+  //     jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(residentCompany);
+  //     // if (residentCompany) {
+  //     //   jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
+  //     //   return await residentCompanyService.getResidentCompany(residentCompany.id);
+  //     // }
+  //     let result = await residentCompanyService.updateResidentCompany(payload);
+  //     console.log(result);
+  //   })
+  // });
   describe('gloabalSearchCompaniesOld method', () => {
     let mockSearchPayload: SearchResidentCompanyPayload = {
       q: "test", role: 1, pagination: true, page: 1, limit: 10,
@@ -820,11 +846,7 @@ describe('ResidentCompanyService', () => {
     let mockRcAdvisors: ResidentCompanyAdvisory = { "id": 1, "companyId": 1, "name": "Antibody", "title": "Test", "status": "0", "organization": "1", "createdAt": 1600000, "updatedAt": 16000000 };
     it('should delete data based on id', async () => {
       jest.spyOn(residentCompanyAdvisoryRepository, 'findOne').mockResolvedValueOnce(mockRcAdvisors);
-      // jest.spyOn(residentCompanyManagementRepository, 'findOne').mockResolvedValueOnce(mockRcMembers);
-      // jest.spyOn(residentCompanyTechnicalRepository, 'findOne').mockResolvedValueOnce(mockRcTechnicalTeams);
       jest.spyOn(residentCompanyAdvisoryRepository, 'save').mockResolvedValueOnce(mockRcAdvisors);
-      // jest.spyOn(residentCompanyManagementRepository, 'save').mockResolvedValueOnce(mockRcMembers);
-      // jest.spyOn(residentCompanyTechnicalRepository, 'save').mockResolvedValueOnce(mockRcTechnicalTeams);
       const notes = await residentCompanyService.softDeleteMember(1, "advisors");
       expect(notes).toBe(mockRcAdvisors);
     })
@@ -833,6 +855,40 @@ describe('ResidentCompanyService', () => {
       jest.spyOn(residentCompanyAdvisoryRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Member with provided id not available.'));
       try {
         await residentCompanyService.softDeleteMember(1, "advisors");
+      } catch (e) {
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe('Member with provided id not available.');
+        expect(e.response.statusCode).toBe(406);
+      }
+    });
+    it('should delete data based on id', async () => {
+      jest.spyOn(residentCompanyManagementRepository, 'findOne').mockResolvedValueOnce(mockResidentManagement);
+      jest.spyOn(residentCompanyManagementRepository, 'save').mockResolvedValueOnce(mockResidentManagement);
+      const notes = await residentCompanyService.softDeleteMember(1, "managements");
+      expect(notes).toBe(mockResidentManagement);
+    })
+
+    it('it should throw exception if member id is not provided  ', async () => {
+      jest.spyOn(residentCompanyManagementRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Member with provided id not available.'));
+      try {
+        await residentCompanyService.softDeleteMember(1, "managements");
+      } catch (e) {
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe('Member with provided id not available.');
+        expect(e.response.statusCode).toBe(406);
+      }
+    });
+    it('should delete data based on id', async () => {
+      jest.spyOn(residentCompanyTechnicalRepository, 'findOne').mockResolvedValueOnce(mockResidentTechnical);
+      jest.spyOn(residentCompanyTechnicalRepository, 'save').mockResolvedValueOnce(mockResidentTechnical);
+      const notes = await residentCompanyService.softDeleteMember(1, "technicals");
+      expect(notes).toBe(mockResidentTechnical);
+    })
+
+    it('it should throw exception if member id is not provided  ', async () => {
+      jest.spyOn(residentCompanyTechnicalRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Member with provided id not available.'));
+      try {
+        await residentCompanyService.softDeleteMember(1, "technicals");
       } catch (e) {
         expect(e.response.error).toBe('Not Acceptable');
         expect(e.response.message).toBe('Member with provided id not available.');
@@ -900,7 +956,7 @@ describe('ResidentCompanyService', () => {
         " WHERE \"site\" = \'{" + 1 + "}\' and \"comnpanyId\" = " + 1 +
         "AND \"companyOnboardingStatus\" = true";
       residentCompanyHistoryRepository.query(queryStr);
-      let result = await residentCompanyService.getstartedWithBiolabs(1, 1)
+      let result = await residentCompanyService.getstartedWithBiolabs(1, 1);
       expect(result).not.toBeNull()
     })
   });
@@ -972,5 +1028,45 @@ describe('ResidentCompanyService', () => {
       let result = await residentCompanyService.getCompanySizeQuartly(1)
       expect(result).not.toBeNull()
     })
+  });
+  describe('checkEmptyVal method', () => {
+    const data: any = {
+      id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
+      title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management",
+      academicAffiliation: "Test", joiningAsMember: true, mainExecutivePOC: true,
+      laboratoryExecutivePOC: true, invoicingExecutivePOC: true,emergencyExecutivePOC:true
+    }
+    let type = "managements";
+    it("should check if type advisors should not be null", async () => {
+      {
+      
+        if (type == 'advisors' && (data.name || data.title || data.organization)) {
+          return true;
+        }
+        await residentCompanyService.checkEmptyVal(type, data);
+      }
+    });
+    it("should check if type managements should not be null", async () => {
+
+      type = "managements";
+      if (type == 'managements' &&
+        (data.email || data.emergencyExecutivePOC || data.invoicingExecutivePOC || data.joiningAsMember
+          || data.laboratoryExecutivePOC || data.linkedinLink || data.name || data.phone || data.publications || data.title)) {
+        return true;
+      }
+      await residentCompanyService.checkEmptyVal(type, data);
+
+
+    });
+    it("should check if type technicals should not be null", async () => {
+       type = "technicals";
+      if (type == 'technicals' &&
+        (data.email || data.emergencyExecutivePOC || data.invoicingExecutivePOC || data.joiningAsMember
+          || data.laboratoryExecutivePOC || data.linkedinLink || data.name || data.phone || data.publications || data.title)) {
+        return true;
+      }
+      await residentCompanyService.checkEmptyVal(type, data);
+
+    });
   });
 });
