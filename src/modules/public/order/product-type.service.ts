@@ -28,7 +28,7 @@ export class ProductTypeService {
      * @returns All product type
      */
     async getProductType() {
-        return await await this.productTypeRepository.find();
+        return await this.productTypeRepository.find();
     }
 
     /**
