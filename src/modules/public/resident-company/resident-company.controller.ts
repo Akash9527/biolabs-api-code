@@ -339,22 +339,23 @@ export class ResidentCompanyController {
   }
 
   /**
-   * Description: BIOL-275 Get Space Change Waitlist by status
-   * @description Get space change waitlist by status
-   * @param status
-   * @returns
+   * Description: BIOL-275 Get Space Change Waitlist by status,siteId and companyId
+   * @param status array of status (0,1,2)
+   * @param req Request object
+   * @param companyId id of the company
+   * @returns list of Space Change Waitlist
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @Get('/spacechangewaitlist/param?')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getSpaceChangeWaitlist(@Query('status') status: number[], @Request() req): Promise<any> {
+  async getSpaceChangeWaitlist(@Query('status') status: number[], @Request() req, @Query('companyId') companyId: number): Promise<any> {
     let siteIdArr = req.user.site_id;
     if (req.headers['x-site-id']) {
       siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     }
-    return this.residentCompanyService.getSpaceChangeWaitListByStatusAndSiteId(status, siteIdArr);
+    return this.residentCompanyService.getSpaceChangeWaitListByStatusSiteIdAndCompanyId(status, siteIdArr, companyId);
   }
 
   /**
@@ -382,12 +383,8 @@ export class ResidentCompanyController {
   @Get('/spacechangewaitlist/items/:companyId')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getItemsForSpaceChangeWaitlist(@Param('companyId') companyId: number, @Request() req): Promise<any> {
-    let siteIdArr = req.user.site_id;
-    if (req.headers['x-site-id']) {
-      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
-    }
-    return this.residentCompanyService.getSpaceChangeWaitlistItems(siteIdArr, companyId);
+  async getItemsForSpaceChangeWaitlist(@Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getSpaceChangeWaitlistItems(companyId);
   }
 
   /**

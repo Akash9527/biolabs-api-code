@@ -4,7 +4,6 @@ import { EMAIL } from 'constants/email';
 import { In, Like, Repository } from 'typeorm';
 import { Mail } from '../../../utils/Mail';
 import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
-import { ItemDto } from '../dto/item.dto';
 import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
 import { Item } from '../entity/item.entity';
 import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
@@ -16,7 +15,6 @@ import { Funding } from '../master/funding.entity';
 import { Modality } from '../master/modality.entity';
 import { Site } from '../master/site.entity';
 import { TechnologyStage } from '../master/technology-stage.entity';
-import { ProductType } from '../order/model/product-type.entity';
 import { ProductTypeService } from '../order/product-type.service';
 import { User } from '../user';
 import { AddNotesDto } from './add-notes.dto';
@@ -1454,7 +1452,7 @@ order by quat;
    * @returns
    */
   private async fetchMaxPriorityOrderOfWaitlist(): Promise<number> {
-    const REQUEST_STATUS_OPEN: number = 0;
+    const REQUEST_STATUS_OPEN = 0;
     let maxPriorityOrder: any = await this.spaceChangeWaitlistRepository
       .createQueryBuilder(`space_change_waitlist`)
       .select(`MAX(space_change_waitlist.priorityOrder)`, `max`)
@@ -1475,7 +1473,7 @@ order by quat;
    * @returns
    */
   public async addToSpaceChangeWaitList(payload: AddSpaceChangeWaitlistDto, @Request() req): Promise<any> {
-    const APPROVED_DENIED_PRIORITY_ORDER: number = -1;
+    const APPROVED_DENIED_PRIORITY_ORDER = -1;
     const residentCompany: ResidentCompany = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
       return result;
     });
@@ -1519,7 +1517,6 @@ order by quat;
 
       const resp = await this.spaceChangeWaitlistRepository.save(this.spaceChangeWaitlistRepository.create(spaceChangeWaitlistObj));
 
-      let itemArr: Item[] = [];
       for (let itemDto of payload.items) {
         let itemObj: Item = new Item();
 
@@ -1576,32 +1573,40 @@ order by quat;
   }
 
   /**
-   * Description: BIOL-275 GET spacechange wait list by status.
-   * @description GET spacechange wait list by status.
-   * @param statusArr
-   * @returns
+   *  Description: BIOL-275 GET spacechange waitlist by status, siteId and companyId.
+   * @description GET spacechange waitlist by status, siteId and companyId.
+   * @param statusArr array of status (0,1,2)
+   * @param siteIdArr array of siteId
+   * @param companyId id if the company
+   * @returns list of Space Change Waitlist
    */
-  public async getSpaceChangeWaitListByStatusAndSiteId(statusArr: number[], siteIdArr: number[]): Promise<any> {
-    const response = {};
+  public async getSpaceChangeWaitListByStatusSiteIdAndCompanyId(statusArr: number[], siteIdArr: number[], companyId: number): Promise<any> {
+    let response = {};
     let status: number[] = [];
     for (let index = 0; index < statusArr.length; index++) {
       status.push(Number(statusArr[index]));
     }
-    let spaceChangeWaitlist: any = await this.spaceChangeWaitlistRepository
-      .createQueryBuilder("space_change_waitlist")
+
+    let waitlistQuery = await this.spaceChangeWaitlistRepository.createQueryBuilder("space_change_waitlist")
       .select("space_change_waitlist.*")
       .addSelect("rc.companyName", "residentCompanyName")
       .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
-      .where("space_change_waitlist.requestStatus IN (:...status)", { status: status })
-      .andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr })
-      .orderBy("space_change_waitlist.priorityOrder", "ASC")
-      .getRawMany();
+      .where("space_change_waitlist.requestStatus IN (:...status)", { status: status });
+
+    if (siteIdArr && siteIdArr.length) {
+      waitlistQuery.andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+    }
+    if (companyId && companyId != 0 && companyId != undefined) {
+      waitlistQuery.andWhere("space_change_waitlist.residentCompanyId = :residentCompanyId", { residentCompanyId: companyId });
+    }
+    waitlistQuery.orderBy("space_change_waitlist.priorityOrder", "ASC");
+    let spaceChangeWaitlist: any = await waitlistQuery.getRawMany();
     response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
     return response;
   }
 
   /**
-   * @description BIOL-275: GET spacechange wait list by id
+   * @description BIOL-275: GET spacechange waitlist by id
    * @param statusArr
    * @returns
    */
@@ -1619,31 +1624,18 @@ order by quat;
 
   /**
    * @description Get items for waitlist
-   * @param siteId id of Site
    * @param companyId id of Company
    * @returns list of items
    */
-  public async getSpaceChangeWaitlistItems(siteId: number[], companyId: number) {
+  public async getSpaceChangeWaitlistItems(companyId: number) {
     const response = {};
+    const month = new Date().getMonth() + 2; // Getting next month from currect date
     const queryStr = `
-    SELECT 
-      count(*) as "current_quantity",
-      tb."productTypeName",
-      tb.product_type_id
-    FROM  
-      order_product as op
-      LEFT Join (
-          SELECT pr.id as pid,
-                 pt."productTypeName",
-                 pt.id as product_type_id 
-          FROM product as pr
-          JOIN product_type as pt on pt.id = pr."productTypeId"
-          WHERE "siteId" && ARRAY[` + siteId + `]::int[]
-                ) as tb
-          on tb.pid = op."productId"
-      WHERE op."manuallyEnteredProduct" = false
-          AND op."companyId" = ${companyId}
-    GROUP BY tb."productTypeName",tb.product_type_id;
+    select op."productTypeId", COUNT(*), pt."productTypeName"
+    from product_type as pt
+    Left Join (select "productTypeId" from order_product where "companyId" = ${companyId} and month = ${month} ) as op
+    on pt.id = op."productTypeId"
+    group by op."productTypeId", pt."productTypeName"
     `;
 
     const items = await this.residentCompanyHistoryRepository.query(queryStr);

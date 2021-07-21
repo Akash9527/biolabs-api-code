@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmpty, IsNotEmpty, IsNumber, Min } from "class-validator";
+import { IsNotEmpty, Min } from "class-validator";
 import { MembershipChangeEnum } from "../enum/membership-change-enum";
 import { RequestStatusEnum } from "../enum/request-status-enum";
 import { ItemDto } from "./item.dto";

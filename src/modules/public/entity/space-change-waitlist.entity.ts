@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { MembershipChangeEnum } from '../enum/membership-change-enum';
 import { RequestStatusEnum } from '../enum/request-status-enum';
 import { ResidentCompany } from '../resident-company/resident-company.entity';
