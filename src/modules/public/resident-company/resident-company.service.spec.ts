@@ -24,6 +24,7 @@ import { ListResidentCompanyPayload } from './list-resident-company.payload';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { AddNotesDto } from "./add-notes.dto";
+import { UpdateResidentCompanyPayload } from "./update-resident-company.payload";
 
 const mockCompany: any = { id: 1 };
 const mockAddResidentCompany: AddResidentCompanyPayload = {
@@ -74,6 +75,22 @@ const mockRC: ResidentCompany = {
   "selectionDate": new Date("2021-07-05T18:30:00.000Z"),
   "companyStatusChangeDate": 2021,
 }
+const mockResidentHistory: ResidentCompanyHistory = {
+  id: 1, name: "Biolabs", email: "elon@space.com", companyName: "tesla", site: [2, 1], biolabsSources: 1, otherBiolabsSources: "",
+  technology: "Tech World", rAndDPath: "Tech World", startDate: 1626134400, foundedPlace: "Tech World", companyStage: 1,
+  otherCompanyStage: "", funding: "1", fundingSource: [1], otherFundingSource: "",
+  otherIntellectualProperty: "", isAffiliated: false, affiliatedInstitution: "", noOfFullEmp: 0, empExpect12Months: 0,
+  utilizeLab: 0, expect12MonthsUtilizeLab: 0, industry: ["95"], modality: ["3"], equipmentOnsite: "Tech World",
+  preferredMoveIn: 1, otherIndustries: {}, otherModality: {}, "status": "1", companySize: 20,
+  companyStatus: "1", companyVisibility: true, companyOnboardingStatus: true, elevatorPitch: null, logoOnWall: null,
+  logoOnLicensedSpace: null, bioLabsAssistanceNeeded: null, technologyPapersPublished: null,
+  technologyPapersPublishedLinkCount: null, technologyPapersPublishedLink: null, patentsFiledGranted: null,
+  patentsFiledGrantedDetails: null, foundersBusinessIndustryBefore: null, academiaPartnerships: null,
+  academiaPartnershipDetails: null, industryPartnerships: null, industryPartnershipsDetails: null,
+  newsletters: null, shareYourProfile: null, website: null, foundersBusinessIndustryName: null,
+  createdAt: 2021, updatedAt: 2021, pitchdeck: "pitchDeck.img", logoImgUrl: "logoimgurl.img",
+  committeeStatus: '1', selectionDate: new Date("2021-07-05T18:30:00.000Z"), companyStatusChangeDate: 2021, comnpanyId: 1, intellectualProperty: null
+}
 const mockResidentDocument: ResidentCompanyDocuments = {
   id: 1, company_id: 1, doc_type: "Document", name: "ResidentDocument",
   link: "residentDocumentLink", status: '1', createdAt: 2021, updatedAt: 2021
@@ -119,21 +136,20 @@ describe('ResidentCompanyService', () => {
           provide: getRepositoryToken(ResidentCompany), useValue: {
             createQueryBuilder: jest.fn(() =>
             ({
+              select: jest.fn().mockReturnThis(),
               addSelect: jest.fn().mockReturnThis(),
               where: jest.fn().mockReturnThis(),
               setParameter: jest.fn().mockReturnThis(),
-              getOne: jest.fn().mockReturnThis(),
               leftJoin: jest.fn().mockReturnThis(),
-              select: jest.fn().mockReturnThis(),
+              getOne: jest.fn(),
+              getRawOne: jest.fn(),
+              getRawMany: jest.fn(),
               andWhere: jest.fn().mockReturnThis(),
-              getRawOne: jest.fn().mockReturnThis(),
-              orderBy: jest.fn().mockReturnThis(),
-              addOrderBy: jest.fn().mockReturnThis(),
               skip: jest.fn().mockReturnThis(),
               take: jest.fn().mockReturnThis(),
-              getMany: jest.fn().mockReturnThis(),
-              getRawMany: jest.fn().mockReturnThis(),
-              query: jest.fn()
+              addOrderBy: jest.fn().mockReturnThis(),
+              orderBy: jest.fn().mockReturnThis(),
+              getMany: jest.fn()
             })),
             find: jest.fn(),
             findOne: jest.fn(),
@@ -273,27 +289,19 @@ describe('ResidentCompanyService', () => {
   });
   describe('Create method', () => {
 
-    // it('it should called getByEmail  method ', async () => {
-    //   mockAddResidentCompany.email = "admin@gmail.com";
-    //   residentCompanyRepository
-    //     .createQueryBuilder('resident-companies')
-    //     .where('resident-companies.email = :email')
-    //     .setParameter('email', mockRC.email)
-    //     .getOne();
-    //   //jest.spyOn(residentCompanyRepository, 'save').mockResolvedValueOnce(mockRC);
-    //   let ans = await residentCompanyService.create(mockAddResidentCompany);
-    //   console.log(ans);
+    it('it should called getByEmail  method ', async () => {
+      // mockAddResidentCompany.email = "admin@gmail.com";
+      residentCompanyRepository
+        .createQueryBuilder('resident-companies')
+        .where('resident-companies.email = :email')
+        .setParameter('email', mockAddResidentCompany.email)
+        .getOne();
+      //await residentCompanyService.sendEmailToSiteAdmin(sites, req, payload.companyName);
 
-    // })
-    it('should not create user if email already exist', async () => {
-      jest.spyOn(residentCompanyService, 'getByEmail').mockRejectedValueOnce(new NotAcceptableException("User with provided email already created."));
-      try {
-        await residentCompanyService.create(mockAddResidentCompany);
-      } catch (e) {
-        expect(e.response.error).toBe('Not Acceptable');
-        expect(e.response.message).toBe("User with provided email already created.")
-      }
-    });
+      let ans = await residentCompanyService.create(mockAddResidentCompany);
+      expect(ans).not.toBeNull();
+    })
+
   });
   describe('updateResidentCompanyImg method', () => {
     let payload = {
@@ -365,7 +373,33 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull();
     })
   });
+  describe('addResidentCompany method', () => {
+    const req: any = {
+      user: { site_id: [1, 2], role: 1 },
+      headers: { 'x-site-id': [2] }
+    }
+    let resp = { status: 'success', message: 'Application Successfully submitted' };
+    it('should return resident companies  object', async () => {
+      residentCompanyRepository
+        .createQueryBuilder('resident-companies')
+        .where('resident-companies.email = :email')
+        .setParameter('email', mockAddResidentCompany.email)
+        .getOne();
+      jest.spyOn(residentCompanyRepository, 'save').mockResolvedValueOnce(mockRC);
+      if (mockRC.id) {
+        const historyData: any = JSON.parse(JSON.stringify(mockRC));
+        historyData.comnpanyId = mockRC.id;
+        delete historyData.id;
+        // await this.residentCompanyHistoryRepository.save(historyData);
+        jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
+      }
+      let result = await residentCompanyService.addResidentCompany(mockAddResidentCompany, req);
+      expect(result).not.toBeNull();
+      expect(result).toStrictEqual(resp);
+    })
+  });
   describe('addResidentCompanyDocument method', () => {
+
     let payload: ResidentCompanyDocumentsFillableFields = {
       id: 1,
       email: "elon@space.com",
@@ -428,6 +462,7 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull();
     })
   });
+
   describe('addResidentCompanyTechnical method', () => {
     let payload: ResidentCompanyTechnicalFillableFields = {
       id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
@@ -576,9 +611,9 @@ describe('ResidentCompanyService', () => {
   });
 
   describe('getResidentCompanyForSponsorBySite method', () => {
-    let mockRCSponsers: Array<any> = [{ "newStartUps": 0, "site": 0, "graduate": 0, "companyStats": 0, "categoryStats": 0 }];
-    let mockRecidentCompanies = { companyStats: 0, graduate: 0, categoryStats: 0 }
+    let mockSites: Array<any> = [{ "id": 2, "name": "Ipsen" }, { "id": 1, "name": "Tufts" }];
     it('should return array of Resident companies for Sponser', async () => {
+      jest.spyOn(siteRepository, 'find').mockResolvedValueOnce(mockSites);
       residentCompanyRepository.
         createQueryBuilder("resident_companies").
         select("count(*)", "graduate").
@@ -595,9 +630,15 @@ describe('ResidentCompanyService', () => {
         query("SELECT c.name, c.id  as industryId, (select count(rc.*) FROM resident_companies as rc " +
           "where c.id = ANY(rc.industry::int[]) and " + 1 + " = ANY(rc.site::int[])  ) as industryCount " +
           " FROM public.categories as c order by industryCount desc limit 3;");
-      jest.spyOn(residentCompanyService, 'getResidentCompanyForSponsorBySite').mockResolvedValueOnce(mockRCSponsers);
+      residentCompanyRepository.
+        query(" select count(*) as newStartUps FROM resident_companies " +
+          " where resident_companies.\"companyOnboardingStatus\" = true and " +
+          + 1 + "= ANY(resident_companies.\"site\"::int[]) and" +
+          " resident_companies.\"companyStatus\" = '1' and " +
+          " (CURRENT_DATE - INTERVAL '3 months')  < (resident_companies.\"createdAt\") ");
       let result = await residentCompanyService.getResidentCompanyForSponsorBySite();
-      expect(result).toBe(mockRCSponsers);
+      expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined();
     })
   });
 
@@ -635,7 +676,7 @@ describe('ResidentCompanyService', () => {
     })
     it('should return array of resident companies', async () => {
       mockRC.companyStatus = '2';
-      if (Number(mockRC.companyStatus) !== 1) {
+      if (Number(mockRC.companyStatus) == 2) {
         mockRC.companyOnboardingStatus = false;
         mockRC.companyVisibility = false;
         jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
@@ -654,7 +695,34 @@ describe('ResidentCompanyService', () => {
       }
     });
   });
-
+  describe('updateResidentCompany method', () => {
+    const payload: UpdateResidentCompanyPayload = {
+      "id": 1, "email": "yestest@gmail.com", "name": "New Vision", "companyName": "NewVisionTest",
+      "site": [1], "biolabsSources": 4, "otherBiolabsSources": "", "technology": "wrsdfcersdgsfd",
+      "rAndDPath": "r R&D path & commerciali", "startDate": 1625097600,
+      "foundedPlace": "etsfgve", "companyStage": 4, "otherCompanyStage": "", "funding": "12", "fundingSource": [2, 7],
+      "otherFundingSource": "", "intellectualProperty": 3,
+      "otherIntellectualProperty": "", "isAffiliated": false, "affiliatedInstitution": "",
+      "noOfFullEmp": 13, "empExpect12Months": 13, "utilizeLab": 13, "expect12MonthsUtilizeLab": 13,
+      "industry": ['94,95, 96, 97'], "otherIndustries": {}, "modality": ['6, 7, 8,9, 10, 11'],
+      "otherModality": {}, "preferredMoveIn": 4, "equipmentOnsite": "TestNew", "elevatorPitch": "string",
+      "companySize": 20, "logoOnWall": true, "logoOnLicensedSpace": true, "bioLabsAssistanceNeeded": "string",
+      "technologyPapersPublished": true, "technologyPapersPublishedLinkCount": 0, "technologyPapersPublishedLink": "string",
+      "patentsFiledGranted": true, "patentsFiledGrantedDetails": "newvision", "foundersBusinessIndustryBefore": true,
+      "academiaPartnerships": true, "academiaPartnershipDetails": "ersdf", "industryPartnerships": true,
+      "industryPartnershipsDetails": "string", "newsletters": true, "shareYourProfile": true,
+      "website": "string", "companyMembers": [], "companyAdvisors": [],
+      "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV"
+    };
+    it('should return array of resident companies', async () => {
+    //   jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
+    //   if (mockRC) {
+    //     jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
+    //   }
+    //   let result = await residentCompanyService.updateResidentCompany(payload);
+    //  console.log(result);
+    })
+  });
   describe('gloabalSearchCompaniesOld method', () => {
     let mockSearchPayload: SearchResidentCompanyPayload = {
       q: "test", role: 1, pagination: true, page: 1, limit: 10,
