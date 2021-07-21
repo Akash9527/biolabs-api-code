@@ -1596,7 +1596,7 @@ order by quat;
     if (siteIdArr && siteIdArr.length) {
       waitlistQuery.andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
     }
-    if (companyId && companyId != 0 && companyId != undefined) {
+    if (companyId && companyId != undefined && companyId > 0) {
       waitlistQuery.andWhere("space_change_waitlist.residentCompanyId = :residentCompanyId", { residentCompanyId: companyId });
     }
     waitlistQuery.orderBy("space_change_waitlist.priorityOrder", "ASC");
