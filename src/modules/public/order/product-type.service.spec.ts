@@ -28,6 +28,7 @@ describe('ProductTypeService', () => {
                     useValue:
                     {
                         find: jest.fn(),
+                        findOne: jest.fn(),
                         create: jest.fn(() => mockProductType),
                         save: jest.fn(),
                     }
@@ -77,7 +78,15 @@ describe('ProductTypeService', () => {
             expect(productTypes[0]).toBe(producttypes[0]);
             expect(productTypes).toBe(producttypes);
         })
+    });
+    describe(' test getProductTypeById functionality', () => {
 
+        it('should test getProductType method', async () => {
+            jest.spyOn(productTypeRepository, 'findOne').mockResolvedValueOnce(mockProductType);
+            const productTypes = await productTypeService.getProductTypeById(mockProductType.id);
+            expect(productTypes).not.toBeNull();
+            expect(productTypes).toBe(mockProductType);
+        })
     });
 
 });

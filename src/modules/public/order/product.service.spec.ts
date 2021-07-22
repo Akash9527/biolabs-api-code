@@ -227,8 +227,8 @@ describe('Product Service', () => {
                 try {
                     await productService.softDeleteProduct(new NotAcceptableException('Product with provided id not available.'));
                 } catch (e) {
-                    expect(e.response.error).toBe('Not Acceptable');
-                    expect(e.response.message).toBe('Product with provided id not available.');
+                    expect(e.response.error).toBe('Product with provided id not available.');
+                    expect(e.response.message).toBe('Error in soft deleting product');
                     expect(e.response.statusCode).toBe(406);
                 }
             });
@@ -327,12 +327,12 @@ describe('Product Service', () => {
             });
 
             it('it should throw exception if product id is not provided   ', async () => {
-                jest.spyOn(productRepository, 'update').mockResolvedValueOnce('Product with provided id not available.');
+                jest.spyOn(productRepository, 'update').mockResolvedValueOnce(new NotAcceptableException('Product with provided id not available.'));
                 try {
                     await productService.updateProduct(product.id, payload, req, 1);
                 } catch (e) {
                     expect(e.response.error).toBe('Not Acceptable');
-                    expect(e.response.message).toBe('Product with provided id not available.');
+                    expect(e.message).toBe('Error in update productProduct with provided id not available.');
                     expect(e.response.statusCode).toBe(406);
                 }
             });

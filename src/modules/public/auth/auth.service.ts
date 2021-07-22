@@ -10,6 +10,8 @@ import { LoginPayload } from './login.payload';
 import { MasterService } from '../master';
 import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
+const {info} = require('../../../utils/logger');
+
 
 
 const appRoot = require('app-root-path');
@@ -30,6 +32,7 @@ export class AuthService {
    * @description This method will call on appliaction boot up to generate the master data.
    */
   async onApplicationBootstrap() {
+    info("Generating the master data at the time of application boot up",__filename,"onApplicationBootstrap()");
     await this.masterService.createRoles();
     await this.masterService.createSites();
     await this.masterService.createFundings();
@@ -46,7 +49,8 @@ export class AuthService {
    * @description This method creates the default super admin with all site access.
    * @return user object with token info
    */
-  public async createSuperAdmin() {
+  private async createSuperAdmin() {
+    info("Creating application super admin user with all sites access",__filename,"createSuperAdmin()");
     const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
     if (!superAdmin) {
       await this.userService.create(migrationData['superadmin']);
@@ -93,6 +97,7 @@ export class AuthService {
    * @return user object
    */
   async validateUser(payload: LoginPayload): Promise<any> {
+    info("Validatig the user email :"+payload.email,__filename,"validateUser()");
     const user: any = await this.userService.getByEmail(payload.email);
     if (!user || user.status != '1' || user.password == null || !Hash.compare(payload.password, user.password)) {
       throw new UnauthorizedException('Invalid credentials!');

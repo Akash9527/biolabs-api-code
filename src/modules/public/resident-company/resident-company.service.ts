@@ -30,6 +30,8 @@ import { ResidentCompany } from './resident-company.entity';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
+const {error, warn, info,debug}=require("../../../utils/logger")
+const {InternalException,BiolabsException} = require('../../common/exception/biolabs-error');
 
 
 @Injectable()
@@ -77,6 +79,7 @@ export class ResidentCompanyService {
    * @return resident company object
    */
   async get(id: number) {
+    info("Getting Resindent Comapny information by Company ID :"+id,__filename,"get()");
     return this.residentCompanyRepository.findOne(id);
   }
 
@@ -87,6 +90,7 @@ export class ResidentCompanyService {
  * @return resident company object
  */
   async updateResidentCompanyImg(payload) {
+    info("Updating Resident company image by Company ID :" + payload.id,__filename,"getByEmail()");
     const companyId = payload.id;
     const resident = await this.get(companyId);
     if (resident) {
@@ -99,6 +103,7 @@ export class ResidentCompanyService {
       }
       return resident;
     } else {
+      error("resident company with provided id not available.",__filename,"updateResidentCompanyImg()");
       throw new NotAcceptableException('resident company with provided id not available.');
     }
   }
@@ -110,11 +115,17 @@ export class ResidentCompanyService {
    * @return resident company object
    */
   async getByEmail(email: string) {
+    info("Getting user information by user email ID :" + email,__filename,"getByEmail()");
+    try {
     return await this.residentCompanyRepository
       .createQueryBuilder('resident-companies')
       .where('resident-companies.email = :email')
       .setParameter('email', email)
       .getOne();
+    } catch (er) {
+      error("Getting error in find user by email id " + email, __filename, "getByEmail()");
+      throw new BiolabsException(er);
+    }
   }
 
   /**
@@ -124,9 +135,11 @@ export class ResidentCompanyService {
    * @return resident companies object
    */
   async create(payload: AddResidentCompanyPayload) {
+    info("create Resident Company CompanyName:"+payload.companyName,__filename,"create()");
     const rc = await this.getByEmail(payload.email);
 
     if (rc) {
+      error("User with provided email already created.",__filename,"create()");
       throw new NotAcceptableException(
         'User with provided email already created.',
       );
@@ -141,20 +154,19 @@ export class ResidentCompanyService {
    * @return resident companies advisor object
    */
   async addResidentCompanyAdvisor(payload: ResidentCompanyAdvisoryFillableFields) {
+      info("adding resident company advisors CompanyId:"+payload.companyId,__filename,"getResidentCompanies()");
     if (payload.id)
       await this.residentCompanyAdvisoryRepository.update(payload.id, payload)
         .catch(err => {
-          throw new HttpException({
-            message: err.message + ' in advisor team'
-          }, HttpStatus.BAD_REQUEST);
+          error(err.message,__filename,"addResidentCompanyAdvisor()");
+          throw new InternalException(err.message);
         });
     else {
       delete payload.id;
       await this.residentCompanyAdvisoryRepository.save(this.residentCompanyAdvisoryRepository.create(payload))
         .catch(err => {
-          throw new HttpException({
-            message: err.message + ' in advisor team'
-          }, HttpStatus.BAD_REQUEST);
+          error(err.message,__filename,"addResidentCompanyAdvisor()");
+          throw new InternalException(err.message);
         });
     }
   }
@@ -166,6 +178,7 @@ export class ResidentCompanyService {
    * @param id number of Company id.
    */
   async residentCompanyAdvisors(Advisors: [], id: number) {
+      info("adding resident company advisors",__filename,"residentCompanyAdvisors()");
     if (Advisors.length > 0) {
       for (let i = 0; i < Advisors.length; i++) {
         let advisor: any = Advisors[i];
@@ -184,8 +197,14 @@ export class ResidentCompanyService {
    * @return resident companies document object
    */
   async addResidentCompanyDocument(payload: ResidentCompanyDocumentsFillableFields) {
+    info(`Adding Resident company document CompanyId: ${payload.company_id}`,__filename,"addResidentCompanyDocument()");
+    try{
     const savedRcDocument = await this.residentCompanyDocumentsRepository.save(this.residentCompanyDocumentsRepository.create(payload));
     return savedRcDocument;
+    }catch(err){
+      error("Error in adding resident company document",__filename,"addResidentCompanyDocument()");
+      throw new InternalException('Error in adding resident company document');
+    }
   }
 
   /**
@@ -195,20 +214,19 @@ export class ResidentCompanyService {
    * @return resident companies management object
    */
   async addResidentCompanyManagement(payload: ResidentCompanyManagementFillableFields) {
+    info(`Adding Resident company management  companyId:`+payload.companyId,__filename,"addResidentCompanyManagement()");
     if (payload.id)
       await this.residentCompanyManagementRepository.update(payload.id, payload)
         .catch(err => {
-          throw new HttpException({
-            message: err.message + ' in Management team'
-          }, HttpStatus.BAD_REQUEST);
+          error(err.message,__filename,"addResidentCompanyManagement()");
+          throw new InternalException(err.message);
         });
     else {
       delete payload.id;
       await this.residentCompanyManagementRepository.save(this.residentCompanyManagementRepository.create(payload))
         .catch(err => {
-          throw new HttpException({
-            message: err.message + ' in Management team'
-          }, HttpStatus.BAD_REQUEST);
+          error(err.message,__filename,"addResidentCompanyManagement()");
+          throw new InternalException(err.message);
         });
     }
   }
@@ -219,7 +237,8 @@ export class ResidentCompanyService {
    * @param companyMember array of company magmt Member.
    * @param id number of Company id.
    */
-  async residentCompanyManagements(companyMembers: [], id: number) {
+  async residentCompanyManagements(companyMembers:any, id: number) {   
+    info(`resident company management`,__filename,"residentCompanyManagements()");
     if (companyMembers.length > 0) {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
@@ -241,17 +260,15 @@ export class ResidentCompanyService {
     if (payload.id)
       await this.residentCompanyTechnicalRepository.update(payload.id, payload)
         .catch(err => {
-          throw new HttpException({
-            message: err.message + ' in technical team'
-          }, HttpStatus.BAD_REQUEST);
+          error(err.message,__filename,"addResidentCompanyTechnical()");
+          throw new InternalException(err.message);
         });
     else {
       delete payload.id;
       await this.residentCompanyTechnicalRepository.save(this.residentCompanyTechnicalRepository.create(payload))
         .catch(err => {
-          throw new HttpException({
-            message: err.message + ' in technical team'
-          }, HttpStatus.BAD_REQUEST);
+            error(err.message,__filename,"addResidentCompanyTechnical()");
+          throw new InternalException(err.message)
         });
     }
   }
@@ -263,6 +280,7 @@ export class ResidentCompanyService {
    * @param id number of Company id.
    */
   async residentCompanyTechnicals(techMembers: [], id: number) {
+      info("Error in find resident companies",__filename,"residentCompanyTechnicals()");
     if (techMembers.length > 0) {
       for (let i = 0; i < techMembers.length; i++) {
         let techMember: any = techMembers[i];
@@ -282,10 +300,12 @@ export class ResidentCompanyService {
    * @return resident companies object
    */
   async addResidentCompany(payload: AddResidentCompanyPayload, req: Request) {
+      info("Adding resident company "+payload.companyName,__filename,"addResidentCompany()");
     const rc = await this.getByEmail(payload.email);
     const sites = payload.site;
 
     if (rc) {
+      error("User with provided email already created.",__filename,"addResidentCompany()");
       throw new NotAcceptableException(
         'User with provided email already created.',
       );
@@ -311,6 +331,8 @@ export class ResidentCompanyService {
     } catch {
       response['status'] = 'error';
       response['message'] = 'Could not add application';
+        error("Error in add resident company",__filename,"addResidentCompany()");
+        throw new InternalException('Error in add resident company');
     }
 
     response['status'] = 'success';
@@ -326,6 +348,8 @@ export class ResidentCompanyService {
    * @param companyName name of the company for which application is submitted.
    */
   private async sendEmailToSiteAdmin(site: any, req, companyName: string) {
+    info("Sending email to site admin",__filename,"sendEmailToSIteAdmin()");
+    try{
     let siteAdminEmails = [];
     let userInfo;
     let siteList = [];
@@ -363,6 +387,10 @@ export class ResidentCompanyService {
       origin: req.headers['origin'],
     };
     await this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, 'applicationFormSubmit', userInfo);
+  }catch(err){
+    error("Error in sending email to site admin",__filename,"sendEmailToSiteAdmin()");
+    throw new InternalException('Error in sending email to site admin'+err.message);
+  }
   }
 
   /**
@@ -372,6 +400,8 @@ export class ResidentCompanyService {
    * @return array of resident companies object
    */
   async getResidentCompanies(payload: ListResidentCompanyPayload, siteIdArr: number[]) {
+    info("Getting resident companies by name:"+payload.q,__filename,"getResidentCompanies()");
+    try{
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
       .select("resident_companies.* ")
       .addSelect("s.name", "siteName")
@@ -420,6 +450,10 @@ export class ResidentCompanyService {
       rcQuery.skip(skip).take(take)
     }
     return await rcQuery.getRawMany();
+  }catch(err){
+    error("Error in find resident companies",__filename,"getResidentCompanies()");
+    throw new BiolabsException('Error in find resident companies'+err.message);
+  }
   }
 
   /**
@@ -453,6 +487,8 @@ export class ResidentCompanyService {
    * @return array of resident companies object
    */
   async getResidentCompaniesBkp(payload: ListResidentCompanyPayload) {
+    info("Getting resident companies BKP",__filename,"getRcFundings()");
+    try{
     let search;
     let skip;
     let take;
@@ -489,6 +525,10 @@ export class ResidentCompanyService {
       skip,
       take
     });
+  }catch(err){
+    error("Error in find resident company for Bkp",__filename,"getResidentCompaniesBkp()");
+    throw new BiolabsException('Error in find resident company for Bkp'+err.message);
+  }
   }
 
   /**
@@ -498,6 +538,7 @@ export class ResidentCompanyService {
    * @return array of sites object
    */
   async getRcSites(ids) {
+    info("Getting resident company sites",__filename,"getRcSites()");
     if (ids && ids.length > 0) {
       return await this.siteRepository.find({
         select: ["id", "name"],
@@ -514,6 +555,7 @@ export class ResidentCompanyService {
    * @return array of categories object
    */
   async getRcCategories(ids) {
+    info("Getting resident company categories",__filename,"getRcCategories()");
     if (ids && ids.length > 0) {
       return await this.categoryRepository.find({
         select: ["id", "name"],
@@ -530,6 +572,7 @@ export class ResidentCompanyService {
    * @return array of fundings object
    */
   async getRcFundings(ids) {
+    info("Getting resident company Fundings",__filename,"getRcFundings()");
     if (ids && ids.length > 0) {
       return await this.fundingRepository.find({
         select: ["id", "name"],
@@ -546,6 +589,7 @@ export class ResidentCompanyService {
    * @return array of technology stages object
    */
   async getRcTechnologyStages(ids) {
+    info("Getting resident Technology stages",__filename,"getRcTechnologyStages()");
     if (ids) {
       return await this.technologyStageRepository.findOne({
         select: ["id", "name"],
@@ -562,6 +606,7 @@ export class ResidentCompanyService {
    * @return array of biolabs sources object
    */
   async getRcBiolabsSources(ids) {
+    info("Getting resident company Biolabs sources",__filename,"getRcBiolabsSources()");
     if (ids) {
       return await this.biolabsSourceRepository.findOne({
         select: ["id", "name"],
@@ -578,6 +623,7 @@ export class ResidentCompanyService {
    * @return array of modalities object
    */
   async getRcModalities(ids) {
+    info("Getting resident company modalities",__filename,"getRcModalities()");
     if (ids) {
       return await this.modalityRepository.find({
         select: ["id", "name"],
@@ -594,6 +640,7 @@ export class ResidentCompanyService {
    * @return array of biolabs sources object
    */
   async getRcMembers(id) {
+    info("Getting resident company members",__filename,"getRcMembers()");
     if (id) {
       return await this.residentCompanyManagementRepository.find({
         where: { companyId: id, status: 0 },
@@ -609,6 +656,7 @@ export class ResidentCompanyService {
    * @return array of biolabs sources object
    */
   async getRcAdvisors(id) {
+    info("Getting resident company Advisors",__filename,"getRcAdvisors()");
     if (id) {
       return await this.residentCompanyAdvisoryRepository.find({
         where: { companyId: id, status: 0 },
@@ -624,6 +672,7 @@ export class ResidentCompanyService {
    * @return array of biolabs sources object
    */
   async getRcTechnicalTeams(id) {
+      info("Getting resident company technical teams",__filename,"getRcTechnicalTeams()");
     if (id) {
       return await this.residentCompanyTechnicalRepository.find({
         where: { companyId: id, status: 0 },
@@ -639,8 +688,9 @@ export class ResidentCompanyService {
    * @return resident company object
    */
   async getResidentCompanyForSponsor() {
+    info("Getting Resident company for Sponser",__filename,"getResidentCompanyForSponser()");
     let response = {};
-
+    try{
     const graduate: any = await this.residentCompanyRepository.
       createQueryBuilder("resident_companies").
       select("count(*)", "graduate").
@@ -662,7 +712,10 @@ export class ResidentCompanyService {
     response['companyStats'] = (!stats) ? 0 : stats;
     response['graduate'] = (!graduate) ? 0 : graduate;
     response['categoryStats'] = (!categoryStats) ? 0 : categoryStats;
-
+    }catch(err){
+      error("Error in find resident company for sponser",__filename,"getResidentCompanyForSponsor()");
+      throw new BiolabsException('Error in find resident company for sponser'+err.message);
+    }
     return response;
 
   }
@@ -674,8 +727,9 @@ export class ResidentCompanyService {
   * @return resident company object
   */
   async getResidentCompanyForSponsorBySite() {
+    info("Getting Resident company for Sponser by site",__filename,"getResidentCompanyForSponserBySite()");
     let res = [];
-
+    try{
     const sites = await this.siteRepository.find();
 
     for (let site of sites) {
@@ -730,6 +784,10 @@ export class ResidentCompanyService {
       response['categoryStats'] = (!categoryStats) ? 0 : categoryStats;
       res.push(response);
     }
+  }catch(err){
+    error("Error in find resident company for sponser",__filename,"getResidentCompanyForSponsorBySite()");
+    throw new BiolabsException('Error in find resident company for sponser'+err.message);
+  }
     return res;
 
   }
@@ -743,7 +801,10 @@ export class ResidentCompanyService {
    * @return resident company object
    */
   async getResidentCompany(id) {
+    info("Getting Resident company by id :" + id,__filename,"getResidentCompany()");
+    try{
     if (id == null) {
+      debug("Resident company is not fonund by id :" + id,__filename,"getResidentCompany()");
       return {};
     }
     const residentCompany: any = await this.residentCompanyRepository.findOne({
@@ -761,10 +822,15 @@ export class ResidentCompanyService {
       residentCompany.companyTechnicalTeams = await this.getRcTechnicalTeams(residentCompany.id);
       return residentCompany;
     } else {
+      error("Error in find resident company",__filename,"getResidentCompany()");
       throw new NotAcceptableException(
         'Company with provided id not available.',
       );
     }
+  }catch(err){
+    error("Error in find resident company",__filename,"getResidentCompany()");
+    throw new BiolabsException('Error in find resident company',err.message);
+  }
   }
 
   /**
@@ -774,6 +840,8 @@ export class ResidentCompanyService {
    * @return resident company object
    */
   async updateResidentCompanyStatus(payload: UpdateResidentCompanyStatusPayload) {
+    info(`updating resident company status by comapnyId: ${payload.companyId}`,__filename,"updateResidentCompanyStatus()")
+    try{
     const residentCompany: any = await this.residentCompanyRepository.findOne({
       where: { id: payload.companyId }
     });
@@ -797,12 +865,17 @@ export class ResidentCompanyService {
       historyData.comnpanyId = residentCompany.id;
       delete historyData.id;
       await this.residentCompanyHistoryRepository.save(historyData);
+      debug("Resident company updated successfully",__filename,"updateResidentCompanyStatus()")
       return residentCompany;
     } else {
       throw new NotAcceptableException(
         'Company with provided id not available.',
       );
     }
+  }catch(err){
+    error("Error in update resident company status",__filename,"updateResidentCompanyStatus()");
+    throw new InternalException('Error in update resident company status'+err.message);
+  }
   }
 
   /**
@@ -812,6 +885,8 @@ export class ResidentCompanyService {
    * @return resident company object
    */
   async updateResidentCompany(payload: UpdateResidentCompanyPayload) {
+    info(`updating resident company id: ${payload.id}`,__filename,"updateResidentCompany()")
+    try{
     const residentCompany: any = await this.residentCompanyRepository.findOne({
       where: { id: payload.id }
     });
@@ -846,12 +921,18 @@ export class ResidentCompanyService {
       historyData.comnpanyId = residentCompany.id;
       delete historyData.id;
       await this.residentCompanyHistoryRepository.save(historyData);
+      debug("Resident company updated successfully",__filename,"updateResidentCompany()")
       return await this.getResidentCompany(residentCompany.id);
     } else {
+        error("Company with provided id not available.",__filename,"updateResidentCompany()");
       throw new NotAcceptableException(
         'Company with provided id not available.',
       );
     }
+  }catch(err){
+    error("Error in update resident company",__filename,"updateResidentCompany()");
+    throw new InternalException('Error in update resident company'+err.message);
+  }
   }
 
   /**
@@ -860,6 +941,7 @@ export class ResidentCompanyService {
    * @param val input value
    */
   private parseToArray(val) {
+
     if (typeof val === 'object') {
       return val;
     }
@@ -873,6 +955,8 @@ export class ResidentCompanyService {
    * @return array of resident companies object
    */
   async gloabalSearchCompaniesOld(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
+    info(`global search companies old`,__filename,"gloabalSearchCompaniesOld()")
+    try{
     let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
       .where("resident_companies.status IN (:...status)", { status: [1, 0] });
 
@@ -953,6 +1037,10 @@ export class ResidentCompanyService {
 
     rcQuery.addOrderBy("id", "DESC");
     return await rcQuery.getMany();
+  }catch(err){
+    error("Error in search companies old delete user",__filename,"gloabalSearchCompaniesOld()");
+    throw new BiolabsException('Error in search companies old'+err.message);
+  }
   }
   /**
    * Description: This method will return the resident companies list.
@@ -961,7 +1049,8 @@ export class ResidentCompanyService {
    * @return array of resident companies object
    */
   async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
-
+    info(`global search companies`,__filename,"gloabalSearchCompanies()")
+    try{
     let globalSearch = `SELECT * FROM global_search_view AS gsv`;
     globalSearch += ` where "status" IN ('1', '0')  `;
 
@@ -1098,9 +1187,13 @@ export class ResidentCompanyService {
     }
 
     globalSearch += ` ORDER BY \"id\" DESC `;
-    // console.log('globalSearch Final ====', globalSearch);
+    info(`globalSearch query: ${globalSearch}`,__filename,"gloabalSearchCompanies()")
 
     return await this.residentCompanyRepository.query(globalSearch);
+  }catch(err){
+    error("Error in search companies",__filename,"gloabalSearchCompanies()");
+    throw new BiolabsException('Error in search companies'+err.message);
+  }
   }
 
   /**
@@ -1110,12 +1203,19 @@ export class ResidentCompanyService {
   * @return note object
   */
   async addNote(payload: AddNotesDto, req: any): Promise<any> {
+    info(`add note createdby: ${req.user.id}`,__filename,"addNote()")
+    try{
     const company = await this.residentCompanyRepository.findOne(payload.companyId);
+    debug(`company: ${payload.companyId}`,__filename,"addNote")
     const note = new Notes();
     note.createdBy = req.user.id;
     note.notes = payload.notes;
     note.residentCompany = company;
     return await this.notesRepository.save(await this.notesRepository.create(note));
+    }catch(err){
+      error("Error in add note",__filename,"addNote()");
+      throw new InternalException('Error in add note'+err.message);
+    }
   }
 
   /**
@@ -1124,6 +1224,7 @@ export class ResidentCompanyService {
      * @param id it is a request parameter expect a number value of note id.
      */
   async getNoteById(id: number) {
+    info(`get note by id: ${id}`,__filename,"getNoteById()")
     return await this.notesRepository.findOne(id);
   }
 
@@ -1134,6 +1235,8 @@ export class ResidentCompanyService {
    * @return notes object
    */
   async getNoteByCompanyId(companyId) {
+    info(`get note by companyId: ${companyId}`,__filename,"getNoteByComapnyId()")
+    try{
     return await this.notesRepository
       .createQueryBuilder('notes')
       .select('notes.id', 'id')
@@ -1146,6 +1249,10 @@ export class ResidentCompanyService {
       .andWhere("notes.residentCompanyId = :residentCompanyId", { residentCompanyId: companyId })
       .orderBy("notes.createdAt", "DESC")
       .getRawMany();
+    }catch(err){
+      error("Getting error in find the note",__filename,"getNoteByCompanyId()");
+      throw new BiolabsException('Getting error in find the note'+err.message);
+    }
   }
 
   /**
@@ -1155,13 +1262,21 @@ export class ResidentCompanyService {
      * @return object of affected rows
      */
   async softDeleteNote(id) {
+    info(`Inside soft delete the note by id: ${id}`,__filename,"softDeleteNote()")
+    try{
     const note = await this.getNoteById(id);
     if (note) {
       note.notesStatus = 99;
+      debug("Soft note deleted succesfully",__filename,"softDeleteNote()");
       return await this.notesRepository.save(note);
     } else {
+      error(`Note with provided id not available`,__filename,"softDeleteNote()")
       throw new NotAcceptableException('Note with provided id not available.');
     }
+  }catch(err){
+    error("Error in soft delete note",__filename,"softDeleteNote()");
+    throw new BiolabsException('Error in soft delete note' ,err.message);
+  }
   }
 
   /**
@@ -1171,6 +1286,7 @@ export class ResidentCompanyService {
    * @param data data to be saved (for advisors,managements,technicals)
    */
   checkEmptyVal(type, data) {
+    info(`Check Empty value by type: ${type}`,__filename,"checkEmptyVal()")
     if (type == 'advisors' && (data.name || data.title || data.organization)) {
       return true;
     } else if (type == 'managements' &&
@@ -1192,6 +1308,7 @@ export class ResidentCompanyService {
   * @return object of affected rows
   */
   async softDeleteMember(id, type: string) {
+    info(`Inside soft delete the Member Id ${id} type: ${type}`,__filename,"softDeleteMember()")
     let repo;
     if (type == 'advisors') {
       repo = this.residentCompanyAdvisoryRepository;
@@ -1207,8 +1324,10 @@ export class ResidentCompanyService {
     });
     if (item) {
       item.status = '99';
+      debug("Soft deleted succesfully",__filename,"softDeleteMember()");
       return await repo.save(item);
     } else {
+    warn(`Member with provided id not available`,__filename,"softDeleteMember()")
       throw new NotAcceptableException('Member with provided id not available.');
     }
   }
@@ -1221,7 +1340,9 @@ export class ResidentCompanyService {
    * @returns stages of technology
    */
   async getStagesOfTechnologyBySiteId(siteId: number, companyId: number) {
+    info(`get stages of technology by siteId: ${siteId} companyId: ${companyId}`,__filename,"getStagesOfTechnologyBySiteId()")
     const response = {};
+    try{
     const queryStr = " SELECT \"stage\", \"name\", \"quarterno\", \"quat\" " +
       " FROM " +
       " (SELECT MAX(rch.\"companyStage\") AS stage, " +
@@ -1235,8 +1356,13 @@ export class ResidentCompanyService {
       " ) AS csg " +
       " LEFT JOIN technology_stages AS ts ON ts.id = csg.\"stage\" " +
       " ORDER BY quat";
+    info(`query: ${queryStr}`,__filename,"getStagesOfTechnologyBySiteId()")
     const compResidentHistory = await this.residentCompanyHistoryRepository.query(queryStr);
     response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
+    }catch(err){
+      error("Getting error in find the stages of technology",__filename,"getStagesOfTechnologySiteId()");
+      throw new BiolabsException('Getting error in find the stages of technology'+err.message);
+    }
     return response;
   }
 
@@ -1248,7 +1374,9 @@ export class ResidentCompanyService {
    * @returns fundings
    */
   async getFundingBySiteIdAndCompanyId(siteId: number, companyId: number) {
+    info(`get fundings by siteId: ${siteId} companyId: ${companyId}`,__filename,"getFundingBySiteIdAndCompanyId()")
     const response = {};
+    try{
     const queryStr = " SELECT MAX(\"funding\" ::Decimal) as \"Funding\", " +
       " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
       " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
@@ -1258,8 +1386,13 @@ export class ResidentCompanyService {
       " extract(quarter from rch.\"createdAt\"), " +
       " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
       " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
+      debug(`getting funds by query: ${queryStr}`,__filename,"getFundingBySiteIdAndCompanyId()")
     const fundigs = await this.residentCompanyHistoryRepository.query(queryStr);
     response['fundings'] = (!fundigs) ? 0 : fundigs;
+    }catch(err){
+      error("Getting error in find the fundings",__filename,"getFundingBySiteIdAndCompanyId()");
+      throw new BiolabsException('Getting error in find the fundings'+err.message);
+    }
     return response;
   }
 
@@ -1271,11 +1404,18 @@ export class ResidentCompanyService {
    * @returns started with biolabs date
    */
   async getstartedWithBiolabs(siteId: number, companyId: number) {
+    info(`get started with Biolabs by siteId: ${siteId} companyId: ${companyId}`,__filename,"getstartedWithBiolabs()")
+    try{
     const queryStr = "SELECT min(\"createdAt\")  as startWithBiolabs FROM public.resident_company_history" +
       " WHERE \"site\" = \'{" + siteId + "}\' and \"comnpanyId\" = " + companyId +
       "AND \"companyOnboardingStatus\" = true";
+      debug(`get started with biolabs history by query: ${queryStr}`,__filename,"getstartedWithBiolabs()")
     const startWithBiolab = await this.residentCompanyHistoryRepository.query(queryStr);
     return startWithBiolab;
+    }catch(err){
+      error("Getting error in find the history of started with Biolabs analysis",__filename,"getstartedWithBiolabs()");
+      throw new BiolabsException('Getting error in find the history of started with Biolabs analysis'+err.message);
+    }
   }
   /**
    * Description: This method returns current month fee details
@@ -1285,6 +1425,8 @@ export class ResidentCompanyService {
    * @returns current month fee details
    */
   async getFinancialFees(companyId: number) {
+    info(`get financial fees by companyId: ${companyId}`,__filename,"getFinancialFees()")
+    try{
     const currentMonth = new Date().getMonth() + 1;
     const queryStr = "SELECT  p. \"productTypeId\",SUM(calculate_prorating(o.\"cost\",o.\"month\",o.\"startDate\",o.\"endDate\",o.\"quantity\",o.\"currentCharge\",o.\"year\"))  From order_product as o " +
       "INNER JOIN product as p ON  p.id =o.\"productId\" " +
@@ -1293,7 +1435,12 @@ export class ResidentCompanyService {
       "AND o.\"month\" =  " + currentMonth +
       "AND p.\"productTypeId\" IN(1, 2, 5) " +
       "group by  p.\"productTypeId\" ";
+      info(`getting financial fees by query: ${queryStr}`,__filename,"getFinancialFees()")
     return await this.residentCompanyHistoryRepository.query(queryStr);
+    }catch(err){
+      error("Getting error in find the financial fees",__filename,"getFinancialFees()");
+      throw new BiolabsException('Getting error in find the financial fees'+err.message);
+    }
   }
 
   /**
@@ -1304,17 +1451,21 @@ export class ResidentCompanyService {
    * @returns latest feeds
    */
   async getFeeds(siteId: number, companyId: number) {
+    info(`get feeds by siteId: ${siteId} companyId: ${companyId}`,__filename,"getFeeds()")
+    try{
     const getFeeds = await this.residentCompanyHistoryRepository.query("SELECT feeds(" + companyId + ")").catch(err => {
       switch (err.code) {
         case '42883':
-          throw new HttpException({
-            message: err.message + ' in getFeeds'
-          }, HttpStatus.NOT_FOUND);
+          debug(err.message,__filename,"getFeeds()")
+          throw new BiolabsException(err.message);
           break;
       }
     });
-    // console.log('getFeeds for ' + companyId, getFeeds);
     return getFeeds;
+  }catch(err){
+    error("Getting error to find the time analysis",__filename,"getFeeds()");
+   throw new BiolabsException('Getting error in forget password process'+err.message);
+  }
   }
 
   /**
@@ -1385,7 +1536,8 @@ order by quat;
  */
 
   async getCompanySizeQuartly(companyId: number) {
-    const queryStr = `
+    try {
+      const queryStr = `
     SELECT 
        MAX("companySize") as noOfEmployees,
           extract(quarter from "updatedAt")as quarterNo,
@@ -1397,7 +1549,13 @@ order by quat;
             to_char("updatedAt", '"Q"Q.YYYY')
             order by quat;
     `;
-    return await this.residentCompanyHistoryRepository.query(queryStr);
+
+      debug(`getting companySize Quarterly: ${queryStr}`, __filename, "getCompanySizeQuartly()")
+      return await this.residentCompanyHistoryRepository.query(queryStr);
+    } catch (err) {
+      error("Getting error in find theget company size quartly", __filename, "getCompanySizeQuartly()");
+      throw new BiolabsException('Getting error in find company size quartly' + err.message);
+    }
   }
 
   /**
@@ -1554,10 +1712,12 @@ order by quat;
         await this.itemRepository.save(this.itemRepository.create(itemObj));
       }
 
+      /** Update Resident Company details */
       residentCompany.companyStage = payload.companyStage;
       residentCompany.funding = payload.funding;
       residentCompany.fundingSource = payload.fundingSource;
       residentCompany.companySize = payload.companySize;
+      residentCompany.shareYourProfile = payload.shareYourProfile;
       await this.residentCompanyRepository.update(residentCompany.id, residentCompany)
         .catch(err => {
           throw new HttpException({

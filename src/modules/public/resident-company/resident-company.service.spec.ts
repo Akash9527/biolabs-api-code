@@ -29,7 +29,7 @@ import { Item } from "../entity/item.entity";
 import { SpaceChangeWaitlist } from "../entity/space-change-waitlist.entity";
 import { ProductType } from "../order/model/product-type.entity";
 import { ProductTypeService } from "../order/product-type.service";
-
+const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 const mockCompany: any = { id: 1 };
 const mockAddResidentCompany: AddResidentCompanyPayload = {
   name: "Biolabs", email: "elon@space.com", companyName: "tesla", site: [2, 1], biolabsSources: 1, otherBiolabsSources: "",
@@ -115,23 +115,23 @@ const mockResidentTechnical: ResidentCompanyTechnical = {
   laboratoryExecutivePOC: true, invoicingExecutivePOC: true, emergencyExecutivePOC: true, createdAt: 2021, updatedAt: 2021,
 }
 const mock: UpdateResidentCompanyPayload = {
-      "id": 1, "email": "yestest@gmail.com", "name": "New Vision", "companyName": "NewVisionTest",
-      "site": [1], "biolabsSources": 4, "otherBiolabsSources": "", "technology": "wrsdfcersdgsfd",
-      "rAndDPath": "r R&D path & commerciali", "startDate": 1625097600,
-      "foundedPlace": "etsfgve", "companyStage": 4, "otherCompanyStage": "", "funding": "12", "fundingSource": [2, 7],
-      "otherFundingSource": "", "intellectualProperty": 3,
-      "otherIntellectualProperty": "", "isAffiliated": false, "affiliatedInstitution": "",
-      "noOfFullEmp": 13, "empExpect12Months": 13, "utilizeLab": 13, "expect12MonthsUtilizeLab": 13,
-      "industry": ['94,95, 96, 97'], "otherIndustries": {}, "modality": ['6, 7, 8,9, 10, 11'],
-      "otherModality": {}, "preferredMoveIn": 4, "equipmentOnsite": "TestNew", "elevatorPitch": "string",
-      "companySize": 20, "logoOnWall": true, "logoOnLicensedSpace": true, "bioLabsAssistanceNeeded": "string",
-      "technologyPapersPublished": true, "technologyPapersPublishedLinkCount": 0, "technologyPapersPublishedLink": "string",
-      "patentsFiledGranted": true, "patentsFiledGrantedDetails": "newvision", "foundersBusinessIndustryBefore": true,
-      "academiaPartnerships": true, "academiaPartnershipDetails": "ersdf", "industryPartnerships": true,
-      "industryPartnershipsDetails": "string", "newsletters": true, "shareYourProfile": true,
-      "website": "string", "companyMembers": [], "companyAdvisors": [],
-      "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV"
-    };
+  "id": 1, "email": "yestest@gmail.com", "name": "New Vision", "companyName": "NewVisionTest",
+  "site": [1], "biolabsSources": 4, "otherBiolabsSources": "", "technology": "wrsdfcersdgsfd",
+  "rAndDPath": "r R&D path & commerciali", "startDate": 1625097600,
+  "foundedPlace": "etsfgve", "companyStage": 4, "otherCompanyStage": "", "funding": "12", "fundingSource": [2, 7],
+  "otherFundingSource": "", "intellectualProperty": 3,
+  "otherIntellectualProperty": "", "isAffiliated": false, "affiliatedInstitution": "",
+  "noOfFullEmp": 13, "empExpect12Months": 13, "utilizeLab": 13, "expect12MonthsUtilizeLab": 13,
+  "industry": ['94,95, 96, 97'], "otherIndustries": {}, "modality": ['6, 7, 8,9, 10, 11'],
+  "otherModality": {}, "preferredMoveIn": 4, "equipmentOnsite": "TestNew", "elevatorPitch": "string",
+  "companySize": 20, "logoOnWall": true, "logoOnLicensedSpace": true, "bioLabsAssistanceNeeded": "string",
+  "technologyPapersPublished": true, "technologyPapersPublishedLinkCount": 0, "technologyPapersPublishedLink": "string",
+  "patentsFiledGranted": true, "patentsFiledGrantedDetails": "newvision", "foundersBusinessIndustryBefore": true,
+  "academiaPartnerships": true, "academiaPartnershipDetails": "ersdf", "industryPartnerships": true,
+  "industryPartnershipsDetails": "string", "newsletters": true, "shareYourProfile": true,
+  "website": "string", "companyMembers": [], "companyAdvisors": [],
+  "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV"
+};
 const mockNotes: Notes = { id: 1, createdBy: 1, createdAt: new Date(), residentCompany: new ResidentCompany(), notesStatus: 1, notes: "this is note 1" };
 describe('ResidentCompanyService', () => {
   let residentCompanyService: ResidentCompanyService;
@@ -153,9 +153,9 @@ describe('ResidentCompanyService', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [ResidentCompanyService, Mail,ProductTypeService,
+      providers: [ResidentCompanyService, Mail, ProductTypeService,
         {
-          provide:  getRepositoryToken(ResidentCompany), useValue: {
+          provide: getRepositoryToken(ResidentCompany), useValue: {
             createQueryBuilder: jest.fn(() =>
             ({
               select: jest.fn().mockReturnThis(),
@@ -264,9 +264,9 @@ describe('ResidentCompanyService', () => {
           }
         },
         { provide: Notes, useValue: {} },
-        { provide: getRepositoryToken(SpaceChangeWaitlist), useValue: {  }},
-        { provide: getRepositoryToken(Item), useValue: {  } },
-        { provide: getRepositoryToken(ProductType), useValue: {  } },
+        { provide: getRepositoryToken(SpaceChangeWaitlist), useValue: {} },
+        { provide: getRepositoryToken(Item), useValue: {} },
+        { provide: getRepositoryToken(ProductType), useValue: {} },
       ],
       imports: [PassportModule.register({ defaultStrategy: 'jwt' })
       ],
@@ -398,31 +398,31 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull();
     })
   });
-  describe('addResidentCompany method', () => {
-    const req: any = {
-      user: { site_id: [1, 2], role: 1 },
-      headers: { 'x-site-id': [2] }
-    }
-    let resp = { status: 'success', message: 'Application Successfully submitted' };
-    it('should return resident companies  object', async () => {
-      residentCompanyRepository
-        .createQueryBuilder('resident-companies')
-        .where('resident-companies.email = :email')
-        .setParameter('email', mockAddResidentCompany.email)
-        .getOne();
-      jest.spyOn(residentCompanyRepository, 'save').mockResolvedValueOnce(mockRC);
-      if (mockRC.id) {
-        const historyData: any = JSON.parse(JSON.stringify(mockRC));
-        historyData.comnpanyId = mockRC.id;
-        delete historyData.id;
-        // await this.residentCompanyHistoryRepository.save(historyData);
-        jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
-      }
-      let result = await residentCompanyService.addResidentCompany(mockAddResidentCompany, req);
-      expect(result).not.toBeNull();
-      expect(result).toStrictEqual(resp);
-    })
-  });
+  // describe('addResidentCompany method', () => {
+  //   const req: any = {
+  //     user: { site_id: [1, 2], role: 1 },
+  //     headers: { 'x-site-id': [2] }
+  //   }
+  //   let resp = { status: 'success', message: 'Application Successfully submitted' };
+  //   it('should return resident companies  object', async () => {
+  //     residentCompanyRepository
+  //       .createQueryBuilder('resident-companies')
+  //       .where('resident-companies.email = :email')
+  //       .setParameter('email', mockAddResidentCompany.email)
+  //       .getOne();
+  //     jest.spyOn(residentCompanyRepository, 'save').mockResolvedValueOnce(mockRC);
+  //     if (mockRC.id) {
+  //       const historyData: any = JSON.parse(JSON.stringify(mockRC));
+  //       historyData.comnpanyId = mockRC.id;
+  //       delete historyData.id;
+  //       // await this.residentCompanyHistoryRepository.save(historyData);
+  //       jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
+  //     }
+  //     let result = await residentCompanyService.addResidentCompany(mockAddResidentCompany, req);
+  //     expect(result).not.toBeNull();
+  //     expect(result).toStrictEqual(resp);
+  //   })
+  // });
   describe('addResidentCompanyDocument method', () => {
 
     let payload: ResidentCompanyDocumentsFillableFields = {
@@ -441,18 +441,26 @@ describe('ResidentCompanyService', () => {
     })
   });
   describe('residentCompanyManagements method', () => {
-    let companyMembers = [1, 2, 3];
-    let companyMember: any = { companyId: 1 }
+    let companyMembers:Array<ResidentCompanyManagementFillableFields> = [
+      {
+        id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
+        title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management",
+        academicAffiliation: "Test", joiningAsMember: true, mainExecutivePOC: true,
+        laboratoryExecutivePOC: true, invoicingExecutivePOC: true,
+      }
+      ];
+    // let companyMember = { "companyId": 1 }
     it('should return resident companies document object', async () => {
       if (companyMembers.length > 0) {
         for (let i = 0; i < companyMembers.length; i++) {
-          companyMember = companyMembers[i];
+          let companyMember = companyMembers[i];
+          //companyMember.companyId = companyMembers.id;
           jest.spyOn(residentCompanyService, 'checkEmptyVal').mockReturnValue(true);
-          // jest.spyOn(residentCompanyDocumentsRepository, 'save').mockResolvedValueOnce(mockResidentDocument);
-          // let result = await residentCompanyService.addResidentCompanyDocument(companyMember);
+          //jest.spyOn(residentCompanyService, 'addResidentCompanyManagement').mockResolvedValueOnce(companyMember);
+         await residentCompanyService.addResidentCompanyManagement(companyMember);
         }
       }
-      await residentCompanyService.residentCompanyManagements([], companyMember.companyId);
+      let result=await residentCompanyService.residentCompanyManagements(companyMembers,1);   
     });
   });
   describe('addResidentCompanyAdvisor method', () => {
@@ -691,11 +699,12 @@ describe('ResidentCompanyService', () => {
     it('should throw exception if company with provided id not available.', async () => {
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(null);
       try {
-        await residentCompanyService.getResidentCompany(new NotAcceptableException(
+        await residentCompanyService.getResidentCompany(new BiolabsException(
           'Company with provided id not available.'));
       } catch (e) {
-        expect(e.response.error).toBe('Not Acceptable');
-        expect(e.response.message).toBe("Company with provided id not available.")
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Error in find resident company');
       }
     });
   });
@@ -725,13 +734,22 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull();
     })
     it('should throw exception if company with provided id not available.', async () => {
+      jest.spyOn(residentCompanyRepository, 'update').mockRejectedValueOnce(new InternalException('Error in update resident company status'));
+      try {
+        await residentCompanyService.updateResidentCompanyStatus(payload);
+      } catch (e) {
+        expect(e.name).toBe('InternalException');
+        expect(e instanceof InternalException).toBeTruthy(); 
+      }
+    });
+    it('should throw NotAcceptableException if company with provided id not available.', async () => {
       jest.spyOn(residentCompanyRepository, 'update').mockRejectedValueOnce(new NotAcceptableException(
         'Company with provided id not available.'))
       try {
         await residentCompanyService.updateResidentCompanyStatus(payload);
       } catch (e) {
-        expect(e.response.error).toBe('Not Acceptable');
-        expect(e.response.message).toBe("Company with provided id not available.")
+        expect(e.name).toBe('InternalException');
+        expect(e instanceof InternalException).toBeTruthy(); 
       }
     });
   });
@@ -839,11 +857,21 @@ describe('ResidentCompanyService', () => {
     it('it should throw exception if note id is not provided  ', async () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
       try {
-        await residentCompanyService.softDeleteNote(new NotAcceptableException('User with provided id not available.'));
+        await residentCompanyService.softDeleteNote(new BiolabsException('Error in soft delete note'));
       } catch (e) {
-        expect(e.response.error).toBe('Not Acceptable');
-        // expect(e.response.message).toBe('User with provided id not available.');
-        expect(e.response.statusCode).toBe(406);
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Error in soft delete note');
+      }
+    });
+    it('it should throw exception if note id is not provided  ', async () => {
+      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+      try {
+        await residentCompanyService.softDeleteNote(new NotAcceptableException('Note with provided id not available.'));
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Error in soft delete note');
       }
     });
   });
@@ -852,11 +880,7 @@ describe('ResidentCompanyService', () => {
     let mockRcAdvisors: ResidentCompanyAdvisory = { "id": 1, "companyId": 1, "name": "Antibody", "title": "Test", "status": "0", "organization": "1", "createdAt": 1600000, "updatedAt": 16000000 };
     it('should delete data based on id', async () => {
       jest.spyOn(residentCompanyAdvisoryRepository, 'findOne').mockResolvedValueOnce(mockRcAdvisors);
-      // jest.spyOn(residentCompanyManagementRepository, 'findOne').mockResolvedValueOnce(mockRcMembers);
-      // jest.spyOn(residentCompanyTechnicalRepository, 'findOne').mockResolvedValueOnce(mockRcTechnicalTeams);
       jest.spyOn(residentCompanyAdvisoryRepository, 'save').mockResolvedValueOnce(mockRcAdvisors);
-      // jest.spyOn(residentCompanyManagementRepository, 'save').mockResolvedValueOnce(mockRcMembers);
-      // jest.spyOn(residentCompanyTechnicalRepository, 'save').mockResolvedValueOnce(mockRcTechnicalTeams);
       const notes = await residentCompanyService.softDeleteMember(1, "advisors");
       expect(notes).toBe(mockRcAdvisors);
     })
