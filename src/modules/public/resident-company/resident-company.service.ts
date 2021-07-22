@@ -1552,10 +1552,12 @@ order by quat;
         await this.itemRepository.save(this.itemRepository.create(itemObj));
       }
 
+      /** Update Resident Company details */
       residentCompany.companyStage = payload.companyStage;
       residentCompany.funding = payload.funding;
       residentCompany.fundingSource = payload.fundingSource;
       residentCompany.companySize = payload.companySize;
+      residentCompany.shareYourProfile = payload.shareYourProfile;
       await this.residentCompanyRepository.update(residentCompany.id, residentCompany)
         .catch(err => {
           throw new HttpException({
