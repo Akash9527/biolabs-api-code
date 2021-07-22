@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AddProductTypeDto } from './dto/AddProductType.dto';
 import { ProductType } from './model/product-type.entity';
+const { info } = require("../../../utils/logger")
 
 @Injectable()
 export class ProductTypeService {
@@ -19,6 +20,7 @@ export class ProductTypeService {
      * @return saved order product object
      */
     async addProductType(addProductTypeDto: AddProductTypeDto) {
+        info("Adding product Type Name:" + addProductTypeDto.productTypeName, __filename, "addProductType()")
         return await this.productTypeRepository.save(this.productTypeRepository.create(addProductTypeDto));
     }
 
