@@ -66,4 +66,6 @@ export class AddSpaceChangeWaitlistDto {
     @ApiProperty({ description: 'Total Company Size', required: false, nullable: true })
     companySize: number;
 
+    @ApiProperty({ description: 'Confirmation to share company profile', required: true, nullable: false })
+    shareYourProfile: boolean;
 }
