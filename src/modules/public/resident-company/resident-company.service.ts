@@ -365,7 +365,6 @@ export class ResidentCompanyService {
         .groupBy('users.email')
         .getRawMany();
 
-
       for await (let s of site) {
         await this.siteRepository
           .query(`select name as siteName from sites where id = ${s}`).then(res => {
@@ -380,6 +379,7 @@ export class ResidentCompanyService {
           },
         });
       }
+
       userInfo = {
         token: req.headers.authorization,
         company_name: companyName,
@@ -392,6 +392,7 @@ export class ResidentCompanyService {
         EMAIL.SUBJECT_FORM = 'Biolabs | Space Change Request Submitted';
         contentParam = 'spaceChangeWaitlistSubmit';
       }
+
       await this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, contentParam, userInfo);
     } catch (err) {
       error("Error in sending email to site admin", __filename, "sendEmailToSiteAdmin()");
@@ -1805,26 +1806,72 @@ order by quat;
   public async getSpaceChangeWaitListByStatusSiteIdAndCompanyId(statusArr: number[], siteIdArr: number[], companyId: number): Promise<any> {
     let response = {};
     let status: number[] = [];
-    for (let index = 0; index < statusArr.length; index++) {
-      status.push(Number(statusArr[index]));
-    }
+    try {
+      for (let index = 0; index < statusArr.length; index++) {
+        status.push(Number(statusArr[index]));
+      }
 
-    let waitlistQuery = await this.spaceChangeWaitlistRepository.createQueryBuilder("space_change_waitlist")
-      .select("space_change_waitlist.*")
-      .addSelect("rc.companyName", "residentCompanyName")
-      .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
-      .where("space_change_waitlist.requestStatus IN (:...status)", { status: status });
+      let waitlistQuery = await this.spaceChangeWaitlistRepository.createQueryBuilder("space_change_waitlist")
+        .select("space_change_waitlist.*")
+        .addSelect("rc.companyName", "residentCompanyName")
+        .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
+        .where("space_change_waitlist.requestStatus IN (:...status)", { status: status });
 
-    if (siteIdArr && siteIdArr.length) {
-      waitlistQuery.andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+      if (siteIdArr && siteIdArr.length) {
+        waitlistQuery.andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
+      }
+      if (companyId && companyId != undefined && companyId > 0) {
+        waitlistQuery.andWhere("space_change_waitlist.residentCompanyId = :residentCompanyId", { residentCompanyId: companyId });
+      }
+      waitlistQuery.orderBy("space_change_waitlist.priorityOrder", "ASC");
+      let spaceChangeWaitlist: any = await waitlistQuery.getRawMany();
+      response = this.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist);
+      response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
+    } catch (error) {
+      response['status'] = 'Error';
+      response['message'] = 'Problem in fetching Space Change Waitlist';
+      response['body'] = error;
+      return response;
     }
-    if (companyId && companyId != undefined && companyId > 0) {
-      waitlistQuery.andWhere("space_change_waitlist.residentCompanyId = :residentCompanyId", { residentCompanyId: companyId });
-    }
-    waitlistQuery.orderBy("space_change_waitlist.priorityOrder", "ASC");
-    let spaceChangeWaitlist: any = await waitlistQuery.getRawMany();
-    response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
     return response;
+  }
+
+  /**
+   * Description: Iterates SpaceChangeWaitlist array, fetches items for each iteration and addes to the array.
+   * @description Iterates SpaceChangeWaitlist array, fetches items for each iteration and addes to the array.
+   * @param spaceChangeWaitlist SpaceChangeWaitlist array
+   * @returns SpaceChangeWaitlist array with Item array
+   */
+  private async getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist: any[]) {
+    if (spaceChangeWaitlist) {
+      for (let index = 0; index < spaceChangeWaitlist.length; index++) {
+        const spaceChangeWaitlistObj = await this.getItems(spaceChangeWaitlist[index].id).then((result) => {
+          return result;
+        }).catch(err => {
+          throw new HttpException({
+            status: "Error",
+            message: "Problem in fetching Items for Space Change Waitlist",
+            body: err
+          }, HttpStatus.INTERNAL_SERVER_ERROR);
+        });
+        spaceChangeWaitlist[index].items = spaceChangeWaitlistObj;
+      }
+    }
+    return spaceChangeWaitlist;
+  }
+
+
+  /**
+   * Description: Fetch Item array by SpaceChangeWaitlist id.
+   * @description Fetch Item array by SpaceChangeWaitlist id.
+   * @param spaceChangeWaitlistId SpaceChangeWaitlist Id
+   * @returns array of Item
+   */
+  private async getItems(spaceChangeWaitlistId: number) {
+    const items: any[] = await this.itemRepository.find({
+      where: { spaceChangeWaitlist_id: spaceChangeWaitlistId }
+    });
+    return items;
   }
 
   /**
