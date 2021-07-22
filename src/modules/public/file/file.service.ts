@@ -2,7 +2,7 @@ import { BlobServiceClient, BlockBlobClient } from '@azure/storage-blob';
 import { BadRequestException, Injectable, NotAcceptableException } from '@nestjs/common';
 import { ResidentCompanyService } from '../resident-company';
 import { UsersService } from '../user/user.service';
-const {info,error,debug} = require('../../../utils/logger');
+const {error,debug} = require('../../../utils/logger');
 
 @Injectable()
 export class FileService {

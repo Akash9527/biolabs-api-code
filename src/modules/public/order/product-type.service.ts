@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AddProductTypeDto } from './dto/AddProductType.dto';
 import { ProductType } from './model/product-type.entity';
-const {error, warn, info,debug}=require("../../../utils/logger")
-const {ResourceNotFoundException,InternalException,BiolabsException} = require('../../common/exception/biolabs-error');
+const { info } = require("../../../utils/logger")
 
 @Injectable()
 export class ProductTypeService {
@@ -21,7 +20,7 @@ export class ProductTypeService {
      * @return saved order product object
      */
     async addProductType(addProductTypeDto: AddProductTypeDto) {
-        info("Adding product Type Name:"+addProductTypeDto.productTypeName,__filename,"addProductType()")
+        info("Adding product Type Name:" + addProductTypeDto.productTypeName, __filename, "addProductType()")
         return await this.productTypeRepository.save(this.productTypeRepository.create(addProductTypeDto));
     }
 
@@ -31,8 +30,7 @@ export class ProductTypeService {
      * @returns All product type
      */
     async getProductType() {
-        info("Getting product Type",__filename,"addProductType()")
-        return await await this.productTypeRepository.find();
+        return await this.productTypeRepository.find();
     }
 
     /**

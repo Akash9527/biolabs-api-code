@@ -10,8 +10,8 @@ import { Mail } from '../../../utils/Mail';
 import { EMAIL } from '../../../constants/email';
 import { Request } from 'express';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
-const {info,error,debug,warn} = require('../../../utils/logger');
-const {ResourceNotFoundException,InternalException,BiolabsException} = require('../../common/exception/biolabs-error');
+const { info, error, debug } = require('../../../utils/logger');
+const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 
 @Injectable()
 export class UsersService {
@@ -32,7 +32,7 @@ export class UsersService {
    * @return user object
    */
   async get(id: number) {
-    info("Getting user information by user ID :"+id,__filename,"get()");
+    info("Getting user information by user ID :" + id, __filename, "get()");
     return this.userRepository.findOne(id);
   }
 
@@ -43,7 +43,7 @@ export class UsersService {
    * @return user object
    */
   async getByEmail(email: string) {
-    info("Getting user information by user email ID :" + email,__filename,"getByEmail()");
+    info("Getting user information by user email ID :" + email, __filename, "getByEmail()");
     try {
       return await this.userRepository
         .createQueryBuilder('users')
@@ -65,11 +65,11 @@ export class UsersService {
    * @return user object
    */
   async create(payload: UserFillableFields) {
-    info("Creating a new biolabs user",__filename,"create()");
+    info("Creating a new biolabs user", __filename, "create()");
     const user = await this.getByEmail(payload.email);
 
     if (user) {
-      debug("User with provided email already created",__filename,"create()");
+      debug("User with provided email already created", __filename, "create()");
       throw new NotAcceptableException('User with provided email already created.',
       );
     }
@@ -84,12 +84,12 @@ export class UsersService {
    * @return user object
    */
   async addUser(payload: UserFillableFields, req: Request) {
-    debug("Adding a new biolabs user"+payload.email,__filename,"addUser()");
-    let savedUser : any= null;
+    debug("Adding a new biolabs user" + payload.email, __filename, "addUser()");
+    let savedUser: any = null;
     try {
       const user = await this.getByEmail(payload.email);
       if (user) {
-        debug("User with provided email already created",__filename,"addUser()");
+        debug("User with provided email already created", __filename, "addUser()");
         throw new NotAcceptableException('User with provided email already created.');
       }
       const newUser = await this.userRepository.create(payload);
@@ -103,7 +103,7 @@ export class UsersService {
       };
       let tenant = { tenantEmail: payload.email };
       this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, 'Invite', userInfo);
-      info("User added successfully",__filename,"addUser(");
+      info("User added successfully", __filename, "addUser(");
     } catch (err) {
       console.log(err)
       error("Getting error to create the new user " + err.message, __filename, "addUser()");
@@ -120,37 +120,37 @@ export class UsersService {
    * @return user object
    */
   async updateUser(payload) {
-    debug("Updating user " +payload.email,__filename,"updateUser()");
+    debug("Updating user " + payload.email, __filename, "updateUser()");
     const user = await this.get(payload.id);
-    try{
-    if (user) {
-      user.firstName = payload.firstName;
-      user.lastName = payload.lastName;
-      user.title = payload.title;
-      user.phoneNumber = payload.phoneNumber;
-      user.companyId = (payload.companyId) ? payload.companyId : user.companyId;
-      user.userType = payload.userType;
-      user.site_id = (payload.site_id) ? payload.site_id : user.site_id;
-      if (
-        payload.password &&
-        payload.password !== '' &&
-        payload.password != null
-      ) {
-        user.password = payload.password;
+    try {
+      if (user) {
+        user.firstName = payload.firstName;
+        user.lastName = payload.lastName;
+        user.title = payload.title;
+        user.phoneNumber = payload.phoneNumber;
+        user.companyId = (payload.companyId) ? payload.companyId : user.companyId;
+        user.userType = payload.userType;
+        user.site_id = (payload.site_id) ? payload.site_id : user.site_id;
+        if (
+          payload.password &&
+          payload.password !== '' &&
+          payload.password != null
+        ) {
+          user.password = payload.password;
+        } else {
+          delete user.password;
+        }
+        await this.userRepository.update(user.id, user);
+        info("User updated successfully", __filename, "updateUser(");
+        if (user.password) delete user.password;
+        return await this.getUserById(user.id);
       } else {
-        delete user.password;
+        throw new NotAcceptableException('User with provided id not available.');
       }
-      await this.userRepository.update(user.id, user);
-      info("User updated successfully",__filename,"updateUser(");
-      if (user.password) delete user.password;
-      return await this.getUserById(user.id);
-    } else {
-      throw new NotAcceptableException('User with provided id not available.');
+    } catch (err) {
+      error("Getting error to create the new user " + err.message, __filename, "updateUser()");
+      throw new BiolabsException('Getting error in updating user', err.message);
     }
-  }catch(err){
-    error("Getting error to create the new user " + err.message, __filename, "updateUser()");
-    throw new BiolabsException('Getting error in updating user', err.message);
-  }
   }
 
   /**
@@ -160,23 +160,23 @@ export class UsersService {
    * @return user object
    */
   async updateUserProfilePic(payload) {
-    info("Updating the user profile picture "+payload.email);
+    info("Updating the user profile picture " + payload.email);
     const user = await this.get(payload.id);
-    try{
-    if (user) {
-      delete user.password;
-      user.imageUrl = payload.imageUrl;
-      await this.userRepository.update(user.id, user);
-      return user;
-    } else {
-      error("User with provided id not available."+payload.id,__filename,"softDeleteUser()");
-      throw new NotAcceptableException('User with provided id not available.');
-    }
-  }catch(err){
-     error("Getting error in updating the user profile picture" +err.message,__filename,"updateUserProfilePic()");
-     throw new BiolabsException('Getting error in updating the user profile picture'+ err.message);
+    try {
+      if (user) {
+        delete user.password;
+        user.imageUrl = payload.imageUrl;
+        await this.userRepository.update(user.id, user);
+        return user;
+      } else {
+        error("User with provided id not available." + payload.id, __filename, "softDeleteUser()");
+        throw new NotAcceptableException('User with provided id not available.');
+      }
+    } catch (err) {
+      error("Getting error in updating the user profile picture" + err.message, __filename, "updateUserProfilePic()");
+      throw new BiolabsException('Getting error in updating the user profile picture' + err.message);
 
-  }
+    }
   }
 
   /**
@@ -186,21 +186,21 @@ export class UsersService {
    * @return object of affected rows
    */
   async softDeleteUser(id) {
-    info("Inside soft delete the user userId "+id,__filename,"softDeleteUser()");
-    try{
-    const user = await this.get(id);
-    if (user) {
-      user.status = '99';
-      debug("Soft deleted succesfully",__filename,"softDeleteUser()");
-      return await this.userRepository.save(user);
-    } else {
-      error("User with provided id not available."+id,__filename,"softDeleteUser()");
-      throw new NotAcceptableException('User with provided id not available.');
+    info("Inside soft delete the user userId " + id, __filename, "softDeleteUser()");
+    try {
+      const user = await this.get(id);
+      if (user) {
+        user.status = '99';
+        debug("Soft deleted succesfully", __filename, "softDeleteUser()");
+        return await this.userRepository.save(user);
+      } else {
+        error("User with provided id not available." + id, __filename, "softDeleteUser()");
+        throw new NotAcceptableException('User with provided id not available.');
+      }
+    } catch (err) {
+      error("Error in soft delete user", __filename, "softDeleteUser()");
+      throw new BiolabsException('Error in soft delete user' + err.message);
     }
-  }catch(err){
-    error("Error in soft delete user",__filename,"softDeleteUser()");
-    throw new BiolabsException('Error in soft delete user'+ err.message);
-  }
   }
 
   /**
@@ -210,7 +210,7 @@ export class UsersService {
    * @return array of user object
    */
   async getUsers(payload: ListUserPayload, siteIdArr?: number[]) {
-    info("Getting list of user",__filename,"getUsers()");
+    info("Getting list of user", __filename, "getUsers()");
     let userQuery = await this.userRepository.createQueryBuilder("users")
       .where("users.status IN (:...status)", { status: [1, 0] })
       .andWhere("users.site_id && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
@@ -234,7 +234,7 @@ export class UsersService {
     }
     userQuery.addOrderBy("users.firstName", "ASC");
     userQuery.addOrderBy("users.lastName", "ASC");
-    debug("Getting list of user by query : "+userQuery.getSql(),__filename,"getUsers()");
+    debug("Getting list of user by query : " + userQuery.getSql(), __filename, "getUsers()");
     return await userQuery.getMany();
     // return await this.userRepository.find({
     //   where: search,
@@ -251,7 +251,7 @@ export class UsersService {
    * @return user object
    */
   async getUserById(id) {
-    info("Getting user by Id : "+id ,__filename,"getUserById()");
+    info("Getting user by Id : " + id, __filename, "getUserById()");
     const user: any = await this.get(id);
     if (user) {
       if (user.companyId) {
@@ -262,7 +262,7 @@ export class UsersService {
       }
       return user;
     } else {
-      error("User with provided id not available.",__filename,"getUserById()");
+      error("User with provided id not available.", __filename, "getUserById()");
       throw new NotAcceptableException('User with provided id not available.');
     }
   }
@@ -274,7 +274,7 @@ export class UsersService {
    * @return user object
    */
   async validateToken(token: string) {
-    info("Validating user token : " + token,__filename,"validateToken()");
+    info("Validating user token : " + token, __filename, "validateToken()");
     try {
       const tokenData = await this.userTokenRepository.findOne({
         where: [{ token: token, status: 1 }],
@@ -283,16 +283,16 @@ export class UsersService {
         const user = await this.get(tokenData.user_id);
         if (user.status == '1' || user.status == '0') return user;
         else {
-          error("Token is invalid",__filename,"setNewPassword()");
+          error("Token is invalid", __filename, "setNewPassword()");
           throw new NotAcceptableException('Token is invalid.');
         }
       } else {
-        error("Token is invalid",__filename,"setNewPassword()");
+        error("Token is invalid", __filename, "setNewPassword()");
         throw new NotAcceptableException('Token is invalid.');
       }
     } catch (err) {
-      error("Getting error in validating the user token",__filename,"validateToken()");
-      throw new BiolabsException('Getting error in validating the user token'+ err.message);
+      error("Getting error in validating the user token", __filename, "validateToken()");
+      throw new BiolabsException('Getting error in validating the user token' + err.message);
     }
   }
 
@@ -317,11 +317,11 @@ export class UsersService {
         this.userTokenRepository.save(tokenData);
         return newUser;
       } else {
-        error("Token is invalid",__filename,"setNewPassword()");
+        error("Token is invalid", __filename, "setNewPassword()");
         throw new NotAcceptableException('Token is invalid.');
       }
     } else {
-      error("Token is invalid",__filename,"setNewPassword()");
+      error("Token is invalid", __filename, "setNewPassword()");
       throw new NotAcceptableException('Token is invalid.');
     }
   }
@@ -333,28 +333,28 @@ export class UsersService {
    * @return user object
    */
   async generateToken(user) {
-    info("Generate the token for the user"+user.email,__filename,"generateToken()");
-    try{
-    let token = this.jwtService.sign({
-      id: user.id,
-      time: new Date().getTime(),
-    });
-    const tokenData = { user_id: user.id, token: token };
-    const tokenChk = await this.userTokenRepository.find({
-      where: [{ user_id: user.id, status: '1' }],
-    });
-    if (tokenChk) {
-      await this.userTokenRepository.update(
-        { user_id: user.id },
-        { status: '99' },
+    info("Generate the token for the user" + user.email, __filename, "generateToken()");
+    try {
+      let token = this.jwtService.sign({
+        id: user.id,
+        time: new Date().getTime(),
+      });
+      const tokenData = { user_id: user.id, token: token };
+      const tokenChk = await this.userTokenRepository.find({
+        where: [{ user_id: user.id, status: '1' }],
+      });
+      if (tokenChk) {
+        await this.userTokenRepository.update(
+          { user_id: user.id },
+          { status: '99' },
+        );
+      }
+      return await this.userTokenRepository.save(
+        this.userTokenRepository.create(tokenData),
       );
-    }
-    return await this.userTokenRepository.save(
-      this.userTokenRepository.create(tokenData),
-    );
-    }catch(err){
-      error("Getting error in generating user token",__filename,"generateToken()");
-      throw new BiolabsException('Getting error in generating user token'+ err.message);
+    } catch (err) {
+      error("Getting error in generating user token", __filename, "generateToken()");
+      throw new BiolabsException('Getting error in generating user token' + err.message);
     }
 
   }
@@ -367,32 +367,32 @@ export class UsersService {
    * @return user object
    */
   async forgotPassword(payload: UserFillableFields, req: Request) {
-    info("Generate the token for the user to reset the password" + payload.email,__filename,"forgotPassword()");
-   try{
-    const user = await this.getByEmail(payload.email);
-    if (user) {
-      const userInformation = await this.generateToken(user);
-      const userInfo = {
-        token: userInformation.token,
-        userName: user.firstName,
-        origin: req.headers['origin'],
-      };
-      let tenant = { tenantEmail: payload.email, role: payload.role };
-      this.mail.sendEmail(
-        tenant,
-        EMAIL.SUBJECT_FORGOT_PASSWORD,
-        'forgotMail',
-        userInfo,
-      );
-      return true;
-    } else {
-      throw new NotAcceptableException(
-        'User with provided email already created.',
-      );
+    info("Generate the token for the user to reset the password" + payload.email, __filename, "forgotPassword()");
+    try {
+      const user = await this.getByEmail(payload.email);
+      if (user) {
+        const userInformation = await this.generateToken(user);
+        const userInfo = {
+          token: userInformation.token,
+          userName: user.firstName,
+          origin: req.headers['origin'],
+        };
+        let tenant = { tenantEmail: payload.email, role: payload.role };
+        this.mail.sendEmail(
+          tenant,
+          EMAIL.SUBJECT_FORGOT_PASSWORD,
+          'forgotMail',
+          userInfo,
+        );
+        return true;
+      } else {
+        throw new NotAcceptableException(
+          'User with provided email already created.',
+        );
+      }
+    } catch (err) {
+      error("Getting error in forget password process or sending email", __filename, "forgotPassword()");
+      throw new BiolabsException('Getting error in forget password process' + err.message);
     }
-  }catch(err){
-    error("Getting error in forget password process or sending email",__filename,"forgotPassword()");
-    throw new BiolabsException('Getting error in forget password process'+ err.message);
-  }
   }
 }

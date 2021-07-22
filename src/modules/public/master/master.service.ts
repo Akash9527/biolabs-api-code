@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { diff } from 'json-diff';
 import { In, Like, Repository } from 'typeorm';
-import { MasterPayload } from './master.payload';
 import { BiolabsSource } from './biolabs-source.entity';
 import { Category } from './category.entity';
 import { Funding } from './funding.entity';
+import { MasterPayload } from './master.payload';
 import { Modality } from './modality.entity';
 import { Role } from './role.entity';
 import { Site } from './site.entity';
@@ -13,9 +14,8 @@ import { COMPANY_STATUS } from '../../../constants/company-status';
 import { USER_TYPE } from '../../../constants/user-type';
 import { COMMITTEE_STATUS } from 'constants/committee_status';
 import { ProductType } from '../order/model/product-type.entity';
-const {error, warn, info,debug}=require("../../../utils/logger")
-const {ResourceNotFoundException,InternalException,BiolabsException} = require('../../common/exception/biolabs-error');
-
+const { error, info, debug } = require("../../../utils/logger")
+const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 const appRoot = require('app-root-path');
 const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
 type status_enum = '-1' | '0' | '1' | '99';
@@ -48,45 +48,44 @@ export class MasterService {
    * @return array of sites object
    */
   async getSites(payload: MasterPayload) {
-    info("Getting site by Name: "+payload.q,__filename,"createSite()");
-    try{
-    let search: any = {};
-    let skip;
-    let take;
-    // filtering site list. Use payload.role if role is required.
-    if (payload.siteIdArr) {
-      payload.siteIdArr = this.parseToArray(payload.siteIdArr);
-      search = { id: In(payload.siteIdArr) };
-    }
+    info("Getting site by Name: " + payload.q, __filename, "createSite()");
+    try {
+      let search: any = {};
+      let skip;
+      let take;
+      // filtering site list. Use payload.role if role is required.
+      if (payload.siteIdArr) {
+        payload.siteIdArr = this.parseToArray(payload.siteIdArr);
+        search = { id: In(payload.siteIdArr) };
+      }
 
-    if (payload.q && payload.q != "") {
-      search = { ...search, ...{ name: Like("%" + payload.q + "%"), status: '1' } };
-    } else {
-      search = { ...search, ...{ status: '1' } };
-    }
+      if (payload.q && payload.q != "") {
+        search = { ...search, ...{ name: Like("%" + payload.q + "%"), status: '1' } };
+      } else {
+        search = { ...search, ...{ status: '1' } };
+      }
 
-    if (payload.pagination) {
-      skip = { skip: 0 }
-      take = { take: 10 }
-      if (payload.limit) {
-        take = { take: payload.limit };
-        if (payload.page) {
-          skip = { skip: payload.page * payload.limit }
+      if (payload.pagination) {
+        skip = { skip: 0 }
+        take = { take: 10 }
+        if (payload.limit) {
+          take = { take: payload.limit };
+          if (payload.page) {
+            skip = { skip: payload.page * payload.limit }
+          }
         }
       }
-    }
 
-    return await this.siteRepository.find({
-      select: ["id", "name"],
-      where: search,
-      order: { ['name']: 'ASC' },
-      skip,
-      take
-    });
-  }catch(err){
-    error("Error in finding sites"+err.message,__filename,"getSites()");
-    throw new BiolabsException(err.message);
-  }
+      return await this.siteRepository.find({
+        where: search,
+        order: { ['name']: 'ASC' },
+        skip,
+        take
+      });
+    } catch (err) {
+      error("Error in finding sites" + err.message, __filename, "getSites()");
+      throw new BiolabsException(err.message);
+    }
   }
 
   /**
@@ -95,20 +94,20 @@ export class MasterService {
    * @return array of product object 
    */
   async createProductType() {
-    info("creating product type",__filename,"createProductType()");
-    try{
-    const productType = await this.productTypeRepository.find();
-    const ptypeData = migrationData["productTypeName"]
-    if (!productType || productType.length == 0) {
-      for (let index = 0; index < ptypeData.length; index++) {
-        const productType = ptypeData[index];
-        await this.productTypeRepository.save(this.productTypeRepository.create(productType));
+    info("creating product type", __filename, "createProductType()");
+    try {
+      const productType = await this.productTypeRepository.find();
+      const ptypeData = migrationData["productTypeName"]
+      if (!productType || productType.length == 0) {
+        for (let index = 0; index < ptypeData.length; index++) {
+          const productType = ptypeData[index];
+          await this.productTypeRepository.save(this.productTypeRepository.create(productType));
+        }
       }
+    } catch (err) {
+      error("Error in creating product type" + err.message, __filename, "createSite()");
+      throw new InternalException(err.message);
     }
-  }catch(err){
-    error("Error in creating product type"+err.message,__filename,"createSite()");
-    throw new InternalException(err.message);
-  }
   }
 
   /**
@@ -117,45 +116,33 @@ export class MasterService {
    * @return array of site object
    */
   async createSites() {
-    info("Creating sites",__filename,"createSites()");
-    const sites = this.getSites(new MasterPayload());
+    const _sites = migrationData['sites'];
     let resp = {};
-    return await sites.then(async data => {
-      const _sites = migrationData['sites'];
-      for (const _site of _sites) {
-        if (!data.find(r => r.name == _site.name)) {
-          resp[_site.name] = await this.createSite(_site.name, _site.id);
-        }
-        if (_site.name == _site[_site.length - 1]) {
-          return resp;
-        }
-      }
-    }, error => {
-      if (error)
-      error("Error in Creating sites",__filename,"createSites()");
-        return;
-    })
+    for (const _site of _sites) {
+      resp[_site.name] = await this.createSite(_site);
+    }
+    return resp;
   }
 
   /**
    * Description: This method will store the site.
    * @description This method will store the site.
-   * @param name string
-   * @param id number
+   * @param site site data object
    * @return site object
    */
-  async createSite(name: string, id: number) {
-    info("Creating sites by Name: "+name,__filename,"createSite()");
-    try{
-    const status: status_enum = '1';
-    const payload = {
-      id, name, status
+  async createSite(_site: Site) {
+    const existingSite = await this.siteRepository.findOne(_site.id);
+    if (existingSite) {
+      delete existingSite.createdAt;
+      delete existingSite.updatedAt;
     }
-    return await this.siteRepository.save(this.siteRepository.create(payload));
-  }catch(err){
-    error("Error in creating site"+err.message,__filename,"createSite()");
-    throw new InternalException(err.message);
-  }
+    // Will compare 2 json and get the difference
+    const changes = diff(existingSite, _site);
+    if (existingSite && changes) {
+      return await this.siteRepository.update(_site.id, _site);
+    } else if (!existingSite) {
+      return await this.siteRepository.save(this.siteRepository.create(_site));
+    }
   }
 
   /**
@@ -165,36 +152,36 @@ export class MasterService {
    * @return array of roles object
    */
   async getRoles(payload: MasterPayload) {
-    info("Getting roles by Name: "+payload.q,__filename,"getRoles()")
-    try{
-    let search;
-    let skip;
-    let take;
-    if (payload.q && payload.q != "") {
-      search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
-    } else {
-      search = [{ status: '1' }]
-    }
-    if (payload.pagination) {
-      skip = { skip: 0 }
-      take = { take: 10 }
-      if (payload.limit) {
-        take = { take: payload.limit };
-        if (payload.page) {
-          skip = { skip: payload.page * payload.limit }
+    info("Getting roles by Name: " + payload.q, __filename, "getRoles()")
+    try {
+      let search;
+      let skip;
+      let take;
+      if (payload.q && payload.q != "") {
+        search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
+      } else {
+        search = [{ status: '1' }]
+      }
+      if (payload.pagination) {
+        skip = { skip: 0 }
+        take = { take: 10 }
+        if (payload.limit) {
+          take = { take: payload.limit };
+          if (payload.page) {
+            skip = { skip: payload.page * payload.limit }
+          }
         }
       }
+      return await this.roleRepository.find({
+        select: ["id", "name"],
+        where: search,
+        skip,
+        take
+      });
+    } catch (err) {
+      error("Error in getting roles" + err.message, __filename, "getRoles()");
+      throw new BiolabsException(err.message);
     }
-    return await this.roleRepository.find({
-      select: ["id", "name"],
-      where: search,
-      skip,
-      take
-    });
-  }catch(err){
-    error("Error in getting roles"+err.message,__filename,"getRoles()");
-    throw new BiolabsException(err.message);
-  }
   }
 
   /**
@@ -203,7 +190,7 @@ export class MasterService {
    * @return array of role object
    */
   async createRoles() {
-    info("Creating Roles",__filename,"createRoles()");
+    info("Creating Roles", __filename, "createRoles()");
     const roles = this.getRoles(new MasterPayload());
     let resp = {};
     return await roles.then(async data => {
@@ -218,8 +205,8 @@ export class MasterService {
       }
     }, error => {
       if (error)
-      error("Error in creating Roles",__filename,"createRoles()");
-        return;
+        error("Error in creating Roles", __filename, "createRoles()");
+      return;
     });
   }
 
@@ -231,17 +218,17 @@ export class MasterService {
    * @return role object
    */
   async createRole(name: string, id: number) {
-    info("creating Role by Name"+name,__filename,"createRole()");
-    try{
-    const status: status_enum = '1';
-    const payload = {
-      id, name, status
+    info("creating Role by Name" + name, __filename, "createRole()");
+    try {
+      const status: status_enum = '1';
+      const payload = {
+        id, name, status
+      }
+      return await this.roleRepository.save(this.roleRepository.create(payload));
+    } catch (err) {
+      error("Error in creating Role" + err.message, __filename, "createRole()");
+      throw new InternalException(err.message);
     }
-    return await this.roleRepository.save(this.roleRepository.create(payload));
-  }catch(err){
-    error("Error in creating Role"+err.message,__filename,"createRole()");
-    throw new InternalException(err.message);
-  }
   }
 
   /**
@@ -251,53 +238,53 @@ export class MasterService {
    * @return array of categories object
    */
   async getCategories(payload: MasterPayload) {
-    info("Getting categories by Name: "+payload.q,__filename,"getCategories()");
-    try{
-    let search;
-    let skip;
-    let take;
-    if (payload.q && payload.q != "") {
-      search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
-    } else {
-      search = [{ status: '1' }]
-    }
-    if (payload.pagination) {
-      skip = { skip: 0 }
-      take = { take: 10 }
-      if (payload.limit) {
-        take = { take: payload.limit };
-        if (payload.page) {
-          skip = { skip: payload.page * payload.limit }
+    info("Getting categories by Name: " + payload.q, __filename, "getCategories()");
+    try {
+      let search;
+      let skip;
+      let take;
+      if (payload.q && payload.q != "") {
+        search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
+      } else {
+        search = [{ status: '1' }]
+      }
+      if (payload.pagination) {
+        skip = { skip: 0 }
+        take = { take: 10 }
+        if (payload.limit) {
+          take = { take: payload.limit };
+          if (payload.page) {
+            skip = { skip: payload.page * payload.limit }
+          }
         }
       }
+      const categories: any[] = await this.categoryRepository.find({
+        select: ["id", "name", "parent_id"],
+        where: search,
+        order: { id: "ASC" },
+        skip,
+        take
+      });
+      // Create root for top-level node(s)
+      const root: any[] = [];
+
+      categories.forEach(category => {
+        // No parentId means top level
+        if (!category.parent_id) return root.push(category);
+
+        // Insert node as child of parent in flat array
+        const parentIndex = categories.findIndex(el => el.id === category.parent_id);
+        if (!categories[parentIndex].children) {
+          return categories[parentIndex].children = [category];
+        }
+        categories[parentIndex].children.push(category);
+
+      });
+      return root;
+    } catch (err) {
+      error(err.message, __filename, "getCategories()");
+      throw new BiolabsException(err.message);
     }
-    const categories: any[] = await this.categoryRepository.find({
-      select: ["id", "name", "parent_id"],
-      where: search,
-      order: { id: "ASC" },
-      skip,
-      take
-    });
-    // Create root for top-level node(s)
-    const root: any[] = [];
-
-    categories.forEach(category => {
-      // No parentId means top level
-      if (!category.parent_id) return root.push(category);
-
-      // Insert node as child of parent in flat array
-      const parentIndex = categories.findIndex(el => el.id === category.parent_id);
-      if (!categories[parentIndex].children) {
-        return categories[parentIndex].children = [category];
-      }
-      categories[parentIndex].children.push(category);
-
-    });
-    return root;
-  }catch(err){
-    error(err.message,__filename,"getCategories()");
-    throw new BiolabsException(err.message);
-  }
   }
 
   /**
@@ -306,22 +293,22 @@ export class MasterService {
    * @return array of category object
    */
   async createCategories() {
-    info("creating categories",__filename,"createCategories()");
-    try{
-    const _categories = migrationData['categories'];
-    // for (const _category of _categories) {
-    //   await this.createCategory(_category, 0);
-    // }
-    const promises = _categories.map(
-      async _category => {
-        return await this.createCategory(_category, 0);
-      }
-    );
-    const categories = await Promise.all(promises);
-    return categories;
-    }catch(err){
-      error("Error in creating categories"+err.message,__filename,"createCategories()");
-    throw new InternalException(err.message);
+    info("creating categories", __filename, "createCategories()");
+    try {
+      const _categories = migrationData['categories'];
+      // for (const _category of _categories) {
+      //   await this.createCategory(_category, 0);
+      // }
+      const promises = _categories.map(
+        async _category => {
+          return await this.createCategory(_category, 0);
+        }
+      );
+      const categories = await Promise.all(promises);
+      return categories;
+    } catch (err) {
+      error("Error in creating categories" + err.message, __filename, "createCategories()");
+      throw new InternalException(err.message);
     }
   }
 
@@ -333,22 +320,22 @@ export class MasterService {
    * @return category object
    */
   async createCategory(category: { name: string, id: number, subcategories?: [] }, parent_id: number) {
-    info("creating category",__filename,"createCategory()");
-    try{
-    this.saveCategory(category.name, category.id, parent_id);
-    if (('subcategories' in category) && category.subcategories.length > 0) {
-      const promises = category.subcategories.map(
-        async _subcategories => {
-          return await this.createCategory(_subcategories, category.id);
-        }
-      );
-      const subCategories = await Promise.all(promises);
-      return subCategories;
+    info("creating category", __filename, "createCategory()");
+    try {
+      this.saveCategory(category.name, category.id, parent_id);
+      if (('subcategories' in category) && category.subcategories.length > 0) {
+        const promises = category.subcategories.map(
+          async _subcategories => {
+            return await this.createCategory(_subcategories, category.id);
+          }
+        );
+        const subCategories = await Promise.all(promises);
+        return subCategories;
+      }
+    } catch (err) {
+      error("Error in creating category", __filename, "createCategory()");
+      throw new InternalException(err.message);
     }
-  }catch(err){
-    error("Error in creating category",__filename,"createCategory()");
-    throw new InternalException(err.message);
-  }
   }
 
   /**
@@ -360,23 +347,23 @@ export class MasterService {
    * @return category object
    */
   async saveCategory(name: string, id: number, parent_id: number) {
-    info("creating category by Name: "+name,__filename,"saveCategory()");
-    try{
-    const status: status_enum = '1';
-    const payload = { id: id, name: name, parent_id: parent_id, status: status }
-    const checkDuplicateCategory = await this.categoryRepository.find(
-      { where: { name: name, parent_id: parent_id } }
-    );
-    if (checkDuplicateCategory && checkDuplicateCategory.length > 0) {
-      debug("Category already existed",__filename,"saveCategory()");
-      return false;
-    } else {
-      return await this.categoryRepository.save(payload);
+    info("creating category by Name: " + name, __filename, "saveCategory()");
+    try {
+      const status: status_enum = '1';
+      const payload = { id: id, name: name, parent_id: parent_id, status: status }
+      const checkDuplicateCategory = await this.categoryRepository.find(
+        { where: { name: name, parent_id: parent_id } }
+      );
+      if (checkDuplicateCategory && checkDuplicateCategory.length > 0) {
+        debug("Category already existed", __filename, "saveCategory()");
+        return false;
+      } else {
+        return await this.categoryRepository.save(payload);
+      }
+    } catch (err) {
+      error("Error in creating category", __filename, "saveCategory()");
+      throw new InternalException(err.message);
     }
-  }catch(err){
-    error("Error in creating category",__filename,"saveCategory()");
-    throw new InternalException(err.message);
-  }
   }
 
   /**
@@ -386,36 +373,36 @@ export class MasterService {
    * @return array of biolabs sources object
    */
   async getBiolabsSource(payload: MasterPayload) {
-    info("Getting Biolabs Sources by Name: "+payload.q,__filename,"getBiolabsSource()");
-    try{
-    let search;
-    let skip;
-    let take;
-    if (payload.q && payload.q != "") {
-      search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
-    } else {
-      search = [{ status: '1' }]
-    }
-    if (payload.pagination) {
-      skip = { skip: 0 }
-      take = { take: 10 }
-      if (payload.limit) {
-        take = { take: payload.limit };
-        if (payload.page) {
-          skip = { skip: payload.page * payload.limit }
+    info("Getting Biolabs Sources by Name: " + payload.q, __filename, "getBiolabsSource()");
+    try {
+      let search;
+      let skip;
+      let take;
+      if (payload.q && payload.q != "") {
+        search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
+      } else {
+        search = [{ status: '1' }]
+      }
+      if (payload.pagination) {
+        skip = { skip: 0 }
+        take = { take: 10 }
+        if (payload.limit) {
+          take = { take: payload.limit };
+          if (payload.page) {
+            skip = { skip: payload.page * payload.limit }
+          }
         }
       }
+      return await this.biolabsSourceRepository.find({
+        select: ["id", "name"],
+        where: search,
+        skip,
+        take
+      });
+    } catch (err) {
+      error("Error in find Biolabs source", __filename, "getBiolabsSource()");
+      throw new BiolabsException(err.message);
     }
-    return await this.biolabsSourceRepository.find({
-      select: ["id", "name"],
-      where: search,
-      skip,
-      take
-    });
-  }catch(err){
-    error("Error in find Biolabs source",__filename,"getBiolabsSource()");
-    throw new BiolabsException(err.message);
-  }
   }
 
   /**
@@ -424,7 +411,7 @@ export class MasterService {
    * @return array of biolabs sources object
    */
   async createBiolabsSources() {
-    info("Creating Biolabs Sources",__filename,"creatBiolabsSources()");
+    info("Creating Biolabs Sources", __filename, "creatBiolabsSources()");
     const biolabsSources = this.getBiolabsSource(new MasterPayload());
     let resp = {};
     return await biolabsSources.then(async data => {
@@ -439,8 +426,8 @@ export class MasterService {
       }
     }, error => {
       if (error)
-      error("Error in creating Biolabs Sources",__filename,"createBiolabsSources()");
-        return;
+        error("Error in creating Biolabs Sources", __filename, "createBiolabsSources()");
+      return;
     });
   }
 
@@ -452,17 +439,17 @@ export class MasterService {
    * @return biolabs source object
    */
   async createBiolabsSource(name: string, id: number) {
-    info("creating Biolabs sources by Name"+name+" Id: "+id,__filename,"createBiolabsSource()");
-    try{
-    const status: status_enum = '1';
-    const payload = {
-      id, name, status
+    info("creating Biolabs sources by Name" + name + " Id: " + id, __filename, "createBiolabsSource()");
+    try {
+      const status: status_enum = '1';
+      const payload = {
+        id, name, status
+      }
+      return await this.biolabsSourceRepository.save(this.biolabsSourceRepository.create(payload));
+    } catch (err) {
+      error("Error in Creating Biolabs sources", __filename, "createBiolabsSource()");
+      throw new InternalException(err.message);
     }
-    return await this.biolabsSourceRepository.save(this.biolabsSourceRepository.create(payload));
-  }catch(err){
-    error("Error in Creating Biolabs sources",__filename,"createBiolabsSource()");
-    throw new InternalException(err.message);
-  }
   }
 
   /**
@@ -472,36 +459,36 @@ export class MasterService {
    * @return array of fundings object
    */
   async getFundings(payload: MasterPayload) {
-    info("Getting Fundings by Name: "+payload.q,__filename,"getFundings()");
-    try{
-    let search;
-    let skip;
-    let take;
-    if (payload.q && payload.q != "") {
-      search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
-    } else {
-      search = [{ status: '1' }]
-    }
-    if (payload.pagination) {
-      skip = { skip: 0 }
-      take = { take: 10 }
-      if (payload.limit) {
-        take = { take: payload.limit };
-        if (payload.page) {
-          skip = { skip: payload.page * payload.limit }
+    info("Getting Fundings by Name: " + payload.q, __filename, "getFundings()");
+    try {
+      let search;
+      let skip;
+      let take;
+      if (payload.q && payload.q != "") {
+        search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
+      } else {
+        search = [{ status: '1' }]
+      }
+      if (payload.pagination) {
+        skip = { skip: 0 }
+        take = { take: 10 }
+        if (payload.limit) {
+          take = { take: payload.limit };
+          if (payload.page) {
+            skip = { skip: payload.page * payload.limit }
+          }
         }
       }
+      return await this.fundingRepository.find({
+        select: ["id", "name"],
+        where: search,
+        skip,
+        take
+      });
+    } catch (err) {
+      error("Error in find Fundings", __filename, "getFundings()");
+      throw new BiolabsException(err.message);
     }
-    return await this.fundingRepository.find({
-      select: ["id", "name"],
-      where: search,
-      skip,
-      take
-    });
-  }catch(err){
-    error("Error in find Fundings",__filename,"getFundings()");
-    throw new BiolabsException(err.message);
-  }
   }
 
   /**
@@ -510,7 +497,7 @@ export class MasterService {
    * @return array of fundings object
    */
   async createFundings() {
-    error("creating fundings",__filename,"createFundings()");
+    error("creating fundings", __filename, "createFundings()");
     const fundings = this.getFundings(new MasterPayload());
     let resp = {};
     return await fundings.then(async data => {
@@ -525,8 +512,8 @@ export class MasterService {
       }
     }, error => {
       if (error)
-      error("Error in delete Order product",__filename,"createFundings()");
-        return;
+        error("Error in delete Order product", __filename, "createFundings()");
+      return;
     });
   }
 
@@ -538,17 +525,17 @@ export class MasterService {
    * @return funding object
    */
   async createFunding(name: string, id: number) {
-    info("creating fundings by Name: "+name,__filename,"createFunding()");
-    try{
-    const status: status_enum = '1';
-    const payload = {
-      id, name, status
+    info("creating fundings by Name: " + name, __filename, "createFunding()");
+    try {
+      const status: status_enum = '1';
+      const payload = {
+        id, name, status
+      }
+      return await this.fundingRepository.save(this.fundingRepository.create(payload));
+    } catch (err) {
+      error("Error in creating funding", __filename, "createFunding()");
+      throw new InternalException(err.message);
     }
-    return await this.fundingRepository.save(this.fundingRepository.create(payload));
-  }catch(err){
-    error("Error in creating funding",__filename,"createFunding()");
-    throw new InternalException(err.message);
-  }
   }
 
   /**
@@ -558,36 +545,36 @@ export class MasterService {
    * @return array of modalities object
    */
   async getModalities(payload: MasterPayload) {
-    info("Getting modalities by Name: "+payload.q,__filename,"getModalities()");
-    try{
-    let search;
-    let skip;
-    let take;
-    if (payload.q && payload.q != "") {
-      search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
-    } else {
-      search = [{ status: '1' }]
-    }
-    if (payload.pagination) {
-      skip = { skip: 0 }
-      take = { take: 10 }
-      if (payload.limit) {
-        take = { take: payload.limit };
-        if (payload.page) {
-          skip = { skip: payload.page * payload.limit }
+    info("Getting modalities by Name: " + payload.q, __filename, "getModalities()");
+    try {
+      let search;
+      let skip;
+      let take;
+      if (payload.q && payload.q != "") {
+        search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
+      } else {
+        search = [{ status: '1' }]
+      }
+      if (payload.pagination) {
+        skip = { skip: 0 }
+        take = { take: 10 }
+        if (payload.limit) {
+          take = { take: payload.limit };
+          if (payload.page) {
+            skip = { skip: payload.page * payload.limit }
+          }
         }
       }
+      return await this.modalityRepository.find({
+        select: ["id", "name"],
+        where: search,
+        skip,
+        take
+      });
+    } catch (err) {
+      error("Error in finding modalities", __filename, "getModalities()");
+      throw new BiolabsException(err.message);
     }
-    return await this.modalityRepository.find({
-      select: ["id", "name"],
-      where: search,
-      skip,
-      take
-    });
-  }catch(err){
-    error("Error in finding modalities",__filename,"getModalities()");
-    throw new BiolabsException(err.message);
-  }
   }
 
   /**
@@ -596,7 +583,7 @@ export class MasterService {
    * @return array of modalities object
    */
   async createModalities() {
-    info("creating Modalities",__filename,"createModalities()");
+    info("creating Modalities", __filename, "createModalities()");
     const modalities = this.getModalities(new MasterPayload());
     let resp = {};
     return await modalities.then(async data => {
@@ -611,8 +598,8 @@ export class MasterService {
       }
     }, error => {
       if (error)
-      error("Error in creating modalities",__filename,"createModalities()");
-        return;
+        error("Error in creating modalities", __filename, "createModalities()");
+      return;
     });
   }
 
@@ -624,17 +611,17 @@ export class MasterService {
    * @return modality object
    */
   async createModality(name: string, id: number) {
-    info("creating modality by Name: "+name,__filename,"createModality()");
-    try{
-    const status: status_enum = '1';
-    const payload = {
-      id, name, status
+    info("creating modality by Name: " + name, __filename, "createModality()");
+    try {
+      const status: status_enum = '1';
+      const payload = {
+        id, name, status
+      }
+      return await this.modalityRepository.save(this.modalityRepository.create(payload));
+    } catch (err) {
+      error("Error in delete Order product", __filename, "createModality()");
+      throw new InternalException(err.message);
     }
-    return await this.modalityRepository.save(this.modalityRepository.create(payload));
-  }catch(err){
-    error("Error in delete Order product",__filename,"createModality()");
-    throw new InternalException(err.message);
-  }
   }
 
   /**
@@ -644,36 +631,36 @@ export class MasterService {
    * @return array of technology stages object
    */
   async getTechnologyStages(payload: MasterPayload) {
-    info("Getting technology stages by Name:"+payload.q,__filename,"getTechnologyStages()");
-    try{
-    let search;
-    let skip;
-    let take;
-    if (payload.q && payload.q != "") {
-      search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
-    } else {
-      search = [{ status: '1' }]
-    }
-    if (payload.pagination) {
-      skip = { skip: 0 }
-      take = { take: 10 }
-      if (payload.limit) {
-        take = { take: payload.limit };
-        if (payload.page) {
-          skip = { skip: payload.page * payload.limit }
+    info("Getting technology stages by Name:" + payload.q, __filename, "getTechnologyStages()");
+    try {
+      let search;
+      let skip;
+      let take;
+      if (payload.q && payload.q != "") {
+        search = [{ name: Like("%" + payload.q + "%"), status: '1' }]
+      } else {
+        search = [{ status: '1' }]
+      }
+      if (payload.pagination) {
+        skip = { skip: 0 }
+        take = { take: 10 }
+        if (payload.limit) {
+          take = { take: payload.limit };
+          if (payload.page) {
+            skip = { skip: payload.page * payload.limit }
+          }
         }
       }
+      return await this.technologyStageRepository.find({
+        select: ["id", "name"],
+        where: search,
+        skip,
+        take
+      })
+    } catch (err) {
+      error("Error in finding technology stages", __filename, "deleteOrderProduct()");
+      throw new BiolabsException(err.message);
     }
-    return await this.technologyStageRepository.find({
-      select: ["id", "name"],
-      where: search,
-      skip,
-      take
-    })
-  }catch(err){
-    error("Error in finding technology stages",__filename,"deleteOrderProduct()");
-    throw new BiolabsException(err.message);
-  }
   }
 
   /**
@@ -682,7 +669,7 @@ export class MasterService {
    * @return array of technology stages object
    */
   async createTechnologyStages() {
-    info("creating Technology Stages",__filename,"createTechnologyStages()");
+    info("creating Technology Stages", __filename, "createTechnologyStages()");
     const technologyStages = this.getTechnologyStages(new MasterPayload());
     let resp = {};
     return await technologyStages.then(async data => {
@@ -697,8 +684,8 @@ export class MasterService {
       }
     }, error => {
       if (error)
-      error("Error in creating Technology stages",__filename,"createTechnologyStages()");
-        return;
+        error("Error in creating Technology stages", __filename, "createTechnologyStages()");
+      return;
     });
   }
 
@@ -710,17 +697,17 @@ export class MasterService {
    * @return technology stages object
    */
   async createTechnologyStage(name: string, id: number) {
-    info("Creating Technology Stage by Name:"+name,__filename,"createTechnologyStage()")
-    try{
-    const status: status_enum = '1';
-    const payload = {
-      id, name, status
+    info("Creating Technology Stage by Name:" + name, __filename, "createTechnologyStage()")
+    try {
+      const status: status_enum = '1';
+      const payload = {
+        id, name, status
+      }
+      return await this.technologyStageRepository.save(this.technologyStageRepository.create(payload));
+    } catch (err) {
+      error("Error in creating technology stage", __filename, "createTechnologyStage()");
+      throw new InternalException(err.message);
     }
-    return await this.technologyStageRepository.save(this.technologyStageRepository.create(payload));
-  }catch(err){
-    error("Error in creating technology stage",__filename,"createTechnologyStage()");
-    throw new InternalException(err.message);
-  }
   }
 
   /**
@@ -747,7 +734,7 @@ export class MasterService {
    * @param val input value
    */
   private parseToArray(val) {
-    info("parsing to array",__filename,"parseToArray()")
+    info("parsing to array", __filename, "parseToArray()")
     if (typeof val === 'object') {
       return val;
     }
