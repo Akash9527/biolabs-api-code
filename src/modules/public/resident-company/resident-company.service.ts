@@ -303,7 +303,6 @@ export class ResidentCompanyService {
     info("Adding resident company " + payload.companyName, __filename, "addResidentCompany()");
     const rc = await this.getByEmail(payload.email);
     const sites = payload.site;
-
     if (rc) {
       error("User with provided email already created.", __filename, "addResidentCompany()");
       throw new NotAcceptableException(
@@ -327,7 +326,7 @@ export class ResidentCompanyService {
           await this.addResidentCompanyDataInWaitlist(savedRc);
         }
       }
-      await this.sendEmailToSiteAdmin(sites, req, payload.companyName);
+      await this.sendEmailToSiteAdmin(sites, req, payload.companyName, "MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION");
     } catch {
       response['status'] = 'error';
       response['message'] = 'Could not add application';
@@ -347,8 +346,9 @@ export class ResidentCompanyService {
    * @param req object of Request.
    * @param companyName name of the company for which application is submitted.
    */
-  private async sendEmailToSiteAdmin(site: any, req, companyName: string) {
-    info("Sending email to site admin", __filename, "sendEmailToSIteAdmin()");
+  private async sendEmailToSiteAdmin(site: any, req, companyName: string, mailForWhat: string) {
+    const MAIL_FOR = "MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE";
+    info("Sending email to site admin", __filename, "sendEmailToSiteAdmin()");
     try {
       let siteAdminEmails = [];
       let userInfo;
@@ -386,7 +386,14 @@ export class ResidentCompanyService {
         site_name: siteList,
         origin: req.headers['origin'],
       };
-      await this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, 'applicationFormSubmit', userInfo);
+
+      let contentParam = 'applicationFormSubmit';
+      if (mailForWhat == MAIL_FOR) {
+        EMAIL.SUBJECT_FORM = 'Biolabs | Space Change Request Submitted';
+        contentParam = 'spaceChangeWaitlistSubmit';
+      }
+
+      await this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, contentParam, userInfo);
     } catch (err) {
       error("Error in sending email to site admin", __filename, "sendEmailToSiteAdmin()");
       throw new InternalException('Error in sending email to site admin' + err.message);
@@ -1566,6 +1573,7 @@ order by quat;
   private async addResidentCompanyDataInWaitlist(savedRc: any) {
     const PLAN_CHANGE_SUMMARY_INITIAL_VALUE = 'See Notes';
     const REQUEST_NOTES_INITIAL_VALUE = 'When would you like to join BioLabs?, What equipment and facilities do you plan to primarily use onsite?**';
+    const REQUEST_TYPE_EXTERNAL = false;
     const maxPriorityOrder: number = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
       return result;
     });
@@ -1581,7 +1589,7 @@ order by quat;
     spaceChangeWaitlistObj.requestedBy = savedRc.name;
     spaceChangeWaitlistObj.requestStatus = RequestStatusEnum.Open;
     spaceChangeWaitlistObj.fulfilledOn = null;
-    spaceChangeWaitlistObj.isRequestInternal = true;
+    spaceChangeWaitlistObj.isRequestInternal = REQUEST_TYPE_EXTERNAL;
     spaceChangeWaitlistObj.requestNotes = REQUEST_NOTES_INITIAL_VALUE;
     spaceChangeWaitlistObj.internalNotes = null;
     spaceChangeWaitlistObj.siteNotes = null;
@@ -1637,6 +1645,7 @@ order by quat;
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG = "Could not update Resident Company record";
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG = "Could not update Resident Company History record";
     const ERROR_IN_FETCHING_MAX_PRIORITY_ORDER_ERR_MSG = "Error while fetching Max Priority Order to set in new Space Change Waitlist record";
+    const COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG = "Could not send email notification";
     const APPROVED_DENIED_PRIORITY_ORDER = -1;
 
     let residentCompany: any = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
@@ -1680,6 +1689,9 @@ order by quat;
       spaceChangeWaitlistObj.siteNotes = payload.siteNotes;
       spaceChangeWaitlistObj.priorityOrder = maxPriorityOrder;
       let siteIdArr = req.user.site_id;
+      if (req.headers['x-site-id']) {
+        siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+      }
       spaceChangeWaitlistObj.site = siteIdArr;
       spaceChangeWaitlistObj.membershipChange = payload.membershipChange;
       spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
@@ -1688,7 +1700,7 @@ order by quat;
       const resp = await this.spaceChangeWaitlistRepository.save(this.spaceChangeWaitlistRepository.create(spaceChangeWaitlistObj))
         .catch(err => {
           throw new HttpException({
-            status: 'Error1',
+            status: 'Error',
             message: COULD_NOT_SAVE_SPACE_CHANGE_WAITLIST_ERR_MSG,
             body: err
           }, HttpStatus.BAD_REQUEST);
@@ -1728,15 +1740,26 @@ order by quat;
         });
 
       /** Update Resident Company history */
-      this.updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload, residentCompany).catch(err => {
+      await this.updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload, residentCompany).catch(err => {
         throw new HttpException({
           status: "Error",
           message: COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG,
           body: err
         }, HttpStatus.INTERNAL_SERVER_ERROR);
       });
+
+      /** Send email notification to Site Admin to notify about new Plan Change Request submission */
+      const MAIL_FOR = "MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE";
+      await this.sendEmailToSiteAdmin(req.user.site_id, req, residentCompany.companyName, MAIL_FOR).catch(err => {
+        throw new HttpException({
+          status: "Error",
+          message: COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG,
+          body: err
+        }, HttpStatus.INTERNAL_SERVER_ERROR);
+      });
+
     } catch (error) {
-      response['status'] = 'Error2';
+      response['status'] = 'Error';
       response['message'] = error.message;
       response['body'] = error;
       return response;
