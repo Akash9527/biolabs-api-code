@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, Min } from "class-validator";
+import { IsEnum, IsNotEmpty, Min } from "class-validator";
 import { MembershipChangeEnum } from "../enum/membership-change-enum";
 import { RequestStatusEnum } from "../enum/request-status-enum";
 import { ItemDto } from "./item.dto";
@@ -21,6 +21,7 @@ export class AddSpaceChangeWaitlistDto {
 
     @ApiProperty({ description: 'Request status', default: 0, required: true, nullable: false })
     @IsNotEmpty()
+    @IsEnum(RequestStatusEnum)
     requestStatus: RequestStatusEnum;
 
     @ApiProperty({ description: 'The date on which request is fullfilled', required: false, nullable: true })
@@ -41,6 +42,7 @@ export class AddSpaceChangeWaitlistDto {
 
     @ApiProperty({ description: 'Membership change', required: true, nullable: false })
     @IsNotEmpty()
+    @IsEnum(MembershipChangeEnum)
     membershipChange: MembershipChangeEnum;
 
     @ApiProperty({ description: 'Request Graduate Date', required: false, nullable: true })
