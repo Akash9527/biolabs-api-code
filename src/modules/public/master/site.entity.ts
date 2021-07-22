@@ -12,6 +12,21 @@ export class Site {
   @Column({ length: 255 })
   name: string;
 
+  @Column({ length: 255, nullable: true })
+  longName: string;
+
+  @Column({ length: 255, nullable: true })
+  standardizedAddress: string;
+
+  @Column({ nullable: true })
+  colorCode: string;
+
+  @Column({ nullable: true })
+  googleMapUrl: string;
+
+  @Column({ nullable: true })
+  siteMapBoxImgUrl: string;
+
   @Column({ length: 255, enum: ['-1', '0', '1', '99'] })
   status: status_enum;
 

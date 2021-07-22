@@ -7,6 +7,8 @@ import { UpdateResidentCompanyStatusPayload } from './update-resident-company-st
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 import { AddNotesDto } from './add-notes.dto';
+import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
+import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
 
 @Controller('api/resident-company')
 @ApiTags('Resident Company')
@@ -58,11 +60,24 @@ export class ResidentCompanyController {
   }
 
   /**
+    * Description: This method returns some specific fields of Resident Company by residentCompanyId.
+    * @description This method returns some specific fields of Resident Company by residentCompanyId.
+    * @param payload residentCompanyId.
+    */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('/forwaitlist/:residentCompanyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getResidentCompanySpecificFieldsById(@Param('residentCompanyId') residentCompanyId: number): Promise<any> {
+    return this.residentCompanyService.getResidentCompanySpecificFieldsById(residentCompanyId);
+  }
+
+  /**
   * Description: This method is used to get a resident company information for sponsor dashboard.
   * @description This method is used to get a resident company information  for sponsor dashboard.
   * @param id it is a request parameter expect a number value of resident company id.
   */
-
   @Get('/dashboard')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   async getResidentCompanyForSponsor(): Promise<any> {
@@ -243,21 +258,21 @@ export class ResidentCompanyController {
   getstartedWithBiolabs(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
     return this.residentCompanyService.getstartedWithBiolabs(siteId, companyId);
   }
-   /**
-   * Description: This method returns current month fee details.
-   * @description This method returns current month fee details.
-   * @param siteId The Site id
-   * @param companyId The Company id
-   * @returns current month fee details
-   */
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard())
-    @Get('financialfees/:companyId')
-    @ApiResponse({ status: 200, description: 'Successful Response' })
-    @ApiResponse({ status: 401, description: 'Unauthorized' })
-    getFinancialFees(@Param('companyId') companyId: number): Promise<any> {
-      return this.residentCompanyService.getFinancialFees(companyId);
-    }
+  /**
+  * Description: This method returns current month fee details.
+  * @description This method returns current month fee details.
+  * @param siteId The Site id
+  * @param companyId The Company id
+  * @returns current month fee details
+  */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('financialfees/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getFinancialFees(@Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getFinancialFees(companyId);
+  }
 
   /**
    * Description: This method returns latest feeds.
@@ -295,12 +310,94 @@ export class ResidentCompanyController {
    * @param companyId The Company id
    * @returns current month fee details.
    */
-   @ApiBearerAuth()
-   @UseGuards(AuthGuard())
-   @Get('companysizeanalysis/:companyId')
-   @ApiResponse({ status: 200, description: 'Successful Response' })
-   @ApiResponse({ status: 401, description: 'Unauthorized' })
-   getCompanySizeQuartly(@Param('companyId') companyId: number): Promise<any> {
-     return this.residentCompanyService.getCompanySizeQuartly(companyId);
-   }
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('companysizeanalysis/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getCompanySizeQuartly(@Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getCompanySizeQuartly(companyId);
+  }
+
+  /**
+  * @description BIOL-275: Add space waitlist entry
+  * @param payload
+  * @param req
+  * @returns
+  */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Post("/spacechangewaitlist")
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiHeader({
+    name: 'x-site-id',
+    description: 'Selected site ids array',
+  })
+  async addSpaceChangeWaitlist(@Body() payload: AddSpaceChangeWaitlistDto, @Request() req): Promise<any> {
+    return await this.residentCompanyService.addToSpaceChangeWaitList(payload, req);
+  }
+
+  /**
+   * Description: BIOL-275 Get Space Change Waitlist by status,siteId and companyId
+   * @param status array of status (0,1,2)
+   * @param req Request object
+   * @param companyId id of the company
+   * @returns list of Space Change Waitlist
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('/spacechangewaitlist/param?')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getSpaceChangeWaitlist(@Query('status') status: number[], @Request() req, @Query('companyId') companyId: number): Promise<any> {
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return this.residentCompanyService.getSpaceChangeWaitListByStatusSiteIdAndCompanyId(status, siteIdArr, companyId);
+  }
+
+  /**
+   * Description: BIOL-275: Method to return SpaceChangeWaitList object by id.
+   * @description BIOL-275: Get space change waitlist by id.
+   * @param id of SpaceChangeWaitList
+   * @returns object of SpaceChangeWaitList
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('/spacechangewaitlist/:id')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getSpaceChangeWaitlistById(@Param('id') id: number): Promise<any> {
+    return this.residentCompanyService.getSpaceChangeWaitListById(id);
+  }
+
+  /**
+   * @description BIOL-275: Get items for space change waitlist by siteId and companyId
+   * @param status
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('/spacechangewaitlist/items/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getItemsForSpaceChangeWaitlist(@Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getSpaceChangeWaitlistItems(companyId);
+  }
+
+  /**
+   * Updates the priority order of Open space change wait list.
+   * @description Updates the priority order of Open space change wait list.
+   * @param payload it is a request body contains new order of Space Change Waitlist Ids.
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Put('/spacechangewaitlist/priorityorder')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateWaitlistPriorityOrder(@Body() payload: UpdateWaitlistPriorityOrderDto): Promise<any> {
+    return this.residentCompanyService.updateSpaceChangeWaitlistPriorityOrder(payload);
+  }
 }

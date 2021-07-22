@@ -2,6 +2,7 @@ import { BlobServiceClient, BlockBlobClient } from '@azure/storage-blob';
 import { BadRequestException, Injectable, NotAcceptableException } from '@nestjs/common';
 import { ResidentCompanyService } from '../resident-company';
 import { UsersService } from '../user/user.service';
+const {error,debug} = require('../../../utils/logger');
 
 @Injectable()
 export class FileService {
@@ -27,6 +28,7 @@ export class FileService {
     if (file) {
       const fileName = ((userId) ? userId : companyId) + "-" + new Date().getTime() + "-" + file.originalname;
       const blobClient = this.getBlobClient(fileName, payload.fileType);
+      debug("Uploading file "+fileName,__filename,"upload()");
       try {
         const uploaded = await blobClient.uploadData(file.buffer);
         if (payload.fileType == 'user')
@@ -36,12 +38,14 @@ export class FileService {
           await this.residentCompanyService.updateResidentCompanyImg({ id: companyId, imageUrl: fileName, fileType : payload.fileType });
 
         return { upload: uploaded, fileName: fileName };
-      } catch (error) {
+      } catch (err) {
+        error("Error in uploading file "+err.error,__filename,"upload()");
         throw new BadRequestException(
-          error.message
+          err.message
         );
       }
     } else {
+      error("File is invalid ",__filename,"upload()");
       throw new NotAcceptableException(
         'File is invalid.',
       );
@@ -50,18 +54,28 @@ export class FileService {
 
   async getfileStream(fileName: string, fileType: string) {
     try {
+      debug("Getting file stream file name is "+fileName,__filename,"getfileStream()");
       const blobClient = this.getBlobClient(fileName, fileType);
       const blobDownloaded = await blobClient.download();
       return blobDownloaded.readableStreamBody;
-    } catch (error) {
+    } catch (err) {
+      error("File is invalid "+err.message,__filename,"getfileStream()");
       throw new BadRequestException(
-        error.message
+        err.message
       );
     }
   }
 
   async delete(filename: string, containerName: string) {
+    debug("deleting file file name is "+filename,__filename,"delete()");
+    try {
     const blobClient = this.getBlobClient(filename, containerName);
     await blobClient.deleteIfExists();
+  } catch (err) {
+    error("Error in deleting file "+err.message,__filename,"delete()");
+    throw new BadRequestException(
+      err.message
+    );
+  }
   }
 }

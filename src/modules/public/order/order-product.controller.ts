@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards,Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
@@ -77,11 +77,11 @@ export class OrderProductController {
   @Get('all-invoice')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async consolidatedInvoice(@Query('month') month: number,@Request() req): Promise<any> {
+  async consolidatedInvoice(@Query('month') month: number, @Request() req): Promise<any> {
     let siteIdArr = req.user.site_id;
     if (req.headers['x-site-id']) {
       siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     }
-    return await this.orderProductService.consolidatedInvoice(month,siteIdArr);
+    return await this.orderProductService.consolidatedInvoice(month, siteIdArr);
   }
 }

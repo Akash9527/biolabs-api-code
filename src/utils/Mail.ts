@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const axios = require('axios');
 const qs = require('qs');
 dotenv.config();
+const {info,error} = require('./logger');
+const {BiolabsException} = require('../modules/common/exception/biolabs-error');
 
 export class Mail {
    /**
@@ -38,6 +40,7 @@ export class Mail {
    }
 
    private async sendEmailGraphAPI(tenant: any, token: any, subject: string, content: string, userInfo: any) {
+      info("Sending email to "+tenant.tenantEmail, __filename,"sendEmailGraphAPI()");
       let userTxt = tenant && tenant.role && tenant.role == 3 ? 'Insight' : 'Connect';
       let siteNamesList = '';
       let siteNames = [];
@@ -606,6 +609,7 @@ export class Mail {
          .catch((error) => {
             return error;
          });
+         info("Email sent successfully "+__filename,"sendEmailGraphAPI()");  
    }
 
    /**
@@ -615,8 +619,14 @@ export class Mail {
    async sendEmail(tenant: any, subject: string, content: string, userInfo: any) {
       /** Graph API Token Generation implementation */
       const tokenGraphAPI = await this.getGrapAPIToken();
-
+      try{
       /** Graph API Send Email implementation */
       await this.sendEmailGraphAPI(tenant, tokenGraphAPI, subject, content, userInfo);
+
+      }catch(err){
+         error("Error in sending email..."+err,__filename,"sendEmail");
+        // throw new BiolabsException("Error in sending email... "+err); 
+      }
+
    }
 }
