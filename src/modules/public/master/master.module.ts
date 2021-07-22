@@ -11,9 +11,15 @@ import { MasterService } from './master.service';
 import { MasterController } from './master.controller';
 import { PassportModule } from '@nestjs/passport';
 import { ProductType } from '../order/model/product-type.entity';
+import { FileModule } from '../file';
+import { UserModule } from '../user';
+import { ResidentCompanyModule } from '../resident-company';
 
 @Module({
   imports: [
+    FileModule,
+    UserModule,
+    ResidentCompanyModule,
     TypeOrmModule.forFeature([BiolabsSource, Category, Funding, Modality, Role, Site, TechnologyStage, ProductType]),
     PassportModule.register({ defaultStrategy: 'jwt' }),],
   controllers: [MasterController],
