@@ -9,6 +9,7 @@ import { SearchResidentCompanyPayload } from './search-resident-company.payload'
 import { AddNotesDto } from './add-notes.dto';
 import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
 import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
+import { UpdateSpaceChangeWaitlistDto } from '../dto/update-space-change-waitlist.dto';
 
 @Controller('api/resident-company')
 @ApiTags('Resident Company')
@@ -399,5 +400,19 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateWaitlistPriorityOrder(@Body() payload: UpdateWaitlistPriorityOrderDto): Promise<any> {
     return this.residentCompanyService.updateSpaceChangeWaitlistPriorityOrder(payload);
+  }
+
+  /**
+   * Description: Update Space Change Waitlist with items, update Resident Company details, update Resident Company history.
+   * @description Update Space Change Waitlist with items, update Resident Company details, update Resident Company history.
+   * @param payload it is a request body contains new order of Space Change Waitlist Ids.
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Put('/spacechangewaitlist')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateSpaceChangeWaitlist(@Body() payload: UpdateSpaceChangeWaitlistDto): Promise<any> {
+    return this.residentCompanyService.updateSpaceChangeWaitlist(payload);
   }
 }
