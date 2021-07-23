@@ -838,7 +838,7 @@ export class ResidentCompanyService {
       }
     } catch (err) {
       error("Error in find resident company", __filename, "getResidentCompany()");
-      throw new BiolabsException('Error in find resident company' + err.message);
+      throw new BiolabsException('Error in find resident company' ,err.message);
     }
   }
 
@@ -1285,7 +1285,7 @@ export class ResidentCompanyService {
       }
     } catch (err) {
       error("Error in soft delete note", __filename, "softDeleteNote()");
-      throw new BiolabsException('Error in soft delete note' + err.message);
+      throw new BiolabsException('Error in soft delete note' ,err.message);
     }
   }
 
