@@ -67,7 +67,7 @@ export class OrderProductService {
       orderProduct.groupId = orderSave.id;
       orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
       const product = await this.productRepository.findOne(orderProduct.productId);
-      orderProduct.productTypeId = (product) ? product.productType.id : null;
+      orderProduct.productTypeId = (product && product.productType) ? product.productType.id : null;
       await this.orderProductRepository.update(orderSave.id, orderProduct);
 
       if (orderProduct.recurrence) {
@@ -133,7 +133,7 @@ export class OrderProductService {
     });
     debug(`order product: ${orderProduct.productId}`, __filename, "updateOrderProduct()");
     const product = await this.productRepository.findOne(orderProduct.productId);
-    payload.productTypeId = (product) ? product.productType.id : null;
+    payload.productTypeId = (product && product.productType) ? product.productType.id : null;
 
     payload.groupId = orderProduct.groupId;
     payload.manuallyEnteredProduct = orderProduct.manuallyEnteredProduct;
