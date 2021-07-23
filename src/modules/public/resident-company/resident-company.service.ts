@@ -4,7 +4,9 @@ import { EMAIL } from 'constants/email';
 import { In, Like, Repository } from 'typeorm';
 import { Mail } from '../../../utils/Mail';
 import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
+import { UpdateSpaceChangeWaitlistDto } from '../dto/update-space-change-waitlist.dto';
 import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
+import { UpdateWaitlistRequestStatusDto } from '../dto/update-waitlist-request-status.dto';
 import { Item } from '../entity/item.entity';
 import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
 import { MembershipChangeEnum } from '../enum/membership-change-enum';
@@ -1860,7 +1862,6 @@ order by quat;
     return spaceChangeWaitlist;
   }
 
-
   /**
    * Description: Fetch Item array by SpaceChangeWaitlist id.
    * @description Fetch Item array by SpaceChangeWaitlist id.
@@ -1943,5 +1944,174 @@ order by quat;
       response['message'] = 'Could not update Priority Order';
     }
     return response;
+  }
+
+  /**
+   * Description: Update Space Change Waitlist with items, update Resident Company details, update Resident Company history.
+   * @description Update Space Change Waitlist with items, update Resident Company details, update Resident Company history.
+   * @param payload The payload of Space Change Waitlist to with updated entries.
+   * @returns 
+   */
+  public async updateSpaceChangeWaitlist(payload: UpdateSpaceChangeWaitlistDto) {
+    const COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG = "Could not update Resident Company record";
+    const COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG = "Could not update Resident Company History record";
+    let response = {};
+    try {
+      if (payload) {
+        let spaceChangeWaitlistObj: any = await this.spaceChangeWaitlistRepository.findOne(payload.spaceChangeWaitlistId).catch(err => {
+          throw new HttpException({
+            status: "Error",
+            message: "Error in fetching Space Change Waitlist by id " + payload.spaceChangeWaitlistId,
+            body: err
+          }, HttpStatus.INTERNAL_SERVER_ERROR);
+        });
+        if (spaceChangeWaitlistObj) {
+          spaceChangeWaitlistObj.desiredStartDate = payload.desiredStartDate;
+          spaceChangeWaitlistObj.planChangeSummary = payload.planChangeSummary;
+          spaceChangeWaitlistObj.requestStatus = payload.requestStatus;
+          spaceChangeWaitlistObj.fulfilledOn = payload.fulfilledOn;
+          spaceChangeWaitlistObj.isRequestInternal = payload.isRequestInternal;
+          spaceChangeWaitlistObj.requestNotes = payload.requestNotes;
+          spaceChangeWaitlistObj.internalNotes = payload.internalNotes;
+          spaceChangeWaitlistObj.siteNotes = payload.siteNotes;
+          spaceChangeWaitlistObj.membershipChange = payload.membershipChange;
+          spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
+          spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
+          spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
+
+          await this.spaceChangeWaitlistRepository.update(payload.spaceChangeWaitlistId, spaceChangeWaitlistObj)
+            .catch(err => {
+              throw new HttpException({
+                status: "Error",
+                message: "Error in updating Space Change Waitlist by id " + payload.spaceChangeWaitlistId,
+                body: err
+              }, HttpStatus.INTERNAL_SERVER_ERROR);
+            });
+
+          /** Update Space Change Waitlist items */
+          await this.updateSpaceChangeWaitlistItems(payload, spaceChangeWaitlistObj).catch(err => {
+            throw new HttpException({
+              status: "Error",
+              message: "Error in updating Space Change Waitlist items",
+              body: err
+            }, HttpStatus.INTERNAL_SERVER_ERROR);
+          });
+
+          /** Update Resident Company details */
+          let residentCompany: any = spaceChangeWaitlistObj.residentCompany;
+          residentCompany.companyStage = payload.companyStage;
+          residentCompany.funding = payload.funding;
+          residentCompany.fundingSource = payload.fundingSource;
+          residentCompany.companySize = payload.companySize;
+          residentCompany.shareYourProfile = payload.shareYourProfile;
+          await this.residentCompanyRepository.update(residentCompany.id, residentCompany)
+            .catch(err => {
+              throw new HttpException({
+                status: "Error",
+                message: COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG,
+                body: err
+              }, HttpStatus.INTERNAL_SERVER_ERROR);
+            });
+
+          /** Update Resident Company history */
+          await this.updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload, residentCompany).catch(err => {
+            throw new HttpException({
+              status: "Error",
+              message: COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG,
+              body: err
+            }, HttpStatus.INTERNAL_SERVER_ERROR);
+          });
+        } else {
+          response['status'] = 'error';
+          response['message'] = 'Space Change Waitlist not found by id ' + payload.spaceChangeWaitlistId;
+          response['body'] = {};
+          return response;
+        }
+      } else {
+        response['status'] = 'Not acceptable';
+        response['message'] = 'Please provide proper details of Space Change Waitlist entry';
+        response['body'] = {};
+        return response;
+      }
+    } catch (error) {
+      response['status'] = 'Fail';
+      response['message'] = 'Could not update Space Change Waitlist';
+      response['body'] = error;
+      return response;
+    }
+    response['status'] = 'Success';
+    response['message'] = 'Space Change Waitlist updated successfully';
+    response['body'] = error;
+    return response;
+  }
+
+  /**
+   * Description: Delete old item records of SpaceChangeWaitlist and created new updated records.
+   * @description Delete old item records of SpaceChangeWaitlist and created new updated records.
+   * @param payload The payload to update SpaceChangeWaitlist
+   * @param resp 
+   */
+  private async updateSpaceChangeWaitlistItems(payload: any, spaceChangeWaitlistObj: any) {
+    if (payload.items && payload.items.length) {
+      await this.itemRepository.delete({ spaceChangeWaitlist_id: payload.spaceChangeWaitlistId }).catch(err => {
+        throw new HttpException({
+          status: "Error",
+          message: "Error in updating Space Change Waitlist items",
+          body: err
+        }, HttpStatus.INTERNAL_SERVER_ERROR);
+      });
+      for (let itemDto of payload.items) {
+        let itemObj: Item = new Item();
+
+        itemObj.productTypeId = itemDto.productTypeId;
+        itemObj.itemName = itemDto.itemName;
+        itemObj.currentQty = itemDto.currentQty;
+        itemObj.desiredQty = itemDto.desiredQty;
+        itemObj.spaceChangeWaitlist = spaceChangeWaitlistObj;
+        itemObj.spaceChangeWaitlist_id = spaceChangeWaitlistObj.id;
+        await this.itemRepository.save(this.itemRepository.create(itemObj)).catch(err => {
+          throw new HttpException({
+            status: "Error",
+            message: "Error in updating Space Change Waitlist items",
+            body: err
+          }, HttpStatus.INTERNAL_SERVER_ERROR);
+        });
+      }
+    }
+  }
+
+  /**
+   * Description: Updates request status of Space Change Waitlist.
+   * @description Updates request status of Space Change Waitlist.
+   * @param payload payload object with id and status fields
+   * @returns response with status and message fields
+   */
+  public async updateSpaceChangeWaitlistStatus(payload: UpdateWaitlistRequestStatusDto) {
+    let resp = {};
+    try {
+      let count = await this.spaceChangeWaitlistRepository.count({ id: payload.id });
+      if (count < 1) {
+        resp['status'] = 'Error';
+        resp['message'] = 'Space Change Waitlist not found by id : ' + payload.id;
+        resp['body'] = payload;
+        return resp;
+      }
+
+      await this.spaceChangeWaitlistRepository
+        .createQueryBuilder('space_change_waitlist')
+        .update()
+        .set({ requestStatus: payload.status })
+        .where("id = :id", { id: payload.id })
+        .execute();
+    } catch (er) {
+      resp['status'] = 'Error';
+      resp['message'] = 'Error while updating status';
+      resp['body'] = er;
+      return resp;
+    }
+    resp['status'] = 'Success';
+    resp['message'] = 'Status updated successfully';
+    resp['body'] = payload;
+    return resp;
   }
 }
