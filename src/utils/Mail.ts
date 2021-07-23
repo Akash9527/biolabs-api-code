@@ -721,9 +721,8 @@ export class Mail {
                                                                   <tr style="border-collapse:collapse">
                                                                   <td align="left" bgcolor="#fff" style="Margin:0;;padding-bottom:20px;padding-left:30px;padding-right:30px">
                                                                   <p href="" class="es-button msohide" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:14px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:24px;color:#000000">Click on:  <a href="${userInfo.origin +
-                     EMAIL.EMAIL_SUBMITTED_APPLICATION +
-                     userInfo.token
-                     }" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:11px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:20px;color:#167efb;word-break: break-all;">${userInfo.origin + EMAIL.EMAIL_CONFIRM_URL + userInfo.token
+                     EMAIL.EMAIL_SUBMITTED_SPACE_CHANGE_WAITLIST
+                     }" target="_blank" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:11px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:20px;color:#167efb;word-break: break-all;">${userInfo.origin + EMAIL.EMAIL_SUBMITTED_SPACE_CHANGE_WAITLIST
                      }</a> </p>
                                                                </td>
                                                                   </tr>
