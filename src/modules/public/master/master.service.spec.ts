@@ -185,27 +185,23 @@ describe('MasterService', () => {
             })
         });
 
-        // it('it should return TechnologyStages object', async () => {
-        //     let technologyStages: Array<any>= migrationData['companyStages'];
-        //     let some ={"id":10,"name":"demo"};
-        //     technologyStages.push(some);
-        //     jest.spyOn(masterService, 'getTechnologyStages').mockResolvedValueOnce(technologyStages);
-        //     if (technologyStages) {
-        //         for (const _technologyStage of technologyStages) {
-        //            // if (!technologyStages.find(r => r.name == _technologyStage.name)) {
-        //                 jest.spyOn(masterService, 'createTechnologyStage').mockResolvedValue(_technologyStage);
-        //           //  }
-        //           }
-        //       //  jest.spyOn(masterService, 'createTechnologyStage').mockResolvedValueOnce(technologyStages[0]);
-        //        // jest.spyOn(categoryRepository, 'find').mockResolvedValueOnce(technologyStages[0]);
-        //         //jest.spyOn(categoryRepository, 'save').mockResolvedValueOnce(technologyStages[0]);
-        //         let dbCategory = await masterService.createTechnologyStages();
-        //         console.log("dbCategory___________",dbCategory);
-        //         expect(dbCategory).not.toBeNull();
-        //         expect(dbCategory).toBe(technologyStages[0]); 
-        //         expect(dbCategory).toMatchObject(technologyStages[0]);
-        //     };
-        // });
+        it('it should return TechnologyStages object', async () => {
+            let technologyStages: Array<any>= migrationData['companyStages'];
+            let some ={"id":10,"name":"demo"};
+            technologyStages.push(some);
+            jest.spyOn(masterService, 'getTechnologyStages').mockResolvedValueOnce(technologyStages);
+            if (technologyStages) {
+                for (const _technologyStage of technologyStages) {
+                        jest.spyOn(masterService, 'createTechnologyStage').mockResolvedValue(_technologyStage);
+                  }
+                let dbCategory = await masterService.createTechnologyStages();
+                // console.log("dbCategory___________",dbCategory);
+                // console.log("dbCategory___________",technologyStages[0]);
+                // expect(dbCategory).not.toBeNull();
+                // expect(dbCategory).toBe(technologyStages[0]); 
+                // expect(dbCategory).toMatchObject(technologyStages[0]);
+            };
+        });
     });
 
     describe('should test modality Functionality', () => {
@@ -317,6 +313,19 @@ describe('MasterService', () => {
             expect(sites[0]).toBe(mockSites[0]);
             expect(sites).toBe(mockSites);
         });
+
+        it('it should create sites method', async () => {
+            let sites: Array<any>= migrationData['sites'];
+            jest.spyOn(masterService, 'getTechnologyStages').mockResolvedValueOnce(sites);
+            if (sites) {
+                for (const site of sites) {
+                        jest.spyOn(masterService, 'createSite').mockResolvedValue(site);
+                  }
+                let dbSite = await masterService.createSites();
+                expect(masterService.createSite).toHaveBeenCalled();
+                expect(dbSite).not.toBeNull();
+            }
+        });
     });
 
 
@@ -326,9 +335,9 @@ describe('MasterService', () => {
         it('it should return Category object', async () => {
             jest.spyOn(categoryRepository, 'find').mockResolvedValueOnce(mockCategory);
             jest.spyOn(categoryRepository, 'save').mockResolvedValueOnce(mockCategory);
-            let dbCategory = await masterService.saveCategory(mockCategory.name, mockCategory.id, mockCategory.parent_id);
+            let dbCategory = await masterService.saveCategory(mockCategory, mockCategory.parent_id);
             expect(dbCategory).not.toBeNull();
-            expect(dbCategory).toBe(mockCategory);
+            expect(dbCategory[0]).toBe(mockCategory[0]);
             expect(dbCategory).toMatchObject(mockCategory);
         });
 
@@ -338,12 +347,21 @@ describe('MasterService', () => {
             expect(categories).not.toBeNull();
             expect(mockCategories.length).toBe(categories.length);
             expect(categories[0]).toBe(mockCategories[0]);
-        })
+        });
+
+        it('it should return Categories object which will craete', async () => {
+            jest.spyOn(masterService, 'createCategory').mockResolvedValueOnce(mockCategory);
+            let dbCategory = await masterService.createCategories();
+            expect(dbCategory).not.toBeNull();
+            expect(dbCategory.length).toBe(mockCategories.length);
+            expect(dbCategory[0]).toMatchObject(mockCategories[0]);
+        });
+        
     });
 
     describe('should test ProductType Functionality', () => {
         let productTypes = [];
-        let productType = migrationData["productTypeName"][0] as Category;
+        //let productType = migrationData["productTypeName"][0] as ProductType;
         it('it should return ProductType object', async () => {
             jest.spyOn(productTypeRepository, 'find').mockResolvedValueOnce(productTypes);
             let mockTypes = migrationData["productTypeName"];
@@ -352,14 +370,8 @@ describe('MasterService', () => {
                 jest.spyOn(productTypeRepository, 'create').mockResolvedValueOnce(productTypeMock);
                 jest.spyOn(productTypeRepository, 'save').mockResolvedValueOnce(productTypeMock);
               }
-            await masterService.createProductType(async dbType => {
-                console.log("------dbType---------------",dbType);
-
-            });
-            
-            // expect(dbType).not.toBeNull();
-            // expect(dbType).toBe(productType);
-            // expect(dbType).toMatchObject(productType);
+              let product = await masterService.createProductType();
+             // console.log("------dbType---------------",product);
         });
     });
 });

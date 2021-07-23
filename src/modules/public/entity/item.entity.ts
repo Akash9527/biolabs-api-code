@@ -24,7 +24,7 @@ export class Item {
     @Column({ nullable: false })
     currentQty: number;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     desiredQty: number;
 
     @CreateDateColumn({ type: "timestamp" })
