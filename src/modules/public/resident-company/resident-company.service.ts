@@ -1900,11 +1900,15 @@ order by quat;
     const response = {};
     const month = new Date().getMonth() + 2; // Getting next month from currect date
     const queryStr = `
-      select pt.id as "productTypeId", COUNT(op."productTypeId"), pt."productTypeName"
+      select pt.id as "productTypeId", 
+      CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
+      pt."productTypeName"
       from product_type as pt
       Left Join (select "productTypeId" from order_product where "companyId" = ${companyId} and month = ${month} ) as op
       on pt.id = op."productTypeId"
-      group by op."productTypeId", pt."productTypeName", pt.id
+      where pt."productTypeName" <> 'Decontamination Fee' 
+      and pt."productTypeName" <> 'Retainer Fee'
+      group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
     `;
 
     const items = await this.residentCompanyHistoryRepository.query(queryStr);
