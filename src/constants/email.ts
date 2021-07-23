@@ -8,5 +8,6 @@ export const EMAIL = {
   CONTENT_TYPE: 'HTML',
   CC_EMAIL_USER: '',
   EMAIL_CONFIRM_URL: '/reset-password?token=',
-  EMAIL_SUBMITTED_APPLICATION: '/applications'
+  EMAIL_SUBMITTED_APPLICATION: '/applications',
+  EMAIL_SUBMITTED_SPACE_CHANGE_WAITLIST: '/invoice-waitlist/invoice-summary'
 };
