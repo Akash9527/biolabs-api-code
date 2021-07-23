@@ -4,11 +4,14 @@ import { MembershipChangeEnum } from "../enum/membership-change-enum";
 import { RequestStatusEnum } from "../enum/request-status-enum";
 import { ItemDto } from "./item.dto";
 
-export class AddSpaceChangeWaitlistDto {
+/**
+ * @description Payload to update Space Change Waitlist
+ */
+export class UpdateSpaceChangeWaitlistDto {
 
-    @ApiProperty({ description: 'Resident Company Id', required: true, nullable: false })
+    @ApiProperty({ description: 'Space Change Waitlist Id', required: true, nullable: false })
     @IsNotEmpty()
-    residentCompanyId: number;
+    spaceChangeWaitlistId: number;
 
     @ApiProperty({ description: 'Items', required: false, nullable: true })
     items: ItemDto[];
