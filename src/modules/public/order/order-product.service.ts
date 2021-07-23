@@ -193,7 +193,7 @@ export class OrderProductService {
         .getRawMany();
     } catch (err) {
       error("Error in fetching order products between dates", __filename, "fetchOrderProductBetweenDates()");
-      throw new BiolabsException('Error in fetching order products between dates' + err.message);
+      throw new BiolabsException('Error in fetching order products between dates' , err.message);
     }
 
   }

@@ -55,25 +55,25 @@ describe('Product Service', () => {
 
     describe('product service', () => {
         describe('should add/create product', () => {
+            let siteId = 1;
+            const mockProduct = {
+                id: 1,
+                productTypeName: 'New',
+                createdBy: 11,
+                modifiedBy: 11,
+                createdAt: new Date(),
+                modifiedAt: new Date(),
+            } as ProductType;
+
+            const payLoad = {
+                name: 'new',
+                recurrence: true,
+                cost: 100,
+                description: 'new product launch',
+                productTypeId: mockProduct.id,
+            } as AddProductDto;
+
             it('should add/create product', async () => {
-                let siteId = 1;
-                const mockProduct = {
-                    id: 1,
-                    productTypeName: 'New',
-                    createdBy: 11,
-                    modifiedBy: 11,
-                    createdAt: new Date(),
-                    modifiedAt: new Date(),
-                } as ProductType;
-
-                const payLoad = {
-                    name: 'new',
-                    recurrence: true,
-                    cost: 100,
-                    description: 'new product launch',
-                    productTypeId: mockProduct.id,
-                } as AddProductDto;
-
                 if (payLoad.productTypeId) {
                     productTypeRepository.findOne.mockReturnValue(mockProduct);
                 }
@@ -93,12 +93,21 @@ describe('Product Service', () => {
                 expect(products).not.toBeNull();
                 expect(product).toMatchObject(products);
             });
-        });
-        describe('should get all products', () => {
-            it('productService - should be defined', () => {
-                expect(productService).toBeDefined();
+            it('it should throw exception if product is not getting   ', async () => {
+                jest.spyOn(productRepository, 'save').mockResolvedValueOnce(null);
+                try {
+                    await productService.addProduct(new NotAcceptableException('Error in adding product'));
+                } catch (e) {
+                    expect(e.response.message).toBe('Error in adding product');
+                    expect(e.response.statusCode).toBe(406);
+                }
             });
         });
+
+        it('productService - should be defined', () => {
+            expect(productService).toBeDefined();
+        });
+
         describe('should get all products', () => {
 
             it('should get all products', async () => {
@@ -132,7 +141,15 @@ describe('Product Service', () => {
                 let dbProduct = await productService.getAllProducts(siteId);
                 expect(dbProduct).not.toBeNull();
                 expect(dbProduct).toBe(products);
-
+            });
+            it('it should throw exception if product is not getting   ', async () => {
+                jest.spyOn(productRepository, 'createQueryBuilder').mockResolvedValueOnce(null);
+                try {
+                    await productService.getAllProducts(new NotAcceptableException('Error in getting product'));
+                } catch (e) {
+                    expect(e.response.message).toBe('Error in getting product');
+                    expect(e.response.statusCode).toBe(406);
+                }
             });
         });
 
@@ -159,8 +176,15 @@ describe('Product Service', () => {
                     .getRawMany();
                 let dbProduct = await productService.getProductsByName(productName, siteId);
                 expect(dbProduct).not.toBeNull();
-
-
+            });
+            it('it should throw exception if product is not getting   ', async () => {
+                jest.spyOn(productRepository, 'createQueryBuilder').mockResolvedValueOnce(null);
+                try {
+                    await productService.getProductsByName(new NotAcceptableException('Error in getting product'));
+                } catch (e) {
+                    expect(e.response.message).toBe('Error in getting product');
+                    expect(e.response.statusCode).toBe(406);
+                }
             });
         });
 

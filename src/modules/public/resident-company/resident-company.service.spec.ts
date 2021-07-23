@@ -308,8 +308,18 @@ describe('ResidentCompanyService', () => {
         .where('resident-companies.email = :email')
         .setParameter('email', mockRC.email)
         .getOne();
+        //jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockResolvedValue(mockRC);
       const result = await residentCompanyService.getByEmail(mockRC.email);
       expect(result).not.toBeNull();
+    });
+    it('it should throw exception if user id is not provided  ', async () => {
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockReturnValue(null);
+      try {
+        await residentCompanyService.getByEmail(new BiolabsException());
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+      }
     });
   });
   describe('Create method', () => {
@@ -441,14 +451,14 @@ describe('ResidentCompanyService', () => {
     })
   });
   describe('residentCompanyManagements method', () => {
-    let companyMembers:Array<ResidentCompanyManagementFillableFields> = [
+    let companyMembers: Array<ResidentCompanyManagementFillableFields> = [
       {
         id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
         title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management",
         academicAffiliation: "Test", joiningAsMember: true, mainExecutivePOC: true,
         laboratoryExecutivePOC: true, invoicingExecutivePOC: true,
       }
-      ];
+    ];
     // let companyMember = { "companyId": 1 }
     it('should return resident companies document object', async () => {
       if (companyMembers.length > 0) {
@@ -457,10 +467,10 @@ describe('ResidentCompanyService', () => {
           //companyMember.companyId = companyMembers.id;
           jest.spyOn(residentCompanyService, 'checkEmptyVal').mockReturnValue(true);
           //jest.spyOn(residentCompanyService, 'addResidentCompanyManagement').mockResolvedValueOnce(companyMember);
-         await residentCompanyService.addResidentCompanyManagement(companyMember);
+          await residentCompanyService.addResidentCompanyManagement(companyMember);
         }
       }
-      let result=await residentCompanyService.residentCompanyManagements(companyMembers,1);   
+      let result = await residentCompanyService.residentCompanyManagements(companyMembers, 1);
     });
   });
   describe('addResidentCompanyAdvisor method', () => {
@@ -739,7 +749,7 @@ describe('ResidentCompanyService', () => {
         await residentCompanyService.updateResidentCompanyStatus(payload);
       } catch (e) {
         expect(e.name).toBe('InternalException');
-        expect(e instanceof InternalException).toBeTruthy(); 
+        expect(e instanceof InternalException).toBeTruthy();
       }
     });
     it('should throw NotAcceptableException if company with provided id not available.', async () => {
@@ -749,7 +759,7 @@ describe('ResidentCompanyService', () => {
         await residentCompanyService.updateResidentCompanyStatus(payload);
       } catch (e) {
         expect(e.name).toBe('InternalException');
-        expect(e instanceof InternalException).toBeTruthy(); 
+        expect(e instanceof InternalException).toBeTruthy();
       }
     });
   });

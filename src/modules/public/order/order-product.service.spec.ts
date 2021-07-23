@@ -6,9 +6,9 @@ import { OrderProductService } from './order-product.service';
 import { ResidentCompany } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, NotAcceptableException } from '@nestjs/common';
 import { Product } from './model/product.entity';
-
+const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 const createMockRepository = <T = any>(): MockRepository<T> => ({
     find: jest.fn(),
@@ -202,6 +202,7 @@ describe('Order Product Service', () => {
             expect(product.error).not.toBeNull();
             expect(product.error).toContain("Please Select Valid Start Date and End Date");
         });
+      
     });
 
     describe('should update order product', () => {
@@ -304,6 +305,16 @@ describe('Order Product Service', () => {
             let dbOrderProduct = await orderProductService.fetchOrderProductsBetweenDates(12, 1);
             expect(dbOrderProduct).not.toBeNull();
         });
+        it('it should throw exception while fetching order products between dates   ', async () => {
+            jest.spyOn(orderProductRepository, 'createQueryBuilder').mockRejectedValueOnce(null);
+            try {
+                await orderProductService.fetchOrderProductsBetweenDates(new BiolabsException('Error in fetching order products between dates'));
+            } catch (e) {
+                expect(e.name).toBe('BiolabsException');
+                expect(e instanceof BiolabsException).toBeTruthy();  
+                expect(e.message).toBe('Error in fetching order products between dates');
+            }
+        });
     });
 
     describe('should delete the order products', () => {
@@ -336,6 +347,15 @@ describe('Order Product Service', () => {
             let dbOrderProduct = await orderProductService.deleteOrderProduct(1);
             expect(dbOrderProduct).not.toBeNull();
         });
+        it('it should throw exception if product is not getting   ', async () => {
+            jest.spyOn(orderProductRepository, 'delete').mockResolvedValueOnce(null);
+            try {
+                await orderProductService.deleteOrderProduct(new InternalException(''));
+            } catch (e) {
+                expect(e.name).toBe('InternalException');
+                expect(e instanceof InternalException).toBeTruthy();
+            }
+        });
     });
 
     describe('should add future order products', () => {
@@ -366,6 +386,51 @@ describe('Order Product Service', () => {
 
 
     describe('should fetch the all invoices based on month', () => {
+        const monthInvoices=[
+            {
+              "companyid": 3,
+              "orderid": 28,
+              "companyName": "ipsenTest",
+              "month": 6,
+              "productName": "lab bench 1",
+              "productDescription": "",
+              "cost": null,
+              "quantity": 1,
+              "recurrence": true,
+              "currentCharge": true,
+              "startDate": null,
+              "endDate": null
+            },
+          
+            {
+              "companyid": 3,
+              "orderid": 144,
+              "companyName": "ipsenTest",
+              "month": 6,
+              "productName": "lab bench2",
+              "productDescription": "",
+              "cost": null,
+              "quantity": 1,
+              "recurrence": true,
+              "currentCharge": true,
+              "startDate": null,
+              "endDate": null
+            },
+            
+            {
+                "companyid": 4,
+                "orderid": 3,
+                "companyName": "weasrdwedf",
+                "month": 6,
+                "productName": "private lab1",
+                "productDescription": "",
+                "cost": null,
+                "quantity": 1,
+                "recurrence": true,
+                "currentCharge": true,
+                "startDate": null,
+                "endDate": null
+              }];
         it(' fetch fetch the all invoices based on month', async () => {
             const query = `select 
             rc."id" as companyid, 
@@ -423,8 +488,22 @@ describe('Order Product Service', () => {
             rc."companyName", 
             orp."productName"`;
             residentCompanyRepository.query(query);
-            let result = await orderProductService.consolidatedInvoice(1, 1)
+            jest.spyOn(residentCompanyRepository, 'query').mockResolvedValueOnce(monthInvoices);
+            let result = await orderProductService.consolidatedInvoice(6, 1)
             expect(result).not.toBeNull()
+            expect(result[0]).toEqual(monthInvoices[0]);
+            expect(result[1]).toEqual(monthInvoices[1]);
+            expect(result.length).toEqual(monthInvoices.length);
+        });
+        it('it should throw exception while fetching order products between dates   ', async () => {
+            jest.spyOn(residentCompanyRepository, 'query').mockRejectedValueOnce(null);
+            try {
+                await orderProductService.consolidatedInvoice(new BiolabsException('Error in find consolidated Invoice'));
+            } catch (e) {
+                expect(e.name).toBe('BiolabsException');
+                expect(e instanceof BiolabsException).toBeTruthy();  
+                expect(e.message).toBe('Error in find consolidated Invoice');
+            }
         });
     });
 });
