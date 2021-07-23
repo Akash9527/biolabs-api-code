@@ -1906,6 +1906,8 @@ order by quat;
       from product_type as pt
       Left Join (select "productTypeId" from order_product where "companyId" = ${companyId} and month = ${month} ) as op
       on pt.id = op."productTypeId"
+      where pt."productTypeName" <> 'Decontamination Fee' 
+      and pt."productTypeName" <> 'Retainer Fee'
       group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
     `;
 
