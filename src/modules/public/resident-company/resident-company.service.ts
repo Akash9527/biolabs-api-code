@@ -6,6 +6,7 @@ import { Mail } from '../../../utils/Mail';
 import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
 import { UpdateSpaceChangeWaitlistDto } from '../dto/update-space-change-waitlist.dto';
 import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
+import { UpdateWaitlistRequestStatusDto } from '../dto/update-waitlist-request-status.dto';
 import { Item } from '../entity/item.entity';
 import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
 import { MembershipChangeEnum } from '../enum/membership-change-enum';
@@ -2077,5 +2078,40 @@ order by quat;
         });
       }
     }
+  }
+
+  /**
+   * Description: Updates request status of Space Change Waitlist.
+   * @description Updates request status of Space Change Waitlist.
+   * @param payload payload object with id and status fields
+   * @returns response with status and message fields
+   */
+  public async updateSpaceChangeWaitlistStatus(payload: UpdateWaitlistRequestStatusDto) {
+    let resp = {};
+    try {
+      let count = await this.spaceChangeWaitlistRepository.count({ id: payload.id });
+      if (count < 1) {
+        resp['status'] = 'Error';
+        resp['message'] = 'Space Change Waitlist not found by id : ' + payload.id;
+        resp['body'] = payload;
+        return resp;
+      }
+
+      await this.spaceChangeWaitlistRepository
+        .createQueryBuilder('space_change_waitlist')
+        .update()
+        .set({ requestStatus: payload.status })
+        .where("id = :id", { id: payload.id })
+        .execute();
+    } catch (er) {
+      resp['status'] = 'Error';
+      resp['message'] = 'Error while updating status';
+      resp['body'] = er;
+      return resp;
+    }
+    resp['status'] = 'Success';
+    resp['message'] = 'Status updated successfully';
+    resp['body'] = payload;
+    return resp;
   }
 }

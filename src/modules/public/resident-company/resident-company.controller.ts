@@ -1,15 +1,16 @@
-import { Controller, UseGuards, Get, Param, Post, Body, Query, Put, Request, Delete } from '@nestjs/common';
-import { ApiResponse, ApiTags, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResidentCompanyService } from '.';
+import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
+import { UpdateSpaceChangeWaitlistDto } from '../dto/update-space-change-waitlist.dto';
+import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
+import { UpdateWaitlistRequestStatusDto } from '../dto/update-waitlist-request-status.dto';
+import { AddNotesDto } from './add-notes.dto';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
+import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
-import { SearchResidentCompanyPayload } from './search-resident-company.payload';
-import { AddNotesDto } from './add-notes.dto';
-import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
-import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
-import { UpdateSpaceChangeWaitlistDto } from '../dto/update-space-change-waitlist.dto';
 
 @Controller('api/resident-company')
 @ApiTags('Resident Company')
@@ -414,5 +415,20 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateSpaceChangeWaitlist(@Body() payload: UpdateSpaceChangeWaitlistDto): Promise<any> {
     return this.residentCompanyService.updateSpaceChangeWaitlist(payload);
+  }
+
+  /**
+   * Description: Updates request status of Space Change Waitlist.
+   * @description Updates request status of Space Change Waitlist.
+   * @param payload payload object with id and status fields
+   * @returns response with status and message fields
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Put('/spacechangewaitlist/status')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateSpaceChangeWaitlistStatus(@Body() payload: UpdateWaitlistRequestStatusDto): Promise<any> {
+    return this.residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
   }
 }
