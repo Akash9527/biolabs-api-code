@@ -536,7 +536,7 @@ export class ResidentCompanyService {
       });
     } catch (err) {
       error("Error in find resident company for Bkp", __filename, "getResidentCompaniesBkp()");
-      throw new BiolabsException('Error in find resident company for Bkp' + err.message);
+      throw new BiolabsException('Error in find resident company for Bkp' , err.message);
     }
   }
 
@@ -1261,7 +1261,7 @@ export class ResidentCompanyService {
         .getRawMany();
     } catch (err) {
       error("Getting error in find the note", __filename, "getNoteByCompanyId()");
-      throw new BiolabsException('Getting error in find the note' + err.message);
+      throw new BiolabsException('Getting error in find the note' , err.message);
     }
   }
 
@@ -1565,7 +1565,7 @@ order by quat;
       return await this.residentCompanyHistoryRepository.query(queryStr);
     } catch (err) {
       error("Getting error in find theget company size quartly", __filename, "getCompanySizeQuartly()");
-      throw new BiolabsException('Getting error in find company size quartly' + err.message);
+      throw new BiolabsException('Getting error in find company size quartly' ,err.message);
     }
   }
 

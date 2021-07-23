@@ -308,7 +308,7 @@ describe('ResidentCompanyService', () => {
         .where('resident-companies.email = :email')
         .setParameter('email', mockRC.email)
         .getOne();
-        //jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockResolvedValue(mockRC);
+      //jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockResolvedValue(mockRC);
       const result = await residentCompanyService.getByEmail(mockRC.email);
       expect(result).not.toBeNull();
     });
@@ -336,6 +336,16 @@ describe('ResidentCompanyService', () => {
       let ans = await residentCompanyService.create(mockAddResidentCompany);
       expect(ans).not.toBeNull();
     })
+    it('it should throw exception if user id is not provided  ', async () => {
+      jest.spyOn(residentCompanyService, 'getByEmail').mockResolvedValueOnce(mockRC); 
+      try {
+        await residentCompanyService.create(mockAddResidentCompany);
+      } catch (e) {
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe('User with provided email already created.');
+        expect(e.response.statusCode).toBe(406);
+      }
+    });
 
   });
   describe('updateResidentCompanyImg method', () => {
@@ -395,7 +405,6 @@ describe('ResidentCompanyService', () => {
       preferredMoveIn: 1, otherIndustries: {}, otherModality: {}
     }]
     it('it should return array of Resident companies', async () => {
-
       residentCompanyRepository
         .createQueryBuilder("product")
         .select("resident_companies.* ")
@@ -408,31 +417,39 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull();
     })
   });
-  // describe('addResidentCompany method', () => {
-  //   const req: any = {
-  //     user: { site_id: [1, 2], role: 1 },
-  //     headers: { 'x-site-id': [2] }
-  //   }
-  //   let resp = { status: 'success', message: 'Application Successfully submitted' };
-  //   it('should return resident companies  object', async () => {
-  //     residentCompanyRepository
-  //       .createQueryBuilder('resident-companies')
-  //       .where('resident-companies.email = :email')
-  //       .setParameter('email', mockAddResidentCompany.email)
-  //       .getOne();
-  //     jest.spyOn(residentCompanyRepository, 'save').mockResolvedValueOnce(mockRC);
-  //     if (mockRC.id) {
-  //       const historyData: any = JSON.parse(JSON.stringify(mockRC));
-  //       historyData.comnpanyId = mockRC.id;
-  //       delete historyData.id;
-  //       // await this.residentCompanyHistoryRepository.save(historyData);
-  //       jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
-  //     }
-  //     let result = await residentCompanyService.addResidentCompany(mockAddResidentCompany, req);
-  //     expect(result).not.toBeNull();
-  //     expect(result).toStrictEqual(resp);
-  //   })
-  // });
+  describe('addResidentCompany method', () => {
+    const req: any = {
+      user: { site_id: [1, 2], role: 1 },
+      headers: { 'x-site-id': [2] }
+    }
+    let resp = { status: 'success', message: 'Application Successfully submitted' };
+    // it('should return resident companies  object', async () => {
+    //  // jest.spyOn(residentCompanyService, 'getByEmail').mockResolvedValueOnce(mockRC); 
+     
+    //   if (mockRC.id) {
+    //     // const historyData: any = JSON.parse(JSON.stringify(mockRC));
+    //     // historyData.comnpanyId = mockRC.id;
+    //     // delete historyData.id;
+    //     // await this.residentCompanyHistoryRepository.save(historyData);
+    //     jest.spyOn(residentCompanyRepository, 'save').mockResolvedValueOnce(mockRC);
+    //     //jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
+    //   }
+    //  // await residentCompanyService.sendEmailToSiteAdmin(sites, req, payload.companyName, "MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION");
+    //   let result = await residentCompanyService.addResidentCompany(mockAddResidentCompany, req);
+    //   console.log(result);
+    //   // expect(result).not.toBeNull();
+    //   // expect(result).toStrictEqual(resp);
+    // })
+    it('should throw exception if company with provided id not available.', async () => {
+      jest.spyOn(residentCompanyDocumentsRepository, 'save').mockRejectedValueOnce(new InternalException('Error in adding resident company document'));
+      try {
+        await residentCompanyService.addResidentCompany(mockAddResidentCompany, req);
+      } catch (e) {
+        expect(e.name).toBe('InternalException');
+        expect(e instanceof InternalException).toBeTruthy();
+      }
+    });
+  });
   describe('addResidentCompanyDocument method', () => {
 
     let payload: ResidentCompanyDocumentsFillableFields = {
@@ -449,6 +466,15 @@ describe('ResidentCompanyService', () => {
       let result = await residentCompanyService.addResidentCompanyDocument(payload)
       expect(result).toBe(mockResidentDocument);
     })
+    it('should throw exception if company with provided id not available.', async () => {
+      jest.spyOn(residentCompanyDocumentsRepository, 'save').mockRejectedValueOnce(new InternalException('Error in adding resident company document'));
+      try {
+        await residentCompanyService.addResidentCompanyDocument(payload);
+      } catch (e) {
+        expect(e.name).toBe('InternalException');
+        expect(e instanceof InternalException).toBeTruthy();
+      }
+    });
   });
   describe('residentCompanyManagements method', () => {
     let companyMembers: Array<ResidentCompanyManagementFillableFields> = [
@@ -464,13 +490,16 @@ describe('ResidentCompanyService', () => {
       if (companyMembers.length > 0) {
         for (let i = 0; i < companyMembers.length; i++) {
           let companyMember = companyMembers[i];
-          //companyMember.companyId = companyMembers.id;
+          console.log("companyMember =========", companyMember);
+
           jest.spyOn(residentCompanyService, 'checkEmptyVal').mockReturnValue(true);
-          //jest.spyOn(residentCompanyService, 'addResidentCompanyManagement').mockResolvedValueOnce(companyMember);
-          await residentCompanyService.addResidentCompanyManagement(companyMember);
+          if (residentCompanyService.checkEmptyVal('managements', companyMember))
+            //jest.spyOn(residentCompanyService, 'addResidentCompanyManagement').mockReturnValueOnce(mock);
+            await residentCompanyService.addResidentCompanyManagement(companyMember);
         }
       }
       let result = await residentCompanyService.residentCompanyManagements(companyMembers, 1);
+      console.log(result);
     });
   });
   describe('addResidentCompanyAdvisor method', () => {
@@ -555,6 +584,15 @@ describe('ResidentCompanyService', () => {
       let result = await residentCompanyService.getResidentCompaniesBkp(listRCPayload)
       expect(result).toBe(mockRecidentCompanies);
     })
+    it('should throw exception if company with provided id not available.', async () => {
+      try {
+        await residentCompanyService.getResidentCompaniesBkp(null);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Error in find resident company for Bkp');
+      }
+    });
   });
 
   describe('getResidentCompanyForSponsor method', () => {
@@ -752,7 +790,7 @@ describe('ResidentCompanyService', () => {
         expect(e instanceof InternalException).toBeTruthy();
       }
     });
-    it('should throw NotAcceptableException if company with provided id not available.', async () => {
+    it('should throw InternalException if company with provided id not available.', async () => {
       jest.spyOn(residentCompanyRepository, 'update').mockRejectedValueOnce(new NotAcceptableException(
         'Company with provided id not available.'))
       try {
@@ -836,9 +874,21 @@ describe('ResidentCompanyService', () => {
         .andWhere("notes.residentCompanyId = :residentCompanyId", { residentCompanyId: 1 })
         .orderBy("notes.createdAt", "DESC")
         .getRawMany();
+      //jest.spyOn(notesRepository, 'createQueryBuilder').mockReturnValueOnce(mockNotes);
       let result = await residentCompanyService.getNoteByCompanyId(mockRC.id);
       expect(result).not.toBeNull();
     })
+    it('it should throw exception if note is not added  ', async () => {
+      jest.spyOn(notesRepository, 'createQueryBuilder').mockReturnValue(new BiolabsException('Getting error in find the note'));
+      try {
+        await residentCompanyService.getNoteByCompanyId(mockRC.id);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toEqual('Getting error in find the note');
+      }
+    });
+
   });
   describe('addNote method', () => {
     const req: any = {
@@ -856,6 +906,16 @@ describe('ResidentCompanyService', () => {
       expect(notes).not.toBeNull();
       expect(notes).toBe(mockNotes);
     })
+
+    it('it should throw exception if note is not added  ', async () => {
+      jest.spyOn(notesRepository, 'save').mockRejectedValueOnce(new InternalException('Error in add note'));
+      try {
+        await residentCompanyService.addNote(payload, req);
+      } catch (e) {
+        expect(e.name).toBe('InternalException');
+        expect(e instanceof InternalException).toBeTruthy();
+      }
+    });
   });
   describe('softDeleteNote method', () => {
     it('should delete data based on id', async () => {
@@ -908,46 +968,62 @@ describe('ResidentCompanyService', () => {
   });
 
   describe('getStagesOfTechnologyBySiteId method', () => {
-    let mockStagesOfTechnologies = { stagesOfTechnology: 0 }
+    let mockStagesOfTechnologies = [
+      {
+        "stage": 2,
+        "name": "Proof-of-principal/Validation",
+        "quarterno": 2,
+        "quat": "Q2.2021"
+      },
+      {
+        "stage": 2,
+        "name": "Proof-of-principal/Validation",
+        "quarterno": 3,
+        "quat": "Q3.2021"
+      }
+    ];
 
     it('should return object', async () => {
-      const queryStr = " SELECT \"stage\", \"name\", \"quarterno\", \"quat\" " +
-        " FROM " +
-        " (SELECT MAX(rch.\"companyStage\") AS stage, " +
-        "EXTRACT(quarter FROM rch.\"createdAt\") AS \"quarterno\", " +
-        "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quat\" " +
-        "FROM public.resident_company_history AS rch " +
-        "WHERE rch.\"site\" = \'{ " + 1 + "}\' and rch.\"comnpanyId\" = " + 1 +
-        "GROUP BY " +
-        "EXTRACT(quarter FROM rch.\"createdAt\")," +
-        "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
-        " ) AS csg " +
-        " LEFT JOIN technology_stages AS ts ON ts.id = csg.\"stage\" " +
-        " ORDER BY quat";
-      residentCompanyHistoryRepository.query(queryStr);
-      // jest.spyOn(residentCompanyService, 'gloabalSearchCompaniesOld').mockResolvedValueOnce(mockRC);
-      let result = await residentCompanyService.getStagesOfTechnologyBySiteId(1, 1)
-      //  expect(result).toBe(mockStagesOfTechnologies);
-      expect(result).not.toBeNull()
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockStagesOfTechnologies);
+      let result = await residentCompanyService.getStagesOfTechnologyBySiteId(1, 1);
+      expect(result).not.toBeNull();
+      expect(result).toEqual({
+        stagesOfTechnology: [
+          {
+            "stage": 2,
+            "name": "Proof-of-principal/Validation",
+            "quarterno": 2,
+            "quat": "Q2.2021"
+          },
+          {
+            "stage": 2,
+            "name": "Proof-of-principal/Validation",
+            "quarterno": 3,
+            "quat": "Q3.2021"
+          }
+        ]
+      });
     })
   });
 
+
   describe('getFundingBySiteIdAndCompanyId method', () => {
-    let mockfundings = { fundings: 0 }
+    const mockfundings =
+      [
+        {
+          "Funding": "12",
+          "quarterNo": 3,
+          "quaterText": "Q3.2021"
+        }
+      ]
 
     it('should return object', async () => {
-      const queryStr = " SELECT MAX(\"funding\" ::Decimal) as \"Funding\", " +
-        " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
-        " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
-        " FROM public.resident_company_history as rch " +
-        " WHERE rch.\"site\" = \'{" + 1 + "}\' and rch.\"comnpanyId\" = " + 1 +
-        " group by " +
-        " extract(quarter from rch.\"createdAt\"), " +
-        " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
-        " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
-      residentCompanyHistoryRepository.query(queryStr);
-      let result = await residentCompanyService.getFundingBySiteIdAndCompanyId(1, 1)
-      expect(result).not.toBeNull()
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockfundings);
+      let result = await residentCompanyService.getFundingBySiteIdAndCompanyId(1, 1);
+      expect(result).not.toBeNull();
+      expect(result).toEqual({
+        fundings: [{ Funding: '12', quarterNo: 3, quaterText: 'Q3.2021' }]
+      });
     })
   });
   describe('getFeeds method', () => {
@@ -960,14 +1036,17 @@ describe('ResidentCompanyService', () => {
   });
 
   describe('getstartedWithBiolabs method', () => {
-
+    const mockStartBiolabs = [
+      {
+        startwithbiolabs: "2021-07-06T11:25:57.685Z",
+      }
+    ]
     it('should return object', async () => {
-      const queryStr = "SELECT min(\"createdAt\")  as startWithBiolabs FROM public.resident_company_history" +
-        " WHERE \"site\" = \'{" + 1 + "}\' and \"comnpanyId\" = " + 1 +
-        "AND \"companyOnboardingStatus\" = true";
-      residentCompanyHistoryRepository.query(queryStr);
-      let result = await residentCompanyService.getstartedWithBiolabs(1, 1)
-      expect(result).not.toBeNull()
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockStartBiolabs);
+      let result = await residentCompanyService.getstartedWithBiolabs(1, 1);
+      expect(result).not.toBeNull();
+      expect(result[0]).toEqual(mockStartBiolabs[0]);
+      expect(result).toEqual(mockStartBiolabs);
     })
   });
 
@@ -988,56 +1067,73 @@ describe('ResidentCompanyService', () => {
     })
   });
   describe('timelineAnalysis method', () => {
-
+    const mocktimeAnalysis = [
+      {
+        "productTypeId": 2,
+        "sumofquantity": "4",
+        "quarterno": 2,
+        "quat": "Q2.2021"
+      },
+      {
+        "productTypeId": 4,
+        "sumofquantity": "13",
+        "quarterno": 2,
+        "quat": "Q2.2021"
+      },
+      {
+        "productTypeId": 4,
+        "sumofquantity": "31",
+        "quarterno": 3,
+        "quat": "Q3.2021"
+      }
+    ]
     it('should return array of timeline history', async () => {
       const currentMonth = new Date().getMonth() + 1;
-      const queryStr = `
-   SELECT "productTypeId",  MAX("total")as sumofquantity ,
-           extract(quarter from "updatedAt")as quarterNo,
-           to_char("updatedAt", '"Q"Q.YYYY') AS quat
-   FROM
-      (SELECT  p."productTypeId",SUM(o.quantity) as total, o."updatedAt",
-         extract(quarter from o."updatedAt") as quarterNo,
-         to_char(o."updatedAt", '"Q"Q.YYYY') AS quat
-      FROM order_product as o
-   INNER JOIN product as p ON p.id = o."productId"
-           where p.id = o."productId" 
-               AND "companyId"=${1}
-               AND p."productTypeId" IN (2,4)
-   group by p."productTypeId" ,o."updatedAt",
-         extract(quarter from o."updatedAt"),
-         to_char(o."updatedAt", '"Q"Q.YYYY')
-       order by to_char(o."updatedAt", '"Q"Q.YYYY')) as sunTbl
-   GROUP BY extract(quarter from sunTbl."updatedAt"),
-               sunTbl."productTypeId",to_char("updatedAt", '"Q"Q.YYYY')
-               order by quat;
-   `;
-      residentCompanyHistoryRepository.query(queryStr);
-      let result = await residentCompanyService.timelineAnalysis(1)
-      expect(result).not.toBeNull()
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mocktimeAnalysis);
+      let result = await residentCompanyService.timelineAnalysis(1);
+      expect(result).not.toBeNull();
+      expect(result[0]).toEqual(mocktimeAnalysis[0]);
+      expect(result[1]).toEqual(mocktimeAnalysis[1]);
+      expect(result).toEqual(mocktimeAnalysis);
     })
   });
 
   describe('getCompanySizeQuartly method', () => {
-
+    const mockCompanySizeQuarter = [
+      {
+        "noofemployees": 25,
+        "quarterno": 1,
+        "quat": "Q1.2021"
+      },
+      {
+        "noofemployees": 80,
+        "quarterno": 2,
+        "quat": "Q2.2021"
+      },
+      {
+        "noofemployees": 25,
+        "quarterno": 3,
+        "quat": "Q3.2021"
+      }
+    ]
     it('should return array of resident company history', async () => {
-      const currentMonth = new Date().getMonth() + 1;
-      const queryStr = `
-   SELECT 
-      MAX("companySize") as noOfEmployees,
-         extract(quarter from "updatedAt")as quarterNo,
-         to_char("updatedAt", '"Q"Q.YYYY') AS quat
- FROM resident_company_history 
-        where "comnpanyId"=${1}
- group by
-           extract(quarter from "updatedAt"),
-           to_char("updatedAt", '"Q"Q.YYYY')
-           order by quat;
-   `;
-      residentCompanyHistoryRepository.query(queryStr);
-      let result = await residentCompanyService.getCompanySizeQuartly(1)
-      expect(result).not.toBeNull()
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockCompanySizeQuarter);
+      let result = await residentCompanyService.getCompanySizeQuartly(1);
+      expect(result).not.toBeNull();
+      expect(result[0]).toEqual(mockCompanySizeQuarter[0]);
+      expect(result[1]).toEqual(mockCompanySizeQuarter[1]);
+      expect(result).toEqual(mockCompanySizeQuarter);
     })
+    it('it should throw exception if user id is not provided  ', async () => {
+      //jest.spyOn(residentCompanyHistoryRepository, 'query').mockReturnValueOnce(new BiolabsException('Getting error in find company size quartly' ));
+      try {
+        await residentCompanyService.getCompanySizeQuartly(null)
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toEqual('Getting error in find company size quartly');
+      }
+    });
   });
   describe('checkEmptyVal method', () => {
     let data: any = {
