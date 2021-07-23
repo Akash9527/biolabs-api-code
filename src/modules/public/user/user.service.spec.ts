@@ -129,12 +129,13 @@ describe('UserService', () => {
     });
     describe('getByEmail method', () => {
         it('it should called createQueryBuilder  method ', async () => {
-            userRepository.createQueryBuilder('users')
-                .addSelect("users.email")
-                .addSelect("users.password")
-                .where('users.email = :email')
-                .setParameter('email', mockUserFillable.email)
-                .getOne();
+            // userRepository.createQueryBuilder('users')
+            //     .addSelect("users.email")
+            //     .addSelect("users.password")
+            //     .where('users.email = :email')
+            //     .setParameter('email', mockUserFillable.email)
+            //     .getOne();
+            //jest.spyOn(userRepository, 'getOne').mockResolvedValueOnce(mockUser);
             const result = await userService.getByEmail(mockUserFillable.email);
             expect(result).not.toBeNull();
         });
@@ -193,10 +194,11 @@ describe('UserService', () => {
             expect(ans).toBe(mockUser);
         })
         // it('should not create user if email already exist', async () => {
-        //     jest.spyOn(userRepository, 'createQueryBuilder').mockReturnValue(null);
+            
+        //     jest.spyOn(userRepository, 'createQueryBuilder').mockReturnValueOnce(null);
         //     //jest.spyOn(userService, 'getByEmail').mockRejectedValueOnce();
         //     try {
-        //         await userService.getByEmail(new BiolabsException('User with provided id not available.'));
+        //        // await userService.getByEmail(new BiolabsException('User with provided id not available.'));
         //         await userService.create(mockUserFillable);
         //     } catch (e) {
         //         expect(e.response.error).toBe('Not Acceptable');
@@ -213,8 +215,6 @@ describe('UserService', () => {
             try {
                 await userService.addUser(mockUserFillable, req);
             } catch (e) {
-                console.log(e);
-                
                 expect(e.name).toBe('InternalException');
                 expect(e instanceof InternalException).toBeTruthy();
             }
@@ -257,8 +257,8 @@ describe('UserService', () => {
             }
         })
 
-        it.skip('it should throw exception if user id is not provided  ', async () => {
-            jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(null);
+        it('it should throw exception if user id is not provided   ', async () => {
+            jest.spyOn(userService, 'getUserById').mockRejectedValueOnce(new NotAcceptableException('User with provided id not available.'));
             try {
                 await userService.updateUser(payload);
             } catch (e) {
@@ -328,8 +328,6 @@ describe('UserService', () => {
                 try {
                     await userService.getUserById(new NotAcceptableException('User with provided id not available.'));
                 } catch (e) {
-                    console.log(e);
-                    
                     expect(e.response.error).toBe('Not Acceptable');
                     expect(e.response.message).toBe('User with provided id not available.');
                     expect(e.response.statusCode).toBe(406);
