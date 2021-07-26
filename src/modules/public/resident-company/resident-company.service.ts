@@ -1656,7 +1656,7 @@ order by quat;
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG = "Could not update Resident Company record";
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG = "Could not update Resident Company History record";
     const ERROR_IN_FETCHING_MAX_PRIORITY_ORDER_ERR_MSG = "Error while fetching Max Priority Order to set in new Space Change Waitlist record";
-    const COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG = "Could not send email notification";
+    // const COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG = "Could not send email notification";
     const APPROVED_DENIED_PRIORITY_ORDER = -1;
 
     let residentCompany: any = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
@@ -1690,7 +1690,7 @@ order by quat;
       maxPriorityOrder = APPROVED_DENIED_PRIORITY_ORDER;
     }
     info(`Max priority order for Space Change Waitlist : ${maxPriorityOrder} `, __filename, `addToSpaceChangeWaitList()`);
-    try {
+    // try {
       let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
       spaceChangeWaitlistObj.residentCompany = residentCompany;
       spaceChangeWaitlistObj.desiredStartDate = payload.desiredStartDate;
@@ -1770,22 +1770,22 @@ order by quat;
 
       /** Send email notification to Site Admin to notify about new Plan Change Request submission */
       const MAIL_FOR = "MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE";
-      await this.sendEmailToSiteAdmin(req.user.site_id, req, residentCompany.companyName, MAIL_FOR).catch(err => {
-        error(`Error in sending email notification to site admin`, __filename, `addToSpaceChangeWaitList()`);
-        throw new HttpException({
-          status: "Error",
-          message: COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG,
-          body: err
-        }, HttpStatus.INTERNAL_SERVER_ERROR);
+      this.sendEmailToSiteAdmin(req.user.site_id, req, residentCompany.companyName, MAIL_FOR).catch(() => {
+        error(`Error in sending email notification to site admin for SPACE_CHANGE_WAITLIST with id: ${resp.id}`, __filename, `addToSpaceChangeWaitList()`);
+        // throw new HttpException({
+        //   status: "Error",
+        //   message: COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG,
+        //   body: err
+        // }, HttpStatus.INTERNAL_SERVER_ERROR);
       });
 
-    } catch (error) {
-      response['status'] = 'Error';
-      response['message'] = error.message;
-      response['body'] = error;
-      error(`Error in save Space Change Waitlist flow: ${error.message}`, __filename, `addToSpaceChangeWaitList()`);
-      return response;
-    }
+    // } catch (error) {
+    //   response['status'] = 'Error';
+    //   response['message'] = error.message;
+    //   response['body'] = error;
+    //   error(`Error in save Space Change Waitlist flow: ${error.message}`, __filename, `addToSpaceChangeWaitList()`);
+    //   return response;
+    // }
     info(`Space Change waitlist saved successfully`, __filename, `addToSpaceChangeWaitList()`);
     response['status'] = 'Success';
     response['message'] = 'Operation Successful';
@@ -1822,7 +1822,7 @@ order by quat;
   }
 
   /**
-   *  Description: BIOL-275 GET spacechange waitlist by status, siteId and companyId.
+   * Description: BIOL-275 GET spacechange waitlist by status, siteId and companyId.
    * @description GET spacechange waitlist by status, siteId and companyId.
    * @param statusArr array of status (0,1,2)
    * @param siteIdArr array of siteId
