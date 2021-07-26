@@ -179,7 +179,7 @@ export class ResidentCompanyService {
    * @param companyMember array of companyMember.
    * @param id number of Company id.
    */
-  async residentCompanyAdvisors(Advisors: [], id: number) {
+  async residentCompanyAdvisors(Advisors:any, id: number) {
     info("adding resident company advisors", __filename, "residentCompanyAdvisors()");
     if (Advisors.length > 0) {
       for (let i = 0; i < Advisors.length; i++) {
@@ -251,7 +251,6 @@ export class ResidentCompanyService {
       }
     }
   }
-
   /**
    * Description: This method will create the new resident companies technical.
    * @description This method will create the new resident companies technical.
@@ -281,7 +280,7 @@ export class ResidentCompanyService {
    * @param companyMember array of technical Member.
    * @param id number of Company id.
    */
-  async residentCompanyTechnicals(techMembers: [], id: number) {
+  async residentCompanyTechnicals(techMembers:any, id: number) {
     info("Error in find resident companies", __filename, "residentCompanyTechnicals()");
     if (techMembers.length > 0) {
       for (let i = 0; i < techMembers.length; i++) {
@@ -795,7 +794,7 @@ export class ResidentCompanyService {
       }
     } catch (err) {
       error("Error in find resident company for sponser", __filename, "getResidentCompanyForSponsorBySite()");
-      throw new BiolabsException('Error in find resident company for sponser' + err.message);
+      throw new BiolabsException('Error in find resident company for sponser' , err.message);
     }
     return res;
 
@@ -1371,7 +1370,7 @@ export class ResidentCompanyService {
       response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
     } catch (err) {
       error("Getting error in find the stages of technology", __filename, "getStagesOfTechnologySiteId()");
-      throw new BiolabsException('Getting error in find the stages of technology' + err.message);
+      throw new BiolabsException('Getting error in find the stages of technology', err.message);
     }
     return response;
   }
@@ -1401,7 +1400,7 @@ export class ResidentCompanyService {
       response['fundings'] = (!fundigs) ? 0 : fundigs;
     } catch (err) {
       error("Getting error in find the fundings", __filename, "getFundingBySiteIdAndCompanyId()");
-      throw new BiolabsException('Getting error in find the fundings' + err.message);
+      throw new BiolabsException('Getting error in find the fundings' ,err.message);
     }
     return response;
   }
@@ -1424,7 +1423,7 @@ export class ResidentCompanyService {
       return startWithBiolab;
     } catch (err) {
       error("Getting error in find the history of started with Biolabs analysis", __filename, "getstartedWithBiolabs()");
-      throw new BiolabsException('Getting error in find the history of started with Biolabs analysis' + err.message);
+      throw new BiolabsException('Getting error in find the history of started with Biolabs analysis' , err.message);
     }
   }
   /**
@@ -1475,7 +1474,7 @@ export class ResidentCompanyService {
       return getFeeds;
     } catch (err) {
       error("Getting error to find the time analysis", __filename, "getFeeds()");
-      throw new BiolabsException('Getting error in forget password process' + err.message);
+      throw new BiolabsException('Getting error in forget password process' , err.message);
     }
   }
 

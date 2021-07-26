@@ -325,19 +325,17 @@ describe('ResidentCompanyService', () => {
   describe('Create method', () => {
 
     it('it should called getByEmail  method ', async () => {
-      // mockAddResidentCompany.email = "admin@gmail.com";
       residentCompanyRepository
         .createQueryBuilder('resident-companies')
         .where('resident-companies.email = :email')
         .setParameter('email', mockAddResidentCompany.email)
         .getOne();
-      //await residentCompanyService.sendEmailToSiteAdmin(sites, req, payload.companyName);
 
       let ans = await residentCompanyService.create(mockAddResidentCompany);
       expect(ans).not.toBeNull();
     })
     it('it should throw exception if user id is not provided  ', async () => {
-      jest.spyOn(residentCompanyService, 'getByEmail').mockResolvedValueOnce(mockRC); 
+      jest.spyOn(residentCompanyService, 'getByEmail').mockResolvedValueOnce(mockRC);
       try {
         await residentCompanyService.create(mockAddResidentCompany);
       } catch (e) {
@@ -414,8 +412,20 @@ describe('ResidentCompanyService', () => {
         .where("resident_companies.status IN (:...status)", { status: [1, 0] })
         .getRawMany();
       let result = await residentCompanyService.getResidentCompanies(listRCPayload, siteIdArr);
+      //jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockResolvedValueOnce(mock)
       expect(result).not.toBeNull();
     })
+    it('should throw exception ', async () => {
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => {
+          throw new BiolabsException('')
+      });
+      try {
+          await  residentCompanyService.getResidentCompanies(listRCPayload, siteIdArr);
+      } catch (e) {
+          expect(e.name).toBe('BiolabsException');
+          expect(e instanceof BiolabsException).toBeTruthy();
+      }
+  });
   });
   describe('addResidentCompany method', () => {
     const req: any = {
@@ -425,7 +435,7 @@ describe('ResidentCompanyService', () => {
     let resp = { status: 'success', message: 'Application Successfully submitted' };
     // it('should return resident companies  object', async () => {
     //  // jest.spyOn(residentCompanyService, 'getByEmail').mockResolvedValueOnce(mockRC); 
-     
+
     //   if (mockRC.id) {
     //     // const historyData: any = JSON.parse(JSON.stringify(mockRC));
     //     // historyData.comnpanyId = mockRC.id;
@@ -476,6 +486,7 @@ describe('ResidentCompanyService', () => {
       }
     });
   });
+  // <!--TO-DO-->
   describe('residentCompanyManagements method', () => {
     let companyMembers: Array<ResidentCompanyManagementFillableFields> = [
       {
@@ -485,21 +496,19 @@ describe('ResidentCompanyService', () => {
         laboratoryExecutivePOC: true, invoicingExecutivePOC: true,
       }
     ];
-    // let companyMember = { "companyId": 1 }
-    it('should return resident companies document object', async () => {
+    it('should call addResidentCompanyManagement method ', async () => {
       if (companyMembers.length > 0) {
         for (let i = 0; i < companyMembers.length; i++) {
           let companyMember = companyMembers[i];
-          console.log("companyMember =========", companyMember);
-
-          jest.spyOn(residentCompanyService, 'checkEmptyVal').mockReturnValue(true);
+          //console.log("companyMember =========", companyMember);
           if (residentCompanyService.checkEmptyVal('managements', companyMember))
-            //jest.spyOn(residentCompanyService, 'addResidentCompanyManagement').mockReturnValueOnce(mock);
-            await residentCompanyService.addResidentCompanyManagement(companyMember);
+            //console.log("in if block =========", companyMember);
+            jest.spyOn(residentCompanyService, 'addResidentCompanyManagement').mockImplementation();
         }
       }
       let result = await residentCompanyService.residentCompanyManagements(companyMembers, 1);
-      console.log(result);
+
+      expect(result).not.toBeNull();
     });
   });
   describe('addResidentCompanyAdvisor method', () => {
@@ -525,7 +534,33 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull();
     })
   });
-
+  // <!--TO-DO-->
+  describe('residentCompanyAdvisors method', () => {
+    let advisors: Array<ResidentCompanyAdvisoryFillableFields> = [
+      {
+        id: 1,
+        name: "ResidentCompanyAdvisor",
+        status: '1',
+        title: "ResidentCompanyAdvisor",
+        organization: "Tesla",
+        companyId: 1
+      }
+    ];
+    it('should call residentCompanyAdvisors method ', async () => {
+      if (advisors.length > 0) {
+        for (let i = 0; i < advisors.length; i++) {
+          let advisor = advisors[i];
+          // console.log("advisor =========", advisor);
+          if (residentCompanyService.checkEmptyVal('advisors', advisor))
+            //   console.log("in if block =========", advisor);
+            //  // jest.spyOn(residentCompanyService, 'addResidentCompanyAdvisor').mockImplementation();
+            await residentCompanyService.addResidentCompanyAdvisor(advisor);
+        }
+      }
+      let result = await residentCompanyService.residentCompanyAdvisors(advisors, 1);
+      expect(result).not.toBeNull();
+    });
+  });
   describe('addResidentCompanyManagement method', () => {
     let payload: ResidentCompanyManagementFillableFields = {
       id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
@@ -549,7 +584,30 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull();
     })
   });
-
+  // <!--TO-DO-->
+  describe('residentCompanyTechnicals method', () => {
+    let technicals: Array<ResidentCompanyTechnicalFillableFields> = [
+      {
+        id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
+        title: "ResidentManage", phone: "8055969426", linkedinLink: "testAmin@linkedin.in", publications: "Management",
+        joiningAsMember: true, mainExecutivePOC: true, laboratoryExecutivePOC: true, invoicingExecutivePOC: true
+      }
+    ];
+    it('should call residentCompanyTechnicals method ', async () => {
+      if (technicals.length > 0) {
+        for (let i = 0; i < technicals.length; i++) {
+          let technical = technicals[i];
+          // console.log("technical =========", technical);
+          if (residentCompanyService.checkEmptyVal('technicals', technicals))
+            //   console.log("in if block =========", technical);
+            //  // jest.spyOn(residentCompanyService, 'addResidentCompanyAdvisor').mockImplementation();
+            await residentCompanyService.addResidentCompanyTechnical(technical);
+        }
+      }
+      let result = await residentCompanyService.residentCompanyTechnicals(technicals, 1);
+      expect(result).not.toBeNull();
+    });
+  });
   describe('addResidentCompanyTechnical method', () => {
     let payload: ResidentCompanyTechnicalFillableFields = {
       id: 1, email: "elon@space.com", companyId: 1, name: "TestAdmin", status: '1',
@@ -612,10 +670,28 @@ describe('ResidentCompanyService', () => {
         query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
           "where c.id = ANY(rc.industry::int[]) ) as industryCount " +
           "FROM public.categories as c order by industryCount desc limit 3;")
-      //jest.spyOn(residentCompanyService, 'getResidentCompanyForSponsor').mockResolvedValueOnce(mockRecidentCompanies);
+      // jest.spyOn(residentCompanyService, 'getResidentCompanyForSponsor').mockResolvedValueOnce(mockRecidentCompanies);
       let result = await residentCompanyService.getResidentCompanyForSponsor();
       expect(result).not.toBeNull();
     })
+    it('it should throw exception if user id is not provided  ', async () => {
+
+      try {
+        jest.spyOn(residentCompanyService, 'getResidentCompanyForSponsor').mockImplementation(() => {
+          throw new Error();
+        });
+
+        // expect(() => {
+        //   residentCompanyService.getResidentCompanyForSponsor();
+        // }).toThrow('Error in find resident company for sponser');
+        // expect( await residentCompanyService.getResidentCompanyForSponsor()).rejects.toMatch('error');
+      } catch (e) {
+        console.log(e);
+        // expect(e.name).toBe('BiolabsException');
+        // expect(e instanceof BiolabsException).toBeTruthy();
+        // expect(e.message).toEqual('Getting error in find company size quartly');
+      }
+    });
   });
 
   describe('getRcSites method', () => {
@@ -736,6 +812,16 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
     })
+    it('should throw exception if company with provided id not available.', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(null);
+      try {
+        await residentCompanyService.getResidentCompanyForSponsorBySite();
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Error in find resident company for sponser');
+      }
+    });
   });
 
   describe('getResidentCompany method', () => {
@@ -835,6 +921,7 @@ describe('ResidentCompanyService', () => {
       let result = await residentCompanyService.gloabalSearchCompaniesOld(mockSearchPayload, [1, 2])
       expect(result).not.toBeNull();
     })
+
   });
 
   describe('gloabalSearchCompanies method', () => {
@@ -888,7 +975,6 @@ describe('ResidentCompanyService', () => {
         expect(e.message).toEqual('Getting error in find the note');
       }
     });
-
   });
   describe('addNote method', () => {
     const req: any = {
@@ -1004,9 +1090,19 @@ describe('ResidentCompanyService', () => {
         ]
       });
     })
+    it('should throw exception if Getting error in find the stages of technology', async () => {
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockImplementation(() => {
+        throw new BiolabsException('Getting error in find the stages of technology')
+      });
+      try {
+        await residentCompanyService.getStagesOfTechnologyBySiteId(1, 1);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Getting error in find the stages of technology');
+      }
+    });
   });
-
-
   describe('getFundingBySiteIdAndCompanyId method', () => {
     const mockfundings =
       [
@@ -1025,6 +1121,18 @@ describe('ResidentCompanyService', () => {
         fundings: [{ Funding: '12', quarterNo: 3, quaterText: 'Q3.2021' }]
       });
     })
+    it('should throw exception if Getting error in find the fundings', async () => {
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockImplementation(() => {
+        throw new BiolabsException('Getting error in find the fundings')
+      });
+      try {
+        await residentCompanyService.getFundingBySiteIdAndCompanyId(1, 1);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Getting error in find the fundings');
+      }
+    });
   });
   describe('getFeeds method', () => {
     let companyId = 1;
@@ -1048,6 +1156,18 @@ describe('ResidentCompanyService', () => {
       expect(result[0]).toEqual(mockStartBiolabs[0]);
       expect(result).toEqual(mockStartBiolabs);
     })
+    it('should throw exception if Getting error in find the history of started with Biolabs analysis', async () => {
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockImplementation(() => {
+        throw new BiolabsException('Getting error in find the history of started with Biolabs analysis')
+      });
+      try {
+        await residentCompanyService.getstartedWithBiolabs(1, 1);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Getting error in find the history of started with Biolabs analysis');
+      }
+    });
   });
 
   describe('getFinancialFees method', () => {
@@ -1124,14 +1244,16 @@ describe('ResidentCompanyService', () => {
       expect(result[1]).toEqual(mockCompanySizeQuarter[1]);
       expect(result).toEqual(mockCompanySizeQuarter);
     })
-    it('it should throw exception if user id is not provided  ', async () => {
-      //jest.spyOn(residentCompanyHistoryRepository, 'query').mockReturnValueOnce(new BiolabsException('Getting error in find company size quartly' ));
+    it('should throw exception if Getting error in find the fundings', async () => {
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockImplementation(() => {
+        throw new BiolabsException('Getting error in find company size quartly')
+      });
       try {
-        await residentCompanyService.getCompanySizeQuartly(null)
+        await residentCompanyService.getCompanySizeQuartly(1);
       } catch (e) {
         expect(e.name).toBe('BiolabsException');
         expect(e instanceof BiolabsException).toBeTruthy();
-        expect(e.message).toEqual('Getting error in find company size quartly');
+        expect(e.message).toBe('Getting error in find company size quartly');
       }
     });
   });
