@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Any, Repository } from 'typeorm';
 import { ProductType } from '../order/model/product-type.entity';
 import { BiolabsSource } from './biolabs-source.entity';
 import { Category } from './category.entity';
@@ -690,7 +690,50 @@ describe('MasterService', () => {
             expect(modality).toBe(mockModality);
         })
     });
-
+    describe('should test createSites Functionality', () => {
+        let mockSites = {
+            Tufts: {
+                id: 1,
+                name: 'Tufts',
+                longName: 'Tufts Launchpad',
+                standardizedAddress: '75 Kneeland St, 14th Floor Boston, MA 02111',
+                colorCode: '#6baecf',
+                googleMapUrl: 'https://goo.gl/maps/J6KRZNuGFrWkk7iG6',
+                siteMapBoxImgUrl: '',
+                status: '1'
+            },
+            Ipsen: {
+                id: 2,
+                name: 'Ipsen',
+                longName: 'Ipsen Innovation Cente',
+                standardizedAddress: '650 E Kendall St 2nd Floor, Cambridge, MA 02142',
+                colorCode: '#26294a',
+                googleMapUrl: 'https://goo.gl/maps/PuKw7cvjxKxsApNN7',
+                siteMapBoxImgUrl: '',
+                status: '1'
+            },
+            Eisai: {
+                id: 3,
+                name: 'Eisai',
+                longName: 'Eisai Innovation Center BioLabs',
+                standardizedAddress: '35 Cambridge Park Drive, Cambridge, MA 02140 2nd Floor',
+                colorCode: '#d80c8c',
+                googleMapUrl: 'https://goo.gl/maps/fvAQF8sMtykEk76Z8',
+                siteMapBoxImgUrl: '',
+                status: '1'
+            }
+        }
+        it('it should return site object', async () => {
+            const _sites = migrationData['sites'];
+            for (const _site of _sites) {
+                jest.spyOn(masterService, 'createSite').mockResolvedValueOnce(_site);
+            }
+            let result = await masterService.createSites();
+            expect(result).not.toBeNull();
+            expect(result).not.toBeUndefined();
+            expect(result).toEqual(mockSites);
+        });
+    })
 
     describe('should test getTechnologyStages Functionality', () => {
 
@@ -901,7 +944,37 @@ describe('MasterService', () => {
             }
         });
     });
+    describe('should test createRoles Functionality', () => {
+        let mockRoles = [];
+        const _roles = migrationData['roles'];
+        it('it should return site object', async () => {
+            jest.spyOn(masterService, 'getRoles').mockResolvedValueOnce(mockRoles);
+            const resp = Promise.resolve(mockRoles);
+            //console.log("resp =============", resp);
+            let result = await masterService.createRoles();
+            //console.log("result ++++++++++++++", result);
+            expect(result).not.toBeNull();
+            expect(result).not.toBeUndefined();
+            expect(_roles.map(_roles => _roles.name)).toEqual([
+                "superadmin",
+                "siteadmin",
+                "sponsor",
+                "resident"
+            ]);
+            return resp.then(async data => {
+                //console.log("data===============", data)
 
+                for (const _role of _roles) {
+                    if (!data.find(r => r.name == _role.name)) {
+                        return jest.spyOn(masterService, 'createRole').mockResolvedValueOnce(mockRoles);
+                    }
+                    if (_role.name == _roles[_roles.length - 1].name) {
+                        return resp;
+                    }
+                }
+            })
+        });
+    });
     describe('should test role Functionality', () => {
         let mockRoles = migrationData['roles'];
         let mockRole = mockRoles[0] as Role;
@@ -934,7 +1007,35 @@ describe('MasterService', () => {
         });
 
     });
-
+    describe('should test createBiolabsSources Functionality', () => {
+        let mockbiolabsSource = [];
+        const _biolabsSources = migrationData['biolabsSources'];
+        console.log("biolabsSources==========", _biolabsSources[4].name);
+        it('it should return site object', async () => {
+            jest.spyOn(masterService, 'getBiolabsSource').mockResolvedValueOnce(mockbiolabsSource);
+            const resp = Promise.resolve(mockbiolabsSource);
+            let result = await masterService.createBiolabsSources();
+            expect(result).not.toBeNull();
+            expect(result).not.toBeUndefined();
+            expect(_biolabsSources.map(_biolabsSources => _biolabsSources.name)).toEqual([
+                'Website',
+                'Online search',
+                'Event',
+                'Referral',
+                'Other'
+            ]);
+            return resp.then(async data => {
+                for (const _biolabsSource of _biolabsSources) {
+                    if (!data.find(r => r.name == _biolabsSource.name)) {
+                        return jest.spyOn(masterService, 'createBiolabsSource').mockResolvedValueOnce(mockbiolabsSource);
+                    }
+                    if (_biolabsSource.name == _biolabsSources[_biolabsSources.length - 1].name) {
+                        return resp;
+                    }
+                }
+            })
+        });
+    });
     describe('should test biolabs source Functionality', () => {
         let mockbiolabsSources = migrationData['biolabsSources'];
         let mockbiolabsSource = mockbiolabsSources[0] as BiolabsSource;
@@ -1059,6 +1160,138 @@ describe('MasterService', () => {
             });
             try {
                 await masterService.createProductType();
+            } catch (e) {
+                expect(e.name).toBe('InternalException');
+                expect(e instanceof InternalException).toBeTruthy();
+            }
+        });
+    });
+    describe('should test createFundings Functionality', () => {
+        let mockfundings = [];
+        const _fundings = migrationData['fundings'];
+        it('it should return site object', async () => {
+            jest.spyOn(masterService, 'getFundings').mockResolvedValueOnce(mockfundings);
+            const resp = Promise.resolve(mockfundings);
+            //console.log("resp =============", resp);
+            let result = await masterService.createFundings();
+            // console.log("result ++++++++++++++", result);
+            expect(result).not.toBeNull();
+            expect(result).not.toBeUndefined();
+            expect(_fundings.map(_fundings => _fundings.name)).toEqual([
+                'Grant funded',
+                'Self-funded',
+                'Angel Investors(including friends and family)',
+                'Seed-Funding',
+                'VC Series A',
+                'VC Series B or beyond',
+                'Public Company',
+                'Other'
+            ]);
+            return resp.then(async data => {
+                //console.log("data===============", data)
+                for (const _funding of _fundings) {
+                    if (!data.find(r => r.name == _funding.name)) {
+                        return jest.spyOn(masterService, 'createFunding').mockResolvedValueOnce(mockfundings);
+                    }
+                    if (_funding.name == _fundings[_fundings.length - 1].name) {
+                        return resp;
+                    }
+                }
+            })
+        });
+    });
+    describe('should test createModalities Functionality', () => {
+        let mockModalitites = [];
+        const _modalities = migrationData['modalities'];
+        it('it should return site object', async () => {
+            jest.spyOn(masterService, 'getModalities').mockResolvedValueOnce(mockModalitites);
+            const resp = Promise.resolve(mockModalitites);
+            //console.log("resp =============", resp);
+            let result = await masterService.createModalities();
+            //console.log("result ++++++++++++++", result);
+            expect(result).not.toBeNull();
+            expect(result).not.toBeUndefined();
+            expect(_modalities.map(_modalities => _modalities.name)).toEqual([
+                'Antibody',
+                'Antisense oligonucleotide/siRNA',
+                'Cell therapy',
+                'Computational drug discovery',
+                'Drug delivery',
+                'Gene therapy',
+                'Live microbiota',
+                'mRNA',
+                'Protein/peptide',
+                'Radiopharmaceutical',
+                'Small molecule',
+                'Synthetic biology',
+                'Tissue engineering',
+                'Vaccine',
+                'Biosynthetics',
+                'Other'
+            ]);
+            return resp.then(async data => {
+                //console.log("data===============", data)
+                for (const _modalitie of _modalities) {
+                    if (!data.find(r => r.name == _modalitie.name)) {
+                        return jest.spyOn(masterService, 'createModality').mockResolvedValueOnce(mockModalitites);
+                    }
+                    if (_modalitie.name == _modalities[_modalities.length - 1].name) {
+                        return resp;
+                    }
+                }
+            })
+        });
+    });
+    describe('should test createTechnologyStages Functionality', () => {
+        let mockTechnologyStage = [];
+        const _technologyStages = migrationData['companyStages'];
+        it('it should return site object', async () => {
+            jest.spyOn(masterService, 'getTechnologyStages').mockResolvedValueOnce(mockTechnologyStage);
+            const resp = Promise.resolve(_technologyStages);
+            //console.log("resp =============", resp);
+            let result = await masterService.createTechnologyStages();
+            //console.log("result ++++++++++++++", result);
+            expect(result).not.toBeNull();
+            expect(result).not.toBeUndefined();
+            expect(_technologyStages.map(_technologyStages => _technologyStages.name)).toEqual([
+                'Discovery/R&D',
+                'Proof-of-principal/Validation',
+                'Pre-clinical',
+                'Clinical',
+                'Manufacturing',
+                'Public',
+                'Other'
+            ]);
+            return resp.then(async data => {
+                //console.log("data===============", data)
+                for (const _technologyStage of _technologyStages) {
+                    if (!data.find(r => r.name == _technologyStage.name)) {
+                        return jest.spyOn(masterService, 'createTechnologyStage').mockResolvedValueOnce(mockTechnologyStage);
+                    }
+                    if (_technologyStage.name == _technologyStages[_technologyStages.length - 1].name) {
+                        return resp;
+                    }
+                }
+            })
+        });
+    });
+    //<!--TO-Do-->
+    describe('should test createCategories Functionality', () => {
+        const _categories = migrationData['categories'];
+        //console.log("categories============",_categories)
+        it('it should return site object', async () => {
+            jest.spyOn(masterService, 'createCategory').mockResolvedValueOnce(_categories);
+            let result = await masterService.createCategories();
+           // console.log("result ++++++++++++++", result);
+            expect(result).not.toBeNull();
+            expect(result).not.toBeUndefined();
+        });
+        it('should throw exception ', async () => {
+            jest.spyOn(masterService, 'createCategory').mockImplementation(() => {
+                throw new InternalException('');
+            });
+            try {
+                await masterService.createCategories();
             } catch (e) {
                 expect(e.name).toBe('InternalException');
                 expect(e instanceof InternalException).toBeTruthy();

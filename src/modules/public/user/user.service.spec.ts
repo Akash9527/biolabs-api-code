@@ -212,9 +212,7 @@ describe('UserService', () => {
             jest.spyOn(userService, 'getByEmail').mockRejectedValueOnce(new NotAcceptableException("User with provided email already created."));
             try {
                 await userService.addUser(mockUserFillable, req);
-            } catch (e) {
-                console.log(e);
-                
+            } catch (e) {    
                 expect(e.name).toBe('InternalException');
                 expect(e instanceof InternalException).toBeTruthy();
             }
@@ -327,9 +325,7 @@ describe('UserService', () => {
                 jest.spyOn(userService, 'get').mockResolvedValueOnce(null);
                 try {
                     await userService.getUserById(new NotAcceptableException('User with provided id not available.'));
-                } catch (e) {
-                    console.log(e);
-                    
+                } catch (e) {   
                     expect(e.response.error).toBe('Not Acceptable');
                     expect(e.response.message).toBe('User with provided id not available.');
                     expect(e.response.statusCode).toBe(406);
