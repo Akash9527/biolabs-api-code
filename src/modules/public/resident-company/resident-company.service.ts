@@ -1589,7 +1589,7 @@ order by quat;
     }).catch(err => {
       error("Getting error while fetching  maxPriorityOrder", __filename, "addResidentCompanyDataInWaitlist()");
       throw new BiolabsException('Getting error while fetching  maxPriorityOrder ' + err.message);
-    });;
+    });
     debug(`Max priority order: ${maxPriorityOrder}`, __filename, "addResidentCompanyDataInWaitlist()");
     
     let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
