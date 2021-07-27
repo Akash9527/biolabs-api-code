@@ -1642,7 +1642,7 @@ order by quat;
    * @param req
    * @returns
    */
-  public async addToSpaceChangeWaitList(payload: AddSpaceChangeWaitlistDto, @Request() req): Promise<any> {
+  public async addToSpaceChangeWaitList(payload: AddSpaceChangeWaitlistDto, siteIdArr: any, @Request() req): Promise<any> {
     info(`Add Space Change Waitlist for companyId : ${payload.residentCompanyId} and site: ${req.user.site_id}`, __filename, "addToSpaceChangeWaitList()");
     const COULD_NOT_SAVE_SPACE_CHANGE_WAITLIST_ERR_MSG = "Could not save Space Change Waitlist record";
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG = "Could not update Resident Company record";
@@ -1695,7 +1695,7 @@ order by quat;
     spaceChangeWaitlistObj.internalNotes = payload.internalNotes;
     spaceChangeWaitlistObj.siteNotes = payload.siteNotes;
     spaceChangeWaitlistObj.priorityOrder = maxPriorityOrder;
-    let siteIdArr = req.user.site_id;
+    //let siteIdArr = siteIdArr;
     // if (req.headers['x-site-id']) {
     //   siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     // }
