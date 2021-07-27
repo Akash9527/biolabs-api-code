@@ -342,7 +342,11 @@ export class ResidentCompanyController {
   })
   async addSpaceChangeWaitlist(@Body() payload: AddSpaceChangeWaitlistDto, @Request() req): Promise<any> {
     info(`Add Space Change Waitlist record for resident company id: ${payload.residentCompanyId} and site: ${req.user.site_id} `, __filename, `addSpaceChangeWaitlist()`);
-    return await this.residentCompanyService.addToSpaceChangeWaitList(payload, req);
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return await this.residentCompanyService.addToSpaceChangeWaitList(payload, siteIdArr, req);
   }
 
   /**
