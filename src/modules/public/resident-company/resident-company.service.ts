@@ -1935,16 +1935,20 @@ order by quat;
     const response = {};
     const month = new Date().getMonth() + 2; // Getting next month from currect date
     const queryStr = `
-      select pt.id as "productTypeId", 
-      CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
-      pt."productTypeName"
-      from product_type as pt
-      Left Join (select "productTypeId", quantity from order_product where "companyId" = ${companyId} and month = ${month} ) as op
-      on pt.id = op."productTypeId"
-      where pt."productTypeName" <> 'Decontamination Fee' 
-      and pt."productTypeName" <> 'Retainer Fee'
-      group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
-    `;
+        select res."productTypeId", sum(res.count), res."productTypeName"
+        from (
+            select pt.id as "productTypeId",
+            CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
+            pt."productTypeName"
+            from product_type as pt
+            Left Join (select "productTypeId", quantity from order_product where "companyId" = ${companyId} and month = ${month} ) as op
+            on pt.id = op."productTypeId"
+            where pt."productTypeName" <> 'Decontamination Fee'
+            and pt."productTypeName" <> 'Retainer Fee'
+            group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
+            ) as res
+        group by res."productTypeId", res."productTypeName"
+        `;
 
     const items = await this.residentCompanyHistoryRepository.query(queryStr);
     response['items'] = (!items) ? 0 : items;
