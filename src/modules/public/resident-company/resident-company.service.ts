@@ -1578,21 +1578,23 @@ order by quat;
    * @param req
    */
   private async addResidentCompanyDataInWaitlist(savedRc: any) {
+    
     info(`Create waitlist on application submission`, __filename, "addResidentCompanyDataInWaitlist()");
     const PLAN_CHANGE_SUMMARY_INITIAL_VALUE = 'See Notes';
-    const REQUEST_NOTES_INITIAL_VALUE = 'When would you like to join BioLabs?, What equipment and facilities do you plan to primarily use onsite?**';
+    const moveIn = await this.getMoveInPrefrence().find(pr => pr.id == savedRc.preferredMoveIn);
+    const REQUEST_NOTES_INITIAL_VALUE = moveIn.name+', Equipment and facilities you plan to primarily use onsite : '+savedRc.equipmentOnsite;
     const REQUEST_TYPE_EXTERNAL = false;
     const maxPriorityOrder: number = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
       return result;
-    });
+    }).catch(err => {
+      error("Getting error while fetching  maxPriorityOrder", __filename, "addResidentCompanyDataInWaitlist()");
+      throw new BiolabsException('Getting error while fetching  maxPriorityOrder ' + err.message);
+    });;
     debug(`Max priority order: ${maxPriorityOrder}`, __filename, "addResidentCompanyDataInWaitlist()");
-    let productTypes: any = await this.productTypeService.getProductType().then((result) => {
-      return result;
-    });
-
+    
     let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
     spaceChangeWaitlistObj.residentCompany = savedRc;
-    spaceChangeWaitlistObj.desiredStartDate = null;
+    spaceChangeWaitlistObj.desiredStartDate = Date.parse(new Date().toString())/1000;
     spaceChangeWaitlistObj.planChangeSummary = PLAN_CHANGE_SUMMARY_INITIAL_VALUE;
     spaceChangeWaitlistObj.requestedBy = savedRc.name;
     spaceChangeWaitlistObj.requestStatus = RequestStatusEnum.Open;
@@ -1607,21 +1609,11 @@ order by quat;
     spaceChangeWaitlistObj.requestGraduateDate = null;
     spaceChangeWaitlistObj.marketPlace = null;
 
-    const resp = await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj);
+    return await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj).catch(err => {
+      error("Getting error while Saving Waitlist", __filename, "addResidentCompanyDataInWaitlist()");
+      throw new BiolabsException('Getting error while Saving Waitlist ' + err.message);
+    });
 
-    if (productTypes && resp) {
-      for (let index = 0; index < productTypes.length; index++) {
-        let item: Item = new Item();
-        item.productTypeId = productTypes[index].id;
-        item.itemName = productTypes[index].productTypeName;
-        item.currentQty = 0;
-        item.desiredQty = 0;
-        item.spaceChangeWaitlist = resp;
-        item.spaceChangeWaitlist_id = resp.id;
-        await this.itemRepository.save(this.itemRepository.create(item));
-      }
-      debug(`Total product types: ${productTypes.length}`, __filename, `addResidentCompanyDataInWaitlist()`);
-    }
   }
 
   /**
@@ -1935,20 +1927,16 @@ order by quat;
     const response = {};
     const month = new Date().getMonth() + 2; // Getting next month from currect date
     const queryStr = `
-        select res."productTypeId", sum(res.count), res."productTypeName"
-        from (
-            select pt.id as "productTypeId",
-            CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
-            pt."productTypeName"
-            from product_type as pt
-            Left Join (select "productTypeId", quantity from order_product where "companyId" = ${companyId} and month = ${month} ) as op
-            on pt.id = op."productTypeId"
-            where pt."productTypeName" <> 'Decontamination Fee'
-            and pt."productTypeName" <> 'Retainer Fee'
-            group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
-            ) as res
-        group by res."productTypeId", res."productTypeName"
-        `;
+      select pt.id as "productTypeId", 
+      CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
+      pt."productTypeName"
+      from product_type as pt
+      Left Join (select "productTypeId", quantity from order_product where "companyId" = ${companyId} and month = ${month} ) as op
+      on pt.id = op."productTypeId"
+      where pt."productTypeName" <> 'Decontamination Fee' 
+      and pt."productTypeName" <> 'Retainer Fee'
+      group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
+    `;
 
     const items = await this.residentCompanyHistoryRepository.query(queryStr);
     response['items'] = (!items) ? 0 : items;
@@ -2173,5 +2161,14 @@ order by quat;
     resp['body'] = payload;
     info(`Executed updateSpaceChangeWaitlistStatus()`, __filename, `updateSpaceChangeWaitlistStatus()`);
     return resp;
+  }
+
+  getMoveInPrefrence() {
+    return [
+      { id: 1, name: 'Join Biolabs Within : 1 month' },
+      { id: 2, name: 'Join Biolabs Within : 2 - 3 months' },
+      { id: 3, name: 'Join Biolabs Within : 4 - 6 months' },
+      { id: 4, name: 'Join Biolabs Within : More than 6 months' }
+    ];
   }
 }
