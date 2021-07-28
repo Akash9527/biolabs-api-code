@@ -950,9 +950,7 @@ describe('MasterService', () => {
         it('it should return site object', async () => {
             jest.spyOn(masterService, 'getRoles').mockResolvedValueOnce(mockRoles);
             const resp = Promise.resolve(mockRoles);
-            //console.log("resp =============", resp);
             let result = await masterService.createRoles();
-            //console.log("result ++++++++++++++", result);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
             expect(_roles.map(_roles => _roles.name)).toEqual([
@@ -962,8 +960,6 @@ describe('MasterService', () => {
                 "resident"
             ]);
             return resp.then(async data => {
-                //console.log("data===============", data)
-
                 for (const _role of _roles) {
                     if (!data.find(r => r.name == _role.name)) {
                         return jest.spyOn(masterService, 'createRole').mockResolvedValueOnce(mockRoles);
@@ -1010,7 +1006,6 @@ describe('MasterService', () => {
     describe('should test createBiolabsSources Functionality', () => {
         let mockbiolabsSource = [];
         const _biolabsSources = migrationData['biolabsSources'];
-        console.log("biolabsSources==========", _biolabsSources[4].name);
         it('it should return site object', async () => {
             jest.spyOn(masterService, 'getBiolabsSource').mockResolvedValueOnce(mockbiolabsSource);
             const resp = Promise.resolve(mockbiolabsSource);
@@ -1172,9 +1167,7 @@ describe('MasterService', () => {
         it('it should return site object', async () => {
             jest.spyOn(masterService, 'getFundings').mockResolvedValueOnce(mockfundings);
             const resp = Promise.resolve(mockfundings);
-            //console.log("resp =============", resp);
             let result = await masterService.createFundings();
-            // console.log("result ++++++++++++++", result);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
             expect(_fundings.map(_fundings => _fundings.name)).toEqual([
@@ -1188,7 +1181,6 @@ describe('MasterService', () => {
                 'Other'
             ]);
             return resp.then(async data => {
-                //console.log("data===============", data)
                 for (const _funding of _fundings) {
                     if (!data.find(r => r.name == _funding.name)) {
                         return jest.spyOn(masterService, 'createFunding').mockResolvedValueOnce(mockfundings);
@@ -1206,9 +1198,7 @@ describe('MasterService', () => {
         it('it should return site object', async () => {
             jest.spyOn(masterService, 'getModalities').mockResolvedValueOnce(mockModalitites);
             const resp = Promise.resolve(mockModalitites);
-            //console.log("resp =============", resp);
             let result = await masterService.createModalities();
-            //console.log("result ++++++++++++++", result);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
             expect(_modalities.map(_modalities => _modalities.name)).toEqual([
@@ -1230,7 +1220,6 @@ describe('MasterService', () => {
                 'Other'
             ]);
             return resp.then(async data => {
-                //console.log("data===============", data)
                 for (const _modalitie of _modalities) {
                     if (!data.find(r => r.name == _modalitie.name)) {
                         return jest.spyOn(masterService, 'createModality').mockResolvedValueOnce(mockModalitites);
@@ -1248,9 +1237,7 @@ describe('MasterService', () => {
         it('it should return site object', async () => {
             jest.spyOn(masterService, 'getTechnologyStages').mockResolvedValueOnce(mockTechnologyStage);
             const resp = Promise.resolve(_technologyStages);
-            //console.log("resp =============", resp);
             let result = await masterService.createTechnologyStages();
-            //console.log("result ++++++++++++++", result);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
             expect(_technologyStages.map(_technologyStages => _technologyStages.name)).toEqual([
@@ -1263,7 +1250,6 @@ describe('MasterService', () => {
                 'Other'
             ]);
             return resp.then(async data => {
-                //console.log("data===============", data)
                 for (const _technologyStage of _technologyStages) {
                     if (!data.find(r => r.name == _technologyStage.name)) {
                         return jest.spyOn(masterService, 'createTechnologyStage').mockResolvedValueOnce(mockTechnologyStage);
@@ -1275,14 +1261,11 @@ describe('MasterService', () => {
             })
         });
     });
-    //<!--TO-Do-->
     describe('should test createCategories Functionality', () => {
         const _categories = migrationData['categories'];
-        //console.log("categories============",_categories)
         it('it should return site object', async () => {
             jest.spyOn(masterService, 'createCategory').mockResolvedValueOnce(_categories);
             let result = await masterService.createCategories();
-           // console.log("result ++++++++++++++", result);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
         });

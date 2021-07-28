@@ -31,6 +31,8 @@ import { ProductType } from "../order/model/product-type.entity";
 import { ProductTypeService } from "../order/product-type.service";
 import { UpdateWaitlistPriorityOrderDto } from "../dto/update-waitlist-priority-order.dto";
 import { UpdateWaitlistRequestStatusDto } from "../dto/update-waitlist-request-status.dto";
+import { UpdateSpaceChangeWaitlistDto } from "../dto/update-space-change-waitlist.dto";
+import { AddSpaceChangeWaitlistDto } from "../dto/add-space-change-waitlist.dto";
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 const mockCompany: any = { id: 1 };
 const mockAddResidentCompany: AddResidentCompanyPayload = {
@@ -82,8 +84,54 @@ const mockRC: ResidentCompany = {
   "selectionDate": new Date("2021-07-05T18:30:00.000Z"),
   "companyStatusChangeDate": 2021,
 }
-const mockSpaceChangeWaitlistItem: any = {
-  id: 121,
+let mockUpdateSpaceChangeWaitlistDto: UpdateSpaceChangeWaitlistDto = {
+  spaceChangeWaitlistId: 1,
+  requestStatus: 0,
+  isRequestInternal: true,
+  membershipChange: 0,
+  desiredStartDate: 1627603200,
+  items: [
+    {
+      itemName: 'Private Office',
+      currentQty: 12,
+      productTypeId: 4,
+      desiredQty: 12
+    },
+    {
+      itemName: 'Workstation',
+      currentQty: 7,
+      productTypeId: 3,
+      desiredQty: 12
+    },
+    {
+      itemName: 'Private Lab',
+      currentQty: 8,
+      productTypeId: 5,
+      desiredQty: 20
+    },
+
+    {
+      itemName: 'Membership Fee',
+      currentQty: 10,
+      productTypeId: 1,
+      desiredQty: 32
+    },
+
+  ],
+  planChangeSummary: "See Notes",
+  fulfilledOn: 0,
+  requestNotes: 'This is notes1',
+  funding: '12',
+  siteNotes: '', companyStage: 3,
+  companySize: 120,
+  fundingSource: [1, 2],
+  internalNotes: '',
+  shareYourProfile: false,
+  requestGraduateDate: 946665000,
+  marketPlace: true
+}
+let mockSpaceChangeWaitlistItem: any = {
+  id: 1,
   dateRequested: 2021,
   desiredStartDate: 1632614400,
   planChangeSummary: '',
@@ -221,6 +269,7 @@ const mock: UpdateResidentCompanyPayload = {
 const mockNotes: Notes = { id: 1, createdBy: 1, createdAt: new Date(), residentCompany: new ResidentCompany(), notesStatus: 1, notes: "this is note 1" };
 describe('ResidentCompanyService', () => {
   let residentCompanyService: ResidentCompanyService;
+  let productTypeService;
   let residentCompanyRepository: Repository<ResidentCompany>;
   let residentCompanyHistoryRepository: Repository<ResidentCompanyHistory>;
   let residentCompanyDocumentsRepository: Repository<ResidentCompanyDocuments>;
@@ -237,6 +286,7 @@ describe('ResidentCompanyService', () => {
   let notesRepository: Repository<Notes>;
   let spaceChangeWaitlistRepository: Repository<SpaceChangeWaitlist>;
   let itemRepository: Repository<Item>;
+
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -357,7 +407,14 @@ describe('ResidentCompanyService', () => {
               update: jest.fn().mockReturnThis(),
               set: jest.fn().mockReturnThis(),
               where: jest.fn().mockReturnThis(),
+              andWhere: jest.fn().mockReturnThis(),
               execute: jest.fn(),
+              addSelect: jest.fn().mockReturnThis(),
+              leftJoin: jest.fn().mockReturnThis(),
+              getRawMany: jest.fn(),
+              addOrderBy: jest.fn().mockReturnThis(),
+              orderBy: jest.fn().mockReturnThis(),
+
             })),
             findOne: jest.fn(),
             create: jest.fn(),
@@ -371,10 +428,11 @@ describe('ResidentCompanyService', () => {
           provide: getRepositoryToken(Item), useValue: {
             find: jest.fn(),
             findOne: jest.fn(),
-            create: jest.fn(),
+            create: jest.fn(() => mockSpaceChangeWaitlistItem),
             save: jest.fn(),
             query: jest.fn(),
-            update: jest.fn()
+            update: jest.fn(),
+            delete: jest.fn()
           }
         },
         { provide: getRepositoryToken(ProductType), useValue: {} },
@@ -402,6 +460,7 @@ describe('ResidentCompanyService', () => {
     notesRepository = await module.get<Repository<Notes>>(getRepositoryToken(Notes));
     spaceChangeWaitlistRepository = await module.get<Repository<SpaceChangeWaitlist>>(getRepositoryToken(SpaceChangeWaitlist));
     itemRepository = await module.get<Repository<Item>>(getRepositoryToken(Item));
+    productTypeService = await module.get<ProductTypeService>(ProductTypeService);
   });
 
   it('it should be defined', () => {
@@ -1016,18 +1075,18 @@ describe('ResidentCompanyService', () => {
         expect(e instanceof InternalException).toBeTruthy();
       }
     });
-    it('it should throw exception if user id is not provided  ', async () => {
-      jest.spyOn(residentCompanyRepository, 'findOne').mockImplementation(() => {
-        throw new NotAcceptableException(
-          'Company with provided id not available.',
-        );
-      });
-      try {
-        await residentCompanyService.updateResidentCompany(mock);
-      } catch (e) {
-        console.log(e);
-      }
-    });
+    // it('it should throw exception if user id is not provided  ', async () => {
+    //   jest.spyOn(residentCompanyRepository, 'findOne').mockImplementation(() => {
+    //     throw new NotAcceptableException(
+    //       'Company with provided id not available.',
+    //     );
+    //   });
+    //   try {
+    //     await residentCompanyService.updateResidentCompany(mock);
+    //   } catch (e) {
+    //    // console.log(e);
+    //   }
+    // });
   });
   describe('gloabalSearchCompaniesOld method', () => {
     let mockSearchPayload: SearchResidentCompanyPayload = {
@@ -1705,7 +1764,332 @@ describe('ResidentCompanyService', () => {
       expect(result['body']).toEqual({ id: 1, status: 1 });
     });
   });
+  describe('getItems method', () => {
+    it('should return response with status and message fields if it is Successfull', async () => {
+      jest.spyOn(itemRepository, 'find').mockResolvedValue(mockSpaceChangeWaitlistItem.items);
+      let result = await residentCompanyService.getItems(1);
+      expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined();
+      expect(result.length).toBe(mockSpaceChangeWaitlistItem.items.length);
+      expect(result).toBe(mockSpaceChangeWaitlistItem.items);
+    });
+  });
+  describe('getItemsOfSpaceChangeWaitlist method', () => {
+    let spaceChangeWaitlist = [{
+      residentCompanyName: 'BiolabsNewvision_Ipsen',
+      id: 1,
+      dateRequested: 2021,
+      desiredStartDate: 1627603200,
+      planChangeSummary: '',
+      requestedBy: 'BiolabsNewvision',
+      requestStatus: 0,
+      fulfilledOn: 946665000,
+      isRequestInternal: true,
+      requestNotes: 'need 1 more for membership fee and 1 more for private fee',
+      internalNotes: '',
+      siteNotes: '',
+      priorityOrder: 1,
+      site: [2],
+      membershipChange: 0,
+      requestGraduateDate: 946665000,
+      marketPlace: true,
+      createdAt: 2021,
+      updatedAt: 2021,
+      residentCompanyId: 125
+    },
+    {
+      residentCompanyName: 'BiolabsNewvision_Ipsen',
+      id: 2,
+      dateRequested: 2021,
+      desiredStartDate: 1627516800,
+      planChangeSummary: '',
+      requestedBy: 'BiolabsNewvision',
+      requestStatus: 0,
+      fulfilledOn: 946665000,
+      isRequestInternal: true,
+      requestNotes: '',
+      internalNotes: '',
+      siteNotes: '',
+      priorityOrder: 3,
+      site: [2],
+      membershipChange: 0,
+      requestGraduateDate: 946665000,
+      marketPlace: true,
+      createdAt: 2021,
+      updatedAt: 2021,
+      residentCompanyId: 1
+    }
+    ];
+
+    it('should return response with status and message fields if it is Successfull', async () => {
+      if (spaceChangeWaitlist) {
+        for (let index = 0; index < spaceChangeWaitlist.length; index++) {
+          jest.spyOn(itemRepository, 'find').mockResolvedValue(mockSpaceChangeWaitlistItem.items);
+
+        }
+      }
+      let result = await residentCompanyService.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist);
+      expect(result).not.toBeUndefined();
+      expect(result).not.toBeNull();
+      expect(result.length).toEqual(2);
+      expect(result[0].items).toBe(mockSpaceChangeWaitlistItem.items);
+      expect(result[1].items).toBe(mockSpaceChangeWaitlistItem.items);
+    });
+    it('should return response with status and message fields if it is Successfull', async () => {
+      if (spaceChangeWaitlist) {
+        for (let index = 0; index < spaceChangeWaitlist.length; index++) {
+          jest.spyOn(itemRepository, 'find').mockRejectedValueOnce(null);
+        }
+      }
+      try {
+        await residentCompanyService.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist);
+      } catch (e) {
+        expect(e.status).toBe(500);
+        expect(e.response.status).toBe('Error');
+        expect(e.response.message).toEqual('Problem in fetching Items for Space Change Waitlist');
+      }
+    });
+  });
+
+  describe('updateSpaceChangeWaitlistItems method', () => {
+    it('should return response with status and message fields if it is Successfull', async () => {
+      if (mockUpdateSpaceChangeWaitlistDto.items && mockUpdateSpaceChangeWaitlistDto.items.length) {
+        jest.spyOn(itemRepository, 'delete').mockResolvedValue(mockSpaceChangeWaitlistItem);
+        jest.spyOn(itemRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+      }
+      await residentCompanyService.updateSpaceChangeWaitlistItems(mockUpdateSpaceChangeWaitlistDto, mockSpaceChangeWaitlistItem);
+    });
+    it('should return response with status and message fields if it is Successfull', async () => {
+      if (mockUpdateSpaceChangeWaitlistDto.items && mockUpdateSpaceChangeWaitlistDto.items.length) {
+        jest.spyOn(itemRepository, 'delete').mockRejectedValueOnce(null);
+        // jest.spyOn(itemRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+      }
+      try {
+        await residentCompanyService.updateSpaceChangeWaitlistItems(mockUpdateSpaceChangeWaitlistDto, mockSpaceChangeWaitlistItem);
+      } catch (e) {
+        expect(e.status).toBe(500);
+        expect(e.response.status).toBe('Error');
+        expect(e.response.message).toEqual('Error in updating Space Change Waitlist items');
+      }
+    });
+    it('should return response with status and message fields if it is Successfull', async () => {
+      if (mockUpdateSpaceChangeWaitlistDto.items && mockUpdateSpaceChangeWaitlistDto.items.length) {
+        jest.spyOn(itemRepository, 'delete').mockResolvedValue(mockSpaceChangeWaitlistItem);
+        jest.spyOn(itemRepository, 'save').mockRejectedValueOnce(mockSpaceChangeWaitlistItem.items);
+      }
+      try {
+        await residentCompanyService.updateSpaceChangeWaitlistItems(mockUpdateSpaceChangeWaitlistDto, mockSpaceChangeWaitlistItem);
+      } catch (e) {
+        expect(e.status).toBe(500);
+        expect(e.response.status).toBe('Error');
+        expect(e.response.message).toEqual('Error in updating Space Change Waitlist item');
+      }
+    });
+  });
+  describe('updateSpaceChangeWaitlistItems method', () => {
+    it('should return response with status and message fields if it is Successfull', async () => {
+      jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValue(mockResidentHistory);
+      await residentCompanyService.updateCompanyHistoryAfterSavingSpaceChangeWaitlist(mockUpdateSpaceChangeWaitlistDto, mockSpaceChangeWaitlistItem.residentCompany);
+    });
+  });
+  describe('updateSpaceChangeWaitlist method', () => {
+    it('should return response with status and message fields if it is Successfull', async () => {
+      if (mockUpdateSpaceChangeWaitlistDto) {
+        jest.spyOn(spaceChangeWaitlistRepository, 'findOne').mockResolvedValue(mockSpaceChangeWaitlistItem);
+      }
+      jest.spyOn(spaceChangeWaitlistRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem);
+      jest.spyOn(residentCompanyService, 'updateSpaceChangeWaitlistItems').mockResolvedValue(mockSpaceChangeWaitlistItem);
+      jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
+      jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValue(mockResidentHistory);
+      let result = await residentCompanyService.updateSpaceChangeWaitlist(mockUpdateSpaceChangeWaitlistDto);
+      expect(result['message']).toEqual('Space Change Waitlist updated successfully');
+      expect(result['status']).toEqual('Success');
+    });
+
+  });
+  describe('addResidentCompanyDataInWaitlist method', () => {
+    const mockProductType: ProductType = {
+      "productTypeName": "TestProduct",
+      "createdBy": 1,
+      "modifiedBy": 1,
+      "id": 1,
+      "createdAt": new Date("2021-07-14"),
+      "modifiedAt": new Date("2021-07-14")
+    }
+    const mockProductType2 = {
+      "id": 2,
+      "productTypeName": "Lab Bench",
+      "createdBy": 1,
+      "modifiedBy": 1,
+      "createdAt": "2021-07-06T11:23:14.174Z",
+      "modifiedAt": "2021-07-06T11:23:14.174Z"
+    }
+    let producttypes: Array<any> = [{ mockProductType, mockProductType2 }];
+    it('should return response with status and message fields if it is Successfull', async () => {
+      jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(5);
+      jest.spyOn(productTypeService, 'getProductType').mockResolvedValue(producttypes);
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+      await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
+
+    });
+  });
+  describe('addToSpaceChangeWaitList method', () => {
+    let payload: AddSpaceChangeWaitlistDto = {
+      requestStatus: 0,
+      isRequestInternal: true,
+      membershipChange: 0,
+      desiredStartDate: 1627603200,
+      items: [
+        {
+          itemName: 'Private Office',
+          currentQty: null,
+          productTypeId: 4,
+          desiredQty: 12
+        },
+        {
+          itemName: 'Workstation',
+          currentQty: null,
+          productTypeId: 3,
+          desiredQty: 12
+        },
+        {
+          itemName: 'Private Lab',
+          currentQty: null,
+          productTypeId: 5,
+          desiredQty: 20
+        },
+        {
+          itemName: 'Lab Bench',
+          currentQty: null,
+          productTypeId: 2,
+          desiredQty: 10
+        },
+        {
+          itemName: 'Membership Fee',
+          currentQty: null,
+          productTypeId: 1,
+          desiredQty: 32
+        },
+        {
+          itemName: 'TestProduct',
+          currentQty: null,
+          productTypeId: 8,
+          desiredQty: 11
+        }
+      ],
+      requestNotes: 'This is notes1',
+      planChangeSummary: '',
+      fulfilledOn: 946665000,
+      siteNotes: '',
+      residentCompanyId: 1,
+      companyStage: 3,
+      companySize: 120,
+      funding: '12',
+      fundingSource: [1, 2],
+      internalNotes: '',
+      shareYourProfile: false,
+      requestGraduateDate: 946665000,
+      marketPlace: true
+    }
+    const req: any = {
+      user: { site_id: [1, 2], role: 1 },
+      headers: { 'x-site-id': [2] }
+    }
+    const maxPriorityOrder = 5;
+    it('should return response with status and message fields if it is Successfull', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(mockRC);
+      if (payload.requestStatus == 0) {
+        jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(maxPriorityOrder);
+      }
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+
+      mockRC.companyStage = payload.companyStage;
+      mockRC.funding = payload.funding;
+      mockRC.fundingSource = payload.fundingSource;
+      mockRC.companySize = payload.companySize;
+      mockRC.shareYourProfile = payload.shareYourProfile;
+      jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
+
+      let result = await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+      expect(result['message']).toEqual('Operation Successful');
+      expect(result['status']).toEqual('Success');
+    });
+    it('should return response with status and message fields if it is Successfull', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(null);
+      if (payload.requestStatus == 0) {
+        jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(maxPriorityOrder);
+      }
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+      jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
+      let result = await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+      expect(result['message']).toEqual('Resident Company not found by id: 1');
+      expect(result['status']).toEqual('Error');
+    });
+    it('should return response with status and message fields if it is Successfull', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(mockRC);
+      if (payload.requestStatus == 0) {
+        jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockRejectedValueOnce(maxPriorityOrder);
+      }
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+      jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
+      try {
+        await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+      } catch (e) {
+        expect(e.status).toBe(500);
+        expect(e.response.status).toBe('Error');
+        expect(e.response.message).toEqual('Error while fetching Max Priority Order to set in new Space Change Waitlist record');
+      }
+    });
+    it('should return response with status and message fields if it is Successfull', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(mockRC);
+      if (payload.requestStatus == 0) {
+        jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(maxPriorityOrder);
+      }
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockRejectedValueOnce(mockSpaceChangeWaitlistItem);
+      jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
+      try {
+        await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+      } catch (e) {
+        expect(e.status).toBe(400);
+        expect(e.response.status).toBe('Error');
+        expect(e.response.message).toEqual('Could not save Space Change Waitlist record');
+      }
+    });
+    it('should return response with status and message fields if it is Successfull', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(mockRC);
+      if (payload.requestStatus == 0) {
+        jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(maxPriorityOrder);
+      }
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValueOnce(mockSpaceChangeWaitlistItem);
+      jest.spyOn(residentCompanyRepository, 'update').mockRejectedValueOnce(mockSpaceChangeWaitlistItem.residentCompany);
+      try {
+        await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+      } catch (e) {
+        expect(e.status).toBe(500);
+        expect(e.response.status).toBe('Error');
+        expect(e.response.message).toEqual('Could not update Resident Company record');
+      }
+    });
+    it('should return response with status and message fields if it is Successfull', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(mockRC);
+      if (payload.requestStatus == 0) {
+        jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(maxPriorityOrder);
+      }
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValueOnce(mockSpaceChangeWaitlistItem);
+      jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
+      jest.spyOn(residentCompanyService, 'updateCompanyHistoryAfterSavingSpaceChangeWaitlist').mockRejectedValueOnce(mockResidentHistory);
+      try {
+        await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+      } catch (e) {
+        expect(e.status).toBe(500);
+        expect(e.response.status).toBe('Error');
+        expect(e.response.message).toEqual('Could not update Resident Company History record');
+      }
+    });
+  });
 });
+
+
 
 
 

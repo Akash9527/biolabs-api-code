@@ -347,7 +347,7 @@ export class ResidentCompanyService {
    * @param req object of Request.
    * @param companyName name of the company for which application is submitted.
    */
-  private async sendEmailToSiteAdmin(site: any, req, companyName: string, mailForWhat: string) {
+  public async sendEmailToSiteAdmin(site: any, req, companyName: string, mailForWhat: string) {
     info("Sending email to site admin", __filename, "sendEmailToSiteAdmin()");
     const MAIL_FOR = "MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE";
     try {
@@ -942,7 +942,7 @@ export class ResidentCompanyService {
       }
     } catch (err) {
       error("Error in update resident company", __filename, "updateResidentCompany()");
-      throw new InternalException('Error in update resident company' , err.message);
+      throw new InternalException('Error in update resident company', err.message);
     }
   }
 
@@ -1198,7 +1198,6 @@ export class ResidentCompanyService {
       }
 
       globalSearch += ` ORDER BY \"id\" DESC `;
-      // console.log('globalSearch Final ====', globalSearch);
       info(`globalSearch query: ${globalSearch}`, __filename, "gloabalSearchCompanies()")
 
       return await this.residentCompanyRepository.query(globalSearch);
@@ -1473,7 +1472,6 @@ export class ResidentCompanyService {
             break;
         }
       });
-      // console.log('getFeeds for ' + companyId, getFeeds);
       return getFeeds;
     } catch (err) {
       error("Getting error to find the time analysis", __filename, "getFeeds()");
@@ -1578,7 +1576,7 @@ order by quat;
    * @param savedRc
    * @param req
    */
-  private async addResidentCompanyDataInWaitlist(savedRc: any) {
+  public async addResidentCompanyDataInWaitlist(savedRc: any) {
     info(`Create waitlist on application submission`, __filename, "addResidentCompanyDataInWaitlist()");
     const PLAN_CHANGE_SUMMARY_INITIAL_VALUE = 'See Notes';
     const REQUEST_NOTES_INITIAL_VALUE = 'When would you like to join BioLabs?, What equipment and facilities do you plan to primarily use onsite?**';
@@ -1629,7 +1627,7 @@ order by quat;
    * @description Fetch max value of priority order from space_change_waitlist table
    * @returns
    */
-  private async fetchMaxPriorityOrderOfWaitlist(): Promise<number> {
+  public async fetchMaxPriorityOrderOfWaitlist(): Promise<number> {
     info(`Fetching max priority order of Space Change Waitlist`, __filename, 'fetchMaxPriorityOrderOfWaitlist()');
     const REQUEST_STATUS_OPEN = 0;
     let maxPriorityOrder: any = await this.spaceChangeWaitlistRepository
@@ -1663,7 +1661,6 @@ order by quat;
     let residentCompany: any = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
       return result;
     });
-
     let response = {};
     if (residentCompany == null) {
       response['status'] = 'Error';
@@ -1677,8 +1674,10 @@ order by quat;
     let maxPriorityOrder: number;
     if (payload.requestStatus == 0) {
       info(`Fetching max priority order for Space Change Waitlist for status : ${payload.requestStatus} `, __filename, `addToSpaceChangeWaitList()`);
+      
       maxPriorityOrder = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
         return result;
+       
       }).catch(err => {
         error(`Error in fetching max priority order. ${err.message}`, __filename, `addToSpaceChangeWaitList()`);
         throw new HttpException({
@@ -1799,7 +1798,7 @@ order by quat;
    * @param payload ResidentCompany history data
    * @param residentCompany ResidentCompany object
    */
-  private async updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload: any, residentCompany: ResidentCompany) {
+  public async updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload: any, residentCompany: ResidentCompany) {
     info(`Updating resident company history by companyId: ${residentCompany.id}`, __filename, `updateCompanyHistoryAfterSavingSpaceChangeWaitlist()`);
     let historyData: any = JSON.parse(JSON.stringify(residentCompany));
     historyData.companyStage = payload.companyStage;
@@ -1872,7 +1871,7 @@ order by quat;
    * @param spaceChangeWaitlist SpaceChangeWaitlist array
    * @returns SpaceChangeWaitlist array with Item array
    */
-  private async getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist: any[]) {
+  public async getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist: any[]) {
     info(`Getting items of Space Change Waitlist`, __filename, `getItemsOfSpaceChangeWaitlist()`);
     if (spaceChangeWaitlist) {
       for (let index = 0; index < spaceChangeWaitlist.length; index++) {
@@ -1898,7 +1897,7 @@ order by quat;
    * @param spaceChangeWaitlistId SpaceChangeWaitlist Id
    * @returns array of Item
    */
-  private async getItems(spaceChangeWaitlistId: number) {
+  public async getItems(spaceChangeWaitlistId: number) {
     info(`Getting items by spaceChangeWaitlistId: ${spaceChangeWaitlistId}`, __filename, `getItems()`);
     const items: any[] = await this.itemRepository.find({
       where: { spaceChangeWaitlist_id: spaceChangeWaitlistId }
@@ -1918,7 +1917,6 @@ order by quat;
 
     let spaceChangeWaitlistObj: any = await this.spaceChangeWaitlistRepository.findOne(id, { relations: ['items'] });
     if (spaceChangeWaitlistObj) {
-      // console.log(spaceChangeWaitlistObj);
       return spaceChangeWaitlistObj;
     }
     response['status'] = 'error';
@@ -2101,7 +2099,7 @@ order by quat;
    * @param payload The payload to update SpaceChangeWaitlist
    * @param resp 
    */
-  private async updateSpaceChangeWaitlistItems(payload: any, spaceChangeWaitlistObj: any) {
+  public async updateSpaceChangeWaitlistItems(payload: any, spaceChangeWaitlistObj: any) {
     info(`Updating Space Change Waitlist items`, __filename, `updateSpaceChangeWaitlistItems()`);
     if (payload.items && payload.items.length) {
       debug(`Total items present in payload: ${payload.items.length}`, __filename, `updateSpaceChangeWaitlistItems()`);

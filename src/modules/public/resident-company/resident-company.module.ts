@@ -25,6 +25,7 @@ import { Notes } from './rc-notes.entity';
 import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
 import { OrderProductModule } from '../order';
 import { Item } from '../entity/item.entity';
+import { ProductService } from '../order/product.service';
 
 @Module({
   imports: [
@@ -69,6 +70,6 @@ import { Item } from '../entity/item.entity';
   ],
   controllers: [ResidentCompanyController],
   exports: [ResidentCompanyService, Mail],
-  providers: [ResidentCompanyService, Mail],
+  providers: [ResidentCompanyService, Mail,ProductService],
 })
 export class ResidentCompanyModule {}
