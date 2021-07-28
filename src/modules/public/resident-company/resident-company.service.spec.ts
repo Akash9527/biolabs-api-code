@@ -29,6 +29,8 @@ import { Item } from "../entity/item.entity";
 import { SpaceChangeWaitlist } from "../entity/space-change-waitlist.entity";
 import { ProductType } from "../order/model/product-type.entity";
 import { ProductTypeService } from "../order/product-type.service";
+import { UpdateWaitlistPriorityOrderDto } from "../dto/update-waitlist-priority-order.dto";
+import { UpdateWaitlistRequestStatusDto } from "../dto/update-waitlist-request-status.dto";
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 const mockCompany: any = { id: 1 };
 const mockAddResidentCompany: AddResidentCompanyPayload = {
@@ -43,6 +45,7 @@ const listRCPayload: ListResidentCompanyPayload = {
   q: "test", role: 1, pagination: true, page: 3, limit: 3, companyStatus: '1', committeeStatus: '1', companyVisibility: true,
   companyOnboardingStatus: true, sort: true, sortFiled: "", sortOrder: "", sortBy: ""
 }
+
 const mockRC: ResidentCompany = {
   id: 1, name: "Biolabs", email: "elon@space.com", companyName: "tesla", site: [2, 1], biolabsSources: 1, otherBiolabsSources: "",
   technology: "Tech World", rAndDPath: "Tech World", startDate: 1626134400, foundedPlace: "Tech World", companyStage: 1,
@@ -78,6 +81,89 @@ const mockRC: ResidentCompany = {
   "committeeStatus": null,
   "selectionDate": new Date("2021-07-05T18:30:00.000Z"),
   "companyStatusChangeDate": 2021,
+}
+const mockSpaceChangeWaitlistItem: any = {
+  id: 121,
+  dateRequested: 2021,
+  desiredStartDate: 1632614400,
+  planChangeSummary: '',
+  requestedBy: 'BiolabsNewvision',
+  requestStatus: 0,
+  fulfilledOn: 946665000,
+  isRequestInternal: true,
+  requestNotes: 'Require more Private Lab, Workstation, Lab Bench',
+  internalNotes: '',
+  siteNotes: '',
+  priorityOrder: 6,
+  site: [2],
+  membershipChange: 0,
+  requestGraduateDate: 946665000,
+  marketPlace: true,
+  createdAt: 2021,
+  updatedAt: 2021,
+  residentCompany: mockRC,
+  items: [
+    {
+      id: 1,
+      spaceChangeWaitlist_id: 121,
+      productTypeId: 5,
+      itemName: 'Private Lab',
+      currentQty: 5,
+      desiredQty: 7,
+      createdAt: 2021,
+      updatedAt: 2021
+    },
+    {
+      id: 2,
+      spaceChangeWaitlist_id: 121,
+      productTypeId: 2,
+      itemName: 'Lab Bench',
+      currentQty: -2,
+      desiredQty: null,
+      createdAt: 2021,
+      updatedAt: 2021
+    },
+    {
+      id: 3,
+      spaceChangeWaitlist_id: 121,
+      productTypeId: 3,
+      itemName: 'Workstation',
+      currentQty: 4,
+      desiredQty: 3,
+      createdAt: 2021,
+      updatedAt: 2021
+    },
+    {
+      id: 4,
+      spaceChangeWaitlist_id: 121,
+      productTypeId: 4,
+      itemName: 'Private Office',
+      currentQty: 2,
+      desiredQty: null,
+      createdAt: 2021,
+      updatedAt: 2021
+    },
+    {
+      id: 5,
+      spaceChangeWaitlist_id: 121,
+      productTypeId: 4,
+      itemName: 'Private Office',
+      currentQty: 5,
+      desiredQty: null,
+      createdAt: 2021,
+      updatedAt: 2021
+    },
+    {
+      id: 6,
+      spaceChangeWaitlist_id: 121,
+      productTypeId: 1,
+      itemName: 'Membership Fee',
+      currentQty: 4,
+      desiredQty: null,
+      createdAt: 2021,
+      updatedAt: 2021
+    }
+  ]
 }
 const mockResidentHistory: ResidentCompanyHistory = {
   id: 1, name: "Biolabs", email: "elon@space.com", companyName: "tesla", site: [2, 1], biolabsSources: 1, otherBiolabsSources: "",
@@ -149,7 +235,8 @@ describe('ResidentCompanyService', () => {
   let technologyStageRepository: Repository<TechnologyStage>;
   let userRepository: Repository<User>;
   let notesRepository: Repository<Notes>;
-
+  let spaceChangeWaitlistRepository: Repository<SpaceChangeWaitlist>;
+  let itemRepository: Repository<Item>;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -264,8 +351,32 @@ describe('ResidentCompanyService', () => {
           }
         },
         { provide: Notes, useValue: {} },
-        { provide: getRepositoryToken(SpaceChangeWaitlist), useValue: {} },
-        { provide: getRepositoryToken(Item), useValue: {} },
+        {
+          provide: getRepositoryToken(SpaceChangeWaitlist), useValue: {
+            createQueryBuilder: jest.fn(() => ({
+              update: jest.fn().mockReturnThis(),
+              set: jest.fn().mockReturnThis(),
+              where: jest.fn().mockReturnThis(),
+              execute: jest.fn(),
+            })),
+            findOne: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+            query: jest.fn(),
+            update: jest.fn(),
+            count: jest.fn(),
+          }
+        },
+        {
+          provide: getRepositoryToken(Item), useValue: {
+            find: jest.fn(),
+            findOne: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+            query: jest.fn(),
+            update: jest.fn()
+          }
+        },
         { provide: getRepositoryToken(ProductType), useValue: {} },
       ],
       imports: [PassportModule.register({ defaultStrategy: 'jwt' })
@@ -289,7 +400,8 @@ describe('ResidentCompanyService', () => {
     technologyStageRepository = await module.get<Repository<TechnologyStage>>(getRepositoryToken(TechnologyStage));
     userRepository = await module.get<Repository<User>>(getRepositoryToken(User));
     notesRepository = await module.get<Repository<Notes>>(getRepositoryToken(Notes));
-
+    spaceChangeWaitlistRepository = await module.get<Repository<SpaceChangeWaitlist>>(getRepositoryToken(SpaceChangeWaitlist));
+    itemRepository = await module.get<Repository<Item>>(getRepositoryToken(Item));
   });
 
   it('it should be defined', () => {
@@ -417,15 +529,15 @@ describe('ResidentCompanyService', () => {
     })
     it('should throw exception ', async () => {
       jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => {
-          throw new BiolabsException('')
+        throw new BiolabsException('')
       });
       try {
-          await  residentCompanyService.getResidentCompanies(listRCPayload, siteIdArr);
+        await residentCompanyService.getResidentCompanies(listRCPayload, siteIdArr);
       } catch (e) {
-          expect(e.name).toBe('BiolabsException');
-          expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
       }
-  });
+    });
   });
   describe('addResidentCompany method', () => {
     const req: any = {
@@ -674,22 +786,16 @@ describe('ResidentCompanyService', () => {
       let result = await residentCompanyService.getResidentCompanyForSponsor();
       expect(result).not.toBeNull();
     })
-    it('it should throw exception if user id is not provided  ', async () => {
-
+    it('should throw exception if company with provided id not available.', async () => {
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => {
+        throw new BiolabsException('Error in find resident company for sponser')
+      });
       try {
-        jest.spyOn(residentCompanyService, 'getResidentCompanyForSponsor').mockImplementation(() => {
-          throw new Error();
-        });
-
-        // expect(() => {
-        //   residentCompanyService.getResidentCompanyForSponsor();
-        // }).toThrow('Error in find resident company for sponser');
-        // expect( await residentCompanyService.getResidentCompanyForSponsor()).rejects.toMatch('error');
+        await residentCompanyService.getResidentCompanyForSponsor();
       } catch (e) {
-        console.log(e);
-        // expect(e.name).toBe('BiolabsException');
-        // expect(e instanceof BiolabsException).toBeTruthy();
-        // expect(e.message).toEqual('Getting error in find company size quartly');
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Error in find resident company for sponser');
       }
     });
   });
@@ -887,26 +993,42 @@ describe('ResidentCompanyService', () => {
       }
     });
   });
-  // describe('updateResidentCompany method', () => {
-  //   
-  //   let residentCompany: any = {
-  //     id: 1, name: "Biolabs", email: "elon@space.com", companyName: "tesla", site: [2, 1], biolabsSources: 1, otherBiolabsSources: "",
-  //     technology: "Tech World", rAndDPath: "Tech World", startDate: 1626134400, foundedPlace: "Tech World", companyStage: 1,
-  //     otherCompanyStage: "", funding: "1", fundingSource: [1], otherFundingSource: "", intellectualProperty: 1,
-  //     otherIntellectualProperty: "", isAffiliated: false, affiliatedInstitution: "", noOfFullEmp: 0, empExpect12Months: 0,
-  //     utilizeLab: 0, expect12MonthsUtilizeLab: 0, industry: ["95"], modality: ["3"], equipmentOnsite: "Tech World",
-  //     preferredMoveIn: 1, otherIndustries: {}, otherModality: {}, "status": "1", companySize: 20
-  //   }
-  //   it('should return array of resident companies', async () => {
-  //     jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(residentCompany);
-  //     // if (residentCompany) {
-  //     //   jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
-  //     //   return await residentCompanyService.getResidentCompany(residentCompany.id);
-  //     // }
-  //     let result = await residentCompanyService.updateResidentCompany(payload);
-  //     console.log(result);
-  //   })
-  // });
+  describe('updateResidentCompany method', () => {
+    it('should return object of resident companies', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
+      if (mockRC) {
+        jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
+        jest.spyOn(residentCompanyService, 'getResidentCompany').mockResolvedValueOnce(mockRC);
+      }
+      let result = await residentCompanyService.updateResidentCompany(mock);
+      expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined();
+      expect(result).toBe(mockRC);
+    })
+    it('should throw exception ', async () => {
+      jest.spyOn(residentCompanyHistoryRepository, 'save').mockImplementation(() => {
+        throw new InternalException('')
+      });
+      try {
+        await residentCompanyService.updateResidentCompany(mock);
+      } catch (e) {
+        expect(e.name).toBe('InternalException');
+        expect(e instanceof InternalException).toBeTruthy();
+      }
+    });
+    it('it should throw exception if user id is not provided  ', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockImplementation(() => {
+        throw new NotAcceptableException(
+          'Company with provided id not available.',
+        );
+      });
+      try {
+        await residentCompanyService.updateResidentCompany(mock);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  });
   describe('gloabalSearchCompaniesOld method', () => {
     let mockSearchPayload: SearchResidentCompanyPayload = {
       q: "test", role: 1, pagination: true, page: 1, limit: 10,
@@ -921,7 +1043,19 @@ describe('ResidentCompanyService', () => {
       let result = await residentCompanyService.gloabalSearchCompaniesOld(mockSearchPayload, [1, 2])
       expect(result).not.toBeNull();
     })
-
+    it('should throw exception ', async () => {
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => {
+        throw new BiolabsException('Error in search companies old')
+      });
+      try {
+        await residentCompanyService.gloabalSearchCompaniesOld(mockSearchPayload, [1, 2])
+      } catch (e) {
+        // console.log(e);
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toEqual('Error in search companies old');
+      }
+    });
   });
 
   describe('gloabalSearchCompanies method', () => {
@@ -930,11 +1064,28 @@ describe('ResidentCompanyService', () => {
       companyStatus: "1", companyVisibility: true, companyOnboardingStatus: true, siteIdArr: [1, 2], industries: [1, 2], modalities: [1, 2],
       fundingSource: [1, 2], minFund: 1, maxFund: 1000, minCompanySize: 1, maxCompanySize: 100, sort: true, sortFiled: "", sortOrder: "ASC"
     }
-
-    it('should return array of global resident companies', async () => {
-      let result = await residentCompanyService.gloabalSearchCompaniesOld(mockSearchPayload, [1, 2])
+    const mockResidentCompanyArray = [mockRC];
+    it('should return array of resident company Object', async () => {
+      jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockResidentCompanyArray);
+      let result = await residentCompanyService.gloabalSearchCompanies(mockSearchPayload, [1, 2])
       expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined();
+      expect(result.length).toEqual(mockResidentCompanyArray.length);
+      expect(result).toEqual(mockResidentCompanyArray);
     })
+    it('should throw exception if Getting error in find the financial fees', async () => {
+      jest.spyOn(residentCompanyRepository, 'query').mockImplementation(() => {
+        throw new BiolabsException('Error in search companies')
+      });
+      try {
+        await residentCompanyService.gloabalSearchCompanies(mockSearchPayload, [1, 2]);
+      } catch (e) {
+        // console.log(e);
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Error in search companies');
+      }
+    });
   });
 
   describe('getNoteById method', () => {
@@ -1003,6 +1154,32 @@ describe('ResidentCompanyService', () => {
       }
     });
   });
+  describe('getResidentCompanySpecificFieldsById method', () => {
+    it('should get  getResidentCompanySpecificFieldsById', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
+      const result = await residentCompanyService.getResidentCompanySpecificFieldsById(1);
+      expect(result).not.toBeUndefined();
+      expect(result).not.toBeNull();
+      expect(result).toEqual({
+        residentCompanyId: 1,
+        companyStageOfDevelopment: 1,
+        fundingToDate: '1',
+        fundingSource: [1],
+        TotalCompanySize: 20,
+        canWeShareYourDataWithSponsorsEtc: null
+      });
+    })
+    it('should throw exception if company with provided id not available.', async () => {
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(null);
+      try {
+        await residentCompanyService.getResidentCompanySpecificFieldsById(1);
+      } catch (e) {
+        expect(e.status).toEqual(406);
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe("Resident Company not found by id: 1")
+      }
+    });
+  });
   describe('softDeleteNote method', () => {
     it('should delete data based on id', async () => {
       jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(mockNotes);
@@ -1042,9 +1219,43 @@ describe('ResidentCompanyService', () => {
     })
 
     it('it should throw exception if member id is not provided  ', async () => {
-      jest.spyOn(residentCompanyAdvisoryRepository, 'findOne').mockRejectedValueOnce(new NotAcceptableException('Member with provided id not available.'));
+      jest.spyOn(residentCompanyAdvisoryRepository, 'findOne').mockResolvedValueOnce(null);
       try {
         await residentCompanyService.softDeleteMember(1, "advisors");
+      } catch (e) {
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe('Member with provided id not available.');
+        expect(e.response.statusCode).toBe(406);
+      }
+    });
+    it('should delete data based on id', async () => {
+      jest.spyOn(residentCompanyManagementRepository, 'findOne').mockResolvedValueOnce(mockResidentManagement);
+      jest.spyOn(residentCompanyManagementRepository, 'save').mockResolvedValueOnce(mockResidentManagement);
+      const notes = await residentCompanyService.softDeleteMember(1, "managements");
+      expect(notes).toBe(mockResidentManagement);
+    })
+
+    it('it should throw exception if member id is not provided  ', async () => {
+      jest.spyOn(residentCompanyManagementRepository, 'findOne').mockResolvedValueOnce(null);
+      try {
+        await residentCompanyService.softDeleteMember(1, "managements");
+      } catch (e) {
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe('Member with provided id not available.');
+        expect(e.response.statusCode).toBe(406);
+      }
+    });
+    it('should delete data based on id', async () => {
+      jest.spyOn(residentCompanyTechnicalRepository, 'findOne').mockResolvedValueOnce(mockResidentTechnical);
+      jest.spyOn(residentCompanyTechnicalRepository, 'save').mockResolvedValueOnce(mockResidentTechnical);
+      const notes = await residentCompanyService.softDeleteMember(1, "technicals");
+      expect(notes).toBe(mockResidentTechnical);
+    })
+
+    it('it should throw exception if member id is not provided  ', async () => {
+      jest.spyOn(residentCompanyTechnicalRepository, 'findOne').mockResolvedValueOnce(null);
+      try {
+        await residentCompanyService.softDeleteMember(1, "technicals");
       } catch (e) {
         expect(e.response.error).toBe('Not Acceptable');
         expect(e.response.message).toBe('Member with provided id not available.');
@@ -1135,12 +1346,57 @@ describe('ResidentCompanyService', () => {
     });
   });
   describe('getFeeds method', () => {
-    let companyId = 1;
+    const mockFeeds = [
+      {
+        "feeds": "Company size changed to 100 on 07/20/2021"
+      },
+      {
+        "feeds": "Company name changed to Ymir Genomics on 07/20/2021"
+      },
+      {
+        "feeds": "Company founded place changed to Washington DC on 07/09/2021"
+      },
+      {
+        "feeds": "Elevator Pitch changed to QA on 07/09/2021"
+      },
+      {
+        "feeds": "Recognized partnerships with academia changed to No on 07/09/2021"
+      },
+      {
+        "feeds": "Recognized partnerships with industry changed to No on 07/09/2021"
+      },
+      {
+        "feeds": "Funding changed to 2500 on 07/09/2021"
+      },
+      {
+        "feeds": "Company name changed to Biolabs_QA on 07/09/2021"
+      },
+      {
+        "feeds": "Technology Summary changed to QA UPDATED on 07/09/2021"
+      },
+      {
+        "feeds": "R&D path & commercialization plan changed to QA UPDATED on 07/09/2021"
+      }
+    ]
     it('should return object', async () => {
-      residentCompanyHistoryRepository.query("SELECT feeds(" + companyId + ")");
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockFeeds);
       let result = await residentCompanyService.getFeeds(1, 1);
       expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined();
+      expect(result).toEqual(mockFeeds);
     })
+    it('should throw exception if Getting error  in forget password process', async () => {
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockImplementation(() => {
+        throw new BiolabsException('Getting error in forget password process')
+      });
+      try {
+        await residentCompanyService.getFeeds(1, 1);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Getting error in forget password process');
+      }
+    });
   });
 
   describe('getstartedWithBiolabs method', () => {
@@ -1171,20 +1427,42 @@ describe('ResidentCompanyService', () => {
   });
 
   describe('getFinancialFees method', () => {
+    const mockFinancialFees = [
+      {
+        "productTypeId": 1,
+        "sum": "700"
+      },
+      {
+        "productTypeId": 2,
+        "sum": "148"
+      },
+      {
+        "productTypeId": 5,
+        "sum": "200"
+      },
 
+    ]
     it('should return array of financial fees', async () => {
-      const currentMonth = new Date().getMonth() + 1;
-      const queryStr = "SELECT  p. \"productTypeId\",SUM(calculate_prorating(o.\"cost\",o.\"month\",o.\"startDate\",o.\"endDate\",o.\"quantity\",o.\"currentCharge\",o.\"year\"))  From order_product as o " +
-        "INNER JOIN product as p ON  p.id =o.\"productId\" " +
-        "where p.id = o.\"productId\" " +
-        "AND o.\"companyId\"=" + 1 +
-        "AND o.\"month\" =  " + currentMonth +
-        "AND p.\"productTypeId\" IN(1, 2, 5) " +
-        "group by  p.\"productTypeId\" ";
-      residentCompanyHistoryRepository.query(queryStr);
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockFinancialFees);
       let result = await residentCompanyService.getFinancialFees(1)
-      expect(result).not.toBeNull()
+      expect(result).not.toBeNull();
+      expect(result[0]).toEqual(mockFinancialFees[0]);
+      expect(result[1]).toEqual(mockFinancialFees[1]);
+      expect(result.length).toEqual(mockFinancialFees.length);
+      expect(result).toEqual(mockFinancialFees);
     })
+    it('should throw exception if Getting error in find the financial fees', async () => {
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockImplementation(() => {
+        throw new BiolabsException('Getting error in find the financial fees')
+      });
+      try {
+        await residentCompanyService.getFinancialFees(1);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Getting error in find the financial fees');
+      }
+    });
   });
   describe('timelineAnalysis method', () => {
     const mocktimeAnalysis = [
@@ -1208,7 +1486,6 @@ describe('ResidentCompanyService', () => {
       }
     ]
     it('should return array of timeline history', async () => {
-      const currentMonth = new Date().getMonth() + 1;
       jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mocktimeAnalysis);
       let result = await residentCompanyService.timelineAnalysis(1);
       expect(result).not.toBeNull();
@@ -1297,4 +1574,138 @@ describe('ResidentCompanyService', () => {
 
     });
   });
+  describe('getSpaceChangeWaitlistItems method', () => {
+    const mockSpaceChangeWaitlistItems = [
+      {
+        "productTypeId": 5,
+        "sum": "0",
+        "productTypeName": "Private Lab"
+      },
+      {
+        "productTypeId": 4,
+        "sum": "2",
+        "productTypeName": "Private Office"
+      },
+      {
+        "productTypeId": 3,
+        "sum": "4",
+        "productTypeName": "Workstation"
+      },
+      {
+        "productTypeId": 2,
+        "sum": "1",
+        "productTypeName": "Lab Bench"
+      },
+      {
+        "productTypeId": 1,
+        "sum": "0",
+        "productTypeName": "Membership Fee"
+      }
+    ]
+
+    it('should return list of items', async () => {
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockSpaceChangeWaitlistItems);
+      let result = await residentCompanyService.getSpaceChangeWaitlistItems(1);
+      expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined();
+      expect(result).toEqual({
+        items: [
+          { productTypeId: 5, sum: '0', productTypeName: 'Private Lab' },
+          { productTypeId: 4, sum: '2', productTypeName: 'Private Office' },
+          { productTypeId: 3, sum: '4', productTypeName: 'Workstation' },
+          { productTypeId: 2, sum: '1', productTypeName: 'Lab Bench' },
+          { productTypeId: 1, sum: '0', productTypeName: 'Membership Fee' }
+        ]
+      });
+    })
+  })
+  describe('getSpaceChangeWaitListById method', () => {
+
+    it('should return array of resident company history', async () => {
+      jest.spyOn(spaceChangeWaitlistRepository, 'findOne').mockReturnValueOnce(mockSpaceChangeWaitlistItem);
+      let result = await residentCompanyService.getSpaceChangeWaitListById(1);
+      expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined()
+      expect(result).toEqual(mockSpaceChangeWaitlistItem);
+    })
+    it('should throw exception', async () => {
+      jest.spyOn(spaceChangeWaitlistRepository, 'findOne').mockResolvedValue(null);
+      try {
+        await residentCompanyService.getSpaceChangeWaitListById(1);
+      }
+      catch (e) {
+        console.log(e);
+      }
+    })
+  });
+  describe('updateSpaceChangeWaitlistPriorityOrder method', () => {
+    let payload: UpdateWaitlistPriorityOrderDto = {
+      spaceChangeWaitlistIds: [
+        1, 2, 3
+      ]
+    }
+    it('should return response with status and message fields', async () => {
+
+      if (payload && payload.spaceChangeWaitlistIds.length > 0) {
+        for (let index = 0; index < payload.spaceChangeWaitlistIds.length; index++) {
+          jest.spyOn(spaceChangeWaitlistRepository, 'findOne').mockResolvedValue(mockSpaceChangeWaitlistItem);
+          mockSpaceChangeWaitlistItem.priorityOrder = index;
+          jest.spyOn(spaceChangeWaitlistRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem);
+        }
+      }
+      let result = await residentCompanyService.updateSpaceChangeWaitlistPriorityOrder(payload);
+      expect(result['message']).toEqual('Priority Order updated successfully');
+      expect(result['status']).toEqual('Success');
+    });
+    it('should return response with status and message fields', async () => {
+      if (payload && payload.spaceChangeWaitlistIds.length > 0) {
+        for (let index = 0; index < payload.spaceChangeWaitlistIds.length; index++) {
+          jest.spyOn(spaceChangeWaitlistRepository, 'findOne').mockResolvedValue(null);
+          jest.spyOn(spaceChangeWaitlistRepository, 'update').mockResolvedValue(null);
+        }
+      }
+      let result = await residentCompanyService.updateSpaceChangeWaitlistPriorityOrder(payload);
+      expect(result['message']).toEqual('Could not update Priority Order');
+      expect(result['status']).toEqual('Fail');
+    });
+    it('should return response with status and message fields', async () => {
+      payload = {
+        spaceChangeWaitlistIds: []
+      }
+      if (payload && payload.spaceChangeWaitlistIds.length < 0) {
+      }
+      let result = await residentCompanyService.updateSpaceChangeWaitlistPriorityOrder(payload);
+      expect(result['message']).toEqual('Please provide proper Space Change Waitlist ids');
+      expect(result['status']).toEqual('Not acceptable');
+    });
+  });
+  describe('updateSpaceChangeWaitlistStatus method', () => {
+    let payload: UpdateWaitlistRequestStatusDto = {
+      id: 1,
+      status: 1
+    }
+    let mockCount: any;
+    it('should return response with status and message fields if it is Successfull', async () => {
+      mockCount = 1;
+      jest.spyOn(spaceChangeWaitlistRepository, 'count').mockResolvedValue(mockCount);
+      if (mockCount > 1) {
+        jest.spyOn(spaceChangeWaitlistRepository, 'createQueryBuilder').mockReturnValueOnce(mockSpaceChangeWaitlistItem);
+      }
+      let result = await residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
+      expect(result['message']).toEqual('Status updated successfully');
+      expect(result['status']).toEqual('Success');
+      expect(result['body']).toEqual({ id: 1, status: 1 });
+    });
+    it('should return response with status and message fields if it get error', async () => {
+      mockCount = 0;
+      jest.spyOn(spaceChangeWaitlistRepository, 'count').mockResolvedValue(mockCount);
+      let result = await residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
+      expect(result['message']).toEqual('Space Change Waitlist not found by id : 1');
+      expect(result['status']).toEqual('Error');
+      expect(result['body']).toEqual({ id: 1, status: 1 });
+    });
+  });
 });
+
+
+

@@ -724,7 +724,7 @@ export class ResidentCompanyService {
       response['categoryStats'] = (!categoryStats) ? 0 : categoryStats;
     } catch (err) {
       error("Error in find resident company for sponser", __filename, "getResidentCompanyForSponsor()");
-      throw new BiolabsException('Error in find resident company for sponser' + err.message);
+      throw new BiolabsException('Error in find resident company for sponser' , err.message);
     }
     return response;
 
@@ -942,7 +942,7 @@ export class ResidentCompanyService {
       }
     } catch (err) {
       error("Error in update resident company", __filename, "updateResidentCompany()");
-      throw new InternalException('Error in update resident company' + err.message);
+      throw new InternalException('Error in update resident company' , err.message);
     }
   }
 
@@ -1050,7 +1050,7 @@ export class ResidentCompanyService {
       return await rcQuery.getMany();
     } catch (err) {
       error("Error in search companies old delete user", __filename, "gloabalSearchCompaniesOld()");
-      throw new BiolabsException('Error in search companies old' + err.message);
+      throw new BiolabsException('Error in search companies old' , err.message);
     }
   }
   /**
@@ -1204,7 +1204,7 @@ export class ResidentCompanyService {
       return await this.residentCompanyRepository.query(globalSearch);
     } catch (err) {
       error("Error in search companies", __filename, "gloabalSearchCompanies()");
-      throw new BiolabsException('Error in search companies' + err.message);
+      throw new BiolabsException('Error in search companies' , err.message);
     }
   }
 
@@ -1451,7 +1451,7 @@ export class ResidentCompanyService {
       return await this.residentCompanyHistoryRepository.query(queryStr);
     } catch (err) {
       error("Getting error in find the financial fees", __filename, "getFinancialFees()");
-      throw new BiolabsException('Getting error in find the financial fees' + err.message);
+      throw new BiolabsException('Getting error in find the financial fees' ,err.message);
     }
   }
 
@@ -1918,6 +1918,7 @@ order by quat;
 
     let spaceChangeWaitlistObj: any = await this.spaceChangeWaitlistRepository.findOne(id, { relations: ['items'] });
     if (spaceChangeWaitlistObj) {
+      // console.log(spaceChangeWaitlistObj);
       return spaceChangeWaitlistObj;
     }
     response['status'] = 'error';
@@ -1936,20 +1937,16 @@ order by quat;
     const response = {};
     const month = new Date().getMonth() + 2; // Getting next month from currect date
     const queryStr = `
-        select res."productTypeId", sum(res.count), res."productTypeName"
-        from (
-            select pt.id as "productTypeId",
-            CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
-            pt."productTypeName"
-            from product_type as pt
-            Left Join (select "productTypeId", quantity from order_product where "companyId" = ${companyId} and month = ${month} ) as op
-            on pt.id = op."productTypeId"
-            where pt."productTypeName" <> 'Decontamination Fee'
-            and pt."productTypeName" <> 'Retainer Fee'
-            group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
-            ) as res
-        group by res."productTypeId", res."productTypeName"
-        `;
+      select pt.id as "productTypeId", 
+      CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
+      pt."productTypeName"
+      from product_type as pt
+      Left Join (select "productTypeId", quantity from order_product where "companyId" = ${companyId} and month = ${month} ) as op
+      on pt.id = op."productTypeId"
+      where pt."productTypeName" <> 'Decontamination Fee' 
+      and pt."productTypeName" <> 'Retainer Fee'
+      group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
+    `;
 
     const items = await this.residentCompanyHistoryRepository.query(queryStr);
     response['items'] = (!items) ? 0 : items;
@@ -1981,7 +1978,7 @@ order by quat;
         response['message'] = 'Please provide proper Space Change Waitlist ids';
         info(`Need ids to update Space Change Waitlist priority order`, __filename, `updateSpaceChangeWaitlistPriorityOrder()`);
       }
-    } catch (error) {
+    } catch (e) {
       response['status'] = 'Fail';
       response['message'] = 'Could not update Priority Order';
       error(`Could not update priority order`, __filename, `updateSpaceChangeWaitlistPriorityOrder()`);
@@ -2148,6 +2145,7 @@ order by quat;
     let resp = {};
     try {
       let count = await this.spaceChangeWaitlistRepository.count({ id: payload.id });
+
       debug(`Count of Space Change Waitlist record by id: ${count}`, __filename, `updateSpaceChangeWaitlistStatus()`);
       if (count < 1) {
         resp['status'] = 'Error';

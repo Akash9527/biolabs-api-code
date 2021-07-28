@@ -167,14 +167,15 @@ describe('UserService', () => {
             expect(ans).not.toBeNull();
             expect(ans).toBe(mockUserToken);
         });
-        it('it should throw exception if user id is not provided  ', async () => {
-            jest.spyOn(userTokenRepository, "find").mockResolvedValue(null);
+        it('should throw exception ', async () => {
+            jest.spyOn(userTokenRepository, "find").mockImplementation(() => {
+                throw new BiolabsException('Getting error in generating user token')
+            });
             try {
-                await userService.generateToken(new BiolabsException('Getting error in generating user token' ));
+                await  userService.generateToken(mockUser);
             } catch (e) {
                 expect(e.name).toBe('BiolabsException');
-                expect(e instanceof BiolabsException).toBeTruthy();  
-                expect(e.message).toBe('Getting error in generating user token');
+                expect(e instanceof BiolabsException).toBeTruthy();
             }
         });
     });
@@ -192,18 +193,16 @@ describe('UserService', () => {
             let ans = await userService.create(mockUserFillable);
             expect(ans).toBe(mockUser);
         })
-        // it('should not create user if email already exist', async () => {
-        //     jest.spyOn(userRepository, 'createQueryBuilder').mockReturnValue(null);
-        //     //jest.spyOn(userService, 'getByEmail').mockRejectedValueOnce();
-        //     try {
-        //         await userService.getByEmail(new BiolabsException('User with provided id not available.'));
-        //         await userService.create(mockUserFillable);
-        //     } catch (e) {
-        //         expect(e.response.error).toBe('Not Acceptable');
-        //         expect(e.response.message).toBe('User with provided id not available.');
-        //         expect(e.response.statusCode).toBe(406);
-        //     }
-        // });
+        it('it should throw exception if user id is not provided  ', async () => {
+            jest.spyOn(userService, 'getByEmail').mockResolvedValueOnce(mockUser);
+            try {
+              await  userService.create(mockUserFillable);
+            } catch (e) {
+              expect(e.response.error).toBe('Not Acceptable');
+              expect(e.response.message).toBe('User with provided email already created.');
+              expect(e.response.statusCode).toBe(406);
+            }
+          });
     });
 
     describe('adduser method', () => {
@@ -397,7 +396,6 @@ describe('UserService', () => {
                     expect(e.response.statusCode).toBe(406);
                 }
             });
-
         });
         describe('forgotPassword method', () => {
             let payload: UserFillableFields = {
