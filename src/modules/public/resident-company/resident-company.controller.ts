@@ -82,6 +82,8 @@ export class ResidentCompanyController {
   * @description This method is used to get a resident company information  for sponsor dashboard.
   * @param id it is a request parameter expect a number value of resident company id.
   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
   @Get('/dashboard')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   async getResidentCompanyForSponsor(): Promise<any> {
