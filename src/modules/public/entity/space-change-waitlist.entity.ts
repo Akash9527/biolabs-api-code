@@ -26,6 +26,9 @@ export class SpaceChangeWaitlist {
   @Column({ length: 510, nullable: true })
   planChangeSummary: string;
 
+  @Column({ length: 510, nullable: true })
+  graduateDescription: string;
+
   @Column({ nullable: false })
   requestedBy: string;
 
