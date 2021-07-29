@@ -22,38 +22,36 @@ describe('PasswordTransformer', () => {
         expect(mail).toBeDefined();
     });
     it('should test getGrapAPIToken method test', () => {
-        mail.getGrapAPIToken();
+        expect(mail.getGrapAPIToken()).toBeDefined();
     });
 
     it('should test sendEmailGraphAPI method', () => {
-        mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo);
+        expect(mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo)).toBeDefined();
     });
 
     it('should test sendEmailGraphAPI method for forgotMail', () => {
         let content: string = "forgotMail";
-        mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo);
+        expect(mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo)).toBeDefined();
     });
 
     it('should test sendEmailGraphAPI method  for Invite', () => {
         let content: string = "Invite";
-        mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo);
+        expect(mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo)).toBeDefined();
     });
 
     it('should test sendEmailGraphAPI method for applicationFormSubmit', () => {
         let content: string = "applicationFormSubmit";
-        mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo);
+        expect(mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo)).toBeDefined();
     });
 
     it('should test sendEmailGraphAPI method for user sites info', () => {
         let site_name = [{id: 1}]
         userInfo.site_name = site_name;
-        mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo);
+        expect(mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo)).toBeDefined();
     });
 
     it('should test sendEmail method ', () => {
-        mail.sendEmail(tenant, subject, content, userInfo);
-       // expect(mail.getGrapAPIToken).toHaveBeenCalled();
-        //expect(mail.sendEmailGraphAPI).toHaveBeenCalledWith(tenant, token, subject, content, userInfo);
+        expect( mail.sendEmail(tenant, subject, content, userInfo)).toBeDefined();
     });
 
 });

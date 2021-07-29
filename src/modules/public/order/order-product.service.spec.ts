@@ -267,7 +267,60 @@ describe('Order Product Service', () => {
             expect(product).not.toBeNull();
             expect(product).toMatchObject(orderProductDto);
         })
+        it('should throw BiolabsException', async () => {
 
+            jest.spyOn(orderProductRepository, 'findOne').mockRejectedValueOnce(new BiolabsException(''));
+            try {
+                await orderProductService.updateOrderProduct(id, orderProductDto);
+            } catch (e) {
+                expect(e.name).toBe('BiolabsException');
+                expect(e instanceof BiolabsException).toBeTruthy();
+            }
+        })
+        it('should throw internalException', async () => {
+            jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(orderProductDto);
+            jest.spyOn(orderProductRepository, 'find').mockRejectedValueOnce(new BiolabsException(''));
+            try {
+                await orderProductService.updateOrderProduct(id, orderProductDto);
+            } catch (e) {
+                expect(e.name).toBe('BiolabsException');
+                expect(e instanceof BiolabsException).toBeTruthy();
+            }
+        })
+        it('should throw internalException', async () => {
+            jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(orderProductDto);
+            jest.spyOn(orderProductRepository, 'find').mockResolvedValueOnce(orderProducts);
+            if (!orderProductDto.recurrence) {
+                for await (const product of orderProducts) {
+                    jest.spyOn(orderProductRepository, 'delete').mockRejectedValueOnce(new InternalException(''));
+                }
+            }
+            try {
+                await orderProductService.updateOrderProduct(id, orderProductDto);
+            } catch (e) {
+                expect(e.name).toBe('InternalException');
+                expect(e instanceof InternalException).toBeTruthy();
+            }
+        })
+        it('should throw internalException', async () => {
+            jest.spyOn(orderProductRepository, 'findOne').mockResolvedValueOnce(orderProductDto);
+            jest.spyOn(orderProductRepository, 'find').mockResolvedValueOnce(orderProducts);
+            jest.spyOn(orderProductRepository, 'create').mockResolvedValueOnce(orderProductDto);
+            jest.spyOn(orderProductRepository, 'save').mockResolvedValueOnce(orderProductDto);
+            if (!orderProductDto.recurrence) {
+                for await (const product of orderProducts) {
+                    jest.spyOn(orderProductRepository, 'delete').mockResolvedValueOnce(product);
+                }
+            }
+            jest.spyOn(orderProductRepository, 'update').mockRejectedValueOnce(new InternalException(''));
+            try {
+                await orderProductService.updateOrderProduct(id, orderProductDto);
+            } catch (e) {
+                expect(e.name).toBe('InternalException');
+                expect(e instanceof InternalException).toBeTruthy();
+            }
+        })
+      
         it('should validate the start date', async () => {
             orderProductDto.startDate = "start date";
             orderProductDto.endDate = "end date"
@@ -284,18 +337,7 @@ describe('Order Product Service', () => {
             expect(product.message).toContain("Prodvide correct date formate");
             expect(product.status).toContain("error");
         });
-        // it('should throw exception ', async () => {
-        //     jest.spyOn(orderProductRepository, 'findOne').mockRejectedValueOnce(() => {
-        //         throw new Error('')
-        //     });
-        //     try {
-        //         await  orderProductService.updateOrderProduct(id, orderProductDto);
-        //     } catch (e) {
-        //         console.log(e);
-        //         // expect(e.name).toBe('InternalException');
-        //         // expect(e instanceof InternalException).toBeTruthy();
-        //     }
-        // });
+
     });
 
     describe('should fetch the order products between given start date and end date', () => {
@@ -404,17 +446,17 @@ describe('Order Product Service', () => {
             expect(dbOrderProduct).not.toBeNull();
             // expect(dbOrderProduct).toBe(mockOreProduct);
         });
-        // it('should throw exception ', async () => {
-        //     jest.spyOn(orderProductRepository, 'save').mockRejectedValueOnce(() => {
-        //         throw new InternalException('')
-        //     });
-        //     try {
-        //         await  orderProductService.addFutureOrderProducts(mockOreProduct);
-        //     } catch (e) {
-        //         expect(e.name).toBe('InternalException');
-        //         expect(e instanceof InternalException).toBeTruthy();
-        //     }
-        // });
+        it('should throw internalException', async () => {
+
+            jest.spyOn(orderProductRepository, 'create').mockRejectedValueOnce(new InternalException(''));
+            jest.spyOn(orderProductRepository, 'save').mockRejectedValueOnce(new InternalException(''));
+            try {
+                await orderProductService.addFutureOrderProducts(mockOreProduct);
+            } catch (e) {
+                expect(e.name).toBe('InternalException');
+                expect(e instanceof InternalException).toBeTruthy();
+            }
+        })
     });
 
 

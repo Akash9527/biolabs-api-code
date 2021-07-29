@@ -348,6 +348,18 @@ describe('UserService', () => {
                     expect(e.message).toBe('Getting error in validating the user tokenToken is invalid.');
                 }
             });
+            it('it should throw exception if Token is invalid  ', async () => {
+                jest.spyOn(userTokenRepository, 'findOne').mockResolvedValue(mockUserToken);
+                jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
+                mockUser.status='-1';
+                try {
+                    await userService.validateToken(mockUserToken.token);
+                } catch (e) {
+                    expect(e.name).toBe('BiolabsException');
+                    expect(e instanceof BiolabsException).toBeTruthy();  
+                    expect(e.message).toBe('Getting error in validating the user tokenToken is invalid.');
+                }
+            });
         });
         describe('setNewPassword method', () => {
             const mockPasswordPayload = {
@@ -388,6 +400,18 @@ describe('UserService', () => {
             })
             it('it should throw exception if Token is invalid  ', async () => {
                 jest.spyOn(userTokenRepository, 'save').mockRejectedValueOnce(new NotAcceptableException('Token is invalid.'));
+                try {
+                    await userService.setNewPassword(mockPasswordPayload);
+                } catch (e) {
+                    expect(e.response.error).toBe('Not Acceptable');
+                    expect(e.response.message).toBe('Token is invalid.');
+                    expect(e.response.statusCode).toBe(406);
+                }
+            });
+            it('it should throw exception if Token is invalid  ', async () => {
+                jest.spyOn(userTokenRepository, 'findOne').mockResolvedValue(mockUserToken);
+                mockUserSetPass.status = '-1';
+                jest.spyOn(userService, 'get').mockResolvedValueOnce(mockUserSetPass);
                 try {
                     await userService.setNewPassword(mockPasswordPayload);
                 } catch (e) {
