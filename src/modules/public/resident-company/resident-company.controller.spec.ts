@@ -537,7 +537,11 @@ describe('ResidentCompanyController', () => {
 
         it('it should called residentService addToSpaceChangeWaitList method ', async () => {
             await residentController.addSpaceChangeWaitlist(mockAddSpaceChangeWaitlistDto, req);
-            expect(await residentService.addToSpaceChangeWaitList).toHaveBeenCalledWith(mockAddSpaceChangeWaitlistDto, req);
+            let siteIdArr = req.user.site_id;
+            if (req.headers['x-site-id']) {
+                siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+            }
+            expect(await residentService.addToSpaceChangeWaitList).toHaveBeenCalledWith(mockAddSpaceChangeWaitlistDto, siteIdArr,req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.addToSpaceChangeWaitList.mockResolvedValue(new UnauthorizedException());

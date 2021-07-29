@@ -359,7 +359,7 @@ describe('ResidentCompanyService', () => {
               return {
                 catch: jest.fn(),
               }
-            }), create: jest.fn()
+            }), create: jest.fn(() => mockResidentManagement)
           }
         },
         {
@@ -697,12 +697,31 @@ describe('ResidentCompanyService', () => {
       let result = await residentCompanyService.addResidentCompanyAdvisor(payload);
       expect(result).not.toBeNull();
     })
+    it('should throw internalException', async () => {
+      if (payload.id)
+        jest.spyOn(residentCompanyAdvisoryRepository, 'update').mockRejectedValueOnce(new InternalException(''));
+      try {
+        await residentCompanyService.addResidentCompanyAdvisor(payload);
+      } catch (e) {
+        expect(e.name).toBe('InternalException');
+        expect(e instanceof InternalException).toBeTruthy();
+      }
+    })
     it('should  save and return resident companies document object if payload id is not available', async () => {
       payload.id = null;
       delete payload.id;
       await residentCompanyAdvisoryRepository.save(residentCompanyAdvisoryRepository.create(payload))
       let result = await residentCompanyService.addResidentCompanyAdvisor(payload);
       expect(result).not.toBeNull();
+    })
+    it('should throw internalException', async () => {
+      jest.spyOn(residentCompanyAdvisoryRepository, 'save').mockRejectedValueOnce(new InternalException(''));
+      try {
+        await residentCompanyService.addResidentCompanyAdvisor(payload);
+      } catch (error) {
+        expect(error.name).toBe('InternalException');
+        expect(error instanceof InternalException).toBeTruthy();
+      }
     })
   });
   // <!--TO-DO-->
@@ -721,10 +740,7 @@ describe('ResidentCompanyService', () => {
       if (advisors.length > 0) {
         for (let i = 0; i < advisors.length; i++) {
           let advisor = advisors[i];
-          // console.log("advisor =========", advisor);
           if (residentCompanyService.checkEmptyVal('advisors', advisor))
-            //   console.log("in if block =========", advisor);
-            //  // jest.spyOn(residentCompanyService, 'addResidentCompanyAdvisor').mockImplementation();
             await residentCompanyService.addResidentCompanyAdvisor(advisor);
         }
       }
@@ -746,13 +762,32 @@ describe('ResidentCompanyService', () => {
       let result = await residentCompanyService.addResidentCompanyManagement(payload);
       expect(result).not.toBeNull();
     })
+    it('should throw internalException', async () => {
+      if (payload.id)
+        jest.spyOn(residentCompanyManagementRepository, 'update').mockRejectedValueOnce(new InternalException(''));
+      try {
+        await residentCompanyService.addResidentCompanyManagement(payload);
+      } catch (e) {
+        expect(e.name).toBe('InternalException');
+        expect(e instanceof InternalException).toBeTruthy();
+      }
+    })
     it('should return   resident companies management object', async () => {
       payload.id = null;
       delete payload.id;
       await residentCompanyManagementRepository.save(payload);
-
+      jest.spyOn(residentCompanyManagementRepository, 'save').mockResolvedValueOnce(mockResidentManagement);
       let result = await residentCompanyService.addResidentCompanyManagement(payload);
       expect(result).not.toBeNull();
+    })
+    it('should throw internalException', async () => {
+      jest.spyOn(residentCompanyManagementRepository, 'save').mockRejectedValueOnce(new InternalException(''));
+      try {
+        await residentCompanyService.addResidentCompanyManagement(payload);
+      } catch (error) {
+        expect(error.name).toBe('InternalException');
+        expect(error instanceof InternalException).toBeTruthy();
+      }
     })
   });
   // <!--TO-DO-->
@@ -768,10 +803,7 @@ describe('ResidentCompanyService', () => {
       if (technicals.length > 0) {
         for (let i = 0; i < technicals.length; i++) {
           let technical = technicals[i];
-          // console.log("technical =========", technical);
           if (residentCompanyService.checkEmptyVal('technicals', technicals))
-            //   console.log("in if block =========", technical);
-            //  // jest.spyOn(residentCompanyService, 'addResidentCompanyAdvisor').mockImplementation();
             await residentCompanyService.addResidentCompanyTechnical(technical);
         }
       }
@@ -791,6 +823,16 @@ describe('ResidentCompanyService', () => {
       let result = await residentCompanyService.addResidentCompanyTechnical(payload);
       expect(result).not.toBeNull();
     })
+    it('should throw internalException', async () => {
+      if (payload.id)
+        jest.spyOn(residentCompanyTechnicalRepository, 'update').mockRejectedValueOnce(new InternalException(''));
+      try {
+        await residentCompanyService.addResidentCompanyTechnical(payload);
+      } catch (e) {
+        expect(e.name).toBe('InternalException');
+        expect(e instanceof InternalException).toBeTruthy();
+      }
+    })
     it('should  save and return resident companies technical object if payload id is not available', async () => {
       payload.id = null;
       delete payload.id;
@@ -798,7 +840,17 @@ describe('ResidentCompanyService', () => {
       let result = await residentCompanyService.addResidentCompanyTechnical(payload);
       expect(result).not.toBeNull();
     })
+    it('should throw internalException', async () => {
+      jest.spyOn(residentCompanyTechnicalRepository, 'save').mockRejectedValueOnce(new InternalException(''));
+      try {
+        await residentCompanyService.addResidentCompanyTechnical(payload);
+      } catch (error) {
+        expect(error.name).toBe('InternalException');
+        expect(error instanceof InternalException).toBeTruthy();
+      }
+    })
   });
+
   describe('getResidentCompaniesBkp method', () => {
     let mockRecidentCompanies: Array<any> = [{
       name: "Biolabs", email: "elon@space.com", companyName: "tesla", site: [2, 1], biolabsSources: 1, otherBiolabsSources: "",
@@ -1075,18 +1127,6 @@ describe('ResidentCompanyService', () => {
         expect(e instanceof InternalException).toBeTruthy();
       }
     });
-    // it('it should throw exception if user id is not provided  ', async () => {
-    //   jest.spyOn(residentCompanyRepository, 'findOne').mockImplementation(() => {
-    //     throw new NotAcceptableException(
-    //       'Company with provided id not available.',
-    //     );
-    //   });
-    //   try {
-    //     await residentCompanyService.updateResidentCompany(mock);
-    //   } catch (e) {
-    //    // console.log(e);
-    //   }
-    // });
   });
   describe('gloabalSearchCompaniesOld method', () => {
     let mockSearchPayload: SearchResidentCompanyPayload = {
@@ -1109,7 +1149,6 @@ describe('ResidentCompanyService', () => {
       try {
         await residentCompanyService.gloabalSearchCompaniesOld(mockSearchPayload, [1, 2])
       } catch (e) {
-        // console.log(e);
         expect(e.name).toBe('BiolabsException');
         expect(e instanceof BiolabsException).toBeTruthy();
         expect(e.message).toEqual('Error in search companies old');
@@ -1139,7 +1178,6 @@ describe('ResidentCompanyService', () => {
       try {
         await residentCompanyService.gloabalSearchCompanies(mockSearchPayload, [1, 2]);
       } catch (e) {
-        // console.log(e);
         expect(e.name).toBe('BiolabsException');
         expect(e instanceof BiolabsException).toBeTruthy();
         expect(e.message).toBe('Error in search companies');
@@ -1688,13 +1726,10 @@ describe('ResidentCompanyService', () => {
       expect(result).toEqual(mockSpaceChangeWaitlistItem);
     })
     it('should throw exception', async () => {
-      jest.spyOn(spaceChangeWaitlistRepository, 'findOne').mockResolvedValue(null);
-      try {
-        await residentCompanyService.getSpaceChangeWaitListById(1);
-      }
-      catch (e) {
-        console.log(e);
-      }
+      jest.spyOn(spaceChangeWaitlistRepository, 'findOne').mockResolvedValueOnce(null);
+      let result = await residentCompanyService.getSpaceChangeWaitListById(1);
+      expect(result['message']).toEqual('Space Change Waitlist not found by id: 1');
+      expect(result['status']).toEqual('error');
     })
   });
   describe('updateSpaceChangeWaitlistPriorityOrder method', () => {
@@ -1995,6 +2030,10 @@ describe('ResidentCompanyService', () => {
       user: { site_id: [1, 2], role: 1 },
       headers: { 'x-site-id': [2] }
     }
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
     const maxPriorityOrder = 5;
     it('should return response with status and message fields if it is Successfull', async () => {
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(mockRC);
@@ -2010,7 +2049,7 @@ describe('ResidentCompanyService', () => {
       mockRC.shareYourProfile = payload.shareYourProfile;
       jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
 
-      let result = await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+      let result = await residentCompanyService.addToSpaceChangeWaitList(payload, siteIdArr, req);
       expect(result['message']).toEqual('Operation Successful');
       expect(result['status']).toEqual('Success');
     });
@@ -2021,7 +2060,7 @@ describe('ResidentCompanyService', () => {
       }
       jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
       jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
-      let result = await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+      let result = await residentCompanyService.addToSpaceChangeWaitList(payload, siteIdArr, req);
       expect(result['message']).toEqual('Resident Company not found by id: 1');
       expect(result['status']).toEqual('Error');
     });
@@ -2033,7 +2072,7 @@ describe('ResidentCompanyService', () => {
       jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
       jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
       try {
-        await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+        await residentCompanyService.addToSpaceChangeWaitList(payload, siteIdArr, req);
       } catch (e) {
         expect(e.status).toBe(500);
         expect(e.response.status).toBe('Error');
@@ -2048,7 +2087,7 @@ describe('ResidentCompanyService', () => {
       jest.spyOn(spaceChangeWaitlistRepository, 'save').mockRejectedValueOnce(mockSpaceChangeWaitlistItem);
       jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
       try {
-        await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+        await residentCompanyService.addToSpaceChangeWaitList(payload, siteIdArr, req);
       } catch (e) {
         expect(e.status).toBe(400);
         expect(e.response.status).toBe('Error');
@@ -2063,7 +2102,7 @@ describe('ResidentCompanyService', () => {
       jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValueOnce(mockSpaceChangeWaitlistItem);
       jest.spyOn(residentCompanyRepository, 'update').mockRejectedValueOnce(mockSpaceChangeWaitlistItem.residentCompany);
       try {
-        await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+        await residentCompanyService.addToSpaceChangeWaitList(payload, siteIdArr, req);
       } catch (e) {
         expect(e.status).toBe(500);
         expect(e.response.status).toBe('Error');
@@ -2079,7 +2118,7 @@ describe('ResidentCompanyService', () => {
       jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
       jest.spyOn(residentCompanyService, 'updateCompanyHistoryAfterSavingSpaceChangeWaitlist').mockRejectedValueOnce(mockResidentHistory);
       try {
-        await residentCompanyService.addToSpaceChangeWaitList(payload, req);
+        await residentCompanyService.addToSpaceChangeWaitList(payload, siteIdArr, req);
       } catch (e) {
         expect(e.status).toBe(500);
         expect(e.response.status).toBe('Error');

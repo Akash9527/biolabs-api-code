@@ -1577,21 +1577,23 @@ order by quat;
    * @param req
    */
   public async addResidentCompanyDataInWaitlist(savedRc: any) {
+
     info(`Create waitlist on application submission`, __filename, "addResidentCompanyDataInWaitlist()");
     const PLAN_CHANGE_SUMMARY_INITIAL_VALUE = 'See Notes';
-    const REQUEST_NOTES_INITIAL_VALUE = 'When would you like to join BioLabs?, What equipment and facilities do you plan to primarily use onsite?**';
+    const moveIn = await this.getMoveInPrefrence().find(pr => pr.id == savedRc.preferredMoveIn);
+    const REQUEST_NOTES_INITIAL_VALUE = moveIn.name + ', Equipment and facilities you plan to primarily use onsite : ' + savedRc.equipmentOnsite;
     const REQUEST_TYPE_EXTERNAL = false;
     const maxPriorityOrder: number = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
       return result;
+    }).catch(err => {
+      error("Getting error while fetching  maxPriorityOrder", __filename, "addResidentCompanyDataInWaitlist()");
+      throw new BiolabsException('Getting error while fetching  maxPriorityOrder ' + err.message);
     });
     debug(`Max priority order: ${maxPriorityOrder}`, __filename, "addResidentCompanyDataInWaitlist()");
-    let productTypes: any = await this.productTypeService.getProductType().then((result) => {
-      return result;
-    });
 
     let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
     spaceChangeWaitlistObj.residentCompany = savedRc;
-    spaceChangeWaitlistObj.desiredStartDate = null;
+    spaceChangeWaitlistObj.desiredStartDate = Date.parse(new Date().toString()) / 1000;
     spaceChangeWaitlistObj.planChangeSummary = PLAN_CHANGE_SUMMARY_INITIAL_VALUE;
     spaceChangeWaitlistObj.requestedBy = savedRc.name;
     spaceChangeWaitlistObj.requestStatus = RequestStatusEnum.Open;
@@ -1606,21 +1608,11 @@ order by quat;
     spaceChangeWaitlistObj.requestGraduateDate = null;
     spaceChangeWaitlistObj.marketPlace = null;
 
-    const resp = await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj);
+    return await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj).catch(err => {
+      error("Getting error while Saving Waitlist", __filename, "addResidentCompanyDataInWaitlist()");
+      throw new BiolabsException('Getting error while Saving Waitlist ' + err.message);
+    });
 
-    if (productTypes && resp) {
-      for (let index = 0; index < productTypes.length; index++) {
-        let item: Item = new Item();
-        item.productTypeId = productTypes[index].id;
-        item.itemName = productTypes[index].productTypeName;
-        item.currentQty = 0;
-        item.desiredQty = 0;
-        item.spaceChangeWaitlist = resp;
-        item.spaceChangeWaitlist_id = resp.id;
-        await this.itemRepository.save(this.itemRepository.create(item));
-      }
-      debug(`Total product types: ${productTypes.length}`, __filename, `addResidentCompanyDataInWaitlist()`);
-    }
   }
 
   /**
@@ -1649,7 +1641,7 @@ order by quat;
    * @param req
    * @returns
    */
-  public async addToSpaceChangeWaitList(payload: AddSpaceChangeWaitlistDto, @Request() req): Promise<any> {
+  public async addToSpaceChangeWaitList(payload: AddSpaceChangeWaitlistDto, siteIdArr: any, @Request() req): Promise<any> {
     info(`Add Space Change Waitlist for companyId : ${payload.residentCompanyId} and site: ${req.user.site_id}`, __filename, "addToSpaceChangeWaitList()");
     const COULD_NOT_SAVE_SPACE_CHANGE_WAITLIST_ERR_MSG = "Could not save Space Change Waitlist record";
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG = "Could not update Resident Company record";
@@ -1691,93 +1683,93 @@ order by quat;
     }
     info(`Max priority order for Space Change Waitlist : ${maxPriorityOrder} `, __filename, `addToSpaceChangeWaitList()`);
     // try {
-      let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
-      spaceChangeWaitlistObj.residentCompany = residentCompany;
-      spaceChangeWaitlistObj.desiredStartDate = payload.desiredStartDate;
-      spaceChangeWaitlistObj.planChangeSummary = payload.planChangeSummary;
-      spaceChangeWaitlistObj.requestedBy = residentCompany.name;
-      spaceChangeWaitlistObj.requestStatus = payload.requestStatus;
-      spaceChangeWaitlistObj.fulfilledOn = payload.fulfilledOn;
-      spaceChangeWaitlistObj.isRequestInternal = payload.isRequestInternal;
-      spaceChangeWaitlistObj.requestNotes = payload.requestNotes;
-      spaceChangeWaitlistObj.internalNotes = payload.internalNotes;
-      spaceChangeWaitlistObj.siteNotes = payload.siteNotes;
-      spaceChangeWaitlistObj.priorityOrder = maxPriorityOrder;
-      let siteIdArr = req.user.site_id;
-      // if (req.headers['x-site-id']) {
-      //   siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
-      // }
-      spaceChangeWaitlistObj.site = siteIdArr;
-      spaceChangeWaitlistObj.membershipChange = payload.membershipChange;
-      spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
-      spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
+    let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
+    spaceChangeWaitlistObj.residentCompany = residentCompany;
+    spaceChangeWaitlistObj.desiredStartDate = payload.desiredStartDate;
+    spaceChangeWaitlistObj.planChangeSummary = payload.planChangeSummary;
+    spaceChangeWaitlistObj.requestedBy = residentCompany.name;
+    spaceChangeWaitlistObj.requestStatus = payload.requestStatus;
+    spaceChangeWaitlistObj.fulfilledOn = payload.fulfilledOn;
+    spaceChangeWaitlistObj.isRequestInternal = payload.isRequestInternal;
+    spaceChangeWaitlistObj.requestNotes = payload.requestNotes;
+    spaceChangeWaitlistObj.internalNotes = payload.internalNotes;
+    spaceChangeWaitlistObj.siteNotes = payload.siteNotes;
+    spaceChangeWaitlistObj.priorityOrder = maxPriorityOrder;
+    //let siteIdArr = siteIdArr;
+    // if (req.headers['x-site-id']) {
+    //   siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    // }
+    spaceChangeWaitlistObj.site = siteIdArr;
+    spaceChangeWaitlistObj.membershipChange = payload.membershipChange;
+    spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
+    spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
 
-      const resp = await this.spaceChangeWaitlistRepository.save(this.spaceChangeWaitlistRepository.create(spaceChangeWaitlistObj))
-        .catch(err => {
-          error(`Error in saving Space Change Waitlist. ${err.message} `, __filename, `addToSpaceChangeWaitList()`);
-          throw new HttpException({
-            status: 'Error',
-            message: COULD_NOT_SAVE_SPACE_CHANGE_WAITLIST_ERR_MSG,
-            body: err
-          }, HttpStatus.BAD_REQUEST);
-        });
+    const resp = await this.spaceChangeWaitlistRepository.save(this.spaceChangeWaitlistRepository.create(spaceChangeWaitlistObj))
+      .catch(err => {
+        error(`Error in saving Space Change Waitlist. ${err.message} `, __filename, `addToSpaceChangeWaitList()`);
+        throw new HttpException({
+          status: 'Error',
+          message: COULD_NOT_SAVE_SPACE_CHANGE_WAITLIST_ERR_MSG,
+          body: err
+        }, HttpStatus.BAD_REQUEST);
+      });
 
-      if (resp == null) {
-        response['status'] = 'Error';
-        response['message'] = COULD_NOT_SAVE_SPACE_CHANGE_WAITLIST_ERR_MSG;
-        response['message'] = {};
-        return response;
-      }
-      info(`Space Change Waitlist saved, id: ${resp.id}`, __filename, `addToSpaceChangeWaitList()`);
-      for (let itemDto of payload.items) {
-        let itemObj: Item = new Item();
+    if (resp == null) {
+      response['status'] = 'Error';
+      response['message'] = COULD_NOT_SAVE_SPACE_CHANGE_WAITLIST_ERR_MSG;
+      response['message'] = {};
+      return response;
+    }
+    info(`Space Change Waitlist saved, id: ${resp.id}`, __filename, `addToSpaceChangeWaitList()`);
+    for (let itemDto of payload.items) {
+      let itemObj: Item = new Item();
 
-        itemObj.productTypeId = itemDto.productTypeId;
-        itemObj.itemName = itemDto.itemName;
-        itemObj.currentQty = itemDto.currentQty;
-        itemObj.desiredQty = itemDto.desiredQty;
-        itemObj.spaceChangeWaitlist = resp;
-        await this.itemRepository.save(this.itemRepository.create(itemObj));
-      }
+      itemObj.productTypeId = itemDto.productTypeId;
+      itemObj.itemName = itemDto.itemName;
+      itemObj.currentQty = itemDto.currentQty;
+      itemObj.desiredQty = itemDto.desiredQty;
+      itemObj.spaceChangeWaitlist = resp;
+      await this.itemRepository.save(this.itemRepository.create(itemObj));
+    }
 
-      /** Update Resident Company details */
-      residentCompany.companyStage = payload.companyStage;
-      residentCompany.funding = payload.funding;
-      residentCompany.fundingSource = payload.fundingSource;
-      residentCompany.companySize = payload.companySize;
-      residentCompany.shareYourProfile = payload.shareYourProfile;
-      await this.residentCompanyRepository.update(residentCompany.id, residentCompany)
-        .then(() => {
-          info(`Resident Company details updated with id: ${residentCompany.id}`, __filename, `addToSpaceChangeWaitList()`);
-        }).catch(err => {
-          error(`Error in updating Resident Company details with id: ${residentCompany.id}`, __filename, `addToSpaceChangeWaitList()`);
-          throw new HttpException({
-            status: "Error",
-            message: COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG,
-            body: err
-          }, HttpStatus.INTERNAL_SERVER_ERROR);
-        });
-
-      /** Update Resident Company history */
-      await this.updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload, residentCompany).catch(err => {
-        error(`Error in updating Resident Company history with id: ${residentCompany.id}`, __filename, `addToSpaceChangeWaitList()`);
+    /** Update Resident Company details */
+    residentCompany.companyStage = payload.companyStage;
+    residentCompany.funding = payload.funding;
+    residentCompany.fundingSource = payload.fundingSource;
+    residentCompany.companySize = payload.companySize;
+    residentCompany.shareYourProfile = payload.shareYourProfile;
+    await this.residentCompanyRepository.update(residentCompany.id, residentCompany)
+      .then(() => {
+        info(`Resident Company details updated with id: ${residentCompany.id}`, __filename, `addToSpaceChangeWaitList()`);
+      }).catch(err => {
+        error(`Error in updating Resident Company details with id: ${residentCompany.id}`, __filename, `addToSpaceChangeWaitList()`);
         throw new HttpException({
           status: "Error",
-          message: COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG,
+          message: COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG,
           body: err
         }, HttpStatus.INTERNAL_SERVER_ERROR);
       });
 
-      /** Send email notification to Site Admin to notify about new Plan Change Request submission */
-      const MAIL_FOR = "MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE";
-      this.sendEmailToSiteAdmin(req.user.site_id, req, residentCompany.companyName, MAIL_FOR).catch(() => {
-        error(`Error in sending email notification to site admin for SPACE_CHANGE_WAITLIST with id: ${resp.id}`, __filename, `addToSpaceChangeWaitList()`);
-        // throw new HttpException({
-        //   status: "Error",
-        //   message: COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG,
-        //   body: err
-        // }, HttpStatus.INTERNAL_SERVER_ERROR);
-      });
+    /** Update Resident Company history */
+    await this.updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload, residentCompany).catch(err => {
+      error(`Error in updating Resident Company history with id: ${residentCompany.id}`, __filename, `addToSpaceChangeWaitList()`);
+      throw new HttpException({
+        status: "Error",
+        message: COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG,
+        body: err
+      }, HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    /** Send email notification to Site Admin to notify about new Plan Change Request submission */
+    const MAIL_FOR = "MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE";
+    this.sendEmailToSiteAdmin(req.user.site_id, req, residentCompany.companyName, MAIL_FOR).catch(() => {
+      error(`Error in sending email notification to site admin for SPACE_CHANGE_WAITLIST with id: ${resp.id}`, __filename, `addToSpaceChangeWaitList()`);
+      // throw new HttpException({
+      //   status: "Error",
+      //   message: COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG,
+      //   body: err
+      // }, HttpStatus.INTERNAL_SERVER_ERROR);
+    });
 
     // } catch (error) {
     //   response['status'] = 'Error';
@@ -1935,15 +1927,19 @@ order by quat;
     const response = {};
     const month = new Date().getMonth() + 2; // Getting next month from currect date
     const queryStr = `
-      select pt.id as "productTypeId", 
-      CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
-      pt."productTypeName"
-      from product_type as pt
-      Left Join (select "productTypeId", quantity from order_product where "companyId" = ${companyId} and month = ${month} ) as op
-      on pt.id = op."productTypeId"
-      where pt."productTypeName" <> 'Decontamination Fee' 
-      and pt."productTypeName" <> 'Retainer Fee'
-      group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
+    select res."productTypeId", sum(res.count), res."productTypeName"
+    from (
+        select pt.id as "productTypeId",
+        CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
+        pt."productTypeName"
+        from product_type as pt
+        Left Join (select "productTypeId", quantity from order_product where "companyId" = ${companyId} and month = ${month} ) as op
+        on pt.id = op."productTypeId"
+        where pt."productTypeName" <> 'Decontamination Fee'
+        and pt."productTypeName" <> 'Retainer Fee'
+        group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
+        ) as res
+    group by res."productTypeId", res."productTypeName"
     `;
 
     const items = await this.residentCompanyHistoryRepository.query(queryStr);
@@ -2170,5 +2166,14 @@ order by quat;
     resp['body'] = payload;
     info(`Executed updateSpaceChangeWaitlistStatus()`, __filename, `updateSpaceChangeWaitlistStatus()`);
     return resp;
+  }
+
+  getMoveInPrefrence() {
+    return [
+      { id: 1, name: 'Join Biolabs Within : 1 month' },
+      { id: 2, name: 'Join Biolabs Within : 2 - 3 months' },
+      { id: 3, name: 'Join Biolabs Within : 4 - 6 months' },
+      { id: 4, name: 'Join Biolabs Within : More than 6 months' }
+    ];
   }
 }
