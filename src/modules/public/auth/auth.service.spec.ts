@@ -9,6 +9,10 @@ import { NotAcceptableException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '../../config';
 import { Hash } from '../../../utils/Hash';
 import { HTTP_CODES } from '../../../utils/httpcode';
+import { SUPER_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-super-admin';
+import { SITE_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-site-admin';
+import { SPONSOR_ACCESSLEVELS } from '../../../constants/privileges-sponsor';
+import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 const mockUser: User = {
     id: 1,
     role: 1,
@@ -30,24 +34,36 @@ const mockUser: User = {
 const mockUserService = () => ({
     getByEmail: jest.fn(),
     validateToken: jest.fn(),
-    forgotPassword: jest.fn()
+    forgotPassword: jest.fn(),
+    create:jest.fn(),
 })
 
 const mockConfigService = () => { }
 const mockJwtService = () => ({
     sign: jest.fn()
 })
-const mockMasterService = () => ({})
+const mockMasterService = () => ({
+    createRoles:jest.fn(),
+    createSites:jest.fn(),
+    createFundings:jest.fn(),
+    createModalities:jest.fn(),
+    createBiolabsSources:jest.fn(),
+    createCategories:jest.fn(),
+    createTechnologyStages:jest.fn(),
+    createProductType:jest.fn(),
+});
 const mockResidentCompanyService = () => ({
     getResidentCompany: jest.fn()
 })
 let req: Request;
-
+const appRoot = require('app-root-path');
+const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
 describe('AuthService', () => {
     let authService;
     let usersService;
     let jwtService;
     let residentCompanyService;
+    let masterService;
 
 
     beforeEach(async () => {
@@ -64,6 +80,7 @@ describe('AuthService', () => {
         }).compile();
 
         authService = await module.get<AuthService>(AuthService);
+        masterService = await module.get<MasterService>(MasterService);
         usersService = await module.get<UsersService>(UsersService);
         jwtService = await module.get<JwtService>(JwtService);
         residentCompanyService = await module.get<ResidentCompanyService>(ResidentCompanyService);
@@ -71,7 +88,32 @@ describe('AuthService', () => {
     it('should be defined', () => {
         expect(authService).toBeDefined();
     });
-
+    describe('should test onApplicationBootstrap functionality', () => {
+        it('should be called masterService method', async () => {
+            await authService.onApplicationBootstrap();
+            expect(await masterService.createRoles).toHaveBeenCalled();
+            expect(await masterService.createSites).toHaveBeenCalled();
+            expect(await masterService.createFundings).toHaveBeenCalled();
+            expect(await masterService.createModalities).toHaveBeenCalled();
+            expect(await masterService.createBiolabsSources).toHaveBeenCalled();
+            expect(await masterService.createCategories).toHaveBeenCalled();
+            //expect(await masterService.validateUse).toHaveBeenCalled();
+        });
+    });
+    describe('should test createSuperAdmin functionality', () => {
+        it('should be called userService getByEmail method', async () => {
+            await authService.onApplicationBootstrap();
+            expect(await usersService.getByEmail).toHaveBeenCalledWith('superadmin@biolabs.io');
+        });
+        it('should validate createAdmin method', async () => {
+            usersService.getByEmail.mockResolvedValue('superadmin@biolabs.io');
+            const superAdmin=await authService.createSuperAdmin();
+            if (!superAdmin) {
+                await usersService.create(migrationData['superadmin']);
+              }
+            expect(superAdmin).not.toBeNull();
+        });
+    });
     describe('should test  validate user functionality', () => {
         const mockLoginPayLoad = { email: 'superadmin@biolabs.io', password: 'Admin' };
 
@@ -106,7 +148,6 @@ describe('AuthService', () => {
                 expect(e.response.error).toBe('Unauthorized');
             }
         });
-
     });
     describe('should test  validate Token functionality', () => {
         const mockTokenString = "tokenString";
@@ -161,6 +202,22 @@ describe('AuthService', () => {
             jwtService.sign.mockReturnValue(true);
             let outcome = authService.createToken(mockUser);
             let permissions = outcome.permissions;
+            switch (permissions.role) {
+                case 1:
+                  permissions = SUPER_ADMIN_ACCESSLEVELS;
+                  break;
+                case 2:
+                  permissions = SITE_ADMIN_ACCESSLEVELS;
+                  break;
+                case 3:
+                  permissions = SPONSOR_ACCESSLEVELS;
+                  break;
+                case 4:
+                  permissions = RESIDENT_ACCESSLEVELS;
+                  break;
+                default:
+                  break;
+            }
             expect(Object.entries(permissions).length).not.toBe(0);
             expect(outcome).toHaveProperty('expiresIn');
             expect(outcome).toHaveProperty('accessToken');

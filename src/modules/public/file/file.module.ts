@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ResidentCompanyModule } from '../resident-company';
-import { UserModule } from '../user';
+import { ResidentCompanyModule, ResidentCompanyService } from '../resident-company';
+import { UserModule, UsersService } from '../user';
 import { FileController } from './file.controller';
 import { FileService } from './file.service';
 
@@ -10,7 +10,7 @@ import { FileService } from './file.service';
     ResidentCompanyModule
   ],
   controllers: [FileController],
-  providers: [FileService],
+  providers: [FileService,ResidentCompanyService,UsersService],
   exports: [FileService],
 })
 export class FileModule { }

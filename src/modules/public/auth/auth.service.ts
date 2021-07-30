@@ -40,7 +40,7 @@ export class AuthService {
     await this.masterService.createBiolabsSources();
     await this.masterService.createCategories();
     await this.masterService.createTechnologyStages();
-    await this.masterService.createProductType();
+    await this.masterService.createCategories();
     await this.createSuperAdmin();
   }
 
