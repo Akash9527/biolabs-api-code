@@ -1685,6 +1685,7 @@ order by quat;
     // try {
     let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
     spaceChangeWaitlistObj.residentCompany = residentCompany;
+    spaceChangeWaitlistObj.graduateDescription = payload.graduateDescription;
     spaceChangeWaitlistObj.desiredStartDate = payload.desiredStartDate;
     spaceChangeWaitlistObj.planChangeSummary = payload.planChangeSummary;
     spaceChangeWaitlistObj.requestedBy = residentCompany.name;
@@ -2005,6 +2006,7 @@ order by quat;
         if (spaceChangeWaitlistObj) {
           spaceChangeWaitlistObj.desiredStartDate = payload.desiredStartDate;
           spaceChangeWaitlistObj.planChangeSummary = payload.planChangeSummary;
+          spaceChangeWaitlistObj.graduateDescription = payload.graduateDescription;
           spaceChangeWaitlistObj.requestStatus = payload.requestStatus;
           spaceChangeWaitlistObj.fulfilledOn = payload.fulfilledOn;
           spaceChangeWaitlistObj.isRequestInternal = payload.isRequestInternal;
