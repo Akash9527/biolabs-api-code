@@ -970,7 +970,12 @@ describe('MasterService', () => {
                 }
             })
         });
+        it('should get error ', async () => {
+            jest.spyOn(masterService, 'getRoles').mockRejectedValueOnce(mockRoles);
+            return await expect(masterService.createRoles()).rejects.toBeTruthy();
+        });
     });
+
     describe('should test role Functionality', () => {
         let mockRoles = migrationData['roles'];
         let mockRole = mockRoles[0] as Role;
@@ -1029,6 +1034,10 @@ describe('MasterService', () => {
                     }
                 }
             })
+        });
+        it('should get error ', async () => {
+            jest.spyOn(masterService, 'getBiolabsSource').mockRejectedValueOnce(mockbiolabsSource);
+            return await expect(masterService.createBiolabsSources()).rejects.toBeTruthy();
         });
     });
     describe('should test biolabs source Functionality', () => {
@@ -1191,6 +1200,10 @@ describe('MasterService', () => {
                 }
             })
         });
+        it('should get error ', async () => {
+            jest.spyOn(masterService, 'getFundings').mockRejectedValueOnce(mockfundings);
+            return await expect(masterService.createFundings()).rejects.toBeTruthy();
+        });
     });
     describe('should test createModalities Functionality', () => {
         let mockModalitites = [];
@@ -1230,6 +1243,10 @@ describe('MasterService', () => {
                 }
             })
         });
+        it('should get error ', async () => {
+            jest.spyOn(masterService, 'getModalities').mockRejectedValueOnce(mockModalitites);
+            return await expect( masterService.createModalities()).rejects.toBeTruthy();
+        });
     });
     describe('should test createTechnologyStages Functionality', () => {
         let mockTechnologyStage = [];
@@ -1259,6 +1276,10 @@ describe('MasterService', () => {
                     }
                 }
             })
+        });
+        it('should get error ', async () => {
+            jest.spyOn(masterService, 'getTechnologyStages').mockRejectedValueOnce(mockTechnologyStage);
+            return await expect(masterService.createTechnologyStages()).rejects.toBeTruthy();
         });
     });
     describe('should test createCategories Functionality', () => {

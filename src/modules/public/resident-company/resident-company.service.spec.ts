@@ -3,7 +3,7 @@ import { ResidentCompany } from "./resident-company.entity";
 import { ResidentCompanyService } from "./resident-company.service";
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { HttpException, HttpStatus, NotAcceptableException } from '@nestjs/common';
+
 import { PassportModule } from "@nestjs/passport";
 import { ResidentCompanyHistory } from "./resident-company-history.entity";
 import { ResidentCompanyDocuments, ResidentCompanyDocumentsFillableFields } from "./rc-documents.entity";
@@ -33,7 +33,8 @@ import { UpdateWaitlistPriorityOrderDto } from "../dto/update-waitlist-priority-
 import { UpdateWaitlistRequestStatusDto } from "../dto/update-waitlist-request-status.dto";
 import { UpdateSpaceChangeWaitlistDto } from "../dto/update-space-change-waitlist.dto";
 import { AddSpaceChangeWaitlistDto } from "../dto/add-space-change-waitlist.dto";
-const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
+import { NotAcceptableException } from "@nestjs/common";
+const { InternalException, HttpException, BiolabsException } = require('../../common/exception/biolabs-error');
 const mockCompany: any = { id: 1 };
 const mockAddResidentCompany: AddResidentCompanyPayload = {
   name: "Biolabs", email: "elon@space.com", companyName: "tesla", site: [2, 1], biolabsSources: 1, otherBiolabsSources: "",
@@ -1790,13 +1791,20 @@ describe('ResidentCompanyService', () => {
       expect(result['status']).toEqual('Success');
       expect(result['body']).toEqual({ id: 1, status: 1 });
     });
-    it('should return response with status and message fields if it get error', async () => {
+    it('shouldthrow Error', async () => {
       mockCount = 0;
       jest.spyOn(spaceChangeWaitlistRepository, 'count').mockResolvedValue(mockCount);
       let result = await residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
       expect(result['message']).toEqual('Space Change Waitlist not found by id : 1');
       expect(result['status']).toEqual('Error');
       expect(result['body']).toEqual({ id: 1, status: 1 });
+    });
+    it('should throw Error', async () => {
+      jest.spyOn(spaceChangeWaitlistRepository, 'count').mockRejectedValueOnce(mockCount);
+      let result = await residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
+      expect(result['message']).toEqual('Error while updating status');
+      expect(result['status']).toEqual('Error');
+      expect(result['body']).toEqual(0);
     });
   });
   describe('getItems method', () => {
@@ -1940,6 +1948,26 @@ describe('ResidentCompanyService', () => {
       expect(result['message']).toEqual('Space Change Waitlist updated successfully');
       expect(result['status']).toEqual('Success');
     });
+    // it('should return response with status and message fields if it is Successfull', async () => {
+    //   if (mockUpdateSpaceChangeWaitlistDto) {
+    //     jest.spyOn(spaceChangeWaitlistRepository, 'findOne').mockRejectedValueOnce(new HttpException(''));
+
+    //   }
+    //   jest.spyOn(spaceChangeWaitlistRepository, 'update').mockRejectedValueOnce(mockSpaceChangeWaitlistItem);
+    //   jest.spyOn(residentCompanyService, 'updateSpaceChangeWaitlistItems').mockRejectedValueOnce(mockSpaceChangeWaitlistItem);
+    //   jest.spyOn(residentCompanyRepository, 'update').mockRejectedValueOnce(mockSpaceChangeWaitlistItem.residentCompany);
+    //   jest.spyOn(residentCompanyHistoryRepository, 'save').mockRejectedValueOnce(mockResidentHistory);
+    //    try {
+    //     let result = await residentCompanyService.updateSpaceChangeWaitlist(mockUpdateSpaceChangeWaitlistDto);
+    //     console.log(result);
+    //   } catch (error) {
+    //     console.log(error);
+
+    //   }
+
+    //   // expect(result['message']).toEqual('Space Change Waitlist updated successfully');
+    //   // expect(result['status']).toEqual('Success');
+    // });
 
   });
   describe('addResidentCompanyDataInWaitlist method', () => {
@@ -1962,9 +1990,33 @@ describe('ResidentCompanyService', () => {
     let producttypes: Array<any> = [{ mockProductType, mockProductType2 }];
     it('should return response with status and message fields if it is Successfull', async () => {
       jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(5);
-      jest.spyOn(productTypeService, 'getProductType').mockResolvedValue(producttypes);
       jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
-      await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
+      let result = await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
+      expect(result).not.toBeNull();
+      expect(result).not.toBeNull();
+    });
+    it('should throw BiolabsException exception', async () => {
+      jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockRejectedValueOnce(new BiolabsException('Getting error while fetching  maxPriorityOrder '));
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+      try {
+        await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toEqual("Getting error while fetching  maxPriorityOrder ");
+      }
+
+    });
+    it('should throw BiolabsException exception', async () => {
+      jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(5);
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockRejectedValueOnce(new BiolabsException('Getting error while Saving Waitlist '));
+      try {
+        await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toEqual('Getting error while Saving Waitlist ');
+      }
 
     });
   });
