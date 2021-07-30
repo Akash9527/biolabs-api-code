@@ -26,6 +26,8 @@ import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
 import { OrderProductModule } from '../order';
 import { Item } from '../entity/item.entity';
 import { ProductService } from '../order/product.service';
+import { ProductTypeService } from '../order/product-type.service';
+import { ProductType } from '../order/model/product-type.entity';
 
 @Module({
   imports: [
@@ -45,7 +47,8 @@ import { ProductService } from '../order/product.service';
       User,
       Notes,
       SpaceChangeWaitlist,
-      Item
+      Item,
+      ProductType
     ]),
     ConfigModule,
     OrderProductModule,
@@ -70,6 +73,6 @@ import { ProductService } from '../order/product.service';
   ],
   controllers: [ResidentCompanyController],
   exports: [ResidentCompanyService, Mail],
-  providers: [ResidentCompanyService, Mail,ProductService],
+  providers: [ResidentCompanyService, Mail,ProductTypeService],
 })
 export class ResidentCompanyModule {}
