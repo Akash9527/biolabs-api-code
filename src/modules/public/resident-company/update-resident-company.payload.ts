@@ -220,7 +220,7 @@ export class UpdateResidentCompanyPayload {
     required: false,
     nullable: true,
   })
-  @MaxLength(500)
+  @MaxLength(1000)
   @IsOptional()
   elevatorPitch: string;
 

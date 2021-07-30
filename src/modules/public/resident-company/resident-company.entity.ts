@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
 import { Notes } from './rc-notes.entity';
 
 /**
@@ -120,7 +121,7 @@ export class ResidentCompany {
   @Column({ default: false })
   companyOnboardingStatus: boolean;
 
-  @Column({ length: 510, default: null, nullable: true })
+  @Column({ length: 1000, default: null, nullable: true })
   elevatorPitch: string;
 
   @Column({ default: null })
@@ -199,8 +200,11 @@ export class ResidentCompany {
   @CreateDateColumn({ type: 'timestamp' })
   companyStatusChangeDate: number;
 
- @OneToMany(() => Notes , (notes) => notes.residentCompany)
+  @OneToMany(() => Notes , (notes) => notes.residentCompany)
   notes?: Notes[];
+
+  @OneToMany(() => SpaceChangeWaitlist , (spaceChangeWaitlist) => spaceChangeWaitlist.residentCompany)
+  spaceChangeWaitlist?: SpaceChangeWaitlist[];
 }
 
 export class ResidentCompanyFillableFields {
