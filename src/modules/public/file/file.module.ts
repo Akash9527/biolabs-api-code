@@ -10,7 +10,7 @@ import { FileService } from './file.service';
     ResidentCompanyModule
   ],
   controllers: [FileController],
-  providers: [FileService,ResidentCompanyService,UsersService],
+  providers: [FileService],
   exports: [FileService],
 })
 export class FileModule { }
