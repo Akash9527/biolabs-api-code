@@ -25,7 +25,6 @@ import { Notes } from './rc-notes.entity';
 import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
 import { OrderProductModule } from '../order';
 import { Item } from '../entity/item.entity';
-import { ProductService } from '../order/product.service';
 import { ProductTypeService } from '../order/product-type.service';
 import { ProductType } from '../order/model/product-type.entity';
 

@@ -186,18 +186,19 @@ export class UsersService {
    */
   async softDeleteUser(id) {
     info("Inside soft delete the user userId " + id, __filename, "softDeleteUser()");
+    const FOR_DELETE_USER = "Deleted";
     try {
       const user = await this.get(id);
       if (user) {
         user.status = '99';
-        user.email = "Deleted";
+        user.email = FOR_DELETE_USER;
         user.firstName = "User";
-        user.lastName = "Deleted";
-        user.password = "Deleted";
-        user.phoneNumber = "Deleted";
-        user.imageUrl = "Deleted";
-        user.title = "Deleted";
-        debug("Soft deleted succesfully", __filename, "softDeleteUser()");
+        user.lastName = FOR_DELETE_USER;
+        user.password = FOR_DELETE_USER;
+        user.phoneNumber = FOR_DELETE_USER;
+        user.imageUrl = FOR_DELETE_USER;
+        user.title = FOR_DELETE_USER;
+        debug("Before Saving", __filename, "softDeleteUser()");
         return await this.userRepository.save(user);
       } else {
         error("User with provided id not available." + id, __filename, "softDeleteUser()");
