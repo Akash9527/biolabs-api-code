@@ -178,7 +178,7 @@ export class ResidentCompanyService {
    * @param companyMember array of companyMember.
    * @param id number of Company id.
    */
-  async residentCompanyAdvisors(Advisors:any, id: number) {
+  async residentCompanyAdvisors(Advisors: any, id: number) {
     info("adding resident company advisors", __filename, "residentCompanyAdvisors()");
     if (Advisors.length > 0) {
       for (let i = 0; i < Advisors.length; i++) {
@@ -238,8 +238,8 @@ export class ResidentCompanyService {
    * @param companyMember array of company magmt Member.
    * @param id number of Company id.
    */
-  async residentCompanyManagements(companyMembers:any, id: number) {   
-    info(`resident company management`,__filename,"residentCompanyManagements()");
+  async residentCompanyManagements(companyMembers: any, id: number) {
+    info(`resident company management`, __filename, "residentCompanyManagements()");
     if (companyMembers.length > 0) {
       for (let i = 0; i < companyMembers.length; i++) {
         let companyMember: any = companyMembers[i];
@@ -280,7 +280,7 @@ export class ResidentCompanyService {
    * @param companyMember array of technical Member.
    * @param id number of Company id.
    */
-  async residentCompanyTechnicals(techMembers:any, id: number) {
+  async residentCompanyTechnicals(techMembers: any, id: number) {
     info("Error in find resident companies", __filename, "residentCompanyTechnicals()");
     if (techMembers.length > 0) {
       for (let i = 0; i < techMembers.length; i++) {
@@ -311,6 +311,8 @@ export class ResidentCompanyService {
       );
     }
     let response = {};
+    let savedResidentCompanyId: number;
+    const MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION = 'MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION';
 
     try {
       for await (const site of payload.site) {
@@ -318,6 +320,7 @@ export class ResidentCompanyService {
         const newRc = await this.residentCompanyRepository.create(payload);
         const savedRc = await this.residentCompanyRepository.save(newRc);
         if (savedRc.id) {
+          savedResidentCompanyId = savedRc.id;
           const historyData: any = JSON.parse(JSON.stringify(savedRc));
           historyData.comnpanyId = savedRc.id;
           delete historyData.id;
@@ -327,7 +330,7 @@ export class ResidentCompanyService {
           await this.addResidentCompanyDataInWaitlist(savedRc);
         }
       }
-      await this.sendEmailToSiteAdmin(sites, req, payload.companyName, "MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION");
+      await this.sendEmailToSiteAdmin(sites, req, payload.companyName, savedResidentCompanyId, MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION);
     } catch {
       response['status'] = 'error';
       response['message'] = 'Could not add application';
@@ -346,10 +349,16 @@ export class ResidentCompanyService {
    * @param site array of sites.
    * @param req object of Request.
    * @param companyName name of the company for which application is submitted.
+   * @param companyId id of the company.
    */
-  public async sendEmailToSiteAdmin(site: any, req, companyName: string, mailForWhat: string) {
+  public async sendEmailToSiteAdmin(site: any, req, companyName: string, companyId: number, mailForWhat: string) {
     info("Sending email to site admin", __filename, "sendEmailToSiteAdmin()");
-    const MAIL_FOR = "MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE";
+    const MAIL_FOR_SPACE_CHANGE_REQUEST_SUBMITTED = 'MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE';
+    const SUBJECT_FOR_SPACE_CHANGE_REQUEST_SUBMITTED = 'Biolabs | Space Change Request Submitted';
+
+    const MAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES = 'MAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES';
+    const SUBJECT_FOR_SPONSORSHIP_QN_CHANGE_TO_YES = 'Biolabs | A Company has changed their privacy settings';
+
     try {
       let siteAdminEmails = [];
       let userInfo;
@@ -386,14 +395,18 @@ export class ResidentCompanyService {
         company_name: companyName,
         site_name: siteList,
         origin: req.headers['origin'],
+        companyId: companyId
       };
       debug(`userInfo.origin: ${userInfo.origin}`, __filename, `sendEmailToSiteAdmin()`);
       let contentParam = 'applicationFormSubmit';
-      if (mailForWhat == MAIL_FOR) {
-        EMAIL.SUBJECT_FORM = 'Biolabs | Space Change Request Submitted';
+      if (mailForWhat == MAIL_FOR_SPACE_CHANGE_REQUEST_SUBMITTED) {
+        EMAIL.SUBJECT_FORM = SUBJECT_FOR_SPACE_CHANGE_REQUEST_SUBMITTED;
         contentParam = 'spaceChangeWaitlistSubmit';
+      } else if (mailForWhat == MAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES) {
+        EMAIL.SUBJECT_FORM = SUBJECT_FOR_SPONSORSHIP_QN_CHANGE_TO_YES;
+        contentParam = 'sponsorshipQuestionChangedToYes';
       }
-
+      debug(`EMAIL.SUBJECT_FORM: ${EMAIL.SUBJECT_FORM}`, __filename, `sendEmailToSiteAdmin()`);
       await this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, contentParam, userInfo);
     } catch (err) {
       error("Error in sending email to site admin", __filename, "sendEmailToSiteAdmin()");
@@ -537,7 +550,7 @@ export class ResidentCompanyService {
       });
     } catch (err) {
       error("Error in find resident company for Bkp", __filename, "getResidentCompaniesBkp()");
-      throw new BiolabsException('Error in find resident company for Bkp' , err.message);
+      throw new BiolabsException('Error in find resident company for Bkp', err.message);
     }
   }
 
@@ -724,7 +737,7 @@ export class ResidentCompanyService {
       response['categoryStats'] = (!categoryStats) ? 0 : categoryStats;
     } catch (err) {
       error("Error in find resident company for sponser", __filename, "getResidentCompanyForSponsor()");
-      throw new BiolabsException('Error in find resident company for sponser' , err.message);
+      throw new BiolabsException('Error in find resident company for sponser', err.message);
     }
     return response;
 
@@ -796,7 +809,7 @@ export class ResidentCompanyService {
       }
     } catch (err) {
       error("Error in find resident company for sponser", __filename, "getResidentCompanyForSponsorBySite()");
-      throw new BiolabsException('Error in find resident company for sponser' , err.message);
+      throw new BiolabsException('Error in find resident company for sponser', err.message);
     }
     return res;
 
@@ -839,7 +852,7 @@ export class ResidentCompanyService {
       }
     } catch (err) {
       error("Error in find resident company", __filename, "getResidentCompany()");
-      throw new BiolabsException('Error in find resident company' ,err.message);
+      throw new BiolabsException('Error in find resident company', err.message);
     }
   }
 
@@ -895,7 +908,7 @@ export class ResidentCompanyService {
    * @param payload object of type UpdateResidentCompanyPayload
    * @return resident company object
    */
-  async updateResidentCompany(payload: UpdateResidentCompanyPayload) {
+  async updateResidentCompany(payload: UpdateResidentCompanyPayload, @Request() req) {
     info(`updating resident company id: ${payload.id}`, __filename, "updateResidentCompany()")
     try {
       const residentCompany: any = await this.residentCompanyRepository.findOne({
@@ -932,7 +945,15 @@ export class ResidentCompanyService {
         historyData.comnpanyId = residentCompany.id;
         delete historyData.id;
         await this.residentCompanyHistoryRepository.save(historyData);
-        debug("Resident company updated successfully", __filename, "updateResidentCompany()")
+        debug("Resident company updated successfully", __filename, "updateResidentCompany()");
+
+        /** BIOL-308: Notify Site Admin if the sponsorship question changes to Yes. shareYourProfile = true */
+        if (!residentCompany.shareYourProfile && payload.shareYourProfile) {
+          const MAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES = 'MAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES';
+          debug(`Sponsor ship contact question changed to: ${payload.shareYourProfile}`, __filename, `updateResidentCompany()`);
+          await this.sendEmailToSiteAdmin(payload.site, req, residentCompany.companyName, residentCompany.id, MAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES);
+          info(`Email sent regarding Sponsorship contact question change to Yes`, __filename, `updateResidentCompany()`);
+        }
         return await this.getResidentCompany(residentCompany.id);
       } else {
         error("Company with provided id not available.", __filename, "updateResidentCompany()");
@@ -1050,7 +1071,7 @@ export class ResidentCompanyService {
       return await rcQuery.getMany();
     } catch (err) {
       error("Error in search companies old delete user", __filename, "gloabalSearchCompaniesOld()");
-      throw new BiolabsException('Error in search companies old' , err.message);
+      throw new BiolabsException('Error in search companies old', err.message);
     }
   }
   /**
@@ -1203,7 +1224,7 @@ export class ResidentCompanyService {
       return await this.residentCompanyRepository.query(globalSearch);
     } catch (err) {
       error("Error in search companies", __filename, "gloabalSearchCompanies()");
-      throw new BiolabsException('Error in search companies' , err.message);
+      throw new BiolabsException('Error in search companies', err.message);
     }
   }
 
@@ -1262,7 +1283,7 @@ export class ResidentCompanyService {
         .getRawMany();
     } catch (err) {
       error("Getting error in find the note", __filename, "getNoteByCompanyId()");
-      throw new BiolabsException('Getting error in find the note' , err.message);
+      throw new BiolabsException('Getting error in find the note', err.message);
     }
   }
 
@@ -1286,7 +1307,7 @@ export class ResidentCompanyService {
       }
     } catch (err) {
       error("Error in soft delete note", __filename, "softDeleteNote()");
-      throw new BiolabsException('Error in soft delete note' ,err.message);
+      throw new BiolabsException('Error in soft delete note', err.message);
     }
   }
 
@@ -1402,7 +1423,7 @@ export class ResidentCompanyService {
       response['fundings'] = (!fundigs) ? 0 : fundigs;
     } catch (err) {
       error("Getting error in find the fundings", __filename, "getFundingBySiteIdAndCompanyId()");
-      throw new BiolabsException('Getting error in find the fundings' ,err.message);
+      throw new BiolabsException('Getting error in find the fundings', err.message);
     }
     return response;
   }
@@ -1425,7 +1446,7 @@ export class ResidentCompanyService {
       return startWithBiolab;
     } catch (err) {
       error("Getting error in find the history of started with Biolabs analysis", __filename, "getstartedWithBiolabs()");
-      throw new BiolabsException('Getting error in find the history of started with Biolabs analysis' , err.message);
+      throw new BiolabsException('Getting error in find the history of started with Biolabs analysis', err.message);
     }
   }
   /**
@@ -1450,7 +1471,7 @@ export class ResidentCompanyService {
       return await this.residentCompanyHistoryRepository.query(queryStr);
     } catch (err) {
       error("Getting error in find the financial fees", __filename, "getFinancialFees()");
-      throw new BiolabsException('Getting error in find the financial fees' ,err.message);
+      throw new BiolabsException('Getting error in find the financial fees', err.message);
     }
   }
 
@@ -1475,7 +1496,7 @@ export class ResidentCompanyService {
       return getFeeds;
     } catch (err) {
       error("Getting error to find the time analysis", __filename, "getFeeds()");
-      throw new BiolabsException('Getting error in forget password process' , err.message);
+      throw new BiolabsException('Getting error in forget password process', err.message);
     }
   }
 
@@ -1567,7 +1588,7 @@ order by quat;
       return await this.residentCompanyHistoryRepository.query(queryStr);
     } catch (err) {
       error("Getting error in find theget company size quartly", __filename, "getCompanySizeQuartly()");
-      throw new BiolabsException('Getting error in find company size quartly' ,err.message);
+      throw new BiolabsException('Getting error in find company size quartly', err.message);
     }
   }
 
@@ -1587,7 +1608,7 @@ order by quat;
       return result;
     }).catch(err => {
       error("Getting error while fetching  maxPriorityOrder", __filename, "addResidentCompanyDataInWaitlist()");
-      throw new BiolabsException('Getting error while fetching  maxPriorityOrder ' ,err.message);
+      throw new BiolabsException('Getting error while fetching  maxPriorityOrder ', err.message);
     });
     debug(`Max priority order: ${maxPriorityOrder}`, __filename, "addResidentCompanyDataInWaitlist()");
 
@@ -1610,7 +1631,7 @@ order by quat;
 
     return await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj).catch(err => {
       error("Getting error while Saving Waitlist", __filename, "addResidentCompanyDataInWaitlist()");
-      throw new BiolabsException('Getting error while Saving Waitlist ' , err.message);
+      throw new BiolabsException('Getting error while Saving Waitlist ', err.message);
     });
 
   }
@@ -1649,6 +1670,7 @@ order by quat;
     const ERROR_IN_FETCHING_MAX_PRIORITY_ORDER_ERR_MSG = "Error while fetching Max Priority Order to set in new Space Change Waitlist record";
     // const COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG = "Could not send email notification";
     const APPROVED_DENIED_PRIORITY_ORDER = -1;
+    let shareYourProfileTemp;
 
     let residentCompany: any = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
       return result;
@@ -1662,14 +1684,15 @@ order by quat;
       return response;
     }
     info(`Fetched Resident Company from DB, Company name: : ${residentCompany.companyName} `, __filename, `addToSpaceChangeWaitList()`);
+    shareYourProfileTemp = residentCompany.shareYourProfile;
 
     let maxPriorityOrder: number;
     if (payload.requestStatus == 0) {
       info(`Fetching max priority order for Space Change Waitlist for status : ${payload.requestStatus} `, __filename, `addToSpaceChangeWaitList()`);
-      
+
       maxPriorityOrder = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
         return result;
-       
+
       }).catch(err => {
         error(`Error in fetching max priority order. ${err.message}`, __filename, `addToSpaceChangeWaitList()`);
         throw new HttpException({
@@ -1682,7 +1705,7 @@ order by quat;
       maxPriorityOrder = APPROVED_DENIED_PRIORITY_ORDER;
     }
     info(`Max priority order for Space Change Waitlist : ${maxPriorityOrder} `, __filename, `addToSpaceChangeWaitList()`);
-    // try {
+
     let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
     spaceChangeWaitlistObj.residentCompany = residentCompany;
     spaceChangeWaitlistObj.graduateDescription = payload.graduateDescription;
@@ -1762,23 +1785,21 @@ order by quat;
     });
 
     /** Send email notification to Site Admin to notify about new Plan Change Request submission */
-    const MAIL_FOR = "MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE";
-    this.sendEmailToSiteAdmin(req.user.site_id, req, residentCompany.companyName, MAIL_FOR).catch(() => {
+    const MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE = "MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE";
+    this.sendEmailToSiteAdmin(req.user.site_id, req, residentCompany.companyName, residentCompany.id, MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE).catch(() => {
       error(`Error in sending email notification to site admin for SPACE_CHANGE_WAITLIST with id: ${resp.id}`, __filename, `addToSpaceChangeWaitList()`);
-      // throw new HttpException({
-      //   status: "Error",
-      //   message: COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG,
-      //   body: err
-      // }, HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    // } catch (error) {
-    //   response['status'] = 'Error';
-    //   response['message'] = error.message;
-    //   response['body'] = error;
-    //   error(`Error in save Space Change Waitlist flow: ${error.message}`, __filename, `addToSpaceChangeWaitList()`);
-    //   return response;
-    // }
+    /** BIOL-308: Notify Site Admin if the sponsorship question changes to Yes. shareYourProfile = true */
+    if (!shareYourProfileTemp && payload.shareYourProfile) {
+      const MAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES = "MAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES";
+      debug(`Sponsor ship contact question changed to: ${payload.shareYourProfile}`, __filename, `addToSpaceChangeWaitList()`);
+      await this.sendEmailToSiteAdmin(siteIdArr, req, residentCompany.companyName, residentCompany.id, MAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES).catch(() => {
+        error(`Error in sending email notification to site admin for sponsorship question changes to Yes`, __filename, `addToSpaceChangeWaitList()`);
+      });
+      info(`Email sent regarding Sponsorship contact question change to Yes`, __filename, `addToSpaceChangeWaitList()`);
+    }
+
     info(`Space Change waitlist saved successfully`, __filename, `addToSpaceChangeWaitList()`);
     response['status'] = 'Success';
     response['message'] = 'Operation Successful';
