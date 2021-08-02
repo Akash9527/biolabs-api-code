@@ -106,7 +106,7 @@ export class UsersService {
       info("User added successfully", __filename, "addUser(");
     } catch (err) {
       error("Getting error to create the new user " + err.message, __filename, "addUser()");
-      throw new InternalException('Getting error to create the new user' ,err.message);
+      throw new InternalException('Getting error to create the new user', err.message);
 
     }
     return savedUser;
@@ -173,7 +173,7 @@ export class UsersService {
       }
     } catch (err) {
       error("Getting error in updating the user profile picture" + err.message, __filename, "updateUserProfilePic()");
-      throw new BiolabsException('Getting error in updating the user profile picture' , err.message);
+      throw new BiolabsException('Getting error in updating the user profile picture', err.message);
 
     }
   }
@@ -190,6 +190,13 @@ export class UsersService {
       const user = await this.get(id);
       if (user) {
         user.status = '99';
+        user.email = "Deleted";
+        user.firstName = "User";
+        user.lastName = "Deleted";
+        user.password = "Deleted";
+        user.phoneNumber = "Deleted";
+        user.imageUrl = "Deleted";
+        user.title = "Deleted";
         debug("Soft deleted succesfully", __filename, "softDeleteUser()");
         return await this.userRepository.save(user);
       } else {
@@ -198,7 +205,7 @@ export class UsersService {
       }
     } catch (err) {
       error("Error in soft delete user", __filename, "softDeleteUser()");
-      throw new BiolabsException('Error in soft delete user' , err);
+      throw new BiolabsException('Error in soft delete user', err);
     }
   }
 
@@ -353,7 +360,7 @@ export class UsersService {
       );
     } catch (err) {
       error("Getting error in generating user token", __filename, "generateToken()");
-      throw new BiolabsException('Getting error in generating user token' , err.message);
+      throw new BiolabsException('Getting error in generating user token', err.message);
     }
 
   }
@@ -391,7 +398,7 @@ export class UsersService {
       }
     } catch (err) {
       error("Getting error in forget password process or sending email", __filename, "forgotPassword()");
-      throw new BiolabsException('Getting error in forget password process' , err.message);
+      throw new BiolabsException('Getting error in forget password process', err.message);
     }
   }
 }
