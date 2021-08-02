@@ -9,6 +9,7 @@ import { UpdateWaitlistRequestStatusDto } from '../dto/update-waitlist-request-s
 import { AddNotesDto } from './add-notes.dto';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
+import { UpdateNotesDto } from './update-notes.dto';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
 const { info } = require("../../../utils/logger")
@@ -197,6 +198,21 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async softDeleteNote(@Param('id') id: number): Promise<any> {
     const notes = await this.residentCompanyService.softDeleteNote(id);
+    return notes;
+  }
+  /**
+    * Description: This method is used to update notes in the application.
+    * @description This method is used to update a notes in the application.
+    * @param payload it is a request body contains payload of type UpdateNotesDto.
+    * @param id it is a request parameter expect a number value of note id.
+    */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Put('notes/:id')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateDeleteNote(@Body() payload: UpdateNotesDto, @Param('id') id: number): Promise<any> {
+    const notes = await this.residentCompanyService.updateDeleteNote(payload, id);
     return notes;
   }
 
@@ -446,4 +462,5 @@ export class ResidentCompanyController {
     info(`Update Space Change Waitlist status by id: ${payload.id} `, __filename, `updateSpaceChangeWaitlistStatus()`);
     return this.residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
   }
+
 }
