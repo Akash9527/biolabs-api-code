@@ -707,24 +707,32 @@ export class ResidentCompanyService {
         where("resident_companies.companyStatus = :status", { status: '4' }).getRawOne();
 
       //Get Sum of all companies and Average company size
-      const stats: any = await this.residentCompanyRepository.
+      const count: any = await this.residentCompanyRepository.
         createQueryBuilder("resident_companies").
         select("AVG(resident_companies.companySize)::numeric(10,2)", "avgTeamSize").
         addSelect("count(*)", "startUpcount").
         where("resident_companies.companyStatus = :status", { status: '1' }).
         andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).getRawOne();
 
+        //calculatinng median
+        let status={};
+        const medainResponse: any = await this.residentCompanyRepository.query("select percentile_cont(0.5) within group ( order by resident_companies.\"companySize\" ) as median from public.resident_companies where resident_companies.\"companySize\" is not null");
+        if(medainResponse){
+        medainResponse.forEach(function(medanResult) {
+          status["avgTeamSize"]= Math.round(medanResult.median);
+          status["startUpcount"]= count["startUpcount"];
+        });
+      }
       const categoryStats = await this.categoryRepository.
         query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
           "where c.id = ANY(rc.industry::int[]) ) as industryCount " +
           "FROM public.categories as c order by industryCount desc limit 3;");
 
-      response['companyStats'] = (!stats) ? 0 : stats;
+      response['companyStats'] = (!status) ? 0 : status;
       response['graduate'] = (!graduate) ? 0 : graduate;
       response['categoryStats'] = (!categoryStats) ? 0 : categoryStats;
     } catch (err) {
-      error("Error in find resident company for sponser", __filename, "getResidentCompanyForSponsor()");
-      throw new BiolabsException('Error in find resident company for sponser' , err.message);
+      error("Error in find resident company for sponser",err.message, __filename, "getResidentCompanyForSponsor()");
     }
     return response;
 
@@ -752,13 +760,23 @@ export class ResidentCompanyService {
           andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
 
         //Get Sum of all companies and Average company size
-        const companystats: any = await this.residentCompanyRepository.
+        const count: any = await this.residentCompanyRepository.
           createQueryBuilder("resident_companies").
           select("AVG(resident_companies.companySize)::numeric(10,2)", "avg").
           addSelect("count(*)", "count").
           where("resident_companies.companyStatus = :status", { status: '1' }).
           andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).
           andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
+
+        //calculatinng median
+        let companystats = {};
+        const medainResponse: any = await this.residentCompanyRepository.query("select percentile_cont(0.5) within group ( order by resident_companies.\"companySize\" ) as median from public.resident_companies where resident_companies.\"companySize\" is not null and " + site.id + " = Any(\"site\") ");
+        if (medainResponse) {
+          medainResponse.forEach(function (medanResult) {
+            companystats["avg"] = Math.round(medanResult.median);
+            companystats["count"] = count["count"];
+          });
+        }
 
         const categoryStats = await this.categoryRepository.
           query("SELECT c.name, c.id  as industryId, (select count(rc.*) FROM resident_companies as rc " +
@@ -795,8 +813,7 @@ export class ResidentCompanyService {
         res.push(response);
       }
     } catch (err) {
-      error("Error in find resident company for sponser", __filename, "getResidentCompanyForSponsorBySite()");
-      throw new BiolabsException('Error in find resident company for sponser' , err.message);
+      error("Error in find resident company for sponser",err.message, __filename, "getResidentCompanyForSponsorBySite()");
     }
     return res;
 
@@ -1474,8 +1491,8 @@ export class ResidentCompanyService {
       });
       return getFeeds;
     } catch (err) {
-      error("Getting error to find the time analysis", __filename, "getFeeds()");
-      throw new BiolabsException('Getting error in forget password process' , err.message);
+      error("Getting error in updated feeds", __filename, "getFeeds()");
+      throw new BiolabsException('Getting error in updated feeds' , err.message);
     }
   }
 
