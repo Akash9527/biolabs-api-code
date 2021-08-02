@@ -1701,6 +1701,9 @@ order by quat;
     //   siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     // }
     spaceChangeWaitlistObj.site = siteIdArr;
+    // LAST UPDATE
+    spaceChangeWaitlistObj.createdBy = req.user.id;
+    spaceChangeWaitlistObj.modifiedBy = req.user.id;
     spaceChangeWaitlistObj.membershipChange = payload.membershipChange;
     spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
     spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
@@ -1834,8 +1837,11 @@ order by quat;
       let waitlistQuery = await this.spaceChangeWaitlistRepository.createQueryBuilder("space_change_waitlist")
         .select("space_change_waitlist.*")
         .addSelect("rc.companyName", "residentCompanyName")
+        .addSelect("u.firstName", "firstName")
+        .addSelect("u.lastName", "lastName")
         .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
-        .where("space_change_waitlist.requestStatus IN (:...status)", { status: status });
+        .leftJoin('users', 'u','u.id = space_change_waitlist.modifiedBy')
+        .andWhere("space_change_waitlist.requestStatus IN (:...status)", { status: status });
 
       if (siteIdArr && siteIdArr.length) {
         waitlistQuery.andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
@@ -1987,7 +1993,8 @@ order by quat;
    * @param payload The payload of Space Change Waitlist to with updated entries.
    * @returns 
    */
-  public async updateSpaceChangeWaitlist(payload: UpdateSpaceChangeWaitlistDto) {
+  // TODO
+  public async updateSpaceChangeWaitlist(payload: UpdateSpaceChangeWaitlistDto, @Request() req) {
     info(`Updating Space Change Waitlist record`, __filename, `updateSpaceChangeWaitlist()`);
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG = "Could not update Resident Company record";
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG = "Could not update Resident Company History record";
@@ -2017,6 +2024,7 @@ order by quat;
           spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
           spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
           spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
+          spaceChangeWaitlistObj.modifiedBy = req.user.id;
 
           await this.spaceChangeWaitlistRepository.update(payload.spaceChangeWaitlistId, spaceChangeWaitlistObj)
             .catch(err => {
@@ -2078,10 +2086,10 @@ order by quat;
         debug(`Need proper payload of SpaceChangeWaitlist Dto`, __filename, `updateSpaceChangeWaitlist()`);
         return response;
       }
-    } catch (error) {
+    } catch (e) {
       response['status'] = 'Fail';
       response['message'] = 'Could not update Space Change Waitlist';
-      response['body'] = error;
+      response['body'] = e;
       error(`Error in updating Space Change Waitlist`, __filename, `updateSpaceChangeWaitlist()`);
       return response;
     }
@@ -2136,7 +2144,7 @@ order by quat;
    * @param payload payload object with id and status fields
    * @returns response with status and message fields
    */
-  public async updateSpaceChangeWaitlistStatus(payload: UpdateWaitlistRequestStatusDto) {
+  public async updateSpaceChangeWaitlistStatus(payload: UpdateWaitlistRequestStatusDto, @Request() req) {
     info(`Updating Space Change Waitlist status id: ${payload.id}, new status: ${payload.status}`, __filename, `updateSpaceChangeWaitlistStatus()`);
     let resp = {};
     try {
@@ -2153,7 +2161,7 @@ order by quat;
       await this.spaceChangeWaitlistRepository
         .createQueryBuilder('space_change_waitlist')
         .update()
-        .set({ requestStatus: payload.status })
+        .set({ requestStatus: payload.status , modifiedBy: req.user.id})
         .where("id = :id", { id: payload.id })
         .execute();
     } catch (er) {

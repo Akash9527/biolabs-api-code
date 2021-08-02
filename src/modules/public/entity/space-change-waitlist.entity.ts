@@ -71,4 +71,10 @@ export class SpaceChangeWaitlist {
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt: number;
 
+  // Last UPDATE
+  @Column({ nullable: true })
+  createdBy: number;
+
+  @Column({ nullable: true })
+  modifiedBy: number;
 }
