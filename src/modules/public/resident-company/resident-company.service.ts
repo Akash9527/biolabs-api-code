@@ -394,6 +394,7 @@ export class ResidentCompanyService {
         companyId: companyId
       };
       debug(`userInfo.origin: ${userInfo.origin}`, __filename, `sendEmailToSiteAdmin()`);
+
       let contentParam;
       if (mailForWhat == ApplicationConstants.EMAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION) {
         EMAIL.SUBJECT_FORM = ApplicationConstants.EMAIL_SUBJECT_FOR_RESIDENT_COMPANY_FORM_SUBMISSION;
@@ -406,6 +407,7 @@ export class ResidentCompanyService {
         contentParam = ApplicationConstants.EMAIL_CONTENT_PARAM_FOR_SPONSORSHIP_QN_CHANGE_TO_YES;
       }
       debug(`EMAIL.SUBJECT_FORM: ${EMAIL.SUBJECT_FORM}`, __filename, `sendEmailToSiteAdmin()`);
+
       await this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, contentParam, userInfo);
     } catch (err) {
       error("Error in sending email to site admin", __filename, "sendEmailToSiteAdmin()");
