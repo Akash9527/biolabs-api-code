@@ -1244,6 +1244,7 @@ export class ResidentCompanyService {
     * @description This method is used to update a notes in the application.
     * @param payload it is a request body contains payload of type UpdateNotesDto.
     * @param id it is a request parameter expect a number value of note id.
+    * @return response
     */
   async updateNote(payload: UpdateNotesDto, id: number): Promise<any> {
     info(`updated note based notesId`, __filename, "updateNote()")

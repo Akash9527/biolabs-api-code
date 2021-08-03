@@ -392,7 +392,8 @@ describe('ResidentCompanyService', () => {
             find: jest.fn(), findOne: jest.fn(), query: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
-            save: jest.fn(), createQueryBuilder: jest.fn(() =>
+            save: jest.fn(), 
+            createQueryBuilder: jest.fn(() =>
             ({
               select: jest.fn().mockReturnThis(),
               addSelect: jest.fn().mockReturnThis(),
@@ -404,7 +405,6 @@ describe('ResidentCompanyService', () => {
             }))
           }
         },
-        { provide: Notes, useValue: {} },
         {
           provide: getRepositoryToken(SpaceChangeWaitlist), useValue: {
             createQueryBuilder: jest.fn(() => ({
@@ -1304,20 +1304,31 @@ describe('ResidentCompanyService', () => {
       expect(result['status']).toEqual('Not acceptable');
     });
   });
-  // describe('updateNote method', () => {
-  //   let payload: UpdateNotesDto = { "notes": "this is note 1" };
-  //   it('should delete data based on id', async () => {
-  //     jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(mockNotes);
-  //     if (mockNotes) {
-  //     jest.spyOn(notesRepository, 'update').mockReturnThis();
-  //     }
-  //     let result = await residentCompanyService.updateNote(payload,mockNotes.id);
-  //     console.log(result);
-      
-  //     // expect(result['message']).toEqual('Note deleted succesfully');
-  //     // expect(result['status']).toEqual('Success');
-  //   })
-  // })
+  describe('updateNote method', () => {
+    let payload: UpdateNotesDto = { "notes": "this is note 1" };
+    it('should update note based on id', async () => {
+      jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(mockNotes);
+      if (mockNotes) {
+      jest.spyOn(notesRepository, 'update').mockReturnThis();
+      }
+      let result = await residentCompanyService.updateNote(payload,mockNotes.id);
+      expect(result['message']).toEqual('Note Updated succesfully');
+      expect(result['status']).toEqual('Success');
+    })
+    it('it should throw exception  ', async () => {
+      jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(mockNotes);
+      jest.spyOn(notesRepository, 'update').mockRejectedValueOnce(mockNotes);
+      let result = await residentCompanyService.updateNote(payload,mockNotes.id);
+      expect(result['message']).toEqual('Error while  Updating  note');
+      expect(result['status']).toEqual('Error');
+    });
+    it('it should throw exception if note id is available ', async () => {
+      jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(null);
+      let result = await residentCompanyService.updateNote(payload,mockNotes.id);
+      expect(result['message']).toEqual('Note with provided id not available.');
+      expect(result['status']).toEqual('Not acceptable');
+    });
+  })
   describe('softDeleteMember method', () => {
     let mockRcAdvisors: ResidentCompanyAdvisory = { "id": 1, "companyId": 1, "name": "Antibody", "title": "Test", "status": "0", "organization": "1", "createdAt": 1600000, "updatedAt": 16000000 };
     it('should delete data based on id', async () => {
