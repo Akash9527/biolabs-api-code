@@ -1,4 +1,5 @@
 import { EMAIL } from '../constants/email';
+import { ApplicationConstants } from './application-constants';
 
 const dotenv = require('dotenv');
 const axios = require('axios');
@@ -434,7 +435,7 @@ export class Mail {
                },
             });
          }
-      } else if (content == 'applicationFormSubmit') {
+      } else if (content == ApplicationConstants.EMAIL_CONTENT_PARAM_FOR_RESIDENT_COMPANY_FORM_SUBMISSION) {
          data = {
             message: {
                subject: subject,
@@ -598,7 +599,7 @@ export class Mail {
                },
             });
          }
-      } else if (content == 'spaceChangeWaitlistSubmit') {
+      } else if (content == ApplicationConstants.EMAIL_CONTENT_PARAM_FOR_SPACE_CHANGE_REQUEST_SUBMITTED) {
          data = {
             message: {
                subject: subject,
@@ -760,7 +761,7 @@ export class Mail {
                },
             });
          }
-      } else if (content == 'sponsorshipQuestionChangedToYes') {
+      } else if (content == ApplicationConstants.EMAIL_CONTENT_PARAM_FOR_SPONSORSHIP_QN_CHANGE_TO_YES) {
          data = {
             message: {
                subject: subject,
