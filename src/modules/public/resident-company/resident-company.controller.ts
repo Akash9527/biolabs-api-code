@@ -199,7 +199,7 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async softDeleteNote(@Param('id') id: number): Promise<any> {
-   return  await this.residentCompanyService.softDeleteNote(id);
+    return await this.residentCompanyService.softDeleteNote(id);
   }
   /**
     * Description: This method is used to update notes in the application.
@@ -444,7 +444,11 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateSpaceChangeWaitlist(@Body() payload: UpdateSpaceChangeWaitlistDto, @Request() req): Promise<any> {
     info(`Update Space Change Waitlist record by id: ${payload.spaceChangeWaitlistId} `, __filename, `updateSpaceChangeWaitlist()`);
-    return this.residentCompanyService.updateSpaceChangeWaitlist(payload, req);
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return this.residentCompanyService.updateSpaceChangeWaitlist(payload, siteIdArr, req);
   }
 
   /**
