@@ -168,7 +168,7 @@ export class UsersService {
         await this.userRepository.update(user.id, user);
         return user;
       } else {
-        error("User with provided id not available." + payload.id, __filename, "softDeleteUser()");
+        error("User with provided id not available." + payload.id, __filename, "updateUserProfilePic()");
         throw new NotAcceptableException('User with provided id not available.');
       }
     } catch (err) {
@@ -187,12 +187,13 @@ export class UsersService {
   async softDeleteUser(id) {
     info("Inside soft delete the user userId " + id, __filename, "softDeleteUser()");
     const FOR_DELETE_USER = "Deleted";
+    const FOR_USER="User";
     try {
       const user = await this.get(id);
       if (user) {
         user.status = '99';
         user.email = FOR_DELETE_USER;
-        user.firstName = "User";
+        user.firstName = FOR_USER;
         user.lastName = FOR_DELETE_USER;
         user.password = FOR_DELETE_USER;
         user.phoneNumber = FOR_DELETE_USER;
