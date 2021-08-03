@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ResidentCompanyModule, ResidentCompanyService } from '../resident-company';
-import { UserModule, UsersService } from '../user';
+import { ResidentCompanyModule } from '../resident-company';
+import { UserModule } from '../user';
 import { FileController } from './file.controller';
 import { FileService } from './file.service';
 
