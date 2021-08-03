@@ -90,6 +90,7 @@ let mockUpdateSpaceChangeWaitlistDto: UpdateSpaceChangeWaitlistDto = {
   requestStatus: 0,
   isRequestInternal: true,
   membershipChange: 0,
+  graduateDescription:"graduated",
   desiredStartDate: 1627603200,
   items: [
     {
@@ -1779,6 +1780,10 @@ describe('ResidentCompanyService', () => {
       id: 1,
       status: 1
     }
+    const req: any = {
+      user: { site_id: [1, 2], role: 1 },
+      headers: { 'x-site-id': [2] }
+    }
     let mockCount: any;
     it('should return response with status and message fields if it is Successfull', async () => {
       mockCount = 1;
@@ -1786,7 +1791,7 @@ describe('ResidentCompanyService', () => {
       if (mockCount > 1) {
         jest.spyOn(spaceChangeWaitlistRepository, 'createQueryBuilder').mockReturnValueOnce(mockSpaceChangeWaitlistItem);
       }
-      let result = await residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
+      let result = await residentCompanyService.updateSpaceChangeWaitlistStatus(payload, req);
       expect(result['message']).toEqual('Status updated successfully');
       expect(result['status']).toEqual('Success');
       expect(result['body']).toEqual({ id: 1, status: 1 });
@@ -1794,14 +1799,14 @@ describe('ResidentCompanyService', () => {
     it('shouldthrow Error', async () => {
       mockCount = 0;
       jest.spyOn(spaceChangeWaitlistRepository, 'count').mockResolvedValue(mockCount);
-      let result = await residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
+      let result = await residentCompanyService.updateSpaceChangeWaitlistStatus(payload, req);
       expect(result['message']).toEqual('Space Change Waitlist not found by id : 1');
       expect(result['status']).toEqual('Error');
       expect(result['body']).toEqual({ id: 1, status: 1 });
     });
     it('should throw Error', async () => {
       jest.spyOn(spaceChangeWaitlistRepository, 'count').mockRejectedValueOnce(mockCount);
-      let result = await residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
+      let result = await residentCompanyService.updateSpaceChangeWaitlistStatus(payload, req);
       expect(result['message']).toEqual('Error while updating status');
       expect(result['status']).toEqual('Error');
       expect(result['body']).toEqual(0);
@@ -1936,6 +1941,10 @@ describe('ResidentCompanyService', () => {
     });
   });
   describe('updateSpaceChangeWaitlist method', () => {
+    const req: any = {
+      user: { site_id: [1, 2], role: 1 },
+      headers: { 'x-site-id': [2] }
+  }
     it('should return response with status and message fields if it is Successfull', async () => {
       if (mockUpdateSpaceChangeWaitlistDto) {
         jest.spyOn(spaceChangeWaitlistRepository, 'findOne').mockResolvedValue(mockSpaceChangeWaitlistItem);
@@ -1944,7 +1953,7 @@ describe('ResidentCompanyService', () => {
       jest.spyOn(residentCompanyService, 'updateSpaceChangeWaitlistItems').mockResolvedValue(mockSpaceChangeWaitlistItem);
       jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
       jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValue(mockResidentHistory);
-      let result = await residentCompanyService.updateSpaceChangeWaitlist(mockUpdateSpaceChangeWaitlistDto);
+      let result = await residentCompanyService.updateSpaceChangeWaitlist(mockUpdateSpaceChangeWaitlistDto,req);
       expect(result['message']).toEqual('Space Change Waitlist updated successfully');
       expect(result['status']).toEqual('Success');
     });
@@ -2025,6 +2034,7 @@ describe('ResidentCompanyService', () => {
       requestStatus: 0,
       isRequestInternal: true,
       membershipChange: 0,
+      graduateDescription:"graduated",
       desiredStartDate: 1627603200,
       items: [
         {
