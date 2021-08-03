@@ -654,15 +654,16 @@ describe('ResidentCompanyController', () => {
             internalNotes: '',
             shareYourProfile: false,
             requestGraduateDate: 946665000,
-            marketPlace: true
+            marketPlace: true,
+            graduateDescription:"graduated"
         }
         it('it should called residentService updateSpaceChangeWaitlistPriorityOrder method ', async () => {
-            await residentController.updateSpaceChangeWaitlist(payload);
-            expect(await residentService.updateSpaceChangeWaitlist).toHaveBeenCalledWith(payload);
+            await residentController.updateSpaceChangeWaitlist(payload,req);
+            expect(await residentService.updateSpaceChangeWaitlist).toHaveBeenCalledWith(payload,req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.updateSpaceChangeWaitlist.mockResolvedValue(new UnauthorizedException());
-            const { response } = await residentController.updateSpaceChangeWaitlist(payload);
+            const { response } = await residentController.updateSpaceChangeWaitlist(payload,req);
             expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
             expect(response.message).toBe('Unauthorized');
         });
@@ -673,12 +674,12 @@ describe('ResidentCompanyController', () => {
             status: 1
         }
         it('it should called residentService updateSpaceChangeWaitlistStatus method ', async () => {
-            await residentController.updateSpaceChangeWaitlistStatus(payload);
-            expect(await residentService.updateSpaceChangeWaitlistStatus).toHaveBeenCalledWith(payload);
+            await residentController.updateSpaceChangeWaitlistStatus(payload,req);
+            expect(await residentService.updateSpaceChangeWaitlistStatus).toHaveBeenCalledWith(payload,req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.updateSpaceChangeWaitlistStatus.mockResolvedValue(new UnauthorizedException());
-            const { response } = await residentController.updateSpaceChangeWaitlistStatus(payload);
+            const { response } = await residentController.updateSpaceChangeWaitlistStatus(payload,req);
             expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
             expect(response.message).toBe('Unauthorized');
         });

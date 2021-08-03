@@ -442,9 +442,9 @@ export class ResidentCompanyController {
   @Put('/spacechangewaitlist')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async updateSpaceChangeWaitlist(@Body() payload: UpdateSpaceChangeWaitlistDto): Promise<any> {
+  async updateSpaceChangeWaitlist(@Body() payload: UpdateSpaceChangeWaitlistDto, @Request() req): Promise<any> {
     info(`Update Space Change Waitlist record by id: ${payload.spaceChangeWaitlistId} `, __filename, `updateSpaceChangeWaitlist()`);
-    return this.residentCompanyService.updateSpaceChangeWaitlist(payload);
+    return this.residentCompanyService.updateSpaceChangeWaitlist(payload, req);
   }
 
   /**
@@ -458,9 +458,9 @@ export class ResidentCompanyController {
   @Put('/spacechangewaitlist/status')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async updateSpaceChangeWaitlistStatus(@Body() payload: UpdateWaitlistRequestStatusDto): Promise<any> {
+  async updateSpaceChangeWaitlistStatus(@Body() payload: UpdateWaitlistRequestStatusDto, @Request() req): Promise<any> {
     info(`Update Space Change Waitlist status by id: ${payload.id} `, __filename, `updateSpaceChangeWaitlistStatus()`);
-    return this.residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
+    return this.residentCompanyService.updateSpaceChangeWaitlistStatus(payload, req);
   }
 
 }
