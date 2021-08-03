@@ -1607,7 +1607,6 @@ order by quat;
     spaceChangeWaitlistObj.membershipChange = MembershipChangeEnum.UpdateMembership;
     spaceChangeWaitlistObj.requestGraduateDate = null;
     spaceChangeWaitlistObj.marketPlace = null;
-
     return await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj).catch(err => {
       error("Getting error while Saving Waitlist", __filename, "addResidentCompanyDataInWaitlist()");
       throw new BiolabsException('Getting error while Saving Waitlist ' , err.message);
@@ -1701,7 +1700,6 @@ order by quat;
     //   siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     // }
     spaceChangeWaitlistObj.site = siteIdArr;
-    // LAST UPDATE
     spaceChangeWaitlistObj.createdBy = req.user.id;
     spaceChangeWaitlistObj.modifiedBy = req.user.id;
     spaceChangeWaitlistObj.membershipChange = payload.membershipChange;
@@ -1993,7 +1991,6 @@ order by quat;
    * @param payload The payload of Space Change Waitlist to with updated entries.
    * @returns 
    */
-  // TODO
   public async updateSpaceChangeWaitlist(payload: UpdateSpaceChangeWaitlistDto, @Request() req) {
     info(`Updating Space Change Waitlist record`, __filename, `updateSpaceChangeWaitlist()`);
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG = "Could not update Resident Company record";
