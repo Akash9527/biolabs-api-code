@@ -18,6 +18,9 @@ export class AddSpaceChangeWaitlistDto {
 
     @ApiProperty({ description: 'Plan change summary', required: false, nullable: true, default: 'See Notes' })
     planChangeSummary: string;
+    
+    @ApiProperty({ description: 'Graduate Description', required: false, nullable: true })
+    graduateDescription: string;
 
     @ApiProperty({ description: 'Request status', default: 0, required: true, nullable: false })
     @IsNotEmpty()

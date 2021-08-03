@@ -13,14 +13,14 @@ class BiolabsException extends BaseError {
     }
   }
   
-
+/* istanbul ignore next */
   class ResourceNotFoundException extends BaseError {
     constructor(resource, query) {
       super(`Resource ${resource} was not found.`+query);
       
     }
   }
-
+/* istanbul ignore next */
   class APIException extends BaseError {  
     constructor(name: string, httpCode: string, message: string) {
         super(message);
@@ -45,7 +45,7 @@ class BiolabsException extends BaseError {
     NOT_FOUND = 404,
     INTERNAL_SERVER = 500,
    }
-
+/* istanbul ignore next */
   class HttpException extends BaseError {
     
     public readonly name: string;

@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, EntitySchema, FindConditions, ObjectType } from 'typeorm';
 import { ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments, ValidationOptions, registerDecorator } from 'class-validator';
-
+/* istanbul ignore next */
 @Injectable()
 @ValidatorConstraint({ name: 'unique', async: true })
+
 export class UniqueValidator implements ValidatorConstraintInterface {
   constructor(@InjectConnection() private readonly connection: Connection) { }
 

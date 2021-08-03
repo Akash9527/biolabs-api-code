@@ -26,6 +26,9 @@ export class SpaceChangeWaitlist {
   @Column({ length: 510, nullable: true })
   planChangeSummary: string;
 
+  @Column({ length: 510, nullable: true })
+  graduateDescription: string;
+
   @Column({ nullable: false })
   requestedBy: string;
 
@@ -68,4 +71,9 @@ export class SpaceChangeWaitlist {
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt: number;
 
+  @Column({ nullable: true })
+  createdBy: number;
+
+  @Column({ nullable: true })
+  modifiedBy: number;
 }

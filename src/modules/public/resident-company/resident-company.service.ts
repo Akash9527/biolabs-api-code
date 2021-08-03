@@ -30,6 +30,7 @@ import { ResidentCompanyTechnical, ResidentCompanyTechnicalFillableFields } from
 import { ResidentCompanyHistory } from './resident-company-history.entity';
 import { ResidentCompany } from './resident-company.entity';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
+import { UpdateNotesDto } from './update-notes.dto';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
 const { error, warn, info, debug } = require("../../../utils/logger")
@@ -178,7 +179,7 @@ export class ResidentCompanyService {
    * @param companyMember array of companyMember.
    * @param id number of Company id.
    */
-  async residentCompanyAdvisors(Advisors: [], id: number) {
+  async residentCompanyAdvisors(Advisors: any, id: number) {
     info("adding resident company advisors", __filename, "residentCompanyAdvisors()");
     if (Advisors.length > 0) {
       for (let i = 0; i < Advisors.length; i++) {
@@ -238,7 +239,7 @@ export class ResidentCompanyService {
    * @param companyMember array of company magmt Member.
    * @param id number of Company id.
    */
-  async residentCompanyManagements(companyMembers: [], id: number) {
+  async residentCompanyManagements(companyMembers: any, id: number) {
     info(`resident company management`, __filename, "residentCompanyManagements()");
     if (companyMembers.length > 0) {
       for (let i = 0; i < companyMembers.length; i++) {
@@ -250,7 +251,6 @@ export class ResidentCompanyService {
       }
     }
   }
-
   /**
    * Description: This method will create the new resident companies technical.
    * @description This method will create the new resident companies technical.
@@ -281,7 +281,7 @@ export class ResidentCompanyService {
    * @param companyMember array of technical Member.
    * @param id number of Company id.
    */
-  async residentCompanyTechnicals(techMembers: [], id: number) {
+  async residentCompanyTechnicals(techMembers: any, id: number) {
     info("Error in find resident companies", __filename, "residentCompanyTechnicals()");
     if (techMembers.length > 0) {
       for (let i = 0; i < techMembers.length; i++) {
@@ -348,7 +348,7 @@ export class ResidentCompanyService {
    * @param req object of Request.
    * @param companyName name of the company for which application is submitted.
    */
-  private async sendEmailToSiteAdmin(site: any, req, companyName: string, mailForWhat: string) {
+  public async sendEmailToSiteAdmin(site: any, req, companyName: string, mailForWhat: string) {
     info("Sending email to site admin", __filename, "sendEmailToSiteAdmin()");
     const MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE = 'MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE';
     const MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION = 'MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION';
@@ -544,7 +544,7 @@ export class ResidentCompanyService {
       });
     } catch (err) {
       error("Error in find resident company for Bkp", __filename, "getResidentCompaniesBkp()");
-      throw new BiolabsException('Error in find resident company for Bkp' + err.message);
+      throw new BiolabsException('Error in find resident company for Bkp', err.message);
     }
   }
 
@@ -731,7 +731,7 @@ export class ResidentCompanyService {
       response['categoryStats'] = (!categoryStats) ? 0 : categoryStats;
     } catch (err) {
       error("Error in find resident company for sponser", __filename, "getResidentCompanyForSponsor()");
-      throw new BiolabsException('Error in find resident company for sponser' + err.message);
+      throw new BiolabsException('Error in find resident company for sponser', err.message);
     }
     return response;
 
@@ -803,7 +803,7 @@ export class ResidentCompanyService {
       }
     } catch (err) {
       error("Error in find resident company for sponser", __filename, "getResidentCompanyForSponsorBySite()");
-      throw new BiolabsException('Error in find resident company for sponser' + err.message);
+      throw new BiolabsException('Error in find resident company for sponser', err.message);
     }
     return res;
 
@@ -846,7 +846,7 @@ export class ResidentCompanyService {
       }
     } catch (err) {
       error("Error in find resident company", __filename, "getResidentCompany()");
-      throw new BiolabsException('Error in find resident company' + err.message);
+      throw new BiolabsException('Error in find resident company', err.message);
     }
   }
 
@@ -949,7 +949,7 @@ export class ResidentCompanyService {
       }
     } catch (err) {
       error("Error in update resident company", __filename, "updateResidentCompany()");
-      throw new InternalException('Error in update resident company' + err.message);
+      throw new InternalException('Error in update resident company', err.message);
     }
   }
 
@@ -1057,7 +1057,7 @@ export class ResidentCompanyService {
       return await rcQuery.getMany();
     } catch (err) {
       error("Error in search companies old delete user", __filename, "gloabalSearchCompaniesOld()");
-      throw new BiolabsException('Error in search companies old' + err.message);
+      throw new BiolabsException('Error in search companies old', err.message);
     }
   }
   /**
@@ -1205,13 +1205,12 @@ export class ResidentCompanyService {
       }
 
       globalSearch += ` ORDER BY \"id\" DESC `;
-      // console.log('globalSearch Final ====', globalSearch);
       info(`globalSearch query: ${globalSearch}`, __filename, "gloabalSearchCompanies()")
 
       return await this.residentCompanyRepository.query(globalSearch);
     } catch (err) {
       error("Error in search companies", __filename, "gloabalSearchCompanies()");
-      throw new BiolabsException('Error in search companies' + err.message);
+      throw new BiolabsException('Error in search companies', err.message);
     }
   }
 
@@ -1246,7 +1245,36 @@ export class ResidentCompanyService {
     info(`get note by id: ${id}`, __filename, "getNoteById()")
     return await this.notesRepository.findOne(id);
   }
-
+  /**
+    * Description: This method is used to update notes in the application.
+    * @description This method is used to update a notes in the application.
+    * @param payload it is a request body contains payload of type UpdateNotesDto.
+    * @param id it is a request parameter expect a number value of note id.
+    * @return response
+    */
+  async updateNote(payload: UpdateNotesDto, id: number): Promise<any> {
+    info(`updated note based notesId`, __filename, "updateNote()")
+    let response = {};
+    try {
+      const notes = await this.getNoteById(id);
+      if (notes) {
+        notes.notes = payload.notes;
+        await this.notesRepository.update(notes.id, notes);
+        response['status'] = 'Success';
+        response['message'] = 'Note Updated succesfully';
+        debug("Note Updated succesfully", __filename, "updateNote()");
+      } else {
+        response['status'] = 'Not acceptable';
+        response['message'] = 'Note with provided id not available.';
+        error(`Note with provided id not available`, __filename, "updateNote()")
+      }
+    } catch (err) {
+      response['status'] = 'Error';
+      response['message'] = 'Error while  Updating  note';
+      error("Error while  Updating  note", __filename, "updateNote()");
+    }
+    return response;
+  }
   /**
    * Description: This method is used to get the note by companyId.
    * @description This method is used to get the note by companyId.
@@ -1261,6 +1289,7 @@ export class ResidentCompanyService {
         .select('notes.id', 'id')
         .addSelect("notes.createdAt", 'createdAt')
         .addSelect("notes.notes", "notes")
+        .addSelect("notes.createdBy", "createdBy")
         .addSelect("usr.firstName", "firstname")
         .addSelect("usr.lastName", "lastname")
         .leftJoin('users', 'usr', 'usr.id = notes.createdBy')
@@ -1270,7 +1299,7 @@ export class ResidentCompanyService {
         .getRawMany();
     } catch (err) {
       error("Getting error in find the note", __filename, "getNoteByCompanyId()");
-      throw new BiolabsException('Getting error in find the note' + err.message);
+      throw new BiolabsException('Getting error in find the note', err.message);
     }
   }
 
@@ -1278,24 +1307,31 @@ export class ResidentCompanyService {
      * Description: This method is used to soft delete the note.
      * @description This method is used to soft delete the note.
      * @param id number of note id
-     * @return object of affected rows
+     * @return response
      */
   async softDeleteNote(id) {
     info(`Inside soft delete the note by id: ${id}`, __filename, "softDeleteNote()")
+    let response = {};
     try {
       const note = await this.getNoteById(id);
       if (note) {
         note.notesStatus = 99;
-        debug("Soft note deleted succesfully", __filename, "softDeleteNote()");
-        return await this.notesRepository.save(note);
-      } else {
+        await this.notesRepository.save(note);
+        response['status'] = 'Success';
+        response['message'] = 'Note deleted succesfully';
+        debug("Note deleted succesfully", __filename, "softDeleteNote()");
+      }
+      else {
+        response['status'] = 'Not acceptable';
+        response['message'] = 'Note with provided id not available.';
         error(`Note with provided id not available`, __filename, "softDeleteNote()")
-        throw new NotAcceptableException('Note with provided id not available.');
       }
     } catch (err) {
+      response['status'] = 'Error';
+      response['message'] = 'Error in soft delete note';
       error("Error in soft delete note", __filename, "softDeleteNote()");
-      throw new BiolabsException('Error in soft delete note' + err.message);
     }
+    return response;
   }
 
   /**
@@ -1380,7 +1416,7 @@ export class ResidentCompanyService {
       response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
     } catch (err) {
       error("Getting error in find the stages of technology", __filename, "getStagesOfTechnologySiteId()");
-      throw new BiolabsException('Getting error in find the stages of technology' + err.message);
+      throw new BiolabsException('Getting error in find the stages of technology', err.message);
     }
     return response;
   }
@@ -1410,7 +1446,7 @@ export class ResidentCompanyService {
       response['fundings'] = (!fundigs) ? 0 : fundigs;
     } catch (err) {
       error("Getting error in find the fundings", __filename, "getFundingBySiteIdAndCompanyId()");
-      throw new BiolabsException('Getting error in find the fundings' + err.message);
+      throw new BiolabsException('Getting error in find the fundings', err.message);
     }
     return response;
   }
@@ -1433,7 +1469,7 @@ export class ResidentCompanyService {
       return startWithBiolab;
     } catch (err) {
       error("Getting error in find the history of started with Biolabs analysis", __filename, "getstartedWithBiolabs()");
-      throw new BiolabsException('Getting error in find the history of started with Biolabs analysis' + err.message);
+      throw new BiolabsException('Getting error in find the history of started with Biolabs analysis', err.message);
     }
   }
   /**
@@ -1458,7 +1494,7 @@ export class ResidentCompanyService {
       return await this.residentCompanyHistoryRepository.query(queryStr);
     } catch (err) {
       error("Getting error in find the financial fees", __filename, "getFinancialFees()");
-      throw new BiolabsException('Getting error in find the financial fees' + err.message);
+      throw new BiolabsException('Getting error in find the financial fees', err.message);
     }
   }
 
@@ -1480,11 +1516,10 @@ export class ResidentCompanyService {
             break;
         }
       });
-      // console.log('getFeeds for ' + companyId, getFeeds);
       return getFeeds;
     } catch (err) {
       error("Getting error to find the time analysis", __filename, "getFeeds()");
-      throw new BiolabsException('Getting error in forget password process' + err.message);
+      throw new BiolabsException('Getting error in forget password process', err.message);
     }
   }
 
@@ -1494,6 +1529,7 @@ export class ResidentCompanyService {
    * @param companyId The Company id.
    * @returns timeline data.
    */
+
   async timelineAnalysis(companyId: number) {
     info(`Timeline analysis by companyId : ${companyId}`, __filename, `timelineAnalysis()`);
     // const queryStr = `
@@ -1554,6 +1590,7 @@ order by quat;
  * @param companyId The Company id
  * @returns current month fee details.
  */
+
   async getCompanySizeQuartly(companyId: number) {
     info(`Get Company size quarterly by companyId : ${companyId}`, __filename, `getCompanySizeQuartly()`);
     try {
@@ -1574,7 +1611,7 @@ order by quat;
       return await this.residentCompanyHistoryRepository.query(queryStr);
     } catch (err) {
       error("Getting error in find theget company size quartly", __filename, "getCompanySizeQuartly()");
-      throw new BiolabsException('Getting error in find company size quartly' + err.message);
+      throw new BiolabsException('Getting error in find company size quartly', err.message);
     }
   }
 
@@ -1583,7 +1620,7 @@ order by quat;
    * @param savedRc
    * @param req
    */
-  private async addResidentCompanyDataInWaitlist(savedRc: any) {
+  public async addResidentCompanyDataInWaitlist(savedRc: any) {
 
     info(`Create waitlist on application submission`, __filename, "addResidentCompanyDataInWaitlist()");
     const PLAN_CHANGE_SUMMARY_INITIAL_VALUE = 'See Notes';
@@ -1594,7 +1631,7 @@ order by quat;
       return result;
     }).catch(err => {
       error("Getting error while fetching  maxPriorityOrder", __filename, "addResidentCompanyDataInWaitlist()");
-      throw new BiolabsException('Getting error while fetching  maxPriorityOrder ' + err.message);
+      throw new BiolabsException('Getting error while fetching  maxPriorityOrder ', err.message);
     });
     debug(`Max priority order: ${maxPriorityOrder}`, __filename, "addResidentCompanyDataInWaitlist()");
 
@@ -1614,10 +1651,9 @@ order by quat;
     spaceChangeWaitlistObj.membershipChange = MembershipChangeEnum.UpdateMembership;
     spaceChangeWaitlistObj.requestGraduateDate = null;
     spaceChangeWaitlistObj.marketPlace = null;
-
     return await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj).catch(err => {
       error("Getting error while Saving Waitlist", __filename, "addResidentCompanyDataInWaitlist()");
-      throw new BiolabsException('Getting error while Saving Waitlist ' + err.message);
+      throw new BiolabsException('Getting error while Saving Waitlist ', err.message);
     });
 
   }
@@ -1626,7 +1662,7 @@ order by quat;
    * @description Fetch max value of priority order from space_change_waitlist table
    * @returns
    */
-  private async fetchMaxPriorityOrderOfWaitlist(): Promise<number> {
+  public async fetchMaxPriorityOrderOfWaitlist(): Promise<number> {
     info(`Fetching max priority order of Space Change Waitlist`, __filename, 'fetchMaxPriorityOrderOfWaitlist()');
     const REQUEST_STATUS_OPEN = 0;
     let maxPriorityOrder: any = await this.spaceChangeWaitlistRepository
@@ -1660,7 +1696,6 @@ order by quat;
     let residentCompany: any = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
       return result;
     });
-
     let response = {};
     if (residentCompany == null) {
       response['status'] = 'Error';
@@ -1674,8 +1709,10 @@ order by quat;
     let maxPriorityOrder: number;
     if (payload.requestStatus == 0) {
       info(`Fetching max priority order for Space Change Waitlist for status : ${payload.requestStatus} `, __filename, `addToSpaceChangeWaitList()`);
+
       maxPriorityOrder = await this.fetchMaxPriorityOrderOfWaitlist().then((result) => {
         return result;
+
       }).catch(err => {
         error(`Error in fetching max priority order. ${err.message}`, __filename, `addToSpaceChangeWaitList()`);
         throw new HttpException({
@@ -1691,6 +1728,7 @@ order by quat;
     // try {
     let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
     spaceChangeWaitlistObj.residentCompany = residentCompany;
+    spaceChangeWaitlistObj.graduateDescription = payload.graduateDescription;
     spaceChangeWaitlistObj.desiredStartDate = payload.desiredStartDate;
     spaceChangeWaitlistObj.planChangeSummary = payload.planChangeSummary;
     spaceChangeWaitlistObj.requestedBy = residentCompany.name;
@@ -1706,6 +1744,8 @@ order by quat;
     //   siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     // }
     spaceChangeWaitlistObj.site = siteIdArr;
+    spaceChangeWaitlistObj.createdBy = req.user.id;
+    spaceChangeWaitlistObj.modifiedBy = req.user.id;
     spaceChangeWaitlistObj.membershipChange = payload.membershipChange;
     spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
     spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
@@ -1796,7 +1836,7 @@ order by quat;
    * @param payload ResidentCompany history data
    * @param residentCompany ResidentCompany object
    */
-  private async updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload: any, residentCompany: ResidentCompany) {
+  public async updateCompanyHistoryAfterSavingSpaceChangeWaitlist(payload: any, residentCompany: ResidentCompany) {
     info(`Updating resident company history by companyId: ${residentCompany.id}`, __filename, `updateCompanyHistoryAfterSavingSpaceChangeWaitlist()`);
     let historyData: any = JSON.parse(JSON.stringify(residentCompany));
     historyData.companyStage = payload.companyStage;
@@ -1839,8 +1879,11 @@ order by quat;
       let waitlistQuery = await this.spaceChangeWaitlistRepository.createQueryBuilder("space_change_waitlist")
         .select("space_change_waitlist.*")
         .addSelect("rc.companyName", "residentCompanyName")
+        .addSelect("u.firstName", "firstName")
+        .addSelect("u.lastName", "lastName")
         .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
-        .where("space_change_waitlist.requestStatus IN (:...status)", { status: status });
+        .leftJoin('users', 'u','u.id = space_change_waitlist.modifiedBy')
+        .andWhere("space_change_waitlist.requestStatus IN (:...status)", { status: status });
 
       if (siteIdArr && siteIdArr.length) {
         waitlistQuery.andWhere("space_change_waitlist.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIdArr });
@@ -1869,7 +1912,7 @@ order by quat;
    * @param spaceChangeWaitlist SpaceChangeWaitlist array
    * @returns SpaceChangeWaitlist array with Item array
    */
-  private async getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist: any[]) {
+  public async getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist: any[]) {
     info(`Getting items of Space Change Waitlist`, __filename, `getItemsOfSpaceChangeWaitlist()`);
     if (spaceChangeWaitlist) {
       for (let index = 0; index < spaceChangeWaitlist.length; index++) {
@@ -1895,7 +1938,7 @@ order by quat;
    * @param spaceChangeWaitlistId SpaceChangeWaitlist Id
    * @returns array of Item
    */
-  private async getItems(spaceChangeWaitlistId: number) {
+  public async getItems(spaceChangeWaitlistId: number) {
     info(`Getting items by spaceChangeWaitlistId: ${spaceChangeWaitlistId}`, __filename, `getItems()`);
     const items: any[] = await this.itemRepository.find({
       where: { spaceChangeWaitlist_id: spaceChangeWaitlistId }
@@ -1978,7 +2021,7 @@ order by quat;
         response['message'] = 'Please provide proper Space Change Waitlist ids';
         info(`Need ids to update Space Change Waitlist priority order`, __filename, `updateSpaceChangeWaitlistPriorityOrder()`);
       }
-    } catch (error) {
+    } catch (e) {
       response['status'] = 'Fail';
       response['message'] = 'Could not update Priority Order';
       error(`Could not update priority order`, __filename, `updateSpaceChangeWaitlistPriorityOrder()`);
@@ -1992,7 +2035,7 @@ order by quat;
    * @param payload The payload of Space Change Waitlist to with updated entries.
    * @returns 
    */
-  public async updateSpaceChangeWaitlist(payload: UpdateSpaceChangeWaitlistDto) {
+  public async updateSpaceChangeWaitlist(payload: UpdateSpaceChangeWaitlistDto, @Request() req) {
     info(`Updating Space Change Waitlist record`, __filename, `updateSpaceChangeWaitlist()`);
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG = "Could not update Resident Company record";
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG = "Could not update Resident Company History record";
@@ -2011,6 +2054,7 @@ order by quat;
         if (spaceChangeWaitlistObj) {
           spaceChangeWaitlistObj.desiredStartDate = payload.desiredStartDate;
           spaceChangeWaitlistObj.planChangeSummary = payload.planChangeSummary;
+          spaceChangeWaitlistObj.graduateDescription = payload.graduateDescription;
           spaceChangeWaitlistObj.requestStatus = payload.requestStatus;
           spaceChangeWaitlistObj.fulfilledOn = payload.fulfilledOn;
           spaceChangeWaitlistObj.isRequestInternal = payload.isRequestInternal;
@@ -2021,6 +2065,7 @@ order by quat;
           spaceChangeWaitlistObj.requestGraduateDate = payload.requestGraduateDate;
           spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
           spaceChangeWaitlistObj.marketPlace = payload.marketPlace;
+          spaceChangeWaitlistObj.modifiedBy = req.user.id;
 
           await this.spaceChangeWaitlistRepository.update(payload.spaceChangeWaitlistId, spaceChangeWaitlistObj)
             .catch(err => {
@@ -2082,10 +2127,10 @@ order by quat;
         debug(`Need proper payload of SpaceChangeWaitlist Dto`, __filename, `updateSpaceChangeWaitlist()`);
         return response;
       }
-    } catch (error) {
+    } catch (e) {
       response['status'] = 'Fail';
       response['message'] = 'Could not update Space Change Waitlist';
-      response['body'] = error;
+      response['body'] = e;
       error(`Error in updating Space Change Waitlist`, __filename, `updateSpaceChangeWaitlist()`);
       return response;
     }
@@ -2101,7 +2146,7 @@ order by quat;
    * @param payload The payload to update SpaceChangeWaitlist
    * @param resp 
    */
-  private async updateSpaceChangeWaitlistItems(payload: any, spaceChangeWaitlistObj: any) {
+  public async updateSpaceChangeWaitlistItems(payload: any, spaceChangeWaitlistObj: any) {
     info(`Updating Space Change Waitlist items`, __filename, `updateSpaceChangeWaitlistItems()`);
     if (payload.items && payload.items.length) {
       debug(`Total items present in payload: ${payload.items.length}`, __filename, `updateSpaceChangeWaitlistItems()`);
@@ -2140,11 +2185,12 @@ order by quat;
    * @param payload payload object with id and status fields
    * @returns response with status and message fields
    */
-  public async updateSpaceChangeWaitlistStatus(payload: UpdateWaitlistRequestStatusDto) {
+  public async updateSpaceChangeWaitlistStatus(payload: UpdateWaitlistRequestStatusDto, @Request() req) {
     info(`Updating Space Change Waitlist status id: ${payload.id}, new status: ${payload.status}`, __filename, `updateSpaceChangeWaitlistStatus()`);
     let resp = {};
     try {
       let count = await this.spaceChangeWaitlistRepository.count({ id: payload.id });
+
       debug(`Count of Space Change Waitlist record by id: ${count}`, __filename, `updateSpaceChangeWaitlistStatus()`);
       if (count < 1) {
         resp['status'] = 'Error';
@@ -2156,7 +2202,7 @@ order by quat;
       await this.spaceChangeWaitlistRepository
         .createQueryBuilder('space_change_waitlist')
         .update()
-        .set({ requestStatus: payload.status })
+        .set({ requestStatus: payload.status , modifiedBy: req.user.id})
         .where("id = :id", { id: payload.id })
         .execute();
     } catch (er) {
