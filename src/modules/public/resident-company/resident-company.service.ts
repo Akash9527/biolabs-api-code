@@ -1245,22 +1245,28 @@ export class ResidentCompanyService {
     * @param payload it is a request body contains payload of type UpdateNotesDto.
     * @param id it is a request parameter expect a number value of note id.
     */
-  async updateDeleteNote(payload: UpdateNotesDto, id: number): Promise<any> {
-     info(`updated note based notesId`, __filename, "updateDeleteNote()")
+  async updateNote(payload: UpdateNotesDto, id: number): Promise<any> {
+    info(`updated note based notesId`, __filename, "updateNote()")
+    let response = {};
     try {
       const notes = await this.getNoteById(id);
       if (notes) {
-        notes.notes=payload.notes;
-        debug("Updated note succesfully", __filename, "updateDeleteNote()");
-        return await this.notesRepository.update(notes.id, notes);
+        notes.notes = payload.notes;
+        await this.notesRepository.update(notes.id, notes);
+        response['status'] = 'Success';
+        response['message'] = 'Note Updated succesfully';
+        debug("Note Updated succesfully", __filename, "updateNote()");
       } else {
-        error(`Note with provided id not available`, __filename, "updateDeleteNote()")
-        throw new NotAcceptableException('Note with provided id not available.');
+        response['status'] = 'Not acceptable';
+        response['message'] = 'Note with provided id not available.';
+        error(`Note with provided id not available`, __filename, "updateNote()")
       }
     } catch (err) {
-      error("Error in update note", __filename, "updateDeleteNote()");
-      throw new InternalException('Error while updating notes' , err.message);
+      response['status'] = 'Error';
+      response['message'] = 'Error while  Updating  note';
+      error("Error while  Updating  note", __filename, "updateNote()");
     }
+    return response;
   }
   /**
    * Description: This method is used to get the note by companyId.
@@ -1294,24 +1300,31 @@ export class ResidentCompanyService {
      * Description: This method is used to soft delete the note.
      * @description This method is used to soft delete the note.
      * @param id number of note id
-     * @return object of affected rows
+     * @return response
      */
   async softDeleteNote(id) {
     info(`Inside soft delete the note by id: ${id}`, __filename, "softDeleteNote()")
+    let response = {};
     try {
       const note = await this.getNoteById(id);
       if (note) {
         note.notesStatus = 99;
-        debug("Soft note deleted succesfully", __filename, "softDeleteNote()");
-        return await this.notesRepository.save(note);
-      } else {
+        await this.notesRepository.save(note);
+        response['status'] = 'Success';
+        response['message'] = 'Note deleted succesfully';
+        debug("Note deleted succesfully", __filename, "softDeleteNote()");
+      }
+      else {
+        response['status'] = 'Not acceptable';
+        response['message'] = 'Note with provided id not available.';
         error(`Note with provided id not available`, __filename, "softDeleteNote()")
-        throw new NotAcceptableException('Note with provided id not available.');
       }
     } catch (err) {
+      response['status'] = 'Error';
+      response['message'] = 'Error in soft delete note';
       error("Error in soft delete note", __filename, "softDeleteNote()");
-      throw new BiolabsException('Error in soft delete note', err.message);
     }
+    return response;
   }
 
   /**

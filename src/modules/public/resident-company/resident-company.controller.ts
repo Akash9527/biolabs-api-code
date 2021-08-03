@@ -197,8 +197,7 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async softDeleteNote(@Param('id') id: number): Promise<any> {
-    const notes = await this.residentCompanyService.softDeleteNote(id);
-    return notes;
+   return  await this.residentCompanyService.softDeleteNote(id);
   }
   /**
     * Description: This method is used to update notes in the application.
@@ -211,9 +210,8 @@ export class ResidentCompanyController {
   @Put('notes/:id')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async updateDeleteNote(@Body() payload: UpdateNotesDto, @Param('id') id: number): Promise<any> {
-    const notes = await this.residentCompanyService.updateDeleteNote(payload, id);
-    return notes;
+  async updateNote(@Body() payload: UpdateNotesDto, @Param('id') id: number): Promise<any> {
+    return await this.residentCompanyService.updateNote(payload, id);
   }
 
   /**
