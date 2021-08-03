@@ -1,12 +1,17 @@
-import { Controller, UseGuards, Get, Param, Post, Body, Query, Put, Request, Delete } from '@nestjs/common';
-import { ApiResponse, ApiTags, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResidentCompanyService } from '.';
+import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
+import { UpdateSpaceChangeWaitlistDto } from '../dto/update-space-change-waitlist.dto';
+import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
+import { UpdateWaitlistRequestStatusDto } from '../dto/update-waitlist-request-status.dto';
+import { AddNotesDto } from './add-notes.dto';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
+import { SearchResidentCompanyPayload } from './search-resident-company.payload';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
-import { SearchResidentCompanyPayload } from './search-resident-company.payload';
-import { AddNotesDto } from './add-notes.dto';
+const { info } = require("../../../utils/logger")
 
 @Controller('api/resident-company')
 @ApiTags('Resident Company')
@@ -58,11 +63,27 @@ export class ResidentCompanyController {
   }
 
   /**
+    * Description: This method returns some specific fields of Resident Company by residentCompanyId.
+    * @description This method returns some specific fields of Resident Company by residentCompanyId.
+    * @param payload residentCompanyId.
+    */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('/forwaitlist/:residentCompanyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getResidentCompanySpecificFieldsById(@Param('residentCompanyId') residentCompanyId: number): Promise<any> {
+    info(`Get some specific fields of Resident Company by company Id: ${residentCompanyId}`, __filename, `getResidentCompanySpecificFieldsById()`);
+    return this.residentCompanyService.getResidentCompanySpecificFieldsById(residentCompanyId);
+  }
+
+  /**
   * Description: This method is used to get a resident company information for sponsor dashboard.
   * @description This method is used to get a resident company information  for sponsor dashboard.
   * @param id it is a request parameter expect a number value of resident company id.
   */
-
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
   @Get('/dashboard')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   async getResidentCompanyForSponsor(): Promise<any> {
@@ -208,7 +229,8 @@ export class ResidentCompanyController {
   @Get('stage-technology/:siteId/:companyId')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getStageOfTechnology(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+  async getStageOfTechnology(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+    info(`Get stages of technology by siteId: ${siteId} and companyId: ${companyId}`, __filename, `getStageOfTechnology()`);
     return this.residentCompanyService.getStagesOfTechnologyBySiteId(siteId, companyId);
   }
 
@@ -224,7 +246,8 @@ export class ResidentCompanyController {
   @Get('funding/:siteId/:companyId')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getFundingBySiteIdAndCompanyId(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+  async getFundingBySiteIdAndCompanyId(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
+    info(`Get fundings by siteId: ${siteId} and companyId: ${companyId}`, __filename, `getFundingBySiteIdAndCompanyId()`);
     return this.residentCompanyService.getFundingBySiteIdAndCompanyId(siteId, companyId);
   }
 
@@ -243,21 +266,21 @@ export class ResidentCompanyController {
   getstartedWithBiolabs(@Param('siteId') siteId: number, @Param('companyId') companyId: number): Promise<any> {
     return this.residentCompanyService.getstartedWithBiolabs(siteId, companyId);
   }
-   /**
-   * Description: This method returns current month fee details.
-   * @description This method returns current month fee details.
-   * @param siteId The Site id
-   * @param companyId The Company id
-   * @returns current month fee details
-   */
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard())
-    @Get('financialfees/:companyId')
-    @ApiResponse({ status: 200, description: 'Successful Response' })
-    @ApiResponse({ status: 401, description: 'Unauthorized' })
-    getFinancialFees(@Param('companyId') companyId: number): Promise<any> {
-      return this.residentCompanyService.getFinancialFees(companyId);
-    }
+  /**
+  * Description: This method returns current month fee details.
+  * @description This method returns current month fee details.
+  * @param siteId The Site id
+  * @param companyId The Company id
+  * @returns current month fee details
+  */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('financialfees/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getFinancialFees(@Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getFinancialFees(companyId);
+  }
 
   /**
    * Description: This method returns latest feeds.
@@ -295,12 +318,134 @@ export class ResidentCompanyController {
    * @param companyId The Company id
    * @returns current month fee details.
    */
-   @ApiBearerAuth()
-   @UseGuards(AuthGuard())
-   @Get('companysizeanalysis/:companyId')
-   @ApiResponse({ status: 200, description: 'Successful Response' })
-   @ApiResponse({ status: 401, description: 'Unauthorized' })
-   getCompanySizeQuartly(@Param('companyId') companyId: number): Promise<any> {
-     return this.residentCompanyService.getCompanySizeQuartly(companyId);
-   }
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('companysizeanalysis/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getCompanySizeQuartly(@Param('companyId') companyId: number): Promise<any> {
+    return this.residentCompanyService.getCompanySizeQuartly(companyId);
+  }
+
+  /**
+  * @description BIOL-275: Add space waitlist entry
+  * @param payload
+  * @param req
+  * @returns
+  */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Post("/spacechangewaitlist")
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiHeader({
+    name: 'x-site-id',
+    description: 'Selected site ids array',
+  })
+  async addSpaceChangeWaitlist(@Body() payload: AddSpaceChangeWaitlistDto, @Request() req): Promise<any> {
+    info(`Add Space Change Waitlist record for resident company id: ${payload.residentCompanyId} and site: ${req.user.site_id} `, __filename, `addSpaceChangeWaitlist()`);
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return await this.residentCompanyService.addToSpaceChangeWaitList(payload, siteIdArr, req);
+  }
+
+  /**
+   * Description: BIOL-275 Get Space Change Waitlist by status,siteId and companyId
+   * @param status array of status (0,1,2)
+   * @param req Request object
+   * @param companyId id of the company
+   * @returns list of Space Change Waitlist
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('/spacechangewaitlist/param?')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getSpaceChangeWaitlist(@Query('status') status: number[], @Request() req, @Query('companyId') companyId: number): Promise<any> {
+    info(`Get Space Change Waitlist records by request status: ${status}, site: ${req.user.site_id} and company id: ${companyId} `, __filename, `getSpaceChangeWaitlist()`);
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return this.residentCompanyService.getSpaceChangeWaitListByStatusSiteIdAndCompanyId(status, siteIdArr, companyId);
+  }
+
+  /**
+   * Description: BIOL-275: Method to return SpaceChangeWaitList object by id.
+   * @description BIOL-275: Get space change waitlist by id.
+   * @param id of SpaceChangeWaitList
+   * @returns object of SpaceChangeWaitList
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('/spacechangewaitlist/:id')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getSpaceChangeWaitlistById(@Param('id') id: number): Promise<any> {
+    info(`Get Space Change Waitlist by id: ${id} `, __filename, `getSpaceChangeWaitlistById()`);
+    return this.residentCompanyService.getSpaceChangeWaitListById(id);
+  }
+
+  /**
+   * @description BIOL-275: Get items for space change waitlist by siteId and companyId
+   * @param status
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Get('/spacechangewaitlist/items/:companyId')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getItemsForSpaceChangeWaitlist(@Param('companyId') companyId: number): Promise<any> {
+    info(`Get items for Space Change Waitlist by resident company id: ${companyId} `, __filename, `getItemsForSpaceChangeWaitlist()`);
+    return this.residentCompanyService.getSpaceChangeWaitlistItems(companyId);
+  }
+
+  /**
+   * Updates the priority order of Open space change wait list.
+   * @description Updates the priority order of Open space change wait list.
+   * @param payload it is a request body contains new order of Space Change Waitlist Ids.
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Put('/spacechangewaitlist/priorityorder')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateWaitlistPriorityOrder(@Body() payload: UpdateWaitlistPriorityOrderDto): Promise<any> {
+    info(`Update Space Change Waitlist priority order by ids: ${payload.spaceChangeWaitlistIds} `, __filename, `updateWaitlistPriorityOrder()`);
+    return this.residentCompanyService.updateSpaceChangeWaitlistPriorityOrder(payload);
+  }
+
+  /**
+   * Description: Update Space Change Waitlist with items, update Resident Company details, update Resident Company history.
+   * @description Update Space Change Waitlist with items, update Resident Company details, update Resident Company history.
+   * @param payload it is a request body contains new order of Space Change Waitlist Ids.
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Put('/spacechangewaitlist')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateSpaceChangeWaitlist(@Body() payload: UpdateSpaceChangeWaitlistDto): Promise<any> {
+    info(`Update Space Change Waitlist record by id: ${payload.spaceChangeWaitlistId} `, __filename, `updateSpaceChangeWaitlist()`);
+    return this.residentCompanyService.updateSpaceChangeWaitlist(payload);
+  }
+
+  /**
+   * Description: Updates request status of Space Change Waitlist.
+   * @description Updates request status of Space Change Waitlist.
+   * @param payload payload object with id and status fields
+   * @returns response with status and message fields
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Put('/spacechangewaitlist/status')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateSpaceChangeWaitlistStatus(@Body() payload: UpdateWaitlistRequestStatusDto): Promise<any> {
+    info(`Update Space Change Waitlist status by id: ${payload.id} `, __filename, `updateSpaceChangeWaitlistStatus()`);
+    return this.residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
+  }
 }

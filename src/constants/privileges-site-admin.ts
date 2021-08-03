@@ -57,7 +57,7 @@ export const SITE_ADMIN_ACCESSLEVELS = {
           name: 'Resident Admin',
           action: true,
           create: true,
-          view: false,
+          view: true,
           update: true,
           delete: true,
         }

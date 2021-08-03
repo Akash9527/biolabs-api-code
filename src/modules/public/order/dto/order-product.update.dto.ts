@@ -25,6 +25,18 @@ export class UpdateOrderProductDto {
   quantity: number;
 
   @ApiProperty({
+    required: true,
+    nullable: true,
+  })
+  productTypeId: number;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  groupId: number;
+
+  @ApiProperty({
     required: false,
     nullable: true,
   })

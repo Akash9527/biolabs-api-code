@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { } from '@nestjs/core';
 
 const logger = require('./loggerConfig');
 
@@ -9,13 +9,14 @@ const logger = require('./loggerConfig');
  * @param method  : name of the service from where log generated
  */
 const error = function (message: String, service: String, method: String) {
+    if(process.env.NODE_ENV !='test'){
     logger.defaultMeta.service = service;
     logger.defaultMeta.method = method;
     logger.log({
         level: 'error',
         message: message
     });
-
+}
 };
 
 /**
@@ -25,13 +26,14 @@ const error = function (message: String, service: String, method: String) {
  * @param method  : name of the method from where log generated
  */
 const warn = function (message: String, service: String, method: String) {
+    if(process.env.NODE_ENV !='test'){
     logger.defaultMeta.service = service;
     logger.defaultMeta.method = method;
     logger.log({
         level: 'warn',
         message: message
     });
-
+    }
 };
 
 /**
@@ -41,13 +43,14 @@ const warn = function (message: String, service: String, method: String) {
  * @param method  : name of the method from where log generated
  */
 const info = function (message: String, service: String, method: String) {
+    if(process.env.NODE_ENV !='test'){
     logger.defaultMeta.service = service;
     logger.defaultMeta.method = method;
     logger.log({
         level: 'info',
         message: message
     });
-
+    }
 };
 
 /**
@@ -57,13 +60,14 @@ const info = function (message: String, service: String, method: String) {
  * @param method  : name of the method from where log generated
  */
 const http = function (message: String, service: String, method: String) {
+    if(process.env.NODE_ENV !='test'){
     logger.defaultMeta.service = service;
     logger.defaultMeta.method = method;
     logger.log({
         level: 'http',
         message: message
     });
-
+    }
 };
 
 /**
@@ -73,13 +77,14 @@ const http = function (message: String, service: String, method: String) {
  * @param method  : name of the method from where log generated
  */
 const verbose = function (message: String, service: String, method: String) {
+    if(process.env.NODE_ENV !='test'){
     logger.defaultMeta.service = service;
     logger.defaultMeta.method = method;
     logger.log({
         level: 'verbose',
         message: message
     });
-
+    }
 };
 
 /**
@@ -89,13 +94,14 @@ const verbose = function (message: String, service: String, method: String) {
  * @param method  : name of the method from where log generated
  */
 const debug = function (message: String, service: String, method: String) {
+    if(process.env.NODE_ENV !='test'){
     logger.defaultMeta.service = service;
     logger.defaultMeta.method = method;
     logger.log({
         level: 'debug',
         message: message
     });
-
+    }
 };
 
 /**
@@ -105,12 +111,14 @@ const debug = function (message: String, service: String, method: String) {
  * @param method  : name of the method from where log generated
  */
 const silly = function (message: String, service: String, method: String) {
+    if(process.env.NODE_ENV !='test'){
     logger.defaultMeta.service = service;
     logger.defaultMeta.method = method;
     logger.log({
         level: 'silly',
         message: message
     });
+}
 }
 
 module.exports = { error, warn, info, http, verbose,debug, silly};
