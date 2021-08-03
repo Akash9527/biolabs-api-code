@@ -350,7 +350,9 @@ export class ResidentCompanyService {
    */
   public async sendEmailToSiteAdmin(site: any, req, companyName: string, mailForWhat: string) {
     info("Sending email to site admin", __filename, "sendEmailToSiteAdmin()");
-    const MAIL_FOR = "MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE";
+    const MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE = 'MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE';
+    const MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION = 'MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION';
+
     try {
       let siteAdminEmails = [];
       let userInfo;
@@ -390,9 +392,13 @@ export class ResidentCompanyService {
       };
       debug(`userInfo.origin: ${userInfo.origin}`, __filename, `sendEmailToSiteAdmin()`);
       let contentParam = 'applicationFormSubmit';
-      if (mailForWhat == MAIL_FOR) {
+
+      if (mailForWhat == MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE) {
         EMAIL.SUBJECT_FORM = 'Biolabs | Space Change Request Submitted';
         contentParam = 'spaceChangeWaitlistSubmit';
+      }
+      if (mailForWhat == MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION) {
+        EMAIL.SUBJECT_FORM = 'Biolabs | Form Submitted';
       }
 
       await this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, contentParam, userInfo);
