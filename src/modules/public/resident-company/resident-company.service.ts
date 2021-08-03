@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable, NotAcceptableException, Request 
 import { InjectRepository } from '@nestjs/typeorm';
 import { EMAIL } from 'constants/email';
 import { In, Like, Repository } from 'typeorm';
+import { ApplicationConstants } from 'utils/application-constants';
 import { Mail } from '../../../utils/Mail';
 import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
 import { UpdateSpaceChangeWaitlistDto } from '../dto/update-space-change-waitlist.dto';
@@ -312,6 +313,7 @@ export class ResidentCompanyService {
       );
     }
     let response = {};
+    let savedResidentCompanyId: number;
 
     try {
       for await (const site of payload.site) {
@@ -319,6 +321,7 @@ export class ResidentCompanyService {
         const newRc = await this.residentCompanyRepository.create(payload);
         const savedRc = await this.residentCompanyRepository.save(newRc);
         if (savedRc.id) {
+          savedResidentCompanyId = savedRc.id;
           const historyData: any = JSON.parse(JSON.stringify(savedRc));
           historyData.comnpanyId = savedRc.id;
           delete historyData.id;
@@ -328,7 +331,7 @@ export class ResidentCompanyService {
           await this.addResidentCompanyDataInWaitlist(savedRc);
         }
       }
-      await this.sendEmailToSiteAdmin(sites, req, payload.companyName, "MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION");
+      await this.sendEmailToSiteAdmin(sites, req, payload.companyName, savedResidentCompanyId, ApplicationConstants.EMAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION);
     } catch {
       response['status'] = 'error';
       response['message'] = 'Could not add application';
@@ -347,11 +350,10 @@ export class ResidentCompanyService {
    * @param site array of sites.
    * @param req object of Request.
    * @param companyName name of the company for which application is submitted.
+   * @param companyId id of the company.
    */
-  public async sendEmailToSiteAdmin(site: any, req, companyName: string, mailForWhat: string) {
+  public async sendEmailToSiteAdmin(site: any, req, companyName: string, companyId: number, mailForWhat: string) {
     info("Sending email to site admin", __filename, "sendEmailToSiteAdmin()");
-    const MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE = 'MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE';
-    const MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION = 'MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION';
 
     try {
       let siteAdminEmails = [];
@@ -389,17 +391,22 @@ export class ResidentCompanyService {
         company_name: companyName,
         site_name: siteList,
         origin: req.headers['origin'],
+        companyId: companyId
       };
       debug(`userInfo.origin: ${userInfo.origin}`, __filename, `sendEmailToSiteAdmin()`);
-      let contentParam = 'applicationFormSubmit';
 
-      if (mailForWhat == MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE) {
-        EMAIL.SUBJECT_FORM = 'Biolabs | Space Change Request Submitted';
-        contentParam = 'spaceChangeWaitlistSubmit';
+      let contentParam;
+      if (mailForWhat == ApplicationConstants.EMAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION) {
+        EMAIL.SUBJECT_FORM = ApplicationConstants.EMAIL_SUBJECT_FOR_RESIDENT_COMPANY_FORM_SUBMISSION;
+        contentParam = ApplicationConstants.EMAIL_CONTENT_PARAM_FOR_RESIDENT_COMPANY_FORM_SUBMISSION;
+      } else if (mailForWhat == ApplicationConstants.EMAIL_FOR_SPACE_CHANGE_REQUEST_SUBMITTED) {
+        EMAIL.SUBJECT_FORM = ApplicationConstants.EMAIL_SUBJECT_FOR_SPACE_CHANGE_REQUEST_SUBMITTED;
+        contentParam = ApplicationConstants.EMAIL_CONTENT_PARAM_FOR_SPACE_CHANGE_REQUEST_SUBMITTED;
+      } else if (mailForWhat == ApplicationConstants.EMAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES) {
+        EMAIL.SUBJECT_FORM = ApplicationConstants.EMAIL_SUBJECT_FOR_SPONSORSHIP_QN_CHANGE_TO_YES;
+        contentParam = ApplicationConstants.EMAIL_CONTENT_PARAM_FOR_SPONSORSHIP_QN_CHANGE_TO_YES;
       }
-      if (mailForWhat == MAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION) {
-        EMAIL.SUBJECT_FORM = 'Biolabs | Form Submitted';
-      }
+      debug(`EMAIL.SUBJECT_FORM: ${EMAIL.SUBJECT_FORM}`, __filename, `sendEmailToSiteAdmin()`);
 
       await this.mail.sendEmail(siteAdminEmails, EMAIL.SUBJECT_FORM, contentParam, userInfo);
     } catch (err) {
@@ -902,7 +909,7 @@ export class ResidentCompanyService {
    * @param payload object of type UpdateResidentCompanyPayload
    * @return resident company object
    */
-  async updateResidentCompany(payload: UpdateResidentCompanyPayload) {
+  async updateResidentCompany(payload: UpdateResidentCompanyPayload, @Request() req) {
     info(`updating resident company id: ${payload.id}`, __filename, "updateResidentCompany()")
     try {
       const residentCompany: any = await this.residentCompanyRepository.findOne({
@@ -939,7 +946,14 @@ export class ResidentCompanyService {
         historyData.comnpanyId = residentCompany.id;
         delete historyData.id;
         await this.residentCompanyHistoryRepository.save(historyData);
-        debug("Resident company updated successfully", __filename, "updateResidentCompany()")
+        debug("Resident company updated successfully", __filename, "updateResidentCompany()");
+
+        /** BIOL-308: Notify Site Admin if the sponsorship question changes to Yes. shareYourProfile = true */
+        if (!residentCompany.shareYourProfile && payload.shareYourProfile) {
+          debug(`Sponsor ship contact question changed to: ${payload.shareYourProfile}`, __filename, `updateResidentCompany()`);
+          await this.sendEmailToSiteAdmin(payload.site, req, residentCompany.companyName, residentCompany.id, ApplicationConstants.EMAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES);
+          info(`Email sent regarding Sponsorship contact question change to Yes`, __filename, `updateResidentCompany()`);
+        }
         return await this.getResidentCompany(residentCompany.id);
       } else {
         error("Company with provided id not available.", __filename, "updateResidentCompany()");
@@ -1691,7 +1705,7 @@ order by quat;
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG = "Could not update Resident Company History record";
     const ERROR_IN_FETCHING_MAX_PRIORITY_ORDER_ERR_MSG = "Error while fetching Max Priority Order to set in new Space Change Waitlist record";
     // const COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG = "Could not send email notification";
-    const APPROVED_DENIED_PRIORITY_ORDER = -1;
+    let shareYourProfileTemp;
 
     let residentCompany: any = await this.fetchResidentCompanyById(payload.residentCompanyId).then((result) => {
       return result;
@@ -1705,6 +1719,7 @@ order by quat;
       return response;
     }
     info(`Fetched Resident Company from DB, Company name: : ${residentCompany.companyName} `, __filename, `addToSpaceChangeWaitList()`);
+    shareYourProfileTemp = residentCompany.shareYourProfile;
 
     let maxPriorityOrder: number;
     if (payload.requestStatus == 0) {
@@ -1722,10 +1737,10 @@ order by quat;
         }, HttpStatus.INTERNAL_SERVER_ERROR);
       });
     } else {
-      maxPriorityOrder = APPROVED_DENIED_PRIORITY_ORDER;
+      maxPriorityOrder = ApplicationConstants.APPROVED_DENIED_WAITLIST_PRIORITY_ORDER;
     }
     info(`Max priority order for Space Change Waitlist : ${maxPriorityOrder} `, __filename, `addToSpaceChangeWaitList()`);
-    // try {
+
     let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
     spaceChangeWaitlistObj.residentCompany = residentCompany;
     spaceChangeWaitlistObj.graduateDescription = payload.graduateDescription;
@@ -1807,23 +1822,19 @@ order by quat;
     });
 
     /** Send email notification to Site Admin to notify about new Plan Change Request submission */
-    const MAIL_FOR = "MAIL_FOR_SPACE_CHANGE_WAITLIST_SAVE";
-    this.sendEmailToSiteAdmin(req.user.site_id, req, residentCompany.companyName, MAIL_FOR).catch(() => {
+    this.sendEmailToSiteAdmin(req.user.site_id, req, residentCompany.companyName, residentCompany.id, ApplicationConstants.EMAIL_FOR_SPACE_CHANGE_REQUEST_SUBMITTED).catch(() => {
       error(`Error in sending email notification to site admin for SPACE_CHANGE_WAITLIST with id: ${resp.id}`, __filename, `addToSpaceChangeWaitList()`);
-      // throw new HttpException({
-      //   status: "Error",
-      //   message: COULD_NOT_SEND_EMAIL_NOTIFICATION_ERR_MSG,
-      //   body: err
-      // }, HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    // } catch (error) {
-    //   response['status'] = 'Error';
-    //   response['message'] = error.message;
-    //   response['body'] = error;
-    //   error(`Error in save Space Change Waitlist flow: ${error.message}`, __filename, `addToSpaceChangeWaitList()`);
-    //   return response;
-    // }
+    /** BIOL-308: Notify Site Admin if the sponsorship question changes to Yes. shareYourProfile = true */
+    if (!shareYourProfileTemp && payload.shareYourProfile) {
+      debug(`Sponsor ship contact question changed to: ${payload.shareYourProfile}`, __filename, `addToSpaceChangeWaitList()`);
+      await this.sendEmailToSiteAdmin(siteIdArr, req, residentCompany.companyName, residentCompany.id, ApplicationConstants.EMAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES).catch(() => {
+        error(`Error in sending email notification to site admin for sponsorship question changes to Yes`, __filename, `addToSpaceChangeWaitList()`);
+      });
+      info(`Email sent regarding Sponsorship contact question change to Yes`, __filename, `addToSpaceChangeWaitList()`);
+    }
+
     info(`Space Change waitlist saved successfully`, __filename, `addToSpaceChangeWaitList()`);
     response['status'] = 'Success';
     response['message'] = 'Operation Successful';
@@ -1882,7 +1893,7 @@ order by quat;
         .addSelect("u.firstName", "firstName")
         .addSelect("u.lastName", "lastName")
         .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
-        .leftJoin('users', 'u','u.id = space_change_waitlist.modifiedBy')
+        .leftJoin('users', 'u', 'u.id = space_change_waitlist.modifiedBy')
         .andWhere("space_change_waitlist.requestStatus IN (:...status)", { status: status });
 
       if (siteIdArr && siteIdArr.length) {
@@ -2202,7 +2213,7 @@ order by quat;
       await this.spaceChangeWaitlistRepository
         .createQueryBuilder('space_change_waitlist')
         .update()
-        .set({ requestStatus: payload.status , modifiedBy: req.user.id})
+        .set({ requestStatus: payload.status, modifiedBy: req.user.id })
         .where("id = :id", { id: payload.id })
         .execute();
     } catch (er) {

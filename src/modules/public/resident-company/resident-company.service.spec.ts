@@ -75,7 +75,7 @@ const mockRC: ResidentCompany = {
   "industryPartnerships": null,
   "industryPartnershipsDetails": null,
   "newsletters": null,
-  "shareYourProfile": null,
+  "shareYourProfile": false,
   "website": null,
   "foundersBusinessIndustryName": null,
   "createdAt": 2021,
@@ -270,6 +270,10 @@ const mock: UpdateResidentCompanyPayload = {
   "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV"
 };
 const mockNotes: Notes = { id: 1, createdBy: 1, createdAt: new Date(), residentCompany: new ResidentCompany(), notesStatus: 1, notes: "this is note 1" };
+const req: any = {
+  user: { site_id: [1, 2], role: 1 },
+  headers: { 'x-site-id': [2] }
+}
 describe('ResidentCompanyService', () => {
   let residentCompanyService: ResidentCompanyService;
   let productTypeService;
@@ -1114,8 +1118,9 @@ describe('ResidentCompanyService', () => {
       if (mockRC) {
         jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
         jest.spyOn(residentCompanyService, 'getResidentCompany').mockResolvedValueOnce(mockRC);
+        jest.spyOn(residentCompanyService, 'sendEmailToSiteAdmin').mockReturnThis();
       }
-      let result = await residentCompanyService.updateResidentCompany(mock);
+      let result = await residentCompanyService.updateResidentCompany(mock, req);
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
       expect(result).toBe(mockRC);
@@ -1125,7 +1130,7 @@ describe('ResidentCompanyService', () => {
         throw new InternalException('')
       });
       try {
-        await residentCompanyService.updateResidentCompany(mock);
+        await residentCompanyService.updateResidentCompany(mock, req);
       } catch (e) {
         expect(e.name).toBe('InternalException');
         expect(e instanceof InternalException).toBeTruthy();
@@ -1267,7 +1272,7 @@ describe('ResidentCompanyService', () => {
         fundingToDate: '1',
         fundingSource: [1],
         TotalCompanySize: 20,
-        canWeShareYourDataWithSponsorsEtc: null
+        canWeShareYourDataWithSponsorsEtc: false
       });
     })
     it('should throw exception if company with provided id not available.', async () => {

@@ -239,13 +239,13 @@ describe('ResidentCompanyController', () => {
             "website": "string", "companyMembers": [], "companyAdvisors": [],
             "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV"
         };
-        it('it should called residentService updateResidentCompany method ', async () => {
-            await residentController.updateResidentCompany(mockupdateResidentCompany);
-            expect(await residentService.updateResidentCompany).toHaveBeenCalledWith(mockupdateResidentCompany);
+        it('it should call residentService updateResidentCompany method ', async () => {
+            await residentController.updateResidentCompany(mockupdateResidentCompany, req);
+            expect(await residentService.updateResidentCompany).toHaveBeenCalledWith(mockupdateResidentCompany, req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.updateResidentCompany.mockResolvedValue(new UnauthorizedException());
-            const { response } = await residentController.updateResidentCompany(mockupdateResidentCompany);
+            const { response } = await residentController.updateResidentCompany(mockupdateResidentCompany, req);
             expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
             expect(response.message).toBe('Unauthorized');
         });
@@ -549,7 +549,8 @@ describe('ResidentCompanyController', () => {
             internalNotes: '',
             shareYourProfile: false,
             requestGraduateDate: 946665000,
-            marketPlace: true
+            marketPlace: true,
+            graduateDescription: 'TEST Graduate Description'
         }
 
         it('it should called residentService addToSpaceChangeWaitList method ', async () => {
@@ -633,7 +634,7 @@ describe('ResidentCompanyController', () => {
             isRequestInternal: true,
             membershipChange: 0,
             desiredStartDate: 1627603200,
-            graduateDescription: 'Test GraduateDescription',
+            graduateDescription: 'Test Graduate Description',
             items: [
                 {
                     itemName: 'Private Office',
