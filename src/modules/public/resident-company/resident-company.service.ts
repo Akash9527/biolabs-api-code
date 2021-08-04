@@ -2044,13 +2044,16 @@ order by quat;
    * Description: Update Space Change Waitlist with items, update Resident Company details, update Resident Company history.
    * @description Update Space Change Waitlist with items, update Resident Company details, update Resident Company history.
    * @param payload The payload of Space Change Waitlist to with updated entries.
+   * @param siteIdArr The array of site ids.
+   * @param req The Request object.
    * @returns 
    */
-  public async updateSpaceChangeWaitlist(payload: UpdateSpaceChangeWaitlistDto, @Request() req) {
+  public async updateSpaceChangeWaitlist(payload: UpdateSpaceChangeWaitlistDto, siteIdArr: any, @Request() req) {
     info(`Updating Space Change Waitlist record`, __filename, `updateSpaceChangeWaitlist()`);
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_ERR_MSG = "Could not update Resident Company record";
     const COULD_NOT_UPDATE_RESIDENT_COMPANY_HISTORY_ERR_MSG = "Could not update Resident Company History record";
     let response = {};
+    let shareYourProfileTemp;
     try {
       if (payload) {
         debug(`Space Change Waitlist Id: ${payload.spaceChangeWaitlistId}`, __filename, `updateSpaceChangeWaitlist()`);
@@ -2099,12 +2102,14 @@ order by quat;
           });
 
           /** Update Resident Company details */
+          shareYourProfileTemp = spaceChangeWaitlistObj.residentCompany.shareYourProfile;
           let residentCompany: any = spaceChangeWaitlistObj.residentCompany;
           residentCompany.companyStage = payload.companyStage;
           residentCompany.funding = payload.funding;
           residentCompany.fundingSource = payload.fundingSource;
           residentCompany.companySize = payload.companySize;
           residentCompany.shareYourProfile = payload.shareYourProfile;
+
           await this.residentCompanyRepository.update(residentCompany.id, residentCompany)
             .catch(err => {
               error(`Error in updating resident company details by id: ${residentCompany.id} `, __filename, `updateSpaceChangeWaitlist()`);
@@ -2124,6 +2129,16 @@ order by quat;
               body: err
             }, HttpStatus.INTERNAL_SERVER_ERROR);
           });
+
+          /** BIOL-308: Notify Site Admin if the sponsorship question changes to Yes. shareYourProfile = true */
+          if (!shareYourProfileTemp && payload.shareYourProfile) {
+            debug(`Sponsorship contact question changed to: ${payload.shareYourProfile}`, __filename, `updateSpaceChangeWaitlist()`);
+            await this.sendEmailToSiteAdmin(siteIdArr, req, residentCompany.companyName, residentCompany.id, ApplicationConstants.EMAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES).catch(() => {
+              error(`Error in sending email notification to site admin for sponsorship question changes to Yes`, __filename, `updateSpaceChangeWaitlist()`);
+            });
+            info(`Email sent regarding Sponsorship contact question change to Yes`, __filename, `updateSpaceChangeWaitlist()`);
+          }
+
         } else {
           response['status'] = 'error';
           response['message'] = 'Space Change Waitlist not found by id ' + payload.spaceChangeWaitlistId;
