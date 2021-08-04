@@ -70,6 +70,24 @@ export const SPONSOR_ACCESSLEVELS = {
       view: false,
       update: false,
       delete: false,
+      child: {
+        'invoice-summary': {
+          name: 'Invoice Summary',
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
+        },
+        'waitlist': {
+          name: 'Waitlist',
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
+        }
+      }
     },
     sites: {
       name: 'Sites',

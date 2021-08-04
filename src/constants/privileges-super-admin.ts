@@ -70,6 +70,24 @@ export const SUPER_ADMIN_ACCESSLEVELS = {
       view: true,
       update: true,
       delete: true,
+      child: {
+        'invoice-summary': {
+          name: 'Invoice Summary',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+        'waitlist': {
+          name: 'Waitlist',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        }
+      }
     },
     sites: {
       name: 'Sites',
