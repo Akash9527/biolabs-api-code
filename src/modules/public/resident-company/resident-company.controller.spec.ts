@@ -14,6 +14,8 @@ import { SearchResidentCompanyPayload } from './search-resident-company.payload'
 import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-order.dto';
 import { UpdateSpaceChangeWaitlistDto } from '../dto/update-space-change-waitlist.dto';
 import { UpdateWaitlistRequestStatusDto } from '../dto/update-waitlist-request-status.dto';
+import { Notes } from './rc-notes.entity';
+import { UpdateNotesDto } from './update-notes.dto';
 
 const mockResidentService = () => ({
     addResidentCompany: jest.fn(),
@@ -41,7 +43,8 @@ const mockResidentService = () => ({
     getSpaceChangeWaitlistItems: jest.fn(),
     updateSpaceChangeWaitlistPriorityOrder: jest.fn(),
     updateSpaceChangeWaitlist: jest.fn(),
-    updateSpaceChangeWaitlistStatus: jest.fn()
+    updateSpaceChangeWaitlistStatus: jest.fn(),
+    updateNote: jest.fn()
 });
 
 const mockResidentCompany = {
@@ -236,13 +239,13 @@ describe('ResidentCompanyController', () => {
             "website": "string", "companyMembers": [], "companyAdvisors": [],
             "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV"
         };
-        it('it should called residentService updateResidentCompany method ', async () => {
-            await residentController.updateResidentCompany(mockupdateResidentCompany);
-            expect(await residentService.updateResidentCompany).toHaveBeenCalledWith(mockupdateResidentCompany);
+        it('it should call residentService updateResidentCompany method ', async () => {
+            await residentController.updateResidentCompany(mockupdateResidentCompany, req);
+            expect(await residentService.updateResidentCompany).toHaveBeenCalledWith(mockupdateResidentCompany, req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.updateResidentCompany.mockResolvedValue(new UnauthorizedException());
-            const { response } = await residentController.updateResidentCompany(mockupdateResidentCompany);
+            const { response } = await residentController.updateResidentCompany(mockupdateResidentCompany, req);
             expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
             expect(response.message).toBe('Unauthorized');
         });
@@ -312,6 +315,20 @@ describe('ResidentCompanyController', () => {
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.addNote.mockResolvedValue(new UnauthorizedException());
             const { response } = await residentController.addNote();
+            expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
+            expect(response.message).toBe('Unauthorized');
+        });
+    });
+    describe('should test updateNote Functionality', () => {
+        let payload: UpdateNotesDto = { "notes": "this is note 1" };
+        it('it should called residentService updateNote method ', async () => {
+            expect(payload).not.toBe(null);
+            await residentController.updateNote(payload, 1);
+            expect(await residentService.updateNote).toHaveBeenCalledWith(payload, 1);
+        });
+        it('it should throw UnAuthorized Exception if user is not authorized', async () => {
+            residentService.updateNote.mockResolvedValue(new UnauthorizedException());
+            const { response } = await residentController.updateNote(payload, 1)
             expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
             expect(response.message).toBe('Unauthorized');
         });
@@ -532,7 +549,8 @@ describe('ResidentCompanyController', () => {
             internalNotes: '',
             shareYourProfile: false,
             requestGraduateDate: 946665000,
-            marketPlace: true
+            marketPlace: true,
+            graduateDescription: 'TEST Graduate Description'
         }
 
         it('it should called residentService addToSpaceChangeWaitList method ', async () => {
@@ -541,7 +559,7 @@ describe('ResidentCompanyController', () => {
             if (req.headers['x-site-id']) {
                 siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
             }
-            expect(await residentService.addToSpaceChangeWaitList).toHaveBeenCalledWith(mockAddSpaceChangeWaitlistDto, siteIdArr,req);
+            expect(await residentService.addToSpaceChangeWaitList).toHaveBeenCalledWith(mockAddSpaceChangeWaitlistDto, siteIdArr, req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.addToSpaceChangeWaitList.mockResolvedValue(new UnauthorizedException());
@@ -609,6 +627,7 @@ describe('ResidentCompanyController', () => {
             expect(response.message).toBe('Unauthorized');
         });
     });
+
     describe('should test updateSpaceChangeWaitlist Functionality', () => {
         let payload: UpdateSpaceChangeWaitlistDto = {
             spaceChangeWaitlistId: 1,
@@ -616,6 +635,7 @@ describe('ResidentCompanyController', () => {
             isRequestInternal: true,
             membershipChange: 0,
             desiredStartDate: 1627603200,
+            graduateDescription: 'Test Graduate Description',
             items: [
                 {
                     itemName: 'Private Office',
@@ -654,15 +674,19 @@ describe('ResidentCompanyController', () => {
             internalNotes: '',
             shareYourProfile: false,
             requestGraduateDate: 946665000,
-            marketPlace: true
+            marketPlace: true,
         }
         it('it should called residentService updateSpaceChangeWaitlistPriorityOrder method ', async () => {
-            await residentController.updateSpaceChangeWaitlist(payload);
-            expect(await residentService.updateSpaceChangeWaitlist).toHaveBeenCalledWith(payload);
+            await residentController.updateSpaceChangeWaitlist(payload, req);
+            let siteIdArr = req.user.site_id;
+            if (req.headers['x-site-id']) {
+                siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+            }
+            expect(await residentService.updateSpaceChangeWaitlist).toHaveBeenCalledWith(payload, siteIdArr, req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.updateSpaceChangeWaitlist.mockResolvedValue(new UnauthorizedException());
-            const { response } = await residentController.updateSpaceChangeWaitlist(payload);
+            const { response } = await residentController.updateSpaceChangeWaitlist(payload, req);
             expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
             expect(response.message).toBe('Unauthorized');
         });
@@ -673,12 +697,12 @@ describe('ResidentCompanyController', () => {
             status: 1
         }
         it('it should called residentService updateSpaceChangeWaitlistStatus method ', async () => {
-            await residentController.updateSpaceChangeWaitlistStatus(payload);
-            expect(await residentService.updateSpaceChangeWaitlistStatus).toHaveBeenCalledWith(payload);
+            await residentController.updateSpaceChangeWaitlistStatus(payload, req);
+            expect(await residentService.updateSpaceChangeWaitlistStatus).toHaveBeenCalledWith(payload, req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.updateSpaceChangeWaitlistStatus.mockResolvedValue(new UnauthorizedException());
-            const { response } = await residentController.updateSpaceChangeWaitlistStatus(payload);
+            const { response } = await residentController.updateSpaceChangeWaitlistStatus(payload, req);
             expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
             expect(response.message).toBe('Unauthorized');
         });

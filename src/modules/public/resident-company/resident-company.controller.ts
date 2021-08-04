@@ -9,6 +9,7 @@ import { UpdateWaitlistRequestStatusDto } from '../dto/update-waitlist-request-s
 import { AddNotesDto } from './add-notes.dto';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
 import { SearchResidentCompanyPayload } from './search-resident-company.payload';
+import { UpdateNotesDto } from './update-notes.dto';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
 const { info } = require("../../../utils/logger")
@@ -82,6 +83,8 @@ export class ResidentCompanyController {
   * @description This method is used to get a resident company information  for sponsor dashboard.
   * @param id it is a request parameter expect a number value of resident company id.
   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
   @Get('/dashboard')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   async getResidentCompanyForSponsor(): Promise<any> {
@@ -115,8 +118,8 @@ export class ResidentCompanyController {
   @Put()
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async updateResidentCompany(@Body() payload: UpdateResidentCompanyPayload): Promise<any> {
-    return this.residentCompanyService.updateResidentCompany(payload);
+  async updateResidentCompany(@Body() payload: UpdateResidentCompanyPayload, @Request() req): Promise<any> {
+    return this.residentCompanyService.updateResidentCompany(payload, req);
   }
 
   /**
@@ -196,8 +199,21 @@ export class ResidentCompanyController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async softDeleteNote(@Param('id') id: number): Promise<any> {
-    const notes = await this.residentCompanyService.softDeleteNote(id);
-    return notes;
+    return await this.residentCompanyService.softDeleteNote(id);
+  }
+  /**
+    * Description: This method is used to update notes in the application.
+    * @description This method is used to update a notes in the application.
+    * @param payload it is a request body contains payload of type UpdateNotesDto.
+    * @param id it is a request parameter expect a number value of note id.
+    */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Put('notes/:id')
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateNote(@Body() payload: UpdateNotesDto, @Param('id') id: number): Promise<any> {
+    return await this.residentCompanyService.updateNote(payload, id);
   }
 
   /**
@@ -426,9 +442,13 @@ export class ResidentCompanyController {
   @Put('/spacechangewaitlist')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async updateSpaceChangeWaitlist(@Body() payload: UpdateSpaceChangeWaitlistDto): Promise<any> {
+  async updateSpaceChangeWaitlist(@Body() payload: UpdateSpaceChangeWaitlistDto, @Request() req): Promise<any> {
     info(`Update Space Change Waitlist record by id: ${payload.spaceChangeWaitlistId} `, __filename, `updateSpaceChangeWaitlist()`);
-    return this.residentCompanyService.updateSpaceChangeWaitlist(payload);
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return this.residentCompanyService.updateSpaceChangeWaitlist(payload, siteIdArr, req);
   }
 
   /**
@@ -442,8 +462,9 @@ export class ResidentCompanyController {
   @Put('/spacechangewaitlist/status')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async updateSpaceChangeWaitlistStatus(@Body() payload: UpdateWaitlistRequestStatusDto): Promise<any> {
+  async updateSpaceChangeWaitlistStatus(@Body() payload: UpdateWaitlistRequestStatusDto, @Request() req): Promise<any> {
     info(`Update Space Change Waitlist status by id: ${payload.id} `, __filename, `updateSpaceChangeWaitlistStatus()`);
-    return this.residentCompanyService.updateSpaceChangeWaitlistStatus(payload);
+    return this.residentCompanyService.updateSpaceChangeWaitlistStatus(payload, req);
   }
+
 }

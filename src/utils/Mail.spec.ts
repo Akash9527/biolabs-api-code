@@ -44,6 +44,16 @@ describe('PasswordTransformer', () => {
         expect(mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo)).toBeDefined();
     });
 
+    it('should test sendEmailGraphAPI method for spaceChangeWaitlistSubmit', () => {
+        let content: string = "spaceChangeWaitlistSubmit";
+        expect(mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo)).toBeDefined();
+    });
+
+    it('should test sendEmailGraphAPI method for sponsorshipQuestionChangedToYes', () => {
+        let content: string = "sponsorshipQuestionChangedToYes";
+        expect(mail.sendEmailGraphAPI(tenant, token, subject, content, userInfo)).toBeDefined();
+    });
+
     it('should test sendEmailGraphAPI method for user sites info', () => {
         let site_name = [{id: 1}]
         userInfo.site_name = site_name;
