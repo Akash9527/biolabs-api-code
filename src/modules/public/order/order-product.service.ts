@@ -183,12 +183,13 @@ export class OrderProductService {
    * @param endDate 
    * @returns 
    */
-  async fetchOrderProductsBetweenDates(month: number, companyId: number) {
+  async fetchOrderProductsBetweenDates(month: number, year: number, companyId: number) {
     info(`Fetch Order product between dates : ${month} companyId: ${companyId}`, __filename, "fetchOrderProductsBetweenDates()")
     try {
       return await this.orderProductRepository.createQueryBuilder("order_product")
         .where("order_product.companyId = :companyId", { companyId: companyId })
         .andWhere("order_product.month = :month", { month: month })
+        .andWhere("order_product.year = :year", { year: year })
         .orderBy("order_product.updatedAt", 'DESC')
         .getRawMany();
     } catch (err) {
@@ -228,9 +229,9 @@ export class OrderProductService {
    * @param month 
    * @returns 
    */
-  async consolidatedInvoice(month: number, site: number) {
+  async consolidatedInvoice(month: number, year: number, site: number) {
     try {
-      info(`Consolidated Invoice by month: ${month} site: ${site}`, __filename, "consolidatedInvoice()");
+      info(`Consolidated Invoice by month: ${month}, year ${year} site: ${site}`, __filename, "consolidatedInvoice()");
       const query = `select 
                     rc."id" as companyid, 
                     orp.id as orderId,
@@ -266,6 +267,7 @@ export class OrderProductService {
                           orpd."month" = ${month} 
                           or orpd."month" isnull
                         )
+                        and orpd."year" = ${year}
                         and orpd."currentCharge" = true
                     ) as orp on orp."companyId" = rc."id" 
                   where 
