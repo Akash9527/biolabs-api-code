@@ -50,10 +50,10 @@ begin
  			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Number of employees changed ' , f1."noOfFullEmp", f2."noOfFullEmp" ::text , to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
         if ((f2."companySize" != f1."companySize" OR f1."companySize" is NULL) AND f2."companySize" is NOT NULL) then
- 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Company size changed ', f1."companySize" ::text, f2."companySize" ::text , to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Company size changed ',(CASE WHEN f1."companySize" is NULL THEN '0' ELSE f1."companySize" END), (CASE WHEN f2."companySize" is NULL THEN '0' ELSE f2."companySize" END) , to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."otherFundingSource" != f1."otherFundingSource" OR f1."otherFundingSource" is NULL) AND f2."otherFundingSource" is NOT NULL) then
- 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate")  VALUES ('Funding Source changed to other on ',' - ',' - ', to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate")  VALUES ('Funding Source changed to other',(CASE WHEN ((f1."otherFundingSource" ='') OR (f1."otherFundingSource" is NULL) ) THEN '-' ELSE f1."otherFundingSource" END) ,(CASE WHEN ((f2."otherFundingSource" ='') OR (f2."otherFundingSource" is NULL) )THEN '-' ELSE f2."otherFundingSource" END), to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
         if ((f2."industryname" != f1."industryname" OR f1."industryname" is NULL) AND f2."industryname" is NOT NULL) then
  			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Industry changed ' , f1."industryname" ::text , f2."industryname" ::text , to_char(f2."cdate", 'MM/dd/yyyy'));
@@ -86,13 +86,13 @@ begin
  			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Company founded place changed ' ,f1."foundedPlace" ::text , f2."foundedPlace" ::text , to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."otherCompanyStage" != f1."otherCompanyStage" OR f1."otherCompanyStage" is NULL) AND f2."otherCompanyStage" is NOT NULL) then
- 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Stage of technology changed to other on ', '-','-', to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Stage of technology changed to other',(CASE WHEN ((f1."otherCompanyStage" ='') OR (f1."otherCompanyStage" is NULL) ) THEN '-' ELSE f1."otherCompanyStage" END) ,(CASE WHEN ((f2."otherCompanyStage" ='') OR (f1."otherCompanyStage" is NULL) )THEN '-' ELSE f2."otherCompanyStage" END), to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."intellectualProperty" != f1."intellectualProperty" OR f1."intellectualProperty" is NULL) AND f2."intellectualProperty" is NOT NULL) then
  			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Intellectual property related to your technology changed ' , f1."intellectualProperty" ::text ,  f2."intellectualProperty" ::text ,  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."otherIntellectualProperty" != f1."otherIntellectualProperty" OR f1."otherIntellectualProperty" is NULL) AND f2."otherIntellectualProperty" is NOT NULL) then
- 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Intellectual property related to your technology changed to other ', '-','-' , to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Intellectual property related to your technology changed to other ',  (CASE WHEN ((f1."otherIntellectualProperty" ='') OR (f1."otherIntellectualProperty" is NULL) ) THEN '-' ELSE f1."otherIntellectualProperty" END) ,(CASE WHEN ((f2."otherIntellectualProperty" ='') OR ((f2."otherIntellectualProperty" is NULL)) )THEN '-' ELSE f2."otherIntellectualProperty" END), to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."isAffiliated" != f1."isAffiliated" OR f1."isAffiliated" is NULL) AND f2."isAffiliated" is NOT NULL) then
  			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Affiliated changed ' , (CASE WHEN f2."isAffiliated" = true THEN 'Yes' ELSE 'No' END) ,  to_char(f2."cdate", 'MM/dd/yyyy'));
@@ -135,4 +135,3 @@ begin
 end;
  
 $BODY$;
-
