@@ -75,7 +75,7 @@ const mockRC: ResidentCompany = {
   "industryPartnerships": null,
   "industryPartnershipsDetails": null,
   "newsletters": null,
-  "shareYourProfile": null,
+  "shareYourProfile": false,
   "website": null,
   "foundersBusinessIndustryName": null,
   "createdAt": 2021,
@@ -129,7 +129,7 @@ let mockUpdateSpaceChangeWaitlistDto: UpdateSpaceChangeWaitlistDto = {
   companySize: 120,
   fundingSource: [1, 2],
   internalNotes: '',
-  shareYourProfile: false,
+  shareYourProfile: true,
   requestGraduateDate: 946665000,
   marketPlace: true
 }
@@ -270,6 +270,10 @@ const mock: UpdateResidentCompanyPayload = {
   "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV"
 };
 const mockNotes: Notes = { id: 1, createdBy: 1, createdAt: new Date(), residentCompany: new ResidentCompany(), notesStatus: 1, notes: "this is note 1" };
+const req: any = {
+  user: { site_id: [1, 2], role: 1 },
+  headers: { 'x-site-id': [2] }
+}
 describe('ResidentCompanyService', () => {
   let residentCompanyService: ResidentCompanyService;
   let productTypeService;
@@ -392,7 +396,7 @@ describe('ResidentCompanyService', () => {
             find: jest.fn(), findOne: jest.fn(), query: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
-            save: jest.fn(), 
+            save: jest.fn(),
             createQueryBuilder: jest.fn(() =>
             ({
               select: jest.fn().mockReturnThis(),
@@ -1114,8 +1118,9 @@ describe('ResidentCompanyService', () => {
       if (mockRC) {
         jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
         jest.spyOn(residentCompanyService, 'getResidentCompany').mockResolvedValueOnce(mockRC);
+        jest.spyOn(residentCompanyService, 'sendEmailToSiteAdmin').mockReturnThis();
       }
-      let result = await residentCompanyService.updateResidentCompany(mock);
+      let result = await residentCompanyService.updateResidentCompany(mock, req);
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
       expect(result).toBe(mockRC);
@@ -1125,7 +1130,7 @@ describe('ResidentCompanyService', () => {
         throw new InternalException('')
       });
       try {
-        await residentCompanyService.updateResidentCompany(mock);
+        await residentCompanyService.updateResidentCompany(mock, req);
       } catch (e) {
         expect(e.name).toBe('InternalException');
         expect(e instanceof InternalException).toBeTruthy();
@@ -1267,7 +1272,7 @@ describe('ResidentCompanyService', () => {
         fundingToDate: '1',
         fundingSource: [1],
         TotalCompanySize: 20,
-        canWeShareYourDataWithSponsorsEtc: null
+        canWeShareYourDataWithSponsorsEtc: false
       });
     })
     it('should throw exception if company with provided id not available.', async () => {
@@ -1309,22 +1314,22 @@ describe('ResidentCompanyService', () => {
     it('should update note based on id', async () => {
       jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(mockNotes);
       if (mockNotes) {
-      jest.spyOn(notesRepository, 'update').mockReturnThis();
+        jest.spyOn(notesRepository, 'update').mockReturnThis();
       }
-      let result = await residentCompanyService.updateNote(payload,mockNotes.id);
+      let result = await residentCompanyService.updateNote(payload, mockNotes.id);
       expect(result['message']).toEqual('Note Updated succesfully');
       expect(result['status']).toEqual('Success');
     })
     it('it should throw exception  ', async () => {
       jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(mockNotes);
       jest.spyOn(notesRepository, 'update').mockRejectedValueOnce(mockNotes);
-      let result = await residentCompanyService.updateNote(payload,mockNotes.id);
+      let result = await residentCompanyService.updateNote(payload, mockNotes.id);
       expect(result['message']).toEqual('Error while  Updating  note');
       expect(result['status']).toEqual('Error');
     });
     it('it should throw exception if note id is available ', async () => {
       jest.spyOn(notesRepository, 'findOne').mockResolvedValueOnce(null);
-      let result = await residentCompanyService.updateNote(payload,mockNotes.id);
+      let result = await residentCompanyService.updateNote(payload, mockNotes.id);
       expect(result['message']).toEqual('Note with provided id not available.');
       expect(result['status']).toEqual('Not acceptable');
     });
@@ -1925,6 +1930,7 @@ describe('ResidentCompanyService', () => {
       if (mockUpdateSpaceChangeWaitlistDto.items && mockUpdateSpaceChangeWaitlistDto.items.length) {
         jest.spyOn(itemRepository, 'delete').mockResolvedValue(mockSpaceChangeWaitlistItem);
         jest.spyOn(itemRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+        jest.spyOn(residentCompanyService, 'sendEmailToSiteAdmin').mockReturnThis();
       }
       await residentCompanyService.updateSpaceChangeWaitlistItems(mockUpdateSpaceChangeWaitlistDto, mockSpaceChangeWaitlistItem);
     });
@@ -1966,6 +1972,11 @@ describe('ResidentCompanyService', () => {
       user: { site_id: [1, 2], role: 1 },
       headers: { 'x-site-id': [2] }
     }
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+
     it('should return response with status and message fields if it is Successfull', async () => {
       if (mockUpdateSpaceChangeWaitlistDto) {
         jest.spyOn(spaceChangeWaitlistRepository, 'findOne').mockResolvedValue(mockSpaceChangeWaitlistItem);
@@ -1974,7 +1985,7 @@ describe('ResidentCompanyService', () => {
       jest.spyOn(residentCompanyService, 'updateSpaceChangeWaitlistItems').mockResolvedValue(mockSpaceChangeWaitlistItem);
       jest.spyOn(residentCompanyRepository, 'update').mockResolvedValue(mockSpaceChangeWaitlistItem.residentCompany);
       jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValue(mockResidentHistory);
-      let result = await residentCompanyService.updateSpaceChangeWaitlist(mockUpdateSpaceChangeWaitlistDto, req);
+      let result = await residentCompanyService.updateSpaceChangeWaitlist(mockUpdateSpaceChangeWaitlistDto, siteIdArr, req);
       expect(result['message']).toEqual('Space Change Waitlist updated successfully');
       expect(result['status']).toEqual('Success');
     });
