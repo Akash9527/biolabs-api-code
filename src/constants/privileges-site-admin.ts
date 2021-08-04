@@ -155,7 +155,7 @@ export const SITE_ADMIN_ACCESSLEVELS = {
           create: false,
           view: false,
           update: false,
-          delete: false,
+          delete: false
         },
         'configure': {
           name: 'Cost Configuration',

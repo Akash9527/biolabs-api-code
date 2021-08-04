@@ -11,7 +11,7 @@ export const RESIDENT_ACCESSLEVELS = {
       create: false,
       view: false,
       update: false,
-      delete: false,
+      delete: false
     },
     'sponsor-view': {
       name: 'BioLabs Network',
@@ -19,7 +19,7 @@ export const RESIDENT_ACCESSLEVELS = {
       create: false,
       view: false,
       update: false,
-      delete: false,
+      delete: false
     },
     'application-form': {
       name: 'Application Form',
@@ -27,7 +27,7 @@ export const RESIDENT_ACCESSLEVELS = {
       create: false,
       view: false,
       update: false,
-      delete: false,
+      delete: false
     },
     user: {
       name: 'Manage Users',
@@ -39,11 +39,11 @@ export const RESIDENT_ACCESSLEVELS = {
       child: {
         'management': {
           name: 'Admin',
-          action: true,
-          create: true,
-          view: true,
-          update: true,
-          delete: true,
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
         },
         'sponsor': {
           name: 'Sponsors',
@@ -55,11 +55,11 @@ export const RESIDENT_ACCESSLEVELS = {
         },
         'resident': {
           name: 'Resident Admin',
-          action: true,
-          create: true,
-          view: true,
-          update: true,
-          delete: true,
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
         }
       }
     },
@@ -77,7 +77,7 @@ export const RESIDENT_ACCESSLEVELS = {
           create: false,
           view: false,
           update: false,
-          delete: false,
+          delete: false
         },
         'waitlist': {
           name: 'Waitlist',
@@ -85,7 +85,7 @@ export const RESIDENT_ACCESSLEVELS = {
           create: false,
           view: false,
           update: false,
-          delete: false,
+          delete: false
         }
       }
     },
@@ -104,6 +104,32 @@ export const RESIDENT_ACCESSLEVELS = {
       view: true,
       update: true,
       delete: true,
+      child: {
+        'directory-members': {
+          name: 'Members',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'directory-site': {
+          name: 'Site Employee',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'directory-companies': {
+          name: 'Companies',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        }
+      }
     },
     configurations: {
       name: 'Configurations',
@@ -119,7 +145,7 @@ export const RESIDENT_ACCESSLEVELS = {
           create: false,
           view: false,
           update: false,
-          delete: false,
+          delete: false
         },
         'configure': {
           name: 'Cost Configuration',
@@ -127,7 +153,7 @@ export const RESIDENT_ACCESSLEVELS = {
           create: false,
           view: false,
           update: false,
-          delete: false,
+          delete: false
         },
       },
     },
@@ -137,7 +163,7 @@ export const RESIDENT_ACCESSLEVELS = {
       create: true,
       view: true,
       update: true,
-      delete: true,
+      delete: true
     },
     'resident-companies': {
       name: 'Resident Companies',
@@ -145,7 +171,7 @@ export const RESIDENT_ACCESSLEVELS = {
       create: false,
       view: true,
       update: false,
-      delete: false,
+      delete: false
     },
   },
 };

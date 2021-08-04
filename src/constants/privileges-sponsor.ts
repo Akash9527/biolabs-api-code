@@ -20,6 +20,24 @@ export const SPONSOR_ACCESSLEVELS = {
       view: true,
       update: true,
       delete: true,
+      child: {
+        'sponsor': {
+          name: 'Sponser',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+        'search': {
+          name: 'Resident Companies',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        }
+      }
     },
     'application-form': {
       name: 'Application Form',
@@ -147,5 +165,5 @@ export const SPONSOR_ACCESSLEVELS = {
       update: true,
       delete: true,
     },
-  },
-};
+  }
+}
