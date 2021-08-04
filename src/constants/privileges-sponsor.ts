@@ -159,11 +159,11 @@ export const SPONSOR_ACCESSLEVELS = {
     },
     'resident-companies': {
       name: 'Resident Companies',
-      action: true,
-      create: true,
-      view: true,
-      update: true,
-      delete: true,
+      action: false,
+      create: false,
+      view: false,
+      update: false,
+      delete: false,
     },
   }
 }
