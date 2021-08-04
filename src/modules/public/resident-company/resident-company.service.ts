@@ -720,25 +720,26 @@ export class ResidentCompanyService {
         select("count(*)", "graduate").
         where("resident_companies.companyStatus = :status", { status: '4' }).getRawOne();
 
-      //Get Sum of all companies and Average company size
-      const stats: any = await this.residentCompanyRepository.
-        createQueryBuilder("resident_companies").
-        select("AVG(resident_companies.companySize)::numeric(10,2)", "avgTeamSize").
-        addSelect("count(*)", "startUpcount").
-        where("resident_companies.companyStatus = :status", { status: '1' }).
-        andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).getRawOne();
-
+      let status = {};
+      const count: any = await this.residentCompanyRepository.query("select count(*) from public.resident_companies where resident_companies.\"companyStatus\" = '1' and resident_companies.\"companyOnboardingStatus\" = true");
+      if (count && count.length>0) {
+      status["startUpcount"] = count[0]["count"];
+      }
+      //calculatinng median
+      const medainResponse: any = await this.residentCompanyRepository.query("select percentile_cont(0.5) within group ( order by resident_companies.\"companySize\" ) as median from public.resident_companies where resident_companies.\"companySize\" is not null and resident_companies.\"companyStatus\" = '1'  and resident_companies.\"companyOnboardingStatus\" = true");
+      if (medainResponse && medainResponse.length>0) {
+        status["avgTeamSize"] = Math.round(medainResponse[0].median);
+      }
       const categoryStats = await this.categoryRepository.
         query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
           "where c.id = ANY(rc.industry::int[]) ) as industryCount " +
           "FROM public.categories as c order by industryCount desc limit 3;");
 
-      response['companyStats'] = (!stats) ? 0 : stats;
+      response['companyStats'] = (!status) ? 0 : status;
       response['graduate'] = (!graduate) ? 0 : graduate;
       response['categoryStats'] = (!categoryStats) ? 0 : categoryStats;
     } catch (err) {
-      error("Error in find resident company for sponser", __filename, "getResidentCompanyForSponsor()");
-      throw new BiolabsException('Error in find resident company for sponser', err.message);
+      error("Error in find resident company for sponser",err.message, __filename, "getResidentCompanyForSponsor()");
     }
     return response;
 
@@ -765,14 +766,17 @@ export class ResidentCompanyService {
           where("resident_companies.companyStatus = :status", { status: '4' }).
           andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
 
-        //Get Sum of all companies and Average company size
-        const companystats: any = await this.residentCompanyRepository.
-          createQueryBuilder("resident_companies").
-          select("AVG(resident_companies.companySize)::numeric(10,2)", "avg").
-          addSelect("count(*)", "count").
-          where("resident_companies.companyStatus = :status", { status: '1' }).
-          andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).
-          andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
+        let companystats = {};
+        const count: any = await this.residentCompanyRepository.query("select count(*) from public.resident_companies where resident_companies.\"companyStatus\" = '1'  and resident_companies.\"companyOnboardingStatus\" = true and " + site.id + " = Any(\"site\")");
+        if(count && count.length>0){
+          companystats["count"] = count[0]["count"];
+        }
+        
+        //calculatinng median
+        const medainResponse: any = await this.residentCompanyRepository.query("select percentile_cont(0.5) within group ( order by resident_companies.\"companySize\" ) as median from public.resident_companies where resident_companies.\"companySize\" is not null and " + site.id + " = Any(\"site\") and resident_companies.\"companyStatus\" = '1'  and resident_companies.\"companyOnboardingStatus\" = true"); 
+        if (medainResponse && medainResponse.length>0) {
+          companystats["avg"] = Math.round(medainResponse[0].median);
+        }
 
         const categoryStats = await this.categoryRepository.
           query("SELECT c.name, c.id  as industryId, (select count(rc.*) FROM resident_companies as rc " +
@@ -780,16 +784,6 @@ export class ResidentCompanyService {
             " FROM public.categories as c order by industryCount desc limit 3;");
 
         let newStartUps: any = {};
-        // try {
-        //Get Sum of all New companies onboard in last 3 months
-        // newStartUps = await this.residentCompanyRepository.
-        // createQueryBuilder("resident_companies").
-        // addSelect("count(*)", "newStartUps").
-        // where("resident_companies.status = :status", { status: '1' }).
-        // where("resident_companies.createdAt  >  '06/01/2021' ").
-        // andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).
-        // andWhere(":site = ANY(resident_companies.site::int[]) ", { site: site.id }).getRawOne();
-
         newStartUps = await this.residentCompanyRepository.
           query(" select count(*) as newStartUps FROM resident_companies " +
             " where resident_companies.\"companyOnboardingStatus\" = true and " +
@@ -809,8 +803,7 @@ export class ResidentCompanyService {
         res.push(response);
       }
     } catch (err) {
-      error("Error in find resident company for sponser", __filename, "getResidentCompanyForSponsorBySite()");
-      throw new BiolabsException('Error in find resident company for sponser', err.message);
+      error("Error in find resident company for sponser",err.message, __filename, "getResidentCompanyForSponsorBySite()");
     }
     return res;
 
