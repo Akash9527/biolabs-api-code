@@ -50,8 +50,8 @@ export class OrderProductController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiQuery({ name: 'companyId', required: true, type: 'string' })
-  async fetchOrderProductsBetweenDates(@Query('companyId') companyId: number, @Query('month') month: number): Promise<any> {
-    return await this.orderProductService.fetchOrderProductsBetweenDates(month, companyId);
+  async fetchOrderProductsBetweenDates(@Query('companyId') companyId: number, @Query('month') month: number, @Query('year') year: number): Promise<any> {
+    return await this.orderProductService.fetchOrderProductsBetweenDates(month, year, companyId);
   }
 
 
@@ -77,11 +77,11 @@ export class OrderProductController {
   @Get('all-invoice')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async consolidatedInvoice(@Query('month') month: number, @Request() req): Promise<any> {
+  async consolidatedInvoice(@Query('month') month: number, @Query('year') year: number, @Request() req): Promise<any> {
     let siteIdArr = req.user.site_id;
     if (req.headers['x-site-id']) {
       siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     }
-    return await this.orderProductService.consolidatedInvoice(month, siteIdArr);
+    return await this.orderProductService.consolidatedInvoice(month, year, siteIdArr);
   }
 }

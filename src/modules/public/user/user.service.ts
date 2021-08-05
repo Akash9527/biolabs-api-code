@@ -105,7 +105,6 @@ export class UsersService {
       this.mail.sendEmail(tenant, EMAIL.SUBJECT_INVITE_USER, 'Invite', userInfo);
       info("User added successfully", __filename, "addUser(");
     } catch (err) {
-      console.log(err)
       error("Getting error to create the new user " + err.message, __filename, "addUser()");
       throw new InternalException('Getting error to create the new user', err.message);
 
@@ -169,12 +168,12 @@ export class UsersService {
         await this.userRepository.update(user.id, user);
         return user;
       } else {
-        error("User with provided id not available." + payload.id, __filename, "softDeleteUser()");
+        error("User with provided id not available." + payload.id, __filename, "updateUserProfilePic()");
         throw new NotAcceptableException('User with provided id not available.');
       }
     } catch (err) {
       error("Getting error in updating the user profile picture" + err.message, __filename, "updateUserProfilePic()");
-      throw new BiolabsException('Getting error in updating the user profile picture' + err.message);
+      throw new BiolabsException('Getting error in updating the user profile picture', err.message);
 
     }
   }
@@ -187,11 +186,20 @@ export class UsersService {
    */
   async softDeleteUser(id) {
     info("Inside soft delete the user userId " + id, __filename, "softDeleteUser()");
+    const FOR_DELETE_USER = "Deleted";
+    const FOR_USER="User";
     try {
       const user = await this.get(id);
       if (user) {
         user.status = '99';
-        debug("Soft deleted succesfully", __filename, "softDeleteUser()");
+        user.email = FOR_DELETE_USER;
+        user.firstName = FOR_USER;
+        user.lastName = FOR_DELETE_USER;
+        user.password = FOR_DELETE_USER;
+        user.phoneNumber = FOR_DELETE_USER;
+        user.imageUrl = FOR_DELETE_USER;
+        user.title = FOR_DELETE_USER;
+        debug("Before Saving", __filename, "softDeleteUser()");
         return await this.userRepository.save(user);
       } else {
         error("User with provided id not available." + id, __filename, "softDeleteUser()");
@@ -199,7 +207,7 @@ export class UsersService {
       }
     } catch (err) {
       error("Error in soft delete user", __filename, "softDeleteUser()");
-      throw new BiolabsException('Error in soft delete user' + err.message);
+      throw new BiolabsException('Error in soft delete user', err);
     }
   }
 
@@ -234,7 +242,7 @@ export class UsersService {
     }
     userQuery.addOrderBy("users.firstName", "ASC");
     userQuery.addOrderBy("users.lastName", "ASC");
-    debug("Getting list of user by query : " + userQuery.getSql(), __filename, "getUsers()");
+    debug("Getting list of user by query : ", __filename, "getUsers()");
     return await userQuery.getMany();
     // return await this.userRepository.find({
     //   where: search,
@@ -354,7 +362,7 @@ export class UsersService {
       );
     } catch (err) {
       error("Getting error in generating user token", __filename, "generateToken()");
-      throw new BiolabsException('Getting error in generating user token' + err.message);
+      throw new BiolabsException('Getting error in generating user token', err.message);
     }
 
   }
@@ -392,7 +400,7 @@ export class UsersService {
       }
     } catch (err) {
       error("Getting error in forget password process or sending email", __filename, "forgotPassword()");
-      throw new BiolabsException('Getting error in forget password process' + err.message);
+      throw new BiolabsException('Getting error in forget password process', err.message);
     }
   }
 }
