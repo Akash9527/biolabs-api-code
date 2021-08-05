@@ -76,7 +76,7 @@ describe('OrderProductController', () => {
             productName: 'TestProduct', productDescription: 'This is TestProduct 1',
             startDate: '2021-08-02', endDate: '2021-08-18',
             month: 7, year: 2021, quantity: 20, cost: 100, recurrence: true,
-            currentCharge: true, manuallyEnteredProduct: false, productId: 10, groupId: 1, productTypeId: 1
+            currentCharge: true, manuallyEnteredProduct: false, productId: 10, groupId: 1, productTypeId: 1, status: 0
         };
         it('it should called orderProductService updateOrderProduct method ', async () => {
             expect(mockUpdateOrderProductPayload).not.toBe(null);
@@ -102,8 +102,8 @@ describe('OrderProductController', () => {
     });
     describe('should test fetchOrderProductsBetweenDates Functionality', () => {
         it('it should called orderProductService fetchOrderProductsBetweenDates method ', async () => {
-            await orderProductController.fetchOrderProductsBetweenDates(mockOrderProduct.companyId, mockOrderProduct.month);
-            expect(await orderProductService.fetchOrderProductsBetweenDates).toHaveBeenCalledWith(mockOrderProduct.month, mockOrderProduct.companyId);
+            await orderProductController.fetchOrderProductsBetweenDates(mockOrderProduct.companyId, mockOrderProduct.month, mockOrderProduct.year);
+            expect(await orderProductService.fetchOrderProductsBetweenDates).toHaveBeenCalledWith(mockOrderProduct.month, mockOrderProduct.year, mockOrderProduct.companyId);
         });
         it('it should return  orderProduct object  based on month and Company Id ', async () => {
             const mockOrderProduct2 = {
@@ -146,10 +146,10 @@ describe('OrderProductController', () => {
         }
         let siteIdArr: any;
         it('it should called orderProductService consolidatedInvoice method ', async () => {
-            await orderProductController.consolidatedInvoice(mockOrderProduct.month, req);
+            await orderProductController.consolidatedInvoice(mockOrderProduct.month, mockOrderProduct.year, req);
             siteIdArr = req.user.site_id;
             siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
-            expect(await orderProductService.consolidatedInvoice).toHaveBeenCalledWith(mockOrderProduct.month, siteIdArr);
+            expect(await orderProductService.consolidatedInvoice).toHaveBeenCalledWith(mockOrderProduct.month, mockOrderProduct.year, siteIdArr);
         });
         it('it should return  orderProduct object  based on month ', async () => {
             const mockOrderProduct2 = {
@@ -162,13 +162,13 @@ describe('OrderProductController', () => {
             }
             let consolidatedProducts: Array<any> = [{ mockOrderProduct, mockOrderProduct2 }];
             await orderProductService.consolidatedInvoice.mockResolvedValueOnce(consolidatedProducts);
-            let orderProducts = await orderProductController.consolidatedInvoice(mockOrderProduct.month, req);
+            let orderProducts = await orderProductController.consolidatedInvoice(mockOrderProduct.month, mockOrderProduct.year, req);
             expect(orderProducts).not.toBeNull();
             expect(orderProducts.length).toBe(consolidatedProducts.length);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             orderProductService.consolidatedInvoice.mockResolvedValue(new UnauthorizedException());
-            const { response } = await orderProductController.consolidatedInvoice(mockOrderProduct.month, req);
+            const { response } = await orderProductController.consolidatedInvoice(mockOrderProduct.month, mockOrderProduct.year, req);
             expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
             expect(response.message).toBe('Unauthorized');
         });
