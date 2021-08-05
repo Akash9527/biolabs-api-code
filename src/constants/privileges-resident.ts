@@ -171,7 +171,41 @@ export const RESIDENT_ACCESSLEVELS = {
       create: false,
       view: true,
       update: false,
-      delete: false
-    },
-  },
+      delete: false,
+      'dynamic-value': {
+        'company': {
+          name: 'Company Profile',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'onboarding': {
+          name: 'Onboarding Information',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'invoicing': {
+          name: 'Invoicing',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'planchange': {
+          name: 'Change Request',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        }
+      }
+    }
+  }
 };
