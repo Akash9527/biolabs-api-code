@@ -134,9 +134,8 @@ export class OrderProductService {
     debug(`order product: ${orderProduct.productId}`, __filename, "updateOrderProduct()");
     const product = await this.productRepository.findOne(orderProduct.productId);
     payload.productTypeId = (product && product.productType) ? product.productType.id : null;
-
+    payload.status = orderProduct.status;
     payload.groupId = orderProduct.groupId;
-    payload.manuallyEnteredProduct = orderProduct.manuallyEnteredProduct;
     payload.productId = orderProduct.productId;
     const futureProducts = await this.orderProductRepository.find({
       where: {
