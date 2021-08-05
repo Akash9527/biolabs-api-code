@@ -68,6 +68,7 @@ export class OrderProductService {
       orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
       const product = await this.productRepository.findOne(orderProduct.productId);
       orderProduct.productTypeId = (product && product.productType) ? product.productType.id : null;
+      console.log("add Flow ",orderProduct.productTypeId);
       await this.orderProductRepository.update(orderSave.id, orderProduct);
 
       if (orderProduct.recurrence) {
@@ -131,12 +132,14 @@ export class OrderProductService {
       error(err.message, __filename, "updateOrderProduct()")
       throw new BiolabsException(err.message);
     });
-    debug(`order product: ${orderProduct.productId}`, __filename, "updateOrderProduct()");
-    const product = await this.productRepository.findOne(orderProduct.productId);
+    debug(`order product: ${payload.productId}`, __filename, "updateOrderProduct()");
+    const productId = (payload.productId) ? payload.productId : orderProduct.id;
+    const product = await this.productRepository.findOne(productId);
     payload.productTypeId = (product && product.productType) ? product.productType.id : null;
+    console.log("add Flow ",payload.productTypeId);
     payload.status = orderProduct.status;
     payload.groupId = orderProduct.groupId;
-    payload.productId = orderProduct.productId;
+    payload.productId = productId;
     const futureProducts = await this.orderProductRepository.find({
       where: {
         groupId: payload.groupId,
