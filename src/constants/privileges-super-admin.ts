@@ -182,6 +182,56 @@ export const SUPER_ADMIN_ACCESSLEVELS = {
       view: true,
       update: true,
       delete: true,
+      dynamic: {
+        'company': {
+          name: 'Company Profile',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'onboarding': {
+          name: 'Onboarding Information',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'companyadmin': {
+          name: 'Admin',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'growth': {
+          name: 'Company Growth',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'invoicing': {
+          name: 'Invoicing',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'planchange': {
+          name: 'Change Request',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        }
+      }
     },
   },
 }

@@ -167,12 +167,12 @@ export const RESIDENT_ACCESSLEVELS = {
     },
     'resident-companies': {
       name: 'Resident Companies',
-      action: false,
-      create: false,
+      action: true,
+      create: true,
       view: true,
-      update: false,
-      delete: false,
-      'dynamic-value': {
+      update: true,
+      delete: true,
+      dynamic: {
         'company': {
           name: 'Company Profile',
           action: true,
@@ -188,6 +188,22 @@ export const RESIDENT_ACCESSLEVELS = {
           view: true,
           update: true,
           delete: true
+        },
+        'companyadmin': {
+          name: 'Admin',
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false
+        },
+        'growth': {
+          name: 'Company Growth',
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false
         },
         'invoicing': {
           name: 'Invoicing',
@@ -206,6 +222,6 @@ export const RESIDENT_ACCESSLEVELS = {
           delete: true
         }
       }
-    }
+    },
   }
 };
