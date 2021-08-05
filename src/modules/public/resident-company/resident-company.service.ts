@@ -1515,18 +1515,18 @@ export class ResidentCompanyService {
   async getFeeds(siteId: number, companyId: number) {
     info(`get feeds by siteId: ${siteId} companyId: ${companyId}`, __filename, "getFeeds()")
     try {
-      const getFeeds = await this.residentCompanyHistoryRepository.query("SELECT feeds(" + companyId + ")").catch(err => {
+      const getFeeds = await this.residentCompanyHistoryRepository.query("SELECT * FROM feeds(" + companyId + ")").catch(err => {
         switch (err.code) {
           case '42883':
             debug(err.message, __filename, "getFeeds()")
-            throw new BiolabsException(err.message);
+            throw new BiolabsException("Error in executing feeds function with companyId :  ",companyId,err.message);
             break;
         }
       });
       return getFeeds;
     } catch (err) {
-      error("Getting error to find the time analysis", __filename, "getFeeds()");
-      throw new BiolabsException('Getting error in forget password process', err.message);
+      error("Getting error to find the time analysis",err.message, __filename, "getFeeds()");
+      throw new BiolabsException('Getting error in updating feeds', err.message);
     }
   }
 

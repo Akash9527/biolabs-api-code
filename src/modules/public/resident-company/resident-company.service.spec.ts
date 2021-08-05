@@ -386,7 +386,7 @@ describe('ResidentCompanyService', () => {
 
         { provide: getRepositoryToken(Site), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn() } },
         { provide: getRepositoryToken(BiolabsSource), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn() } },
-        { provide: getRepositoryToken(Category), useValue: { find: jest.fn(), findOne: jest.fn(), query: jest.fn().mockReturnThis(), save: jest.fn() } },
+        { provide: getRepositoryToken(Category), useValue: { query: jest.fn(), find: jest.fn(), findOne: jest.fn(), save: jest.fn() } },
         { provide: getRepositoryToken(Funding), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn() } },
         { provide: getRepositoryToken(Modality), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn() } },
         { provide: getRepositoryToken(TechnologyStage), useValue: { find: jest.fn(), findOne: jest.fn(), save: jest.fn(), query: jest.fn() } },
@@ -885,25 +885,59 @@ describe('ResidentCompanyService', () => {
   });
 
   describe('getResidentCompanyForSponsor method', () => {
-    let mockRecidentCompanies = { companyStats: 0, graduate: 0, categoryStats: 0 }
+    const companyStats = {
+      startUpcount: 0,
+      avgTeamSize: 0
+    }
+    const mockCount = 2;
+    const mockMedian = 4;
+    const mockcatStatus = [
+      {
+        "name": "Lab/Research Tools",
+        "industryid": 90,
+        "industrycount": "1"
+      },
+      {
+        "name": "Pulmonary hypertension",
+        "industryid": 12,
+        "industrycount": "0"
+      },
+      {
+        "name": "Cardiac arrhythmias and associated disorders",
+        "industryid": 11,
+        "industrycount": "0"
+      }
+    ]
+
     it('should return array of Resident companies for Sponser', async () => {
+      //jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockReturnThis();
       residentCompanyRepository.
         createQueryBuilder("resident_companies").
         select("count(*)", "graduate").
         where("resident_companies.companyStatus = :status", { status: '4' }).getRawOne();
-      residentCompanyRepository.
-        createQueryBuilder("resident_companies").
-        select("AVG(resident_companies.companySize)::numeric(10,2)", "avgTeamSize").
-        addSelect("count(*)", "startUpcount").
-        where("resident_companies.companyStatus = :status", { status: '1' }).
-        andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).getRawOne();
-      categoryRepository.
-        query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
-          "where c.id = ANY(rc.industry::int[]) ) as industryCount " +
-          "FROM public.categories as c order by industryCount desc limit 3;")
-      // jest.spyOn(residentCompanyService, 'getResidentCompanyForSponsor').mockResolvedValueOnce(mockRecidentCompanies);
+      jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockCount);
+      jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockMedian);
+      jest.spyOn(categoryRepository, 'query').mockResolvedValue(mockcatStatus);
       let result = await residentCompanyService.getResidentCompanyForSponsor();
       expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined();
+      expect(result).toEqual({
+        companyStats: {},
+        graduate: 0,
+        categoryStats: [
+          { name: 'Lab/Research Tools', industryid: 90, industrycount: '1' },
+          {
+            name: 'Pulmonary hypertension',
+            industryid: 12,
+            industrycount: '0'
+          },
+          {
+            name: 'Cardiac arrhythmias and associated disorders',
+            industryid: 11,
+            industrycount: '0'
+          }
+        ]
+      })
     })
     it('should throw exception if company with provided id not available.', async () => {
       jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => {
@@ -1009,6 +1043,32 @@ describe('ResidentCompanyService', () => {
 
   describe('getResidentCompanyForSponsorBySite method', () => {
     let mockSites: Array<any> = [{ "id": 2, "name": "Ipsen" }, { "id": 1, "name": "Tufts" }];
+    const mockStartUps =
+      [
+        {
+          "newstartups": "0"
+        }
+      ]
+
+    const mockCount = 2;
+    const mockMedian = 4;
+    const mockcatStatus = [
+      {
+        name: "Cardiac arrhythmias and associated disorders",
+        industryid: 11,
+        industrycount: 0
+      },
+      {
+        name: "Pulmonary hypertension",
+        industryid: 12,
+        industrycount: 0
+      },
+      {
+        name: "Therapeutics (Biopharma)",
+        industryid: 1,
+        industrycount:0
+      }
+    ]
     it('should return array of Resident companies for Sponser', async () => {
       jest.spyOn(siteRepository, 'find').mockResolvedValueOnce(mockSites);
       residentCompanyRepository.
@@ -1016,23 +1076,10 @@ describe('ResidentCompanyService', () => {
         select("count(*)", "graduate").
         where("resident_companies.companyStatus = :status", { status: '4' }).
         andWhere(":site = ANY(resident_companies.site::int[]) ", { site: 1 }).getRawOne();
-      residentCompanyRepository.
-        createQueryBuilder("resident_companies").
-        select("AVG(resident_companies.companySize)::numeric(10,2)", "avg").
-        addSelect("count(*)", "count").
-        where("resident_companies.companyStatus = :status", { status: '1' }).
-        andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: "true" }).
-        andWhere(":site = ANY(resident_companies.site::int[]) ", { site: 1 }).getRawOne();
-      categoryRepository.
-        query("SELECT c.name, c.id  as industryId, (select count(rc.*) FROM resident_companies as rc " +
-          "where c.id = ANY(rc.industry::int[]) and " + 1 + " = ANY(rc.site::int[])  ) as industryCount " +
-          " FROM public.categories as c order by industryCount desc limit 3;");
-      residentCompanyRepository.
-        query(" select count(*) as newStartUps FROM resident_companies " +
-          " where resident_companies.\"companyOnboardingStatus\" = true and " +
-          + 1 + "= ANY(resident_companies.\"site\"::int[]) and" +
-          " resident_companies.\"companyStatus\" = '1' and " +
-          " (CURRENT_DATE - INTERVAL '3 months')  < (resident_companies.\"createdAt\") ");
+      jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockCount);
+      jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockMedian);
+      jest.spyOn(categoryRepository, 'query').mockResolvedValue(mockcatStatus);
+      jest.spyOn(categoryRepository, 'query').mockResolvedValue(mockStartUps);
       let result = await residentCompanyService.getResidentCompanyForSponsorBySite();
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
@@ -1473,34 +1520,82 @@ describe('ResidentCompanyService', () => {
   describe('getFeeds method', () => {
     const mockFeeds = [
       {
-        "feeds": "Company size changed to 100 on 07/20/2021"
+        "feeds": "R&D path & commercialization plan changed ",
+        "beforevalue": "Blue Line",
+        "aftervalue": "the stargazer snake eel, is a marine fish belonging to the family Ophichthidae. It is native to shallow tropical and subtropical waters in the western Indo-Pacific region. It hunts at night for crustaceans and small fish, after which it submerges itself into the sediment tail first and remains there all day, with just its eyes and the top of its head projecting, as seen here in Batangas Bay in the Philippines.",
+        "cdate": "08/04/2021"
       },
       {
-        "feeds": "Company name changed to Ymir Genomics on 07/20/2021"
+        "feeds": "Funding Source changed ",
+        "beforevalue": "Angel Investors(including friends and family),Grant funded,Seed-Funding",
+        "aftervalue": "Other",
+        "cdate": "08/04/2021"
       },
       {
-        "feeds": "Company founded place changed to Washington DC on 07/09/2021"
+        "feeds": "Funding Source changed to other",
+        "beforevalue": "-",
+        "aftervalue": "funding source today",
+        "cdate": "08/04/2021"
       },
       {
-        "feeds": "Elevator Pitch changed to QA on 07/09/2021"
+        "feeds": "Intellectual property related to your technology changed ",
+        "beforevalue": "1",
+        "aftervalue": "9999",
+        "cdate": "08/04/2021"
       },
       {
-        "feeds": "Recognized partnerships with academia changed to No on 07/09/2021"
+        "feeds": "Intellectual property related to your technology changed to other ",
+        "beforevalue": "intellectual 4th aug",
+        "aftervalue": "intellectual 4th aug1",
+        "cdate": "08/04/2021"
       },
       {
-        "feeds": "Recognized partnerships with industry changed to No on 07/09/2021"
+        "feeds": "Intellectual property related to your technology changed ",
+        "beforevalue": "9999",
+        "aftervalue": "1",
+        "cdate": "08/04/2021"
       },
       {
-        "feeds": "Funding changed to 2500 on 07/09/2021"
+        "feeds": "Intellectual property related to your technology changed ",
+        "beforevalue": "1",
+        "aftervalue": "9999",
+        "cdate": "08/04/2021"
       },
       {
-        "feeds": "Company name changed to Biolabs_QA on 07/09/2021"
+        "feeds": "Intellectual property related to your technology changed to other ",
+        "beforevalue": "-",
+        "aftervalue": "intellectual 4th aug",
+        "cdate": "08/04/2021"
       },
       {
-        "feeds": "Technology Summary changed to QA UPDATED on 07/09/2021"
+        "feeds": "Company size changed ",
+        "beforevalue": "6",
+        "aftervalue": "5",
+        "cdate": "08/02/2021"
       },
       {
-        "feeds": "R&D path & commercialization plan changed to QA UPDATED on 07/09/2021"
+        "feeds": "Published papers related to your technology changed ",
+        "beforevalue": "No",
+        "aftervalue": "Yes",
+        "cdate": "08/02/2021"
+      },
+      {
+        "feeds": "Funding changed ",
+        "beforevalue": "1000",
+        "aftervalue": "10000",
+        "cdate": "08/02/2021"
+      },
+      {
+        "feeds": "Company size changed ",
+        "beforevalue": "0",
+        "aftervalue": "6",
+        "cdate": "08/02/2021"
+      },
+      {
+        "feeds": "Affiliated Institution changed ",
+        "beforevalue": "Blue Line",
+        "aftervalue": "Blue Line inst",
+        "cdate": "08/02/2021"
       }
     ]
     it('should return object', async () => {
@@ -1510,16 +1605,27 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeUndefined();
       expect(result).toEqual(mockFeeds);
     })
+    it('should throw exception', async () => {
+      jest.spyOn(residentCompanyHistoryRepository, 'query').mockRejectedValueOnce(null);
+      try {
+      await residentCompanyService.getFeeds(1, 1);
+
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toBe('Getting error in updating feeds');
+      }
+    })
     it('should throw exception if Getting error  in forget password process', async () => {
       jest.spyOn(residentCompanyHistoryRepository, 'query').mockImplementation(() => {
-        throw new BiolabsException('Getting error in forget password process')
+        throw new BiolabsException('Getting error in updating feeds')
       });
       try {
         await residentCompanyService.getFeeds(1, 1);
       } catch (e) {
         expect(e.name).toBe('BiolabsException');
         expect(e instanceof BiolabsException).toBeTruthy();
-        expect(e.message).toBe('Getting error in forget password process');
+        expect(e.message).toBe('Getting error in updating feeds');
       }
     });
   });
