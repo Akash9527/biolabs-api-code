@@ -68,7 +68,6 @@ export class OrderProductService {
       orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
       const product = await this.productRepository.findOne(orderProduct.productId);
       orderProduct.productTypeId = (product && product.productType) ? product.productType.id : null;
-      console.log("add Flow ",orderProduct.productTypeId);
       await this.orderProductRepository.update(orderSave.id, orderProduct);
 
       if (orderProduct.recurrence) {
@@ -136,7 +135,6 @@ export class OrderProductService {
     const productId = (payload.productId) ? payload.productId : orderProduct.id;
     const product = await this.productRepository.findOne(productId);
     payload.productTypeId = (product && product.productType) ? product.productType.id : null;
-    console.log("add Flow ",payload.productTypeId);
     payload.status = orderProduct.status;
     payload.groupId = orderProduct.groupId;
     payload.productId = productId;
