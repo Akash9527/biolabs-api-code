@@ -25,6 +25,12 @@ export class UpdateOrderProductDto {
   quantity: number;
 
   @ApiProperty({
+    required: false,
+    nullable: true,
+  })
+  status: number;
+
+  @ApiProperty({
     required: true,
     nullable: true,
   })
