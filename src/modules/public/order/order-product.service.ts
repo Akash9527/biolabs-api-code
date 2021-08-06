@@ -68,6 +68,7 @@ export class OrderProductService {
       orderProduct.productId = (orderProduct.manuallyEnteredProduct) ? orderSave.id : orderProduct.productId;
       const product = await this.productRepository.findOne(orderProduct.productId);
       orderProduct.productTypeId = (product && product.productType) ? product.productType.id : null;
+      console.log("add Flow ",orderProduct.productTypeId);
       await this.orderProductRepository.update(orderSave.id, orderProduct);
 
       if (orderProduct.recurrence) {
@@ -131,13 +132,14 @@ export class OrderProductService {
       error(err.message, __filename, "updateOrderProduct()")
       throw new BiolabsException(err.message);
     });
-    debug(`order product: ${orderProduct.productId}`, __filename, "updateOrderProduct()");
-    const product = await this.productRepository.findOne(orderProduct.productId);
+    debug(`order product: ${payload.productId}`, __filename, "updateOrderProduct()");
+    const productId = (payload.productId) ? payload.productId : orderProduct.id;
+    const product = await this.productRepository.findOne(productId);
     payload.productTypeId = (product && product.productType) ? product.productType.id : null;
-
+    console.log("add Flow ",payload.productTypeId);
+    payload.status = orderProduct.status;
     payload.groupId = orderProduct.groupId;
-    payload.manuallyEnteredProduct = orderProduct.manuallyEnteredProduct;
-    payload.productId = orderProduct.productId;
+    payload.productId = productId;
     const futureProducts = await this.orderProductRepository.find({
       where: {
         groupId: payload.groupId,
@@ -183,12 +185,13 @@ export class OrderProductService {
    * @param endDate 
    * @returns 
    */
-  async fetchOrderProductsBetweenDates(month: number, companyId: number) {
+  async fetchOrderProductsBetweenDates(month: number, year: number, companyId: number) {
     info(`Fetch Order product between dates : ${month} companyId: ${companyId}`, __filename, "fetchOrderProductsBetweenDates()")
     try {
       return await this.orderProductRepository.createQueryBuilder("order_product")
         .where("order_product.companyId = :companyId", { companyId: companyId })
         .andWhere("order_product.month = :month", { month: month })
+        .andWhere("order_product.year = :year", { year: year })
         .orderBy("order_product.updatedAt", 'DESC')
         .getRawMany();
     } catch (err) {
@@ -228,9 +231,9 @@ export class OrderProductService {
    * @param month 
    * @returns 
    */
-  async consolidatedInvoice(month: number, site: number) {
+  async consolidatedInvoice(month: number, year: number, site: number) {
     try {
-      info(`Consolidated Invoice by month: ${month} site: ${site}`, __filename, "consolidatedInvoice()");
+      info(`Consolidated Invoice by month: ${month}, year ${year} site: ${site}`, __filename, "consolidatedInvoice()");
       const query = `select 
                     rc."id" as companyid, 
                     orp.id as orderId,
@@ -266,6 +269,7 @@ export class OrderProductService {
                           orpd."month" = ${month} 
                           or orpd."month" isnull
                         )
+                        and orpd."year" = ${year}
                         and orpd."currentCharge" = true
                     ) as orp on orp."companyId" = rc."id" 
                   where 
