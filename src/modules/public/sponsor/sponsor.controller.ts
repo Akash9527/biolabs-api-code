@@ -3,7 +3,8 @@ import { SponsorService } from './sponsor.service';
 import { ResidentCompanyService } from '../resident-company';
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-
+let KeyVault = require('azure-keyvault');
+let AuthenticationContext = require('adal-node').AuthenticationContext;
 
 @Controller('api/sponsor')
 @ApiTags('sponsor')
@@ -39,4 +40,42 @@ export class SponsorController {
     return this.residentCompanyService.getResidentCompanyForSponsorBySite();
   }
 
+}
+
+// POC FOR AZURE KEY-VAULT
+@Controller('api/azure')
+export class KeyVaultControllers {
+  // Comment for now due to KeyVaultService.
+  // constructor(keyVaultService: KeyVaultService | any) {}
+
+  /**
+   * Description: This method is used to get the values from azure key vault service.
+   * @description This method is used to get the values from azure key vault service.
+   */
+  @Get('getKeyVault')
+  getKeyVault(): any {
+    let clientId = "977fb5e9-1d3d-431c-8687-2de397963e67";
+    let clientSecret = "jVeF6Z.4T-_0prNc5Q624d75fG89~V1CK_";
+    let vaultUri = "https://biolabs-prod.vault.azure.net/";
+
+    let authenticator = function (challenge, callback) {
+      let context = new AuthenticationContext(challenge.authorization);
+      return context.acquireTokenWithClientCredentials(challenge.resource, clientId, clientSecret, function (err, tokenResponse) {
+        if (err) throw err;
+        let authorizationValue = tokenResponse.tokenType + ' ' + tokenResponse.accessToken;
+        return callback(null, authorizationValue);
+      });
+    };
+
+    // code for new client
+    let credentials = new KeyVault.KeyVaultCredentials(authenticator);
+    let client = new KeyVault.KeyVaultClient(credentials);
+
+    //code for fetching secret
+    let secretName = 'user'
+    let secretVersion = ''
+    client.getSecret(vaultUri, secretName, secretVersion).then((result) => {
+      return result
+    })
+  }
 }
