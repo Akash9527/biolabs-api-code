@@ -155,8 +155,8 @@ export class ResidentCompanyController {
   @Get(':id')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getResidentCompany(@Param('id') id: number): Promise<any> {
-    return this.residentCompanyService.getResidentCompany(id);
+  async getResidentCompany(@Param('id') id: number, @Request() req?): Promise<any> {
+    return this.residentCompanyService.getResidentCompany(id, req);
   }
 
   /**

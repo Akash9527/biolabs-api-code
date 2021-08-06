@@ -18,7 +18,6 @@ import { Funding } from '../master/funding.entity';
 import { Modality } from '../master/modality.entity';
 import { Site } from '../master/site.entity';
 import { TechnologyStage } from '../master/technology-stage.entity';
-import { ProductTypeService } from '../order/product-type.service';
 import { User } from '../user';
 import { AddNotesDto } from './add-notes.dto';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
@@ -72,8 +71,7 @@ export class ResidentCompanyService {
     private readonly spaceChangeWaitlistRepository: Repository<SpaceChangeWaitlist>,
     @InjectRepository(Item)
     private readonly itemRepository: Repository<Item>,
-    private readonly mail: Mail,
-    private readonly productTypeService: ProductTypeService
+    private readonly mail: Mail
   ) { }
   /**
    * Description: This method will get the resident company by id.
@@ -722,12 +720,12 @@ export class ResidentCompanyService {
 
       let status = {};
       const count: any = await this.residentCompanyRepository.query("select count(*) from public.resident_companies where resident_companies.\"companyStatus\" = '1' and resident_companies.\"companyOnboardingStatus\" = true");
-      if (count && count.length>0) {
-      status["startUpcount"] = count[0]["count"];
+      if (count && count.length > 0) {
+        status["startUpcount"] = count[0]["count"];
       }
       //calculatinng median
       const medainResponse: any = await this.residentCompanyRepository.query("select percentile_cont(0.5) within group ( order by resident_companies.\"companySize\" ) as median from public.resident_companies where resident_companies.\"companySize\" is not null and resident_companies.\"companyStatus\" = '1'  and resident_companies.\"companyOnboardingStatus\" = true");
-      if (medainResponse && medainResponse.length>0) {
+      if (medainResponse && medainResponse.length > 0) {
         status["avgTeamSize"] = Math.round(medainResponse[0].median);
       }
       const categoryStats = await this.categoryRepository.
@@ -739,7 +737,7 @@ export class ResidentCompanyService {
       response['graduate'] = (!graduate) ? 0 : graduate;
       response['categoryStats'] = (!categoryStats) ? 0 : categoryStats;
     } catch (err) {
-      error("Error in find resident company for sponser",err.message, __filename, "getResidentCompanyForSponsor()");
+      error("Error in find resident company for sponser", err.message, __filename, "getResidentCompanyForSponsor()");
     }
     return response;
 
@@ -768,13 +766,13 @@ export class ResidentCompanyService {
 
         let companystats = {};
         const count: any = await this.residentCompanyRepository.query("select count(*) from public.resident_companies where resident_companies.\"companyStatus\" = '1'  and resident_companies.\"companyOnboardingStatus\" = true and " + site.id + " = Any(\"site\")");
-        if(count && count.length>0){
+        if (count && count.length > 0) {
           companystats["count"] = count[0]["count"];
         }
-        
+
         //calculatinng median
-        const medainResponse: any = await this.residentCompanyRepository.query("select percentile_cont(0.5) within group ( order by resident_companies.\"companySize\" ) as median from public.resident_companies where resident_companies.\"companySize\" is not null and " + site.id + " = Any(\"site\") and resident_companies.\"companyStatus\" = '1'  and resident_companies.\"companyOnboardingStatus\" = true"); 
-        if (medainResponse && medainResponse.length>0) {
+        const medainResponse: any = await this.residentCompanyRepository.query("select percentile_cont(0.5) within group ( order by resident_companies.\"companySize\" ) as median from public.resident_companies where resident_companies.\"companySize\" is not null and " + site.id + " = Any(\"site\") and resident_companies.\"companyStatus\" = '1'  and resident_companies.\"companyOnboardingStatus\" = true");
+        if (medainResponse && medainResponse.length > 0) {
           companystats["avg"] = Math.round(medainResponse[0].median);
         }
 
@@ -803,27 +801,34 @@ export class ResidentCompanyService {
         res.push(response);
       }
     } catch (err) {
-      error("Error in find resident company for sponser",err.message, __filename, "getResidentCompanyForSponsorBySite()");
+      error("Error in find resident company for sponser", err.message, __filename, "getResidentCompanyForSponsorBySite()");
     }
     return res;
 
   }
 
-
-
   /**
    * Description: This method will get the resident company.
    * @description This method will get the resident company.
    * @param id number resident company id
+   * @param req object of Request
    * @return resident company object
    */
-  async getResidentCompany(id) {
+  async getResidentCompany(id: number, @Request() req) {
     info("Getting Resident company by id :" + id, __filename, "getResidentCompany()");
+
+    if (id == null) {
+      debug("Resident company is not fonund by id :" + id, __filename, "getResidentCompany()");
+      return {};
+    }
+
+    if (req && req.user && req.user.companyId && req.user.companyId != id) {
+      error("Error in find resident company", __filename, "getResidentCompany()");
+      throw new NotAcceptableException(
+        'You do not have permission to view this company',
+      );
+    }
     try {
-      if (id == null) {
-        debug("Resident company is not fonund by id :" + id, __filename, "getResidentCompany()");
-        return {};
-      }
       const residentCompany: any = await this.residentCompanyRepository.findOne({
         where: { id: id }
       });
@@ -947,7 +952,7 @@ export class ResidentCompanyService {
           await this.sendEmailToSiteAdmin(payload.site, req, residentCompany.companyName, residentCompany.id, ApplicationConstants.EMAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES);
           info(`Email sent regarding Sponsorship contact question change to Yes`, __filename, `updateResidentCompany()`);
         }
-        return await this.getResidentCompany(residentCompany.id);
+        return await this.getResidentCompany(residentCompany.id, req);
       } else {
         error("Company with provided id not available.", __filename, "updateResidentCompany()");
         throw new NotAcceptableException(
@@ -1519,13 +1524,13 @@ export class ResidentCompanyService {
         switch (err.code) {
           case '42883':
             debug(err.message, __filename, "getFeeds()")
-            throw new BiolabsException("Error in executing feeds function with companyId :  ",companyId,err.message);
+            throw new BiolabsException("Error in executing feeds function with companyId :  ", companyId, err.message);
             break;
         }
       });
       return getFeeds;
     } catch (err) {
-      error("Getting error to find the time analysis",err.message, __filename, "getFeeds()");
+      error("Getting error to find the time analysis", err.message, __filename, "getFeeds()");
       throw new BiolabsException('Getting error in updating feeds', err.message);
     }
   }

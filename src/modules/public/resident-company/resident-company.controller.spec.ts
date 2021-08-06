@@ -113,7 +113,7 @@ const mockResidentCompany = {
 }
 
 const req: any = {
-    user: { site_id: [1, 2], role: 1 },
+    user: { site_id: [1, 2], role: 1, companyId: 70 },
     headers: { 'x-site-id': [2] }
 }
 let siteIdArr: any;
@@ -283,21 +283,22 @@ describe('ResidentCompanyController', () => {
             expect(response.message).toBe('Unauthorized');
         });
     });
+
     describe('should test getResidentCompany Functionality', () => {
         it('it should called residentService getResidentCompany method ', async () => {
-            await residentController.getResidentCompany(mockResidentCompany.residentCompany.id);
-            expect(await residentService.getResidentCompany).toHaveBeenCalledWith(mockResidentCompany.residentCompany.id);
+            await residentController.getResidentCompany(mockResidentCompany.residentCompany.id, req);
+            expect(await residentService.getResidentCompany).toHaveBeenCalledWith(mockResidentCompany.residentCompany.id, req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.getResidentCompany.mockResolvedValue(new UnauthorizedException());
-            const { response } = await residentController.getResidentCompany();
+            const { response } = await residentController.getResidentCompany(mockResidentCompany.residentCompany.id, req);
             expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
             expect(response.message).toBe('Unauthorized');
         });
         it('it should throw exception if we pass same comapny id', async () => {
             residentService.getResidentCompany.mockRejectedValueOnce(new NotAcceptableException('Company with provided id not available.'));
             try {
-                await residentController.getResidentCompany();
+                await residentController.getResidentCompany(mockResidentCompany.residentCompany.id, req);
             } catch (e) {
                 expect(e.response.statusCode).toBe(HTTP_CODES.NOT_ACCEPTABLE);
                 expect(e.response.error).toBe('Not Acceptable');
@@ -305,6 +306,7 @@ describe('ResidentCompanyController', () => {
             }
         });
     });
+    
     describe('should test addNotes Functionality', () => {
         let mockAddNote = { "companyId": 3, "notes": "this is note 1" };
         it('it should called residentService addNote method ', async () => {
