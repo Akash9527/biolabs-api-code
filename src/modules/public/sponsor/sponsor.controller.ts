@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpException, UseGuards } from '@nestjs/common';
 import { SponsorService } from './sponsor.service';
 import { ResidentCompanyService } from '../resident-company';
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -40,20 +40,16 @@ export class SponsorController {
     return this.residentCompanyService.getResidentCompanyForSponsorBySite();
   }
 
-}
-
-// POC FOR AZURE KEY-VAULT
-@Controller('api/azure')
-export class KeyVaultControllers {
-  // Comment for now due to KeyVaultService.
-  // constructor(keyVaultService: KeyVaultService | any) {}
-
   /**
-   * Description: This method is used to get the values from azure key vault service.
-   * @description This method is used to get the values from azure key vault service.
-   */
+    * Description: This method is used to get the values from azure key vault service.
+    * @description This method is used to get the values from azure key vault service.
+    */
+  // @ApiBearerAuth()
+  // @UseGuards(AuthGuard())
   @Get('getKeyVault')
-  getKeyVault(): any {
+  @ApiResponse({ status: 200, description: 'Successful Response' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getKeyVault() {
     let clientId = "977fb5e9-1d3d-431c-8687-2de397963e67";
     let clientSecret = "jVeF6Z.4T-_0prNc5Q624d75fG89~V1CK_";
     let vaultUri = "https://biolabs-prod.vault.azure.net/";
@@ -76,6 +72,12 @@ export class KeyVaultControllers {
     let secretVersion = ''
     client.getSecret(vaultUri, secretName, secretVersion).then((result) => {
       return result
-    })
+    }).catch(err => {
+      throw new HttpException({
+        status: "Error",
+        message: err.message,
+        body: err
+      }, 406);
+    });
   }
 }
