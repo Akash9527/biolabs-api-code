@@ -187,7 +187,7 @@ export class UsersService {
   async softDeleteUser(id) {
     info("Inside soft delete the user userId " + id, __filename, "softDeleteUser()");
     const FOR_DELETE_USER = "Deleted";
-    const FOR_USER="User";
+    const FOR_USER = "User";
     try {
       const user = await this.get(id);
       if (user) {
@@ -264,7 +264,7 @@ export class UsersService {
     if (user) {
       if (user.companyId) {
         const company = await this.residentCompanyService.getResidentCompany(
-          user.companyId,
+          user.companyId, null
         );
         if (company) user.company = company;
       }

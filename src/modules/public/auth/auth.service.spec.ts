@@ -39,6 +39,7 @@ const mockUserService = () => ({
 })
 
 const mockConfigService = () => { }
+
 const mockJwtService = () => ({
     sign: jest.fn()
 })
@@ -134,7 +135,7 @@ describe('AuthService', () => {
             usersService.getByEmail.mockResolvedValue(mockUser);
             let user: User = await authService.validateUser(mockLoginPayLoad);
             expect(user.companyId).toBe(mockUser.companyId);
-            expect(await residentCompanyService.getResidentCompany).toHaveBeenCalledWith(user.companyId);
+            expect(await residentCompanyService.getResidentCompany).toHaveBeenCalledWith(user.companyId, null);
         });
         it('should not validate invalid user', async () => {
             const hashCompareStatic = jest.fn().mockReturnValue(false);

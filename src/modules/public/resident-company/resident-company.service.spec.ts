@@ -271,7 +271,7 @@ const mock: UpdateResidentCompanyPayload = {
 };
 const mockNotes: Notes = { id: 1, createdBy: 1, createdAt: new Date(), residentCompany: new ResidentCompany(), notesStatus: 1, notes: "this is note 1" };
 const req: any = {
-  user: { site_id: [1, 2], role: 1 },
+  user: { site_id: [1, 2], role: 1, companyId: 70 },
   headers: { 'x-site-id': [2] }
 }
 describe('ResidentCompanyService', () => {
@@ -679,9 +679,7 @@ describe('ResidentCompanyService', () => {
       if (companyMembers.length > 0) {
         for (let i = 0; i < companyMembers.length; i++) {
           let companyMember = companyMembers[i];
-          //console.log("companyMember =========", companyMember);
           if (residentCompanyService.checkEmptyVal('managements', companyMember))
-            //console.log("in if block =========", companyMember);
             jest.spyOn(residentCompanyService, 'addResidentCompanyManagement').mockImplementation();
         }
       }
@@ -690,6 +688,7 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull();
     });
   });
+
   describe('addResidentCompanyAdvisor method', () => {
     let payload: ResidentCompanyAdvisoryFillableFields = {
       id: 1,
@@ -1066,7 +1065,7 @@ describe('ResidentCompanyService', () => {
       {
         name: "Therapeutics (Biopharma)",
         industryid: 1,
-        industrycount:0
+        industrycount: 0
       }
     ]
     it('should return array of Resident companies for Sponser', async () => {
@@ -1097,23 +1096,35 @@ describe('ResidentCompanyService', () => {
   });
 
   describe('getResidentCompany method', () => {
-    it('should return array of resident companies', async () => {
+    it('should return an object of resident companies', async () => {
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
-      let result = await residentCompanyService.getResidentCompany(mockRC.id)
+      let result = await residentCompanyService.getResidentCompany(70, req);
       expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined();
+      expect(result).toBe(mockRC);
     })
+
     it('should throw exception if company with provided id not available.', async () => {
-      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(null);
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(null);
       try {
-        await residentCompanyService.getResidentCompany(new BiolabsException(
-          'Company with provided id not available.'));
+        await residentCompanyService.getResidentCompany(70, req);
       } catch (e) {
         expect(e.name).toBe('BiolabsException');
         expect(e instanceof BiolabsException).toBeTruthy();
         expect(e.message).toBe('Error in find resident company');
       }
     });
+
+    it('should throw NotAcceptableException company Ids are not equal.', async () => {
+      try {
+        await residentCompanyService.getResidentCompany(mockRC.id, req);
+      } catch (e) {
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe("You do not have permission to view this company")
+      }
+    });
   });
+
   describe('updateResidentCompanyStatus method', () => {
     let payload: UpdateResidentCompanyStatusPayload = {
       "companyId": 3,
@@ -1608,7 +1619,7 @@ describe('ResidentCompanyService', () => {
     it('should throw exception', async () => {
       jest.spyOn(residentCompanyHistoryRepository, 'query').mockRejectedValueOnce(null);
       try {
-      await residentCompanyService.getFeeds(1, 1);
+        await residentCompanyService.getFeeds(1, 1);
 
       } catch (e) {
         expect(e.name).toBe('BiolabsException');

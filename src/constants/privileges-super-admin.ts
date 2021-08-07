@@ -20,6 +20,16 @@ export const SUPER_ADMIN_ACCESSLEVELS = {
       view: true,
       update: true,
       delete: true,
+      child: {
+        'sponsor': {
+          name: 'Sponser',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+      }
     },
     'application-form': {
       name: 'Application Form',
@@ -70,6 +80,24 @@ export const SUPER_ADMIN_ACCESSLEVELS = {
       view: true,
       update: true,
       delete: true,
+      child: {
+        'invoice-summary': {
+          name: 'Invoice Summary',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+        'waitlist': {
+          name: 'Waitlist',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        }
+      }
     },
     sites: {
       name: 'Sites',
@@ -86,6 +114,32 @@ export const SUPER_ADMIN_ACCESSLEVELS = {
       view: true,
       update: true,
       delete: true,
+      child: {
+        'directory-members': {
+          name: 'Members',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+        'directory-site': {
+          name: 'Site Employee',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+        'directory-companies': {
+          name: 'Companies',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        }
+      }
     },
     configurations: {
       name: 'Configurations',
@@ -128,6 +182,57 @@ export const SUPER_ADMIN_ACCESSLEVELS = {
       view: true,
       update: true,
       delete: true,
+      dynamic: {
+        'company': {
+          name: 'Company Profile',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'onboarding': {
+          name: 'Onboarding Information',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'companyadmin': {
+          name: 'Admin',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'growth': {
+          name: 'Company Growth',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'invoicing': {
+          name: 'Invoicing',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        },
+        'planchange': {
+          name: 'Change Request',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true
+        }
+      }
     },
   },
-};
+}
+

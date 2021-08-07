@@ -20,6 +20,24 @@ export const SPONSOR_ACCESSLEVELS = {
       view: true,
       update: true,
       delete: true,
+      child: {
+        'sponsor': {
+          name: 'Sponser',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+        'search': {
+          name: 'Resident Companies',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        }
+      }
     },
     'application-form': {
       name: 'Application Form',
@@ -70,6 +88,24 @@ export const SPONSOR_ACCESSLEVELS = {
       view: false,
       update: false,
       delete: false,
+      child: {
+        'invoice-summary': {
+          name: 'Invoice Summary',
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
+        },
+        'waitlist': {
+          name: 'Waitlist',
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
+        }
+      }
     },
     sites: {
       name: 'Sites',
@@ -123,11 +159,11 @@ export const SPONSOR_ACCESSLEVELS = {
     },
     'resident-companies': {
       name: 'Resident Companies',
-      action: true,
-      create: true,
-      view: true,
-      update: true,
-      delete: true,
+      action: false,
+      create: false,
+      view: false,
+      update: false,
+      delete: false,
     },
-  },
-};
+  }
+}
