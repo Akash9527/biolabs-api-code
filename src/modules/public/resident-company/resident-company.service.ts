@@ -816,11 +816,13 @@ export class ResidentCompanyService {
    */
   async getResidentCompany(id: number, @Request() req) {
     info("Getting Resident company by id :" + id, __filename, "getResidentCompany()");
+    let siteIdArr;
 
     if (id == null) {
       debug("Resident company is not fonund by id :" + id, __filename, "getResidentCompany()");
       return {};
     }
+
 
     if (req && req.user && req.user.companyId && req.user.companyId != id) {
       error("Error in find resident company", __filename, "getResidentCompany()");
@@ -828,30 +830,69 @@ export class ResidentCompanyService {
         'You do not have permission to view this company',
       );
     }
-    try {
-      const residentCompany: any = await this.residentCompanyRepository.findOne({
-        where: { id: id }
-      });
-      if (residentCompany) {
-        residentCompany.sites = await this.getRcSites(residentCompany.site);
-        residentCompany.categories = await this.getRcCategories(residentCompany.industry);
-        residentCompany.modalities = await this.getRcModalities(residentCompany.modality);
-        residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);
-        residentCompany.companyStages = await this.getRcTechnologyStages(residentCompany.companyStage);
-        residentCompany.biolabsSources = await this.getRcBiolabsSources(residentCompany.biolabsSources);
-        residentCompany.companyMembers = await this.getRcMembers(residentCompany.id);
-        residentCompany.companyAdvisors = await this.getRcAdvisors(residentCompany.id);
-        residentCompany.companyTechnicalTeams = await this.getRcTechnicalTeams(residentCompany.id);
-        return residentCompany;
-      } else {
-        error("Error in find resident company", __filename, "getResidentCompany()");
+
+    if (req && req.user && req.headers) {
+      info(`Fetching site Id array from request header`, __filename, "getResidentCompany()");
+      siteIdArr = req.user.site_id;
+      if (req.headers['x-site-id']) {
+        siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+      }
+      info(`Site Id fetched from request header: ${siteIdArr}`, __filename, "getResidentCompany()");
+    }
+    // try {
+    const residentCompany: any = await this.residentCompanyRepository.findOne({
+      where: { id: id }
+    });
+
+    if (residentCompany) {
+      info(`Fetched resident company from repository, id : ${residentCompany.id}`, __filename, "getResidentCompany()");
+      /** Check if sites are accessible to the user */
+      this.checkIfValidSiteIds(siteIdArr, residentCompany.site);
+
+      residentCompany.sites = await this.getRcSites(residentCompany.site);
+      residentCompany.categories = await this.getRcCategories(residentCompany.industry);
+      residentCompany.modalities = await this.getRcModalities(residentCompany.modality);
+      residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);
+      residentCompany.companyStages = await this.getRcTechnologyStages(residentCompany.companyStage);
+      residentCompany.biolabsSources = await this.getRcBiolabsSources(residentCompany.biolabsSources);
+      residentCompany.companyMembers = await this.getRcMembers(residentCompany.id);
+      residentCompany.companyAdvisors = await this.getRcAdvisors(residentCompany.id);
+      residentCompany.companyTechnicalTeams = await this.getRcTechnicalTeams(residentCompany.id);
+      return residentCompany;
+    } else {
+      error("Error in find resident company", __filename, "getResidentCompany()");
+      throw new NotAcceptableException(
+        'Company with provided id not available.',
+      );
+    }
+    // } catch (err) {
+    //   error("Error in find resident company", __filename, "getResidentCompany()");
+    //   throw new BiolabsException('Error in find resident company', err.message);
+    // }
+  }
+
+  /**
+   * Description: Checks if the company has the site ids which are accessible to the user.
+   * @description Checks if the company has the site ids which are accessible to the user.
+   * @param siteIdArrReq array
+   * @param siteIdArrComp array
+   */
+  public checkIfValidSiteIds(siteIdArrReq: number[], siteIdArrComp: number[]) {
+    info(`Checking company is accessible to the user by site ids  ${siteIdArrReq}`, __filename, "checkIfValidSiteIds()");
+    if (siteIdArrReq && siteIdArrComp) {
+      let found = false;
+      for (let s of siteIdArrComp) {
+        if (siteIdArrReq.indexOf(s) >= 0) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        error(`User does not have permission to access this company`, __filename, `checkIfValidSiteIds()`);
         throw new NotAcceptableException(
-          'Company with provided id not available.',
+          'You do not have permission to view this company',
         );
       }
-    } catch (err) {
-      error("Error in find resident company", __filename, "getResidentCompany()");
-      throw new BiolabsException('Error in find resident company', err.message);
     }
   }
 
