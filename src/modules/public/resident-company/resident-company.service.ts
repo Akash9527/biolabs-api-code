@@ -808,7 +808,7 @@ export class ResidentCompanyService {
    * @param siteId site id 
    * @returns resident conpanies associated with industries.
    */
-  async getCategoryCount(siteId){
+  async getCategoryCount(siteId) {
     let siteFilter = "(select count(rc.*) FROM public.resident_companies as rc where p.id = ANY(rc.industry::int[]) ) as industryCount ";
     if (siteId && siteId > 0) {
       siteFilter = "(select count(rc.*) FROM public.resident_companies as rc where p.id = ANY(rc.industry::int[]) and  " + siteId + " = ANY(rc.site::int[]) ) as industryCount ";
@@ -843,9 +843,9 @@ export class ResidentCompanyService {
       + " select c1name,c1count from CTE2 union "
       + " select cname,ccount from CTE3 "
       + " order by industryCount desc;"
-    info("Query excecuting ",query,__filename,"getCategoryCount()");
+    info("Query excecuting ", query, __filename, "getCategoryCount()");
     const categoryStats = await this.categoryRepository.query(query);
-    var holder = {};
+    let holder = {};
     categoryStats.forEach(function (d) {
       if (holder.hasOwnProperty(d.name)) {
         holder[d.name] = holder[d.name] + parseInt(d.industrycount);
@@ -853,12 +853,12 @@ export class ResidentCompanyService {
         holder[d.name] = parseInt(d.industrycount);
       }
     });
-    var catogaryObj = [];
-    for (var prop in holder) {
-      if(catogaryObj.length<3)
-      catogaryObj.push({ name: prop, industrycount: holder[prop] });
+    let catogaryObj = [];
+    for (let prop in holder) {
+      if (catogaryObj.length < 3)
+        catogaryObj.push({ name: prop, industrycount: holder[prop] });
     }
-     return catogaryObj;
+    return catogaryObj;
   }
 
   /**
