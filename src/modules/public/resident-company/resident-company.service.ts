@@ -843,7 +843,7 @@ export class ResidentCompanyService {
       + " select c1name,c1count from CTE2 union "
       + " select cname,ccount from CTE3 "
       + " order by industryCount desc;"
-    //console.log(query);
+    info("Query excecuting ",query,__filename,"getCategoryCount()");
     const categoryStats = await this.categoryRepository.query(query);
     var holder = {};
     categoryStats.forEach(function (d) {
