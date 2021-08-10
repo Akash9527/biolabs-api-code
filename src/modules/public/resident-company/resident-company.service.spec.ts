@@ -1096,7 +1096,8 @@ describe('ResidentCompanyService', () => {
   });
 
   describe('getResidentCompany method', () => {
-    it('should return an object of resident companies', async () => {
+    it('should return an object of resident company', async () => {
+      jest.spyOn(residentCompanyService, 'checkIfValidSiteIds').mockReturnThis();
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
       let result = await residentCompanyService.getResidentCompany(70, req);
       expect(result).not.toBeNull();
@@ -1109,9 +1110,9 @@ describe('ResidentCompanyService', () => {
       try {
         await residentCompanyService.getResidentCompany(70, req);
       } catch (e) {
-        expect(e.name).toBe('BiolabsException');
-        expect(e instanceof BiolabsException).toBeTruthy();
-        expect(e.message).toBe('Error in find resident company');
+        expect(e.response.statusCode).toBe(406);
+        expect(e.response.message).toBe('Company with provided id not available.');
+        expect(e.response.error).toBe('Not Acceptable');
       }
     });
 
@@ -1123,6 +1124,23 @@ describe('ResidentCompanyService', () => {
         expect(e.response.message).toBe("You do not have permission to view this company")
       }
     });
+  });
+
+  /**
+   * Test cases for public checkIfValidSiteIds(siteIdArrReq: number[], siteIdArrComp: number[]) method
+   */
+  describe('checkIfValidSiteIds method', () => {
+    it('Should throw NotAcceptableException exception', async () => {
+      try {
+        const siteIdArr = [1, 2];
+        const siteIdArrCompany = [3, 4];
+        residentCompanyService.checkIfValidSiteIds(siteIdArr, siteIdArrCompany);
+      } catch (e) {
+        expect(e.response.statusCode).toBe(406);
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe("You do not have permission to view this company")
+      }
+    })
   });
 
   describe('updateResidentCompanyStatus method', () => {
