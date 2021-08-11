@@ -5,7 +5,7 @@ import { UsersService } from '../user';
 import { PasswordPayload } from './password.payload';
 import { ForgotPasswordPayload } from './forgot-password.payload';
 import { Request } from 'express';
-import { refreshTokenPayload } from './refreshToke.payload';
+import { refreshTokenPayload } from './refreshToken.payload';
 
 @Controller('api/auth')
 @ApiTags('Authentication')

@@ -10,7 +10,7 @@ import { LoginPayload } from './login.payload';
 import { MasterService } from '../master';
 import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
-import { refreshTokenPayload } from './refreshToke.payload';
+import { refreshTokenPayload } from './refreshToken.payload';
 const { info } = require('../../../utils/logger');
 
 const appRoot = require('app-root-path');
