@@ -51,13 +51,14 @@ const mockMasterService = () => ({
     createCategories:jest.fn(),
     createTechnologyStages:jest.fn(),
     createProductType:jest.fn(),
+    readMigrationJson:jest.fn()
 });
 const mockResidentCompanyService = () => ({
     getResidentCompany: jest.fn()
 })
 let req: Request;
 const appRoot = require('app-root-path');
-const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
+const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
 describe('AuthService', () => {
     let authService;
     let usersService;
@@ -91,13 +92,14 @@ describe('AuthService', () => {
     describe('should test onApplicationBootstrap functionality', () => {
         it('should be called masterService method', async () => {
             await authService.onApplicationBootstrap();
-            expect(await masterService.createRoles).toHaveBeenCalled();
-            expect(await masterService.createSites).toHaveBeenCalled();
-            expect(await masterService.createFundings).toHaveBeenCalled();
-            expect(await masterService.createModalities).toHaveBeenCalled();
-            expect(await masterService.createBiolabsSources).toHaveBeenCalled();
-            expect(await masterService.createCategories).toHaveBeenCalled();
-            //expect(await masterService.validateUse).toHaveBeenCalled();
+            const fileData = await masterService.readMigrationJson();
+            expect(await masterService.createRoles).toHaveBeenCalledWith(fileData);
+            expect(await masterService.createSites).toHaveBeenCalledWith(fileData);
+            expect(await masterService.createFundings).toHaveBeenCalledWith(fileData);
+            expect(await masterService.createModalities).toHaveBeenCalledWith(fileData);
+            expect(await masterService.createBiolabsSources).toHaveBeenCalledWith(fileData);
+            expect(await masterService.createCategories).toHaveBeenCalledWith(fileData);
+            //expect(await masterService.validateUse).toHaveBeenCalledWith(fileData);
         });
     });
     describe('should test createSuperAdmin functionality', () => {
