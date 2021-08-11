@@ -804,14 +804,14 @@ export class ResidentCompanyService {
   }
 
   /**
-   * @description This method will get top 3 count of resident conpanies associated with industries.
-   * @param siteId site id 
-   * @returns resident conpanies associated with industries.
-   */
+  * @description This method will get top 3 count of resident conpanies associated with industries.
+  * @param siteId site id 
+  * @returns resident conpanies associated with industries.
+  */
   async getCategoryCount(siteId) {
-    let siteFilter = "(select count(rc.*) FROM public.resident_companies as rc where p.id = ANY(rc.industry::int[]) ) as industryCount ";
+    let siteFilter = "(select count(rc.*) FROM public.resident_companies as rc where rc.\"companyStatus\" = '1'  and rc.\"companyOnboardingStatus\" = true  and p.id = ANY(rc.industry::int[]) ) as industryCount ";
     if (siteId && siteId > 0) {
-      siteFilter = "(select count(rc.*) FROM public.resident_companies as rc where p.id = ANY(rc.industry::int[]) and  " + siteId + " = ANY(rc.site::int[]) ) as industryCount ";
+      siteFilter = "(select count(rc.*) FROM public.resident_companies as rc  where  rc.\"companyStatus\" = '1'  and rc.\"companyOnboardingStatus\" = true and p.id = ANY(rc.industry::int[]) and  " + siteId + " = ANY(rc.site::int[]) ) as industryCount ";
     }
     let query =
       " with CTE as"
