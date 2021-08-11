@@ -12,9 +12,6 @@ import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
 const { info } = require('../../../utils/logger');
 
-//const appRoot = require('app-root-path');
-//const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
-
 @Injectable()
 export class AuthService {
   constructor(

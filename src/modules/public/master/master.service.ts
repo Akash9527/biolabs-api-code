@@ -17,7 +17,7 @@ import { ProductType } from '../order/model/product-type.entity';
 import { FileService } from '../file';
 const { error, info, debug } = require("../../../utils/logger")
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
-//const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
+//const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
 type status_enum = '-1' | '0' | '1' | '99';
 const appRoot = require('app-root-path');
 
@@ -759,10 +759,10 @@ export class MasterService {
    * @returns file Data
    */
   async readMigrationJson() {
-    if (!process.env.GET_MASTER_DATA_FROM_AZURE) {
-      return JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.MIGRATION_FILE_NAME));
+    if (!process.env.BIOLAB_GET_MASTER_DATA_FROM_AZURE) {
+      return JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
     } else {
-      const readableStream = await this.fileService.getfileStream(process.env.MIGRATION_FILE_NAME, process.env.CONTAINER_NAME);
+      const readableStream = await this.fileService.getfileStream(process.env.BIOLAB_CONFIGURATION_JSON, process.env.BIOLAB_CONFIG_CONTAINER_NAME);
       const chunks = [];
       return new Promise(function (resolve, reject) {
         readableStream.on("data", data => {
