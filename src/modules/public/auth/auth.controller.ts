@@ -5,6 +5,7 @@ import { UsersService } from '../user';
 import { PasswordPayload } from './password.payload';
 import { ForgotPasswordPayload } from './forgot-password.payload';
 import { Request } from 'express';
+import { refreshTokenPayload } from './refreshToke.payload';
 
 @Controller('api/auth')
 @ApiTags('Authentication')
@@ -66,4 +67,19 @@ export class AuthController {
   async forgotPassword(@Body() payload: ForgotPasswordPayload, @Req() req: Request): Promise<any> {
     return await this.authService.forgotPassword(payload, req);
   }
+
+  
+  /**
+   * Description: This method is used to login a user.
+   * @description This method is used to login a user.
+   * @param payload it is a request body expects the payload of type LoginPayload.
+   */
+   @Post('refresh-token')
+   @ApiResponse({ status: 201, description: 'Successful Login' })
+   @ApiResponse({ status: 400, description: 'Bad Request' })
+   @ApiResponse({ status: 401, description: 'Unauthorized' })
+   async refreshToken(@Body() payload: refreshTokenPayload): Promise<any> {
+     const user = await this.authService.decodeToken(payload);
+     return await this.authService.createToken(user);
+   }
 }
