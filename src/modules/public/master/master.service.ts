@@ -19,6 +19,7 @@ const { error, info, debug } = require("../../../utils/logger")
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 //const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
 type status_enum = '-1' | '0' | '1' | '99';
+const appRoot = require('app-root-path');
 
 @Injectable()
 export class MasterService {
@@ -758,16 +759,20 @@ export class MasterService {
    * @returns file Data
    */
   async readMigrationJson() {
-    const readableStream = await this.fileService.getfileStream(process.env.MIGRATION_FILE_NAME, process.env.CONTAINER_NAME);
-    const chunks = [];
-    return new Promise(function (resolve, reject) {
-      readableStream.on("data", data => {
-        chunks.push(data.toString());
+    if (!process.env.GET_MASTER_DATA_FROM_AZURE) {
+      return JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.MIGRATION_FILE_NAME));
+    } else {
+      const readableStream = await this.fileService.getfileStream(process.env.MIGRATION_FILE_NAME, process.env.CONTAINER_NAME);
+      const chunks = [];
+      return new Promise(function (resolve, reject) {
+        readableStream.on("data", data => {
+          chunks.push(data.toString());
+        });
+        readableStream.on("end", () => {
+          resolve(JSON.parse(chunks.join('').toString()));
+        });
+        readableStream.on('error', reject);
       });
-      readableStream.on("end", () => {
-        resolve(JSON.parse(chunks.join('').toString()));
-      });
-      readableStream.on('error', reject);
-    });
+    }
   }
 }
