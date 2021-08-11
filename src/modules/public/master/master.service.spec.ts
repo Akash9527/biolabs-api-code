@@ -16,9 +16,10 @@ import { USER_TYPE } from '../../../constants/user-type';
 import { COMMITTEE_STATUS } from '../../../constants/committee_status';
 import { of } from 'rxjs';
 import { AnyCnameRecord } from 'node:dns';
+import { FileService } from '../file';
 const appRoot = require('app-root-path');
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
-const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
+const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
 
 const mockMasterPayLoad: MasterPayload = {
     q: "test", pagination: true, page: 12, limit: 6, sort: true, sortFiled: "test"
@@ -35,12 +36,13 @@ describe('MasterService', () => {
     let technologyStageRepository;
     let biolabsSourceRepository;
     let productTypeRepository;
+    let fileService;
 
     beforeEach(async () => {
         const module = await Test.createTestingModule({
             providers: [
                 MasterService,
-
+                FileService,
                 {
                     provide: getRepositoryToken(BiolabsSource), useValue: {
                         find: jest.fn(),
