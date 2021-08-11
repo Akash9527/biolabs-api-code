@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { diff } from 'json-diff';
+// import { diff } from 'json-diff';
 import { In, Like, Repository } from 'typeorm';
 import { BiolabsSource } from './biolabs-source.entity';
 import { Category } from './category.entity';
@@ -133,18 +133,18 @@ export class MasterService {
    * @return site object
    */
   async createSite(_site: Site) {
-    const existingSite = await this.siteRepository.findOne(_site.id);
-    if (existingSite) {
-      delete existingSite.createdAt;
-      delete existingSite.updatedAt;
-    }
-    // Will compare 2 json and get the difference
-    const changes = diff(existingSite, _site);
-    if (existingSite && changes) {
-      return await this.siteRepository.update(_site.id, _site);
-    } else if (!existingSite) {
+    // const existingSite = await this.siteRepository.findOne(_site.id);
+    // if (existingSite) {
+    //   delete existingSite.createdAt;
+    //   delete existingSite.updatedAt;
+    // }
+    // // Will compare 2 json and get the difference
+    // const changes = diff(existingSite, _site);
+    // if (existingSite && changes) {
+    //   return await this.siteRepository.update(_site.id, _site);
+    // } else if (!existingSite) {
       return await this.siteRepository.save(this.siteRepository.create(_site));
-    }
+    // }
   }
 
   /**
