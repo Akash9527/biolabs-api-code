@@ -11,10 +11,9 @@ export class CreateOrderProductDto {
   companyId: number;
 
   @ApiProperty({
-    required: true,
+    required: false,
     nullable: true,
   })
-  @IsNotEmpty()
   status: number;
 
   @ApiProperty({

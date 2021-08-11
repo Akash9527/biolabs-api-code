@@ -46,7 +46,7 @@ export class ProductService {
             return await this.productRepository.save(await this.productRepository.create(product));
         } catch (err) {
             error(err.message, __filename, "addProduct()")
-            throw new NotAcceptableException('Error in adding product' + err.message);
+            throw new NotAcceptableException('Error in adding product' , err.message);
         }
     }
 
@@ -67,7 +67,7 @@ export class ProductService {
                 .getRawMany();
         } catch (err) {
             error(err.message, __filename, "getProductsByName()")
-            throw new NotAcceptableException('Error in getting product' + err.message);
+            throw new NotAcceptableException('Error in getting product' , err.message);
         }
     }
 
@@ -87,7 +87,7 @@ export class ProductService {
                 .getRawMany();
         } catch (err) {
             error(err.message, __filename, "getAllProducts()")
-            throw new NotAcceptableException('Error in soft deleting product' + err.message);
+            throw new NotAcceptableException('Error in getting product' ,err.message);
         }
     }
 
@@ -119,7 +119,7 @@ export class ProductService {
             }
         } catch (err) {
             error(err.message, __filename, "softDeleteProduct()")
-            throw new NotAcceptableException('Error in soft deleting product' + err.message);
+            throw new NotAcceptableException('Error in soft deleting product' , err.message);
         }
     }
     /**

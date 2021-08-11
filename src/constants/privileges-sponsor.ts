@@ -39,11 +39,11 @@ export const SPONSOR_ACCESSLEVELS = {
       child: {
         'management': {
           name: 'Admin',
-          action: true,
-          create: true,
-          view: true,
-          update: true,
-          delete: true,
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
         },
         'sponsor': {
           name: 'Sponsors',
@@ -55,11 +55,11 @@ export const SPONSOR_ACCESSLEVELS = {
         },
         'resident': {
           name: 'Resident Admin',
-          action: true,
-          create: true,
-          view: true,
-          update: true,
-          delete: true,
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
         }
       }
     },

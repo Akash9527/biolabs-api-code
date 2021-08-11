@@ -201,7 +201,7 @@ export class MasterService {
         if (!data.find(r => r.name == _role.name)) {
           resp[_role.name] = await this.createRole(_role.name, _role.id);
         }
-        if (_role.name == _roles[_roles.length - 1]) {
+        if (_role.name == _roles[_roles.length - 1].name) {
           return resp;
         }
       }
@@ -422,7 +422,7 @@ export class MasterService {
         if (!data.find(r => r.name == _biolabsSource.name)) {
           resp[_biolabsSource.name] = await this.createBiolabsSource(_biolabsSource.name, _biolabsSource.id);
         }
-        if (_biolabsSource.name == _biolabsSources[_biolabsSources.length - 1]) {
+        if (_biolabsSource.name == _biolabsSources[_biolabsSources.length - 1].name) {
           return resp;
         }
       }
@@ -508,7 +508,7 @@ export class MasterService {
         if (!data.find(r => r.name == _funding.name)) {
           resp[_funding.name] = await this.createFunding(_funding.name, _funding.id);
         }
-        if (_funding.name == _fundings[_fundings.length - 1]) {
+        if (_funding.name == _fundings[_fundings.length - 1].name) {
           return resp;
         }
       }
@@ -594,7 +594,7 @@ export class MasterService {
         if (!data.find(r => r.name == _modalitie.name)) {
           resp[_modalitie.name] = await this.createModality(_modalitie.name, _modalitie.id);
         }
-        if (_modalitie.name == _modalities[_modalities.length - 1]) {
+        if (_modalitie.name == _modalities[_modalities.length - 1].name) {
           return resp;
         }
       }
@@ -680,7 +680,7 @@ export class MasterService {
         if (!data.find(r => r.name == _technologyStage.name)) {
           resp[_technologyStage.name] = await this.createTechnologyStage(_technologyStage.name, _technologyStage.id);
         }
-        if (_technologyStage.name == _technologyStages[_technologyStages.length - 1]) {
+        if (_technologyStage.name == _technologyStages[_technologyStages.length - 1].name) {
           return resp;
         }
       }

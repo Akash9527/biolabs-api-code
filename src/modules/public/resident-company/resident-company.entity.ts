@@ -121,7 +121,7 @@ export class ResidentCompany {
   @Column({ default: false })
   companyOnboardingStatus: boolean;
 
-  @Column({ length: 510, default: null, nullable: true })
+  @Column({ length: 1000, default: null, nullable: true })
   elevatorPitch: string;
 
   @Column({ default: null })
