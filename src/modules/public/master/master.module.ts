@@ -12,10 +12,11 @@ import { MasterController } from './master.controller';
 import { PassportModule } from '@nestjs/passport';
 import { ProductType } from '../order/model/product-type.entity';
 import { FileModule } from '../file';
+import { ConfigModule } from 'modules/config';
 
 @Module({
   imports: [
-    FileModule,
+    FileModule,ConfigModule,
     TypeOrmModule.forFeature([BiolabsSource, Category, Funding, Modality, Role, Site, TechnologyStage, ProductType]),
     PassportModule.register({ defaultStrategy: 'jwt' }),],
   controllers: [MasterController],
