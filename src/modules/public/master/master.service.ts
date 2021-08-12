@@ -759,7 +759,7 @@ export class MasterService {
    * @returns file Data
    */
   async readMigrationJson() {
-    if (!process.env.BIOLAB_GET_MASTER_DATA_FROM_AZURE) {
+    if (process.env.BIOLAB_GET_MASTER_DATA_FROM_AZURE == 'false') {
       return JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
     } else {
       const readableStream = await this.fileService.getfileStream(process.env.BIOLAB_CONFIGURATION_JSON, process.env.BIOLAB_CONFIG_CONTAINER_NAME);
