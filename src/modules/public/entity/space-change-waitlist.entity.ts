@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
+import { ApplicationConstants } from 'utils/application-constants';
 import { MembershipChangeEnum } from '../enum/membership-change-enum';
 import { RequestStatusEnum } from '../enum/request-status-enum';
 import { ResidentCompany } from '../resident-company/resident-company.entity';
@@ -41,7 +42,7 @@ export class SpaceChangeWaitlist {
   @Column({ nullable: false })
   isRequestInternal: boolean;
 
-  @Column({ length: 510, nullable: true, default: null })
+  @Column({ length: ApplicationConstants.SPACE_CHANGE_WAITLIST_REQUEST_NOTES_COL_LENGTH, nullable: true, default: null })
   requestNotes: string;
 
   @Column({ length: 510, nullable: true, default: null })
