@@ -14,5 +14,7 @@ export const ApplicationConstants = {
 
     EMAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES: 'MAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES',
     EMAIL_SUBJECT_FOR_SPONSORSHIP_QN_CHANGE_TO_YES: 'Biolabs | A Company has changed their privacy settings',
-    EMAIL_CONTENT_PARAM_FOR_SPONSORSHIP_QN_CHANGE_TO_YES: 'sponsorshipQuestionChangedToYes'
+    EMAIL_CONTENT_PARAM_FOR_SPONSORSHIP_QN_CHANGE_TO_YES: 'sponsorshipQuestionChangedToYes',
+
+    SPACE_CHANGE_WAITLIST_REQUEST_NOTES_COL_LENGTH: 600
 };
