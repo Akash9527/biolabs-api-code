@@ -21,6 +21,7 @@ export class AddSpaceChangeWaitlistDto {
     planChangeSummary: string;
     
     @ApiProperty({ description: 'Graduate Description', required: false, nullable: true })
+    @MaxLength(ApplicationConstants.SPACE_CHANGE_WAITLIST_GRADUATE_DESCRIPTION_COL_LENGTH)
     graduateDescription: string;
 
     @ApiProperty({ description: 'Request status', default: 0, required: true, nullable: false })
