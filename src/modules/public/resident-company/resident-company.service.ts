@@ -1451,19 +1451,35 @@ export class ResidentCompanyService {
     info(`Get stages of technology by siteId: ${siteId} companyId: ${companyId}`, __filename, "getStagesOfTechnologyBySiteId()");
     const response = {};
     try {
-      const queryStr = " SELECT \"stage\", \"name\", \"quarterno\", \"quat\" " +
-        " FROM " +
-        " (SELECT MAX(rch.\"companyStage\") AS stage, " +
-        "EXTRACT(quarter FROM rch.\"createdAt\") AS \"quarterno\", " +
-        "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quat\" " +
-        "FROM public.resident_company_history AS rch " +
-        "WHERE rch.\"site\" = \'{ " + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
-        "GROUP BY " +
-        "EXTRACT(quarter FROM rch.\"createdAt\")," +
-        "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
-        " ) AS csg " +
-        " LEFT JOIN technology_stages AS ts ON ts.id = csg.\"stage\" " +
-        " ORDER BY quat";
+      // const queryStr = " SELECT \"stage\", \"name\", \"quarterno\", \"yyyy\",\"quat\" " +
+      //   " FROM " +
+      //   " (SELECT MAX(rch.\"companyStage\") AS stage, " +
+      //   "EXTRACT(quarter FROM rch.\"createdAt\") AS \"quarterno\", " +
+      // "extract(year from rch.\"createdAt\") as  \"yyyy\", " +
+      //   "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quat\" " +
+      //   "FROM public.resident_company_history AS rch " +
+      //   "WHERE rch.\"site\" = \'{ " + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
+      //   "GROUP BY " +
+      //   "EXTRACT(quarter FROM rch.\"createdAt\")," +
+      // "extract(year from rch.\"createdAt\")" " +
+      //   "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
+      //   " ) AS csg " +
+      //   " LEFT JOIN technology_stages AS ts ON ts.id = csg.\"stage\" " +
+      //   " ORDER BY yyyy,quat";
+      const queryStr = ` SELECT "stage", "name", "quarterno", "quat" ,"yyyy" FROM 
+         (SELECT MAX(rch."companyStage") AS stage,
+       EXTRACT(quarter FROM rch."createdAt") AS  quarterNo,
+      extract(year from rch."createdAt") as yyyy ,
+         to_char(rch."createdAt", '"Q"Q.YYYY') AS quat
+         FROM public.resident_company_history AS rch 
+         WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
+         GROUP BY 
+          EXTRACT(quarter FROM rch."createdAt"),
+         extract(year from rch."createdAt") ,
+        to_char(rch."createdAt", '"Q"Q.YYYY')
+          ) AS csg 
+         LEFT JOIN technology_stages AS ts ON ts.id = csg."stage" 
+         ORDER BY yyyy,quarterNo`;
       info(`query: ${queryStr}`, __filename, "getStagesOfTechnologyBySiteId()")
       const compResidentHistory = await this.residentCompanyHistoryRepository.query(queryStr);
       response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
@@ -1485,15 +1501,26 @@ export class ResidentCompanyService {
     info(`get fundings by siteId: ${siteId} companyId: ${companyId}`, __filename, "getFundingBySiteIdAndCompanyId()")
     const response = {};
     try {
-      const queryStr = " SELECT MAX(\"funding\" ::Decimal) as \"Funding\", " +
-        " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
-        " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
-        " FROM public.resident_company_history as rch " +
-        " WHERE rch.\"site\" = \'{" + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
-        " group by " +
-        " extract(quarter from rch.\"createdAt\"), " +
-        " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
-        " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
+      // const queryStr = " SELECT MAX(\"funding\" ::Decimal) as \"Funding\", " +
+      //   " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
+      //   " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
+      //   " FROM public.resident_company_history as rch " +
+      //   " WHERE rch.\"site\" = \'{" + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
+      //   " group by " +
+      //   " extract(quarter from rch.\"createdAt\"), " +
+      //   " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
+      //   " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
+      const queryStr = ` SELECT MAX("funding" ::Decimal) as "Funding",
+      EXTRACT(quarter FROM rch."createdAt") AS  quarterNo,
+       extract(year from rch."createdAt") as yyyy ,
+      to_char(rch."createdAt", '"Q"Q.YYYY') AS quaterText
+          FROM public.resident_company_history as rch 
+         WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
+          group by 
+       EXTRACT(quarter FROM rch."createdAt"),
+        extract(year from rch."createdAt"),
+        to_char(rch."createdAt", '"Q"Q.YYYY')
+          order by  yyyy;`
       debug(`Fetching funds by query: ${queryStr}`, __filename, "getFundingBySiteIdAndCompanyId()");
       const fundigs = await this.residentCompanyHistoryRepository.query(queryStr);
       response['fundings'] = (!fundigs) ? 0 : fundigs;
