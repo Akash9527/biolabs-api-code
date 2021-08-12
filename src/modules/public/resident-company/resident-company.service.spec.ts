@@ -1338,8 +1338,10 @@ describe('ResidentCompanyService', () => {
   });
   describe('getResidentCompanySpecificFieldsById method', () => {
     it('should get  getResidentCompanySpecificFieldsById', async () => {
+      jest.spyOn(residentCompanyService, 'checkIfValidSiteIds').mockReturnThis();
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
-      const result = await residentCompanyService.getResidentCompanySpecificFieldsById(1);
+      const result = await residentCompanyService.getResidentCompanySpecificFieldsById(70, req);
+
       expect(result).not.toBeUndefined();
       expect(result).not.toBeNull();
       expect(result).toEqual({
@@ -1352,13 +1354,15 @@ describe('ResidentCompanyService', () => {
       });
     })
     it('should throw exception if company with provided id not available.', async () => {
+      let companyId = 70;
+      jest.spyOn(residentCompanyService, 'checkIfValidSiteIds').mockReturnThis();
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(null);
       try {
-        await residentCompanyService.getResidentCompanySpecificFieldsById(1);
+        await residentCompanyService.getResidentCompanySpecificFieldsById(companyId, req);
       } catch (e) {
         expect(e.status).toEqual(406);
         expect(e.response.error).toBe('Not Acceptable');
-        expect(e.response.message).toBe("Resident Company not found by id: 1")
+        expect(e.response.message).toBe(`Resident Company not found by id: ${companyId}`)
       }
     });
   });
@@ -1864,8 +1868,9 @@ describe('ResidentCompanyService', () => {
     ]
 
     it('should return list of items', async () => {
+      jest.spyOn(residentCompanyService, 'checkIfValidSiteIds').mockReturnThis();
       jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockSpaceChangeWaitlistItems);
-      let result = await residentCompanyService.getSpaceChangeWaitlistItems(1);
+      let result = await residentCompanyService.getSpaceChangeWaitlistItems(70, req);
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
       expect(result).toEqual({

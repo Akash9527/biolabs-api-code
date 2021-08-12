@@ -64,18 +64,20 @@ export class ResidentCompanyController {
   }
 
   /**
-    * Description: This method returns some specific fields of Resident Company by residentCompanyId.
-    * @description This method returns some specific fields of Resident Company by residentCompanyId.
-    * @param payload residentCompanyId.
-    */
+   * Description: This method returns some specific fields of Resident Company by residentCompanyId.
+   * @description This method returns some specific fields of Resident Company by residentCompanyId.
+   * @param residentCompanyId 
+   * @param req Request object
+   * @returns Return some specific fields on Resident Company
+   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @Get('/forwaitlist/:residentCompanyId')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getResidentCompanySpecificFieldsById(@Param('residentCompanyId') residentCompanyId: number): Promise<any> {
+  async getResidentCompanySpecificFieldsById(@Param('residentCompanyId') residentCompanyId: number, @Request() req): Promise<any> {
     info(`Get some specific fields of Resident Company by company Id: ${residentCompanyId}`, __filename, `getResidentCompanySpecificFieldsById()`);
-    return this.residentCompanyService.getResidentCompanySpecificFieldsById(residentCompanyId);
+    return this.residentCompanyService.getResidentCompanySpecificFieldsById(residentCompanyId, req);
   }
 
   /**
@@ -403,18 +405,20 @@ export class ResidentCompanyController {
   }
 
   /**
-   * @description BIOL-275: Get items for space change waitlist by siteId and companyId
-   * @param status
-   * @returns
+   * Description: BIOL-275: Get items for space change waitlist by siteId and companyId.
+   * @description BIOL-275: Get items for space change waitlist by siteId and companyId.
+   * @param companyId Id of Resident Company
+   * @param req Request object
+   * @returns Return items to show in a waitlist
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @Get('/spacechangewaitlist/items/:companyId')
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getItemsForSpaceChangeWaitlist(@Param('companyId') companyId: number): Promise<any> {
+  async getItemsForSpaceChangeWaitlist(@Param('companyId') companyId: number, @Request() req): Promise<any> {
     info(`Get items for Space Change Waitlist by resident company id: ${companyId} `, __filename, `getItemsForSpaceChangeWaitlist()`);
-    return this.residentCompanyService.getSpaceChangeWaitlistItems(companyId);
+    return this.residentCompanyService.getSpaceChangeWaitlistItems(companyId, req);
   }
 
   /**
