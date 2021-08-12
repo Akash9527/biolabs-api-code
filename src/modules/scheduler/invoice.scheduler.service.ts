@@ -12,7 +12,7 @@ export class InvoiceSchedulerService {
   //@Cron(CronExpression.EVERY_30_SECONDS)
   @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
   handleCron() {
-    this.logger.debug('Called every 30 seconds');
+    this.logger.debug('add-invoice-future-months process is running it will take few mins...!');
     this.orderProductService.updateRecurrenceInvoice();
   }
 }
