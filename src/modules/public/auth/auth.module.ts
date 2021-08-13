@@ -8,6 +8,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { MasterModule } from '../master';
 import { ResidentCompanyModule } from '../resident-company/resident-company.module';
+import { DatabaseModule } from 'modules/main/database.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ResidentCompanyModule } from '../resident-company/resident-company.modu
     ConfigModule,
     MasterModule,
     ResidentCompanyModule,
+    DatabaseModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
