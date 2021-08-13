@@ -92,4 +92,17 @@ export class OrderProductController {
     }
     return await this.orderProductService.consolidatedInvoice(month, year, siteIdArr);
   }
+
+  /**
+  * Description: This method is add recursive invoice data for future months.
+  * @description This method is add recursive invoice data for future months.
+  */
+   @ApiBearerAuth()
+   @UseGuards(AuthGuard())
+   @Get('add-invoice-future-months')
+   @ApiResponse({ status: 200, description: 'Successful Response' })
+   @ApiResponse({ status: 401, description: 'Unauthorized' })
+   async updateRecurrenceInvoice(): Promise<any> {
+     return await this.orderProductService.updateRecurrenceInvoice();
+   }
 }

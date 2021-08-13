@@ -12,14 +12,10 @@ import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
 const { info } = require('../../../utils/logger');
 
-const appRoot = require('app-root-path');
-const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
-
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
     private readonly userService: UsersService,
     private readonly masterService: MasterService,
     private readonly residentCompanyService: ResidentCompanyService
@@ -31,15 +27,16 @@ export class AuthService {
    */
   async onApplicationBootstrap() {
     info("Generating the master data at the time of application boot up", __filename, "onApplicationBootstrap()");
-    await this.masterService.createRoles();
-    await this.masterService.createSites();
-    await this.masterService.createFundings();
-    await this.masterService.createModalities();
-    await this.masterService.createBiolabsSources();
-    await this.masterService.createCategories();
-    await this.masterService.createTechnologyStages();
-    await this.masterService.createCategories();
-    await this.createSuperAdmin();
+    const fileData = await this.masterService.readMigrationJson();
+    await this.masterService.createRoles(fileData);
+    await this.masterService.createSites(fileData);
+    await this.masterService.createFundings(fileData);
+    await this.masterService.createModalities(fileData);
+    await this.masterService.createBiolabsSources(fileData);
+    await this.masterService.createCategories(fileData);
+    await this.masterService.createTechnologyStages(fileData);
+    await this.masterService.createProductType(fileData);
+    await this.createSuperAdmin(fileData);
   }
 
   /**
@@ -47,7 +44,7 @@ export class AuthService {
    * @description This method creates the default super admin with all site access.
    * @return user object with token info
    */
-  private async createSuperAdmin() {
+  private async createSuperAdmin(migrationData: any) {
     info("Creating application super admin user with all sites access", __filename, "createSuperAdmin()");
     const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
     if (!superAdmin) {

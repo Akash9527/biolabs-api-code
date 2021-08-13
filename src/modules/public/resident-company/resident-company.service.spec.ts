@@ -892,19 +892,16 @@ describe('ResidentCompanyService', () => {
     const mockMedian = 4;
     const mockcatStatus = [
       {
-        "name": "Lab/Research Tools",
-        "industryid": 90,
-        "industrycount": "1"
+        "name": "Diagnostics/Biomarkers",
+        "industrycount": 55
       },
       {
-        "name": "Pulmonary hypertension",
-        "industryid": 12,
-        "industrycount": "0"
+        "name": "Digital Health",
+        "industrycount": 38
       },
       {
-        "name": "Cardiac arrhythmias and associated disorders",
-        "industryid": 11,
-        "industrycount": "0"
+        "name": "Veterinary Medicine",
+        "industrycount": 36
       }
     ]
 
@@ -916,26 +913,27 @@ describe('ResidentCompanyService', () => {
         where("resident_companies.companyStatus = :status", { status: '4' }).getRawOne();
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockCount);
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockMedian);
-      jest.spyOn(categoryRepository, 'query').mockResolvedValue(mockcatStatus);
+      jest.spyOn(residentCompanyService, 'getCategoryCount').mockResolvedValue(mockcatStatus);
       let result = await residentCompanyService.getResidentCompanyForSponsor();
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
       expect(result).toEqual({
         companyStats: {},
         graduate: 0,
-        categoryStats: [
-          { name: 'Lab/Research Tools', industryid: 90, industrycount: '1' },
-          {
-            name: 'Pulmonary hypertension',
-            industryid: 12,
-            industrycount: '0'
-          },
-          {
-            name: 'Cardiac arrhythmias and associated disorders',
-            industryid: 11,
-            industrycount: '0'
-          }
-        ]
+         categoryStats: [
+            {
+              "name": "Diagnostics/Biomarkers",
+              "industrycount": 55
+            },
+            {
+              "name": "Digital Health",
+              "industrycount": 38
+            },
+            {
+              "name": "Veterinary Medicine",
+              "industrycount": 36
+            }
+          ]
       })
     })
     it('should throw exception if company with provided id not available.', async () => {
@@ -1051,21 +1049,18 @@ describe('ResidentCompanyService', () => {
 
     const mockCount = 2;
     const mockMedian = 4;
-    const mockcatStatus = [
+    const mockcatStatus= [
       {
-        name: "Cardiac arrhythmias and associated disorders",
-        industryid: 11,
-        industrycount: 0
+        "name": "Diagnostics/Biomarkers",
+        "industrycount": 55
       },
       {
-        name: "Pulmonary hypertension",
-        industryid: 12,
-        industrycount: 0
+        "name": "Digital Health",
+        "industrycount": 38
       },
       {
-        name: "Therapeutics (Biopharma)",
-        industryid: 1,
-        industrycount: 0
+        "name": "Veterinary Medicine",
+        "industrycount": 36
       }
     ]
     it('should return array of Resident companies for Sponser', async () => {
@@ -1077,8 +1072,8 @@ describe('ResidentCompanyService', () => {
         andWhere(":site = ANY(resident_companies.site::int[]) ", { site: 1 }).getRawOne();
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockCount);
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockMedian);
-      jest.spyOn(categoryRepository, 'query').mockResolvedValue(mockcatStatus);
-      jest.spyOn(categoryRepository, 'query').mockResolvedValue(mockStartUps);
+      jest.spyOn(residentCompanyService, 'getCategoryCount').mockResolvedValue(mockcatStatus);
+      
       let result = await residentCompanyService.getResidentCompanyForSponsorBySite();
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
@@ -2353,6 +2348,60 @@ describe('ResidentCompanyService', () => {
         expect(e.response.status).toBe('Error');
         expect(e.response.message).toEqual('Could not update Resident Company History record');
       }
+    });
+  });
+
+  describe('should test getCategoryCount method', () => {
+    const categoryStats = [
+      {
+        "name": "Diagnostics/Biomarkers",
+        "industrycount": 55
+      },
+      {
+        "name": "Digital Health",
+        "industrycount": 38
+      },
+      {
+        "name": "Veterinary Medicine",
+        "industrycount": 36
+      }
+    ]
+    it('should return resident companies coint associated with industies for sponser dashboard', async () => {
+      jest.spyOn(categoryRepository, 'query').mockResolvedValueOnce(categoryStats);
+      var holder = {};
+      categoryStats.forEach(function (d) {
+        if (holder.hasOwnProperty(d.name)) {
+          holder[d.name] = holder[d.name] + (d.industrycount);
+        } else {
+          holder[d.name] = (d.industrycount);
+        }
+      });
+      var catogaryObj = [];
+      for (var prop in holder) {
+        if (catogaryObj.length < 3)
+          catogaryObj.push({ name: prop, industrycount: holder[prop] });
+      }
+      let result = await residentCompanyService.getCategoryCount(0);
+      expect(result).toStrictEqual(categoryStats);
+    });
+    
+    it('should return resident companies coint associated with industies for sites', async () => {
+      jest.spyOn(categoryRepository, 'query').mockResolvedValueOnce(categoryStats);
+      var holder = {};
+      categoryStats.forEach(function (d) {
+        if (holder.hasOwnProperty(d.name)) {
+          holder[d.name] = holder[d.name] + (d.industrycount);
+        } else {
+          holder[d.name] = (d.industrycount);
+        }
+      });
+      var catogaryObj = [];
+      for (var prop in holder) {
+        if (catogaryObj.length < 3)
+          catogaryObj.push({ name: prop, industrycount: holder[prop] });
+      }
+      let siteResult = await residentCompanyService.getCategoryCount(1);
+      expect(siteResult).toStrictEqual(categoryStats);
     });
   });
 });

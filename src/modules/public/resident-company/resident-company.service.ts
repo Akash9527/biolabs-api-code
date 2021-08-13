@@ -728,10 +728,7 @@ export class ResidentCompanyService {
       if (medainResponse && medainResponse.length > 0) {
         status["avgTeamSize"] = Math.round(medainResponse[0].median);
       }
-      const categoryStats = await this.categoryRepository.
-        query("SELECT c.name, c.id as industryId, (select count(rc.*) FROM public.resident_companies as rc " +
-          "where c.id = ANY(rc.industry::int[]) ) as industryCount " +
-          "FROM public.categories as c order by industryCount desc limit 3;");
+      const categoryStats = await this.getCategoryCount(0);
 
       response['companyStats'] = (!status) ? 0 : status;
       response['graduate'] = (!graduate) ? 0 : graduate;
@@ -776,10 +773,7 @@ export class ResidentCompanyService {
           companystats["avg"] = Math.round(medainResponse[0].median);
         }
 
-        const categoryStats = await this.categoryRepository.
-          query("SELECT c.name, c.id  as industryId, (select count(rc.*) FROM resident_companies as rc " +
-            "where c.id = ANY(rc.industry::int[]) and " + site.id + " = ANY(rc.site::int[])  ) as industryCount " +
-            " FROM public.categories as c order by industryCount desc limit 3;");
+        const categoryStats = await this.getCategoryCount(site.id);
 
         let newStartUps: any = {};
         newStartUps = await this.residentCompanyRepository.
@@ -805,6 +799,64 @@ export class ResidentCompanyService {
     }
     return res;
 
+  }
+
+  /**
+  * @description This method will get top 3 count of resident conpanies associated with industries.
+  * @param siteId site id 
+  * @returns resident conpanies associated with industries.
+  */
+  async getCategoryCount(siteId) {
+    let siteFilter = "(select count(rc.*) FROM public.resident_companies as rc where rc.\"companyStatus\" = '1'  and rc.\"companyOnboardingStatus\" = true  and p.id = ANY(rc.industry::int[]) ) as industryCount ";
+    if (siteId && siteId > 0) {
+      siteFilter = "(select count(rc.*) FROM public.resident_companies as rc  where  rc.\"companyStatus\" = '1'  and rc.\"companyOnboardingStatus\" = true and p.id = ANY(rc.industry::int[]) and  " + siteId + " = ANY(rc.site::int[]) ) as industryCount ";
+    }
+    let query =
+      " with CTE as"
+      + "("
+      + " select p.id,p.parent_id cid,p.name as cname ,p1.parent_id as c1id,p1.name as c1name ,p2.parent_id as c2id, p2.name as c2name,"
+      + siteFilter
+      + " from public.categories as p left join public.categories as p1 on p1.id=p.parent_id "
+      + " left join  public.categories as p2 on p2.id=p1.parent_id "
+      + " order by industryCount desc)"
+      + ",CTE1 as"
+      + "("
+      + " select C.c2name as c2name, sum(C.industryCount) as c2count from CTE C"
+      + " where C.c2id is not null and C.c2id=0 and C.industryCount>0"
+      + " group by C.c2name"
+      + ")"
+      + ",CTE2 as"
+      + "("
+      + " select C.c1name as c1name, sum(C.industryCount) as c1count from CTE C"
+      + " where C.c1id is not null and C.c1id=0 and C.industryCount>0"
+      + " group by C.c1name"
+      + ")"
+      + ",CTE3  as"
+      + "("
+      + " select C.cname as cname, sum(C.industryCount) as ccount from CTE C"
+      + " where C.cid is not null and C.cid=0 and C.industryCount>0"
+      + " group by C.cname"
+      + ")"
+      + " select c2name as name,c2count as industryCount from CTE1 union "
+      + " select c1name,c1count from CTE2 union "
+      + " select cname,ccount from CTE3 "
+      + " order by industryCount desc;"
+    info("Query excecuting ", query, __filename, "getCategoryCount()");
+    const categoryStats = await this.categoryRepository.query(query);
+    let holder = {};
+    categoryStats.forEach(function (d) {
+      if (holder.hasOwnProperty(d.name)) {
+        holder[d.name] = holder[d.name] + parseInt(d.industrycount);
+      } else {
+        holder[d.name] = parseInt(d.industrycount);
+      }
+    });
+    let catogaryObj = [];
+    for (let prop in holder) {
+      if (catogaryObj.length < 3)
+        catogaryObj.push({ name: prop, industrycount: holder[prop] });
+    }
+    return catogaryObj;
   }
 
   /**

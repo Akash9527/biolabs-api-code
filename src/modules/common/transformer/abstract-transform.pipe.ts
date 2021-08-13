@@ -33,4 +33,5 @@ export abstract class AbstractTransformPipe implements PipeTransform {
     }
     return values;
   }
+
 }
