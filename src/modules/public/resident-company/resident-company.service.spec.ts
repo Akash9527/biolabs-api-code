@@ -274,6 +274,63 @@ const req: any = {
   user: { site_id: [1, 2], role: 1, companyId: 70 },
   headers: { 'x-site-id': [2] }
 }
+
+let itemsWithUpdatedInvoices = [
+  {
+    "productTypeId": 5,
+    "sum": "0",
+    "productTypeName": "Private Lab"
+  },
+  {
+    "productTypeId": 4,
+    "sum": "0",
+    "productTypeName": "Private Office"
+  },
+  {
+    "productTypeId": 3,
+    "sum": "0",
+    "productTypeName": "Workstation"
+  },
+  {
+    "productTypeId": 2,
+    "sum": "20",
+    "productTypeName": "Lab Bench"
+  },
+  {
+    "productTypeId": 1,
+    "sum": "10",
+    "productTypeName": "Membership Fee"
+  }
+];
+
+const mockSpaceChangeWaitlistItems = [
+  {
+    "productTypeId": 5,
+    "sum": "0",
+    "productTypeName": "Private Lab"
+  },
+  {
+    "productTypeId": 4,
+    "sum": "2",
+    "productTypeName": "Private Office"
+  },
+  {
+    "productTypeId": 3,
+    "sum": "4",
+    "productTypeName": "Workstation"
+  },
+  {
+    "productTypeId": 2,
+    "sum": "1",
+    "productTypeName": "Lab Bench"
+  },
+  {
+    "productTypeId": 1,
+    "sum": "0",
+    "productTypeName": "Membership Fee"
+  }
+];
+
 describe('ResidentCompanyService', () => {
   let residentCompanyService: ResidentCompanyService;
   let productTypeService;
@@ -920,20 +977,20 @@ describe('ResidentCompanyService', () => {
       expect(result).toEqual({
         companyStats: {},
         graduate: 0,
-         categoryStats: [
-            {
-              "name": "Diagnostics/Biomarkers",
-              "industrycount": 55
-            },
-            {
-              "name": "Digital Health",
-              "industrycount": 38
-            },
-            {
-              "name": "Veterinary Medicine",
-              "industrycount": 36
-            }
-          ]
+        categoryStats: [
+          {
+            "name": "Diagnostics/Biomarkers",
+            "industrycount": 55
+          },
+          {
+            "name": "Digital Health",
+            "industrycount": 38
+          },
+          {
+            "name": "Veterinary Medicine",
+            "industrycount": 36
+          }
+        ]
       })
     })
     it('should throw exception if company with provided id not available.', async () => {
@@ -1049,7 +1106,7 @@ describe('ResidentCompanyService', () => {
 
     const mockCount = 2;
     const mockMedian = 4;
-    const mockcatStatus= [
+    const mockcatStatus = [
       {
         "name": "Diagnostics/Biomarkers",
         "industrycount": 55
@@ -1073,7 +1130,7 @@ describe('ResidentCompanyService', () => {
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockCount);
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockMedian);
       jest.spyOn(residentCompanyService, 'getCategoryCount').mockResolvedValue(mockcatStatus);
-      
+
       let result = await residentCompanyService.getResidentCompanyForSponsorBySite();
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
@@ -1829,34 +1886,8 @@ describe('ResidentCompanyService', () => {
 
     });
   });
+
   describe('getSpaceChangeWaitlistItems method', () => {
-    const mockSpaceChangeWaitlistItems = [
-      {
-        "productTypeId": 5,
-        "sum": "0",
-        "productTypeName": "Private Lab"
-      },
-      {
-        "productTypeId": 4,
-        "sum": "2",
-        "productTypeName": "Private Office"
-      },
-      {
-        "productTypeId": 3,
-        "sum": "4",
-        "productTypeName": "Workstation"
-      },
-      {
-        "productTypeId": 2,
-        "sum": "1",
-        "productTypeName": "Lab Bench"
-      },
-      {
-        "productTypeId": 1,
-        "sum": "0",
-        "productTypeName": "Membership Fee"
-      }
-    ]
 
     it('should return list of items', async () => {
       jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockSpaceChangeWaitlistItems);
@@ -1968,16 +1999,18 @@ describe('ResidentCompanyService', () => {
       expect(result['body']).toEqual(0);
     });
   });
+
   describe('getItems method', () => {
     it('should return response with status and message fields if it is Successfull', async () => {
       jest.spyOn(itemRepository, 'find').mockResolvedValue(mockSpaceChangeWaitlistItem.items);
-      let result = await residentCompanyService.getItems(1);
+      let result = await residentCompanyService.getItems(1, itemsWithUpdatedInvoices);
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
       expect(result.length).toBe(mockSpaceChangeWaitlistItem.items.length);
       expect(result).toBe(mockSpaceChangeWaitlistItem.items);
     });
   });
+
   describe('getItemsOfSpaceChangeWaitlist method', () => {
     let spaceChangeWaitlist = [{
       residentCompanyName: 'BiolabsNewvision_Ipsen',
@@ -2027,10 +2060,11 @@ describe('ResidentCompanyService', () => {
 
     it('should return response with status and message fields if it is Successfull', async () => {
       if (spaceChangeWaitlist) {
-        for (let index = 0; index < spaceChangeWaitlist.length; index++) {
-          jest.spyOn(itemRepository, 'find').mockResolvedValue(mockSpaceChangeWaitlistItem.items);
+        // for (let index = 0; index < spaceChangeWaitlist.length; index++) {
+        jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockSpaceChangeWaitlistItems);
+        jest.spyOn(itemRepository, 'find').mockResolvedValue(mockSpaceChangeWaitlistItem.items);
 
-        }
+        // }
       }
       let result = await residentCompanyService.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist);
       expect(result).not.toBeUndefined();
@@ -2162,12 +2196,14 @@ describe('ResidentCompanyService', () => {
     it('should return response with status and message fields if it is Successfull', async () => {
       jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(5);
       jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+      jest.spyOn(productTypeService, 'getProductType').mockResolvedValue(mockSpaceChangeWaitlistItems);
       let result = await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
       expect(result).not.toBeNull();
       expect(result).not.toBeNull();
     });
     it('should throw BiolabsException exception', async () => {
       jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockRejectedValueOnce(new BiolabsException('Getting error while fetching  maxPriorityOrder '));
+      jest.spyOn(productTypeService, 'getProductType').mockResolvedValue(mockSpaceChangeWaitlistItems);
       jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
       try {
         await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
@@ -2176,11 +2212,26 @@ describe('ResidentCompanyService', () => {
         expect(e instanceof BiolabsException).toBeTruthy();
         expect(e.message).toEqual("Getting error while fetching  maxPriorityOrder ");
       }
-
     });
+
+    it('should throw BiolabsException exception in fetching product types', async () => {
+      jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(5);
+      jest.spyOn(productTypeService, 'getProductType').mockRejectedValue(mockSpaceChangeWaitlistItems);
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+
+      try {
+        await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toEqual("Error while fetching product types");
+      }
+    });
+
     it('should throw BiolabsException exception', async () => {
       jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(5);
-      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockRejectedValueOnce(new BiolabsException('Getting error while Saving Waitlist '));
+      jest.spyOn(productTypeService, 'getProductType').mockResolvedValue(mockSpaceChangeWaitlistItems);
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockRejectedValue(mockSpaceChangeWaitlistItem);
       try {
         await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
       } catch (e) {
@@ -2384,7 +2435,7 @@ describe('ResidentCompanyService', () => {
       let result = await residentCompanyService.getCategoryCount(0);
       expect(result).toStrictEqual(categoryStats);
     });
-    
+
     it('should return resident companies coint associated with industies for sites', async () => {
       jest.spyOn(categoryRepository, 'query').mockResolvedValueOnce(categoryStats);
       var holder = {};
