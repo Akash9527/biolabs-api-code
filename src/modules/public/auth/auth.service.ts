@@ -4,7 +4,6 @@ import { SITE_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-site-admi
 import { SPONSOR_ACCESSLEVELS } from '../../../constants/privileges-sponsor';
 import { SUPER_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-super-admin';
 import { Hash } from '../../../utils/Hash';
-import { ConfigService } from '../../config';
 import { User, UsersService } from '../user';
 import { LoginPayload } from './login.payload';
 import { MasterService } from '../master';
