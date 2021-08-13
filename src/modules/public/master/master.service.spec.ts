@@ -698,7 +698,7 @@ describe('MasterService', () => {
                 standardizedAddress: '75 Kneeland St, 14th Floor Boston, MA 02111',
                 colorCode: '#6baecf',
                 googleMapUrl: 'https://goo.gl/maps/J6KRZNuGFrWkk7iG6',
-                siteMapBoxImgUrl: '',
+                siteMapBoxImgUrl: 'https://biolabsblobdev.blob.core.windows.net/configuration/Tufts.png',
                 status: '1'
             },
             Ipsen: {
@@ -708,7 +708,7 @@ describe('MasterService', () => {
                 standardizedAddress: '650 E Kendall St 2nd Floor, Cambridge, MA 02142',
                 colorCode: '#26294a',
                 googleMapUrl: 'https://goo.gl/maps/PuKw7cvjxKxsApNN7',
-                siteMapBoxImgUrl: '',
+                siteMapBoxImgUrl: 'https://biolabsblobdev.blob.core.windows.net/configuration/Ipsen.png',
                 status: '1'
             },
             Eisai: {
@@ -718,7 +718,7 @@ describe('MasterService', () => {
                 standardizedAddress: '35 Cambridge Park Drive, Cambridge, MA 02140 2nd Floor',
                 colorCode: '#d80c8c',
                 googleMapUrl: 'https://goo.gl/maps/fvAQF8sMtykEk76Z8',
-                siteMapBoxImgUrl: '',
+                siteMapBoxImgUrl: 'https://biolabsblobdev.blob.core.windows.net/configuration/Eisai.png',
                 status: '1'
             }
         }
