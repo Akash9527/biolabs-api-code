@@ -58,8 +58,8 @@ const mockResidentCompanyService = () => ({
     getResidentCompany: jest.fn()
 })
 let req: Request;
-const appRoot = require('app-root-path');
-const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
+// const appRoot = require('app-root-path');
+// const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
 describe('AuthService', () => {
     let authService;
     let usersService;
