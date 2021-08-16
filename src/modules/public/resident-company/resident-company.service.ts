@@ -2026,7 +2026,7 @@ order by quat;
    * @param companyId id if the company
    * @returns list of Space Change Waitlist
    */
-  public async getSpaceChangeWaitListByStatusSiteIdAndCompanyId(statusArr: number[], siteIdArr: number[], companyId: number): Promise<any> {
+  public async getSpaceChangeWaitListByStatusSiteIdAndCompanyId(statusArr: number[], siteIdArr: number[], companyId: number, @Request() req): Promise<any> {
     info(`Get Space Change Waitlist by status: ${statusArr}, siteId: ${siteIdArr} and companyId: ${companyId}`, __filename, `getSpaceChangeWaitListByStatusSiteIdAndCompanyId()`);
     let response = {};
     let status: number[] = [];
@@ -2052,7 +2052,7 @@ order by quat;
       }
       waitlistQuery.orderBy("space_change_waitlist.priorityOrder", "ASC");
       let spaceChangeWaitlist: any = await waitlistQuery.getRawMany();
-      response = this.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist);
+      response = this.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist, req);
       response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
     } catch (error) {
       response['status'] = 'Error';
@@ -2069,13 +2069,14 @@ order by quat;
    * Description: Iterates SpaceChangeWaitlist array, fetches items for each iteration and addes to the array.
    * @description Iterates SpaceChangeWaitlist array, fetches items for each iteration and addes to the array.
    * @param spaceChangeWaitlist SpaceChangeWaitlist array
+   * @param req Request object
    * @returns SpaceChangeWaitlist array with Item array
    */
-  public async getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist: any[]) {
+  public async getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist: any[], @Request() req) {
     info(`Getting items of Space Change Waitlist`, __filename, `getItemsOfSpaceChangeWaitlist()`);
     if (spaceChangeWaitlist) {
       for (let index = 0; index < spaceChangeWaitlist.length; index++) {
-        const itemsWithUpdatedInvoice: any = await this.getSpaceChangeWaitlistItems(spaceChangeWaitlist[index].residentCompanyId);
+        const itemsWithUpdatedInvoice: any = await this.getSpaceChangeWaitlistItems(spaceChangeWaitlist[index].residentCompanyId, req);
         const fetchedItemsArr = await this.getItems(spaceChangeWaitlist[index].id, itemsWithUpdatedInvoice.items).then((result) => {
           return result;
         }).catch(err => {
