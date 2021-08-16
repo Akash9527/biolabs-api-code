@@ -18,6 +18,7 @@ import { Funding } from '../master/funding.entity';
 import { Modality } from '../master/modality.entity';
 import { Site } from '../master/site.entity';
 import { TechnologyStage } from '../master/technology-stage.entity';
+import { ProductTypeService } from '../order/product-type.service';
 import { User } from '../user';
 import { AddNotesDto } from './add-notes.dto';
 import { AddResidentCompanyPayload } from './add-resident-company.payload';
@@ -71,7 +72,8 @@ export class ResidentCompanyService {
     private readonly spaceChangeWaitlistRepository: Repository<SpaceChangeWaitlist>,
     @InjectRepository(Item)
     private readonly itemRepository: Repository<Item>,
-    private readonly mail: Mail
+    private readonly mail: Mail,
+    private readonly productTypeService: ProductTypeService
   ) { }
   /**
    * Description: This method will get the resident company by id.
@@ -1739,6 +1741,11 @@ order by quat;
     });
     debug(`Max priority order: ${maxPriorityOrder}`, __filename, "addResidentCompanyDataInWaitlist()");
 
+    /** Fetch product types from DB to set in waitlist as desiredQty = 0 and currentQty = 0 */
+    let productTypes: any = await this.getProductTypesInitially().then((result) => {
+      return result;
+    });
+
     let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
     spaceChangeWaitlistObj.residentCompany = savedRc;
     spaceChangeWaitlistObj.desiredStartDate = Date.parse(new Date().toString()) / 1000;
@@ -1755,11 +1762,62 @@ order by quat;
     spaceChangeWaitlistObj.membershipChange = MembershipChangeEnum.UpdateMembership;
     spaceChangeWaitlistObj.requestGraduateDate = null;
     spaceChangeWaitlistObj.marketPlace = null;
-    return await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj).catch(err => {
+    const respSaved = await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj).then((result) => {
+      return result;
+    }).catch(err => {
       error("Getting error while Saving Waitlist", __filename, "addResidentCompanyDataInWaitlist()");
       throw new BiolabsException('Getting error while Saving Waitlist ', err.message);
     });
+    /** Save items for the waitlist */
+    if (productTypes && respSaved) {
+      this.saveItemsForWaitlist(productTypes, respSaved);
+    }
+    return respSaved;
+  }
 
+  /**
+   * Description: Fetch product types from DB to set in waitlist as desiredQty = 0 and currentQty = 0.
+   * @description Fetch product types from DB to set in waitlist as desiredQty = 0 and currentQty = 0.
+   * @returns list of product types
+   */
+  private async getProductTypesInitially() {
+    info(`Fetching produt types from db`, __filename, `getProductTypesInitially()`);
+    let productTypes: any = await this.productTypeService.getProductType().then((result) => {
+      return result;
+    }).catch(err => {
+      error(`Error while fetching product types`, __filename, `getProductTypesInitially()`);
+      throw new BiolabsException('Error while fetching product types', err.message);
+    });
+    debug(`Fetched produt types from db, total:  ${productTypes.length}`, __filename, `getProductTypesInitially()`);
+    return productTypes;
+  }
+
+  /**
+   * Description: Save product types in items table for waitlist as desiredQty = 0 and currentQty = 0.
+   * @description Save product types in items table for waitlist as desiredQty = 0 and currentQty = 0.
+   * @param productTypes array of product types
+   * @param savedWaitlist Saved waitlist object
+   */
+  private async saveItemsForWaitlist(productTypes: any[], savedWaitlist: any) {
+    info(`Saving produt types in items table, total product types: ${productTypes.length}`, __filename, `saveItemsForWaitlist()`);
+    for (let index = 0; index < productTypes.length; index++) {
+      let productTypeNameTemp = productTypes[index].productTypeName != undefined && productTypes[index].productTypeName != null && productTypes[index].productTypeName != '' ? productTypes[index].productTypeName.trim() : productTypes[index].productTypeName;
+
+      /** Skip some specifice products to be saved in change request */
+      if (!(ApplicationConstants.SKIP_PRODUCT_TYPE_IDS.includes(productTypes[index].id) || ApplicationConstants.SKIP_PRODUCT_TYPE_NAMES.includes(productTypeNameTemp))) {
+        let item: Item = new Item();
+        item.productTypeId = productTypes[index].id;
+        item.itemName = productTypes[index].productTypeName;
+        item.currentQty = 0;
+        item.desiredQty = 0;
+        item.spaceChangeWaitlist = savedWaitlist;
+        item.spaceChangeWaitlist_id = savedWaitlist.id;
+        await this.itemRepository.save(this.itemRepository.create(item)).catch(err => {
+          error(`Error while saving items`, __filename, `saveItemsForWaitlist()`);
+          throw new BiolabsException('Error while saving items in Waitlist ', err.message);
+        });
+      }
+    }
   }
 
   /**
@@ -2017,7 +2075,8 @@ order by quat;
     info(`Getting items of Space Change Waitlist`, __filename, `getItemsOfSpaceChangeWaitlist()`);
     if (spaceChangeWaitlist) {
       for (let index = 0; index < spaceChangeWaitlist.length; index++) {
-        const spaceChangeWaitlistObj = await this.getItems(spaceChangeWaitlist[index].id).then((result) => {
+        const itemsWithUpdatedInvoice: any = await this.getSpaceChangeWaitlistItems(spaceChangeWaitlist[index].residentCompanyId);
+        const fetchedItemsArr = await this.getItems(spaceChangeWaitlist[index].id, itemsWithUpdatedInvoice.items).then((result) => {
           return result;
         }).catch(err => {
           error(`Error in getting items of Space Change Waitlist`, __filename, `getItemsOfSpaceChangeWaitlist()`);
@@ -2027,7 +2086,7 @@ order by quat;
             body: err
           }, HttpStatus.INTERNAL_SERVER_ERROR);
         });
-        spaceChangeWaitlist[index].items = spaceChangeWaitlistObj;
+        spaceChangeWaitlist[index].items = fetchedItemsArr;
       }
     }
     return spaceChangeWaitlist;
@@ -2039,13 +2098,21 @@ order by quat;
    * @param spaceChangeWaitlistId SpaceChangeWaitlist Id
    * @returns array of Item
    */
-  public async getItems(spaceChangeWaitlistId: number) {
+  public async getItems(spaceChangeWaitlistId: number, itemsWithUpdatedInvoices: any[]) {
     info(`Getting items by spaceChangeWaitlistId: ${spaceChangeWaitlistId}`, __filename, `getItems()`);
-    const items: any[] = await this.itemRepository.find({
+
+    const waitlistItems: any[] = await this.itemRepository.find({
       where: { spaceChangeWaitlist_id: spaceChangeWaitlistId }
     });
+    for (let index = 0; index < waitlistItems.length; index++) {
+      let result: any = itemsWithUpdatedInvoices.filter(cItem => (cItem.productTypeId == waitlistItems[index].productTypeId));
+
+      if (result && result.length > 0) {
+        waitlistItems[index].currentQty = Number(result[0].sum);
+      }
+    }
     info(`Executed getItems() method`, __filename, `getItems()`);
-    return items;
+    return waitlistItems;
   }
 
   /**
