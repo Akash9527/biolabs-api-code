@@ -30,6 +30,8 @@ const mockUser: User = {
     createdAt: 12,
     updatedAt: 12,
     toJSON: null,
+    isRequestedMails:null,
+    mailsRequestType:null
 }
 const mockUserService = () => ({
     getByEmail: jest.fn(),

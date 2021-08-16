@@ -403,4 +403,62 @@ export class UsersService {
       throw new BiolabsException('Getting error in forget password process', err.message);
     }
   }
+  
+  /**
+   * Description: This method is used to update the user mails request.
+   * @description This method is used to update the user mails request.
+   * @param payload object of type UpdateUserRequestMailsPayload
+   * @return user object
+   */
+   async updateUserMailRequest(payload) {
+    debug("Updating user Mail request" + payload.id, __filename, "updateUserMailRequest()");
+    const user = await this.get(payload.id);
+    try {
+      if (user) {
+        await this.userRepository
+        .createQueryBuilder('users')
+        .update()
+        .set({ isRequestedMails: payload.isRequestedMails })
+        .where("id = :id", { id: payload.id })
+        .execute();
+
+        info("User emails request updated successfully", __filename, "updateUserMailRequest(");
+        return await this.getUserById(user.id);
+      } else {
+        throw new NotAcceptableException('User with provided id not available.');
+      }
+    } catch (err) {
+      error("Getting error to update user mails request " + err.message, __filename, "updateUserMailRequest()");
+      throw new BiolabsException('Getting error in updating user mails request', err.message);
+    }
+  }
+
+  /**
+   * Description: This method is used to update the user mails request type request.
+   * @description This method is used to update the user mails request type request.
+   * @param payload object of type UpdateUserRequestMailsPayload
+   * @return user object
+   */
+   async updateUserEmailReceivingType(payload) {
+    debug("Updating user Mail request" + payload.id, __filename, "updateUserEmailReceivingType()");
+    const user = await this.get(payload.id);
+    try {
+      if (user) {
+        await this.userRepository
+        .createQueryBuilder('users')
+        .update()
+        .set({ mailsRequestType: payload.mailsRequestType })
+        .where("id = :id", { id: payload.id })
+        .execute();
+
+        info("User emails request type updated successfully", __filename, "updateUserEmailReceivingType(");
+        return await this.getUserById(user.id);
+      } else {
+        throw new NotAcceptableException('User with provided id not available.');
+      }
+    } catch (err) {
+      error("Getting error to update user mails receiving type " + err.message, __filename, "updateUserEmailReceivingType()");
+      throw new BiolabsException('Getting error in updating user mails receiving type', err.message);
+    }
+  }
 }
