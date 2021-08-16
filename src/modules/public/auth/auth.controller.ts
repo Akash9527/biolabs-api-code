@@ -70,9 +70,9 @@ export class AuthController {
 
   
   /**
-   * Description: This method is used to login a user.
-   * @description This method is used to login a user.
-   * @param payload it is a request body expects the payload of type LoginPayload.
+   * Description: This method is used to refresh the access token for loggedIn user.
+   * @description This method is used to refresh the access token for loggedIn user.
+   * @param payload it is a request body expects the payload of type refreshTokenPayload.
    */
    @Post('refresh-token')
    @ApiResponse({ status: 201, description: 'Successful Login' })
