@@ -9,6 +9,7 @@ import { LoginPayload } from './login.payload';
 import { MasterService } from '../master';
 import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
+import { refreshTokenPayload } from './refreshToken.payload';
 const { info } = require('../../../utils/logger');
 
 @Injectable()
@@ -97,7 +98,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials!');
     }
     if (user.companyId) {
-      const company = await this.residentCompanyService.getResidentCompany(user.companyId, null);
+      const company = await this.residentCompanyService.getResidentCompany(user.companyId);
       if (company)
         user.company = company;
     }
@@ -123,5 +124,26 @@ export class AuthService {
    */
   async forgotPassword(payload, req) {
     return this.userService.forgotPassword(payload, req);
+  }
+
+  
+  /**
+   * Description: This method is used to decode the token.
+   * @description This method is used to decode the token.
+   * @param payload object of refreshTokenPayload
+   * @return user object
+   */
+   async decodeToken(payload: refreshTokenPayload): Promise<any> {
+     const token= this.jwtService.decode(payload.accessToken)
+     const user: any = await this.userService.get(token['id'])
+    if (!user || user.status != '1') {
+      throw new UnauthorizedException('Invalid token!');
+    }
+    if (user.companyId) {
+      const company = await this.residentCompanyService.getResidentCompany(user.companyId);
+      if (company)
+        user.company = company;
+    }
+    return user;
   }
 }
