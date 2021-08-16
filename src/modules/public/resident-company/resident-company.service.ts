@@ -2078,9 +2078,10 @@ order by quat;
     const response = {};
     const month = new Date().getMonth() + 2; // Getting next month from currect date
     const queryStr = `
-    select res."productTypeId", sum(res.count), res."productTypeName"
+    select res."productTypeId", sum(res.count), res."quantity", res."productTypeName"
     from (
         select pt.id as "productTypeId",
+        CASE WHEN (op."quantity") is null THEN 0 ELSE (op."quantity") END as quantity,
         CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
         pt."productTypeName"
         from product_type as pt
@@ -2090,7 +2091,7 @@ order by quat;
         and pt."productTypeName" <> 'Retainer Fee'
         group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
         ) as res
-    group by res."productTypeId", res."productTypeName"
+    group by res."productTypeId", res."productTypeName", res."quantity"
     `;
 
     const items = await this.residentCompanyHistoryRepository.query(queryStr);
