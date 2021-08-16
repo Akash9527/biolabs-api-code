@@ -306,7 +306,7 @@ describe('ResidentCompanyController', () => {
             }
         });
     });
-    
+
     describe('should test addNotes Functionality', () => {
         let mockAddNote = { "companyId": 3, "notes": "this is note 1" };
         it('it should called residentService addNote method ', async () => {
@@ -485,8 +485,8 @@ describe('ResidentCompanyController', () => {
     });
     describe('should test getResidentCompanySpecificFieldsById Functionality', () => {
         it('it should called residentService getResidentCompanySpecificFieldsById method ', async () => {
-            await residentController.getResidentCompanySpecificFieldsById(mockResidentCompany.residentCompany.id);
-            expect(await residentService.getResidentCompanySpecificFieldsById).toHaveBeenCalledWith(mockResidentCompany.residentCompany.id);
+            await residentController.getResidentCompanySpecificFieldsById(mockResidentCompany.residentCompany.id, req);
+            expect(await residentService.getResidentCompanySpecificFieldsById).toHaveBeenCalledWith(mockResidentCompany.residentCompany.id, req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.getResidentCompanySpecificFieldsById.mockResolvedValue(new UnauthorizedException());
@@ -602,8 +602,8 @@ describe('ResidentCompanyController', () => {
     });
     describe('should test getItemsForSpaceChangeWaitlist Functionality', () => {
         it('it should called residentService getSpaceChangeWaitlistItems method ', async () => {
-            await residentController.getItemsForSpaceChangeWaitlist(mockResidentCompany.residentCompany.id);
-            expect(await residentService.getSpaceChangeWaitlistItems).toHaveBeenCalledWith(mockResidentCompany.residentCompany.id);
+            await residentController.getItemsForSpaceChangeWaitlist(mockResidentCompany.residentCompany.id, req);
+            expect(await residentService.getSpaceChangeWaitlistItems).toHaveBeenCalledWith(mockResidentCompany.residentCompany.id, req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.getSpaceChangeWaitlistItems.mockResolvedValue(new UnauthorizedException());

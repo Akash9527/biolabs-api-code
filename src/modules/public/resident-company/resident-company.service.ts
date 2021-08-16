@@ -482,11 +482,22 @@ export class ResidentCompanyService {
    * @param payload an id of ResidentCompany
    * @return an objecdt of ResidentCompany
    */
-  public async getResidentCompanySpecificFieldsById(residentCompanyId: number) {
+  public async getResidentCompanySpecificFieldsById(residentCompanyId: number, @Request() req) {
     info(`Get some specific fields of Resident Company by company Id: ${residentCompanyId}`, __filename, `getResidentCompanySpecificFieldsById()`);
+
+    let siteIdArr;
+
+    /** Check if user has permission to view this company */
+    this.CheckCompanyPermissionForUser(req, residentCompanyId);
+    siteIdArr = this.getSiteIdArrFromRequestObject(req);
+
     let response = {};
     let residentCompanyObj = await this.fetchResidentCompanyById(residentCompanyId);
     if (residentCompanyObj) {
+
+      /** Check if sites are accessible to the user */
+      this.checkIfValidSiteIds(siteIdArr, residentCompanyObj.site);
+
       response['residentCompanyId'] = residentCompanyObj.id;
       response['companyStageOfDevelopment'] = residentCompanyObj.companyStage;
       response['fundingToDate'] = residentCompanyObj.funding;
@@ -875,28 +886,16 @@ export class ResidentCompanyService {
       return {};
     }
 
-
-    if (req && req.user && req.user.companyId && req.user.companyId != id) {
-      error("Error in find resident company", __filename, "getResidentCompany()");
-      throw new NotAcceptableException(
-        'You do not have permission to view this company',
-      );
-    }
-
-    if (req && req.user && req.headers) {
-      info(`Fetching site Id array from request header`, __filename, "getResidentCompany()");
-      siteIdArr = req.user.site_id;
-      if (req.headers['x-site-id']) {
-        siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
-      }
-      info(`Site Id fetched from request header: ${siteIdArr}`, __filename, "getResidentCompany()");
-    }
+    /** Check if user has permission to view this company */
+    this.CheckCompanyPermissionForUser(req, id);
+    siteIdArr = this.getSiteIdArrFromRequestObject(req);
     // try {
     const residentCompany: any = await this.residentCompanyRepository.findOne({
       where: { id: id }
     });
 
     if (residentCompany) {
+
       info(`Fetched resident company from repository, id : ${residentCompany.id}`, __filename, "getResidentCompany()");
       /** Check if sites are accessible to the user */
       this.checkIfValidSiteIds(siteIdArr, residentCompany.site);
@@ -2069,13 +2068,65 @@ order by quat;
   }
 
   /**
+   * Description: Check if the user has permission to access the company, if not then throw NotAcceptableException.
+   * @description Check if the user has permission to access the company, if not then throw NotAcceptableException.
+   * @param req Request object
+   * @param residentCompanyId Resident Company id
+   */
+  public CheckCompanyPermissionForUser(@Request() req, residentCompanyId: number) {
+    info(`Checking permission to access the resident company id: ${residentCompanyId}`, __filename, "CheckCompanyPermissionForUser()");
+    if (req && req.user && req.user.companyId && req.user.companyId != residentCompanyId) {
+      error(`User does not have permission to view the company: ${residentCompanyId}`, __filename, "CheckCompanyPermissionForUser()");
+      throw new NotAcceptableException(
+        'You do not have permission to view this company',
+      );
+    }
+  }
+
+  /**
+   * Descrition: Get site id array from request object
+   * @description Get site id array from request object.
+   * @param req Request object
+   * @returns 
+   */
+  public getSiteIdArrFromRequestObject(@Request() req): number[] {
+    info(`Get site id array from request object`, __filename, "getSiteIdArrFromRequestObject()");
+    let siteIdArr: number[];
+    if (req && req.user && req.headers) {
+      info(`Fetching site Id array from request header`, __filename, "getSiteIdArrFromRequestObject()");
+      siteIdArr = req.user.site_id;
+      if (req.headers['x-site-id']) {
+        siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+      }
+      info(`Site Id fetched from request header: ${siteIdArr}`, __filename, "getSiteIdArrFromRequestObject()");
+    }
+    return siteIdArr;
+  }
+
+  /**
    * @description Get items for waitlist
    * @param companyId id of Company
    * @returns list of items
    */
-  public async getSpaceChangeWaitlistItems(companyId: number) {
+  public async getSpaceChangeWaitlistItems(companyId: number, @Request() req) {
     info(`Get Space Change Waitlist items by company id: ${companyId}`, __filename, `getSpaceChangeWaitlistItems()`);
     const response = {};
+    let siteIdArr;
+
+    /** Check if user has permission to view this company */
+    this.CheckCompanyPermissionForUser(req, companyId);
+    siteIdArr = this.getSiteIdArrFromRequestObject(req);
+
+    const residentCompany: any = await this.residentCompanyRepository.findOne({
+      where: { id: companyId }
+    });
+
+    if (residentCompany) {
+      info(`Fetched resident company from repository, id : ${residentCompany.id}`, __filename, "getSpaceChangeWaitlistItems()");
+      /** Check if sites are accessible to the user */
+      this.checkIfValidSiteIds(siteIdArr, residentCompany.site);
+    }
+
     const month = new Date().getMonth() + 2; // Getting next month from currect date
     const queryStr = `
     select res."productTypeId", sum(res.count), res."productTypeName"
