@@ -578,7 +578,7 @@ describe('ResidentCompanyController', () => {
             if (req.headers['x-site-id']) {
                 siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
             }
-            expect(await residentService.getSpaceChangeWaitListByStatusSiteIdAndCompanyId).toHaveBeenCalledWith(status, siteIdArr, mockResidentCompany.residentCompany.id);
+            expect(await residentService.getSpaceChangeWaitListByStatusSiteIdAndCompanyId).toHaveBeenCalledWith(status, siteIdArr, mockResidentCompany.residentCompany.id, req);
         });
         it('it should throw UnAuthorized Exception if user is not authorized', async () => {
             residentService.getSpaceChangeWaitListByStatusSiteIdAndCompanyId.mockResolvedValue(new UnauthorizedException());

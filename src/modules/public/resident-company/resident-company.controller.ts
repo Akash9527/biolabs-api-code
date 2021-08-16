@@ -385,7 +385,7 @@ export class ResidentCompanyController {
     if (req.headers['x-site-id']) {
       siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
     }
-    return this.residentCompanyService.getSpaceChangeWaitListByStatusSiteIdAndCompanyId(status, siteIdArr, companyId);
+    return this.residentCompanyService.getSpaceChangeWaitListByStatusSiteIdAndCompanyId(status, siteIdArr, companyId, req);
   }
 
   /**

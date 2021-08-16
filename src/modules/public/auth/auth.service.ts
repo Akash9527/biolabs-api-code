@@ -98,7 +98,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials!');
     }
     if (user.companyId) {
-      const company = await this.residentCompanyService.getResidentCompany(user.companyId);
+      const company = await this.residentCompanyService.getResidentCompany(user.companyId, null);
       if (company)
         user.company = company;
     }
@@ -140,7 +140,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid token!');
     }
     if (user.companyId) {
-      const company = await this.residentCompanyService.getResidentCompany(user.companyId);
+      const company = await this.residentCompanyService.getResidentCompany(user.companyId, null);
       if (company)
         user.company = company;
     }

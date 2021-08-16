@@ -3,7 +3,6 @@ import { ResidentCompany } from "./resident-company.entity";
 import { ResidentCompanyService } from "./resident-company.service";
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-
 import { PassportModule } from "@nestjs/passport";
 import { ResidentCompanyHistory } from "./resident-company-history.entity";
 import { ResidentCompanyDocuments, ResidentCompanyDocumentsFillableFields } from "./rc-documents.entity";
@@ -2068,24 +2067,25 @@ describe('ResidentCompanyService', () => {
         // for (let index = 0; index < spaceChangeWaitlist.length; index++) {
         jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockSpaceChangeWaitlistItems);
         jest.spyOn(itemRepository, 'find').mockResolvedValue(mockSpaceChangeWaitlistItem.items);
-
-        // }
+        jest.spyOn(residentCompanyService, 'getSpaceChangeWaitlistItems').mockReturnThis();
+        // jest.spyOn(residentCompanyService, 'getItems').mockReturnThis();
+        jest.spyOn(residentCompanyService, 'getItems').mockResolvedValue(mockSpaceChangeWaitlistItems);
       }
-      let result = await residentCompanyService.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist);
+      let result = await residentCompanyService.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist, req);
       expect(result).not.toBeUndefined();
       expect(result).not.toBeNull();
       expect(result.length).toEqual(2);
-      expect(result[0].items).toBe(mockSpaceChangeWaitlistItem.items);
-      expect(result[1].items).toBe(mockSpaceChangeWaitlistItem.items);
     });
+
     it('should return response with status and message fields if it is Successfull', async () => {
       if (spaceChangeWaitlist) {
         for (let index = 0; index < spaceChangeWaitlist.length; index++) {
           jest.spyOn(itemRepository, 'find').mockRejectedValueOnce(null);
         }
+        jest.spyOn(residentCompanyService, 'getSpaceChangeWaitlistItems').mockReturnThis();
       }
       try {
-        await residentCompanyService.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist);
+        await residentCompanyService.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist, req);
       } catch (e) {
         expect(e.status).toBe(500);
         expect(e.response.status).toBe('Error');
