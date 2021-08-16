@@ -22,7 +22,8 @@ const mockAuthService = () => ({
     createToken: jest.fn(),
     validateUser: jest.fn(),
     validateToken: jest.fn(),
-    forgotPassword: jest.fn()
+    forgotPassword: jest.fn(),
+    decodeToken: jest.fn()
 });
 const mockUserService = () => ({
     getByEmail: jest.fn(),
@@ -180,6 +181,33 @@ describe('AuthController', () => {
 
             }
 
+        });
+    });
+
+    describe('test refresh token Functionality', () => {
+        const mockTokenPayload = {accessToken:"tokenString"};
+        const mockdecodedToken = { id: 1, iat: 1628585535, exp: 1628671935 }
+        const mockPayload = { email: 'Testadmin@biolabs.io', password: 'biolabs.io' };
+
+        it('it should call authService decodeToken method', async () => {
+            await authController.refreshToken(mockTokenPayload);
+            expect(await authService.decodeToken).toHaveBeenCalledWith(mockTokenPayload);
+        });
+        it('test refresh token request for valid token', async () => {
+            authService.validateUser.mockReturnValueOnce(mockUser);
+            authService.createToken.mockReturnValueOnce(
+                { ...mockUser, expiresIn: "moke date", accessToken: "dummy date", permissions: "dummy permissions" }
+            );
+            const result = await authController.refreshToken();
+            expect(result).toHaveProperty('accessToken');
+            expect(result).toHaveProperty('permissions');
+            expect(result).toHaveProperty('expiresIn');
+        });
+        it('test token refresh with Unauthorized', async () => {
+            authService.createToken.mockResolvedValue(new UnauthorizedException());
+            const { response } = await authController.refreshToken();
+            expect(response.statusCode).toBe(HTTP_CODES.UNAUTHORIZED);
+            expect(response.message).toBe('Unauthorized');
         });
     });
 
