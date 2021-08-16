@@ -10,7 +10,7 @@ import { LoginPayload } from './login.payload';
 import { MasterService } from '../master';
 import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
-import { DatabaseService } from 'modules/main/database.service';
+import { DatabaseService } from '../master/db-script.service';
 const { info } = require('../../../utils/logger');
 
 @Injectable()
