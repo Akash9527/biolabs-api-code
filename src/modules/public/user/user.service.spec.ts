@@ -14,8 +14,6 @@ import { UpdateUserPayload } from './update-user.payload';
 import { ListUserPayload } from './list-user.payload';
 import { log } from 'winston';
 import { AddUserPayload } from './add-user.payload';
-import { UpdateUserRequestMailsPayload } from './update-user-RequestMails.payload';
-import { UpdateUserEmailReceivingTypePayload } from './update-user-mail-requested-type.payload';
 
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 const mockUser: User = {
@@ -501,73 +499,6 @@ describe('UserService', () => {
             }
         });
     });
-    
-  describe('updateUserMailRequest method', () => {
-    let payload: UpdateUserRequestMailsPayload = {
-      id: 1,
-      isRequestedMails: true
-    }
-    it('should update user mail request ', async () => {
-        jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
-        if (mockUser) {
-              await userRepository
-                .createQueryBuilder('users')
-                .update()
-                .set({ isRequestedMails: payload.isRequestedMails })
-                .where("id = :id", { id: payload.id })
-                .execute();
-            jest.spyOn(userService, 'getUserById').mockResolvedValueOnce(mockUser);
-            const updateUser = await userService.updateUserMailRequest(payload);
-            expect(updateUser).not.toBeNull();
-            expect(updateUser.firstName).toEqual(mockUser.firstName);
-            expect(updateUser.userType).toEqual(mockUser.userType);
-            expect(updateUser).toBe(mockUser);
-        }
-    })
-    it('it should throw exception if user id is not provided   ', async () => {
-        jest.spyOn(userService, 'get').mockResolvedValue(null);
-        try {
-            await userService.updateUserMailRequest(payload);
-        } catch (e) {
-            expect(e.name).toBe('BiolabsException');
-            expect(e instanceof BiolabsException).toBeTruthy();  
-            expect(e.message).toBe('Getting error in updating user mails request');
-        }
-    });
-  });
-  describe('updateUserEmailReceivingType method', () => {
-    let payload: UpdateUserEmailReceivingTypePayload = {
-      id: 1,
-      mailsRequestType: '0'
-    }
-    it('should update user mail request ', async () => {
-        jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(mockUser);
-        if (mockUser) {
-              await userRepository
-                .createQueryBuilder('users')
-                .update()
-                .set({ mailsRequestType: payload.mailsRequestType })
-                .where("id = :id", { id: payload.id })
-                .execute();
-            jest.spyOn(userService, 'getUserById').mockResolvedValueOnce(mockUser);
-            const updateUser = await userService.updateUserEmailReceivingType(payload);
-            expect(updateUser).not.toBeNull();
-            expect(updateUser.firstName).toEqual(mockUser.firstName);
-            expect(updateUser.userType).toEqual(mockUser.userType);
-            expect(updateUser).toBe(mockUser);
-        }
-    })
-    it('it should throw exception if user id is not provided   ', async () => {
-        jest.spyOn(userService, 'get').mockResolvedValue(null);
-        try {
-            await userService.updateUserEmailReceivingType(payload);
-        } catch (e) {
-            expect(e.name).toBe('BiolabsException');
-            expect(e instanceof BiolabsException).toBeTruthy();  
-            expect(e.message).toBe('Getting error in updating user mails receiving type');
-        }
-    });
-  });
 });
 
 

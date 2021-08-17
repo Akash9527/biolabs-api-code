@@ -6,8 +6,6 @@ import { AddUserPayload } from './add-user.payload';
 import { UpdateUserPayload } from './update-user.payload';
 import { ListUserPayload } from './list-user.payload';
 import { Request as RequestExpress } from 'express';
-import { UpdateUserRequestMailsPayload } from './update-user-RequestMails.payload';
-import { UpdateUserEmailReceivingTypePayload } from './update-user-mail-requested-type.payload';
 
 @Controller('api/user')
 @ApiTags('User')
@@ -101,34 +99,4 @@ export class UserController {
   async getUserById(@Param('id') id: number): Promise<any> {
     return this.userService.getUserById(id);
   }
-
-  /**
-   * Description: This method is used to upadte a mails request of sponser user.
-   * @description This method is used to update a mails request of sponser user.
-   * @param payload it is a request body contains payload of type UpdateUserRequestMailsPayload.
-   */
-   @ApiBearerAuth()
-   @UseGuards(AuthGuard())
-   @Put('/emails/request')
-   @ApiResponse({ status: 200, description: 'Successful Response' })
-   @ApiResponse({ status: 401, description: 'Unauthorized' })
-   async updateUserRequestMails(@Body() payload: UpdateUserRequestMailsPayload): Promise<any> {
-     const user = await this.userService.updateUserMailRequest(payload);
-     return user;
-   }
-
-  /**
-   * Description: This method is used to upadte mails request type of sponser user.
-   * @description This method is used to update mails request type of sponser user.
-   * @param payload it is a request body contains payload of type UpdateUserRequestMailsPayload.
-   */
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard())
-    @Put('/mails/receiving/type')
-    @ApiResponse({ status: 200, description: 'Successful Response' })
-    @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async updateUserMailsReceivingType(@Body() payload: UpdateUserEmailReceivingTypePayload): Promise<any> {
-      const user = await this.userService.updateUserEmailReceivingType(payload);
-      return user;
-    }
 }
