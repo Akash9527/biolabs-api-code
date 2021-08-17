@@ -13,6 +13,7 @@ import { SUPER_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-super-ad
 import { SITE_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-site-admin';
 import { SPONSOR_ACCESSLEVELS } from '../../../constants/privileges-sponsor';
 import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
+import { DatabaseService } from '../master/db-script.service';
 const mockUser: User = {
     id: 1,
     role: 1,
@@ -79,6 +80,8 @@ const mockUserService = () => ({
 
 const mockConfigService = () => { }
 
+const mockdatabaseService = () => { }
+
 const mockJwtService = () => ({
     sign: jest.fn(),
     decode: jest.fn()
@@ -106,6 +109,7 @@ describe('AuthService', () => {
     let jwtService;
     let residentCompanyService;
     let masterService;
+    let databaseService;
 
 
     beforeEach(async () => {
@@ -117,7 +121,8 @@ describe('AuthService', () => {
                 { provide: JwtService, useFactory: mockJwtService },
                 { provide: MasterService, useFactory: mockMasterService },
                 { provide: ResidentCompanyService, useFactory: mockResidentCompanyService },
-                { provide: ConfigService, useFactory: mockConfigService }
+                { provide: ConfigService, useFactory: mockConfigService },
+                { provide: DatabaseService, useFactory: mockdatabaseService }
             ]
         }).compile();
 
@@ -126,6 +131,7 @@ describe('AuthService', () => {
         usersService = await module.get<UsersService>(UsersService);
         jwtService = await module.get<JwtService>(JwtService);
         residentCompanyService = await module.get<ResidentCompanyService>(ResidentCompanyService);
+        databaseService = await module.get<DatabaseService>(DatabaseService);
     });
     it('should be defined', () => {
         expect(authService).toBeDefined();
