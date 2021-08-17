@@ -14,6 +14,7 @@ import { UpdateUserPayload } from './update-user.payload';
 import { ListUserPayload } from './list-user.payload';
 import { log } from 'winston';
 import { AddUserPayload } from './add-user.payload';
+
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 const mockUser: User = {
     id: 1,
@@ -31,7 +32,9 @@ const mockUser: User = {
     password: "test@1234",
     createdAt: 12,
     updatedAt: 12,
-    toJSON: null
+    toJSON: null,
+    mailsRequestType:null,
+    isRequestedMails:null
 }
 const mockJwtService = () => ({
     sign: jest.fn()
@@ -93,7 +96,10 @@ describe('UserService', () => {
                             skip: jest.fn().mockReturnThis(),
                             take: jest.fn().mockReturnThis(),
                             addOrderBy: jest.fn().mockReturnThis(),
-                            getMany: jest.fn()
+                            getMany: jest.fn(),
+                            update: jest.fn().mockReturnThis(),
+                            set: jest.fn().mockReturnThis(),
+                            execute:jest.fn()
                         })),
                     }
                 },
@@ -382,7 +388,9 @@ describe('UserService', () => {
                 password: "test@1234",
                 createdAt: 12,
                 updatedAt: 12,
-                toJSON: null
+                toJSON: null,
+                mailsRequestType:null,
+                isRequestedMails:null
             }
 
             it('should  set setNewPassword ', async () => {
