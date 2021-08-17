@@ -22,6 +22,10 @@ export const ApplicationConstants = {
 
     /** Products type names skip be saved in external change request */
     SKIP_PRODUCT_TYPE_IDS: [6, 7],
-    SKIP_PRODUCT_TYPE_NAMES: ['Retainer Fee', 'Decontamination Fee']
+    SKIP_PRODUCT_TYPE_NAMES: ['Retainer Fee', 'Decontamination Fee'],
+
+    /** Email template paths */
+    EMAIL_TEMPLATE_FORGOT_PASSWORD_PATH: '/src/modules/public/email-template/forgot-password.html',
+    EMAIL_TEMPLATE_SPONSORSHIP_QN_CHANGE_TO_YES_PATH: '/src/modules/public/email-template/sponsorship-question-change-to-yes.html'
 
 };
