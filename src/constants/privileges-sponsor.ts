@@ -169,8 +169,8 @@ export const SPONSOR_ACCESSLEVELS = {
       name: 'My Profile',
       action: false,
       create: false,
-      view: false,
-      update: false,
+      view: true,
+      update: true,
       delete: false,
     },
     'resident-companies': {

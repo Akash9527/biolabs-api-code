@@ -139,6 +139,12 @@ export class UsersService {
         } else {
           delete user.password;
         }
+        if(payload.hasOwnProperty('isRequestedMails')){
+          user.isRequestedMails = payload.isRequestedMails;
+        }
+        if(payload.mailsRequestType){
+          user.mailsRequestType = payload.mailsRequestType;
+        }
         await this.userRepository.update(user.id, user);
         info("User updated successfully", __filename, "updateUser(");
         if (user.password) delete user.password;
@@ -403,4 +409,5 @@ export class UsersService {
       throw new BiolabsException('Getting error in forget password process', err.message);
     }
   }
+  
 }

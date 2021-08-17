@@ -8,6 +8,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { MasterModule } from '../master';
 import { ResidentCompanyModule } from '../resident-company/resident-company.module';
+import { DatabaseService } from '../master/db-script.service';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { ResidentCompanyModule } from '../resident-company/resident-company.modu
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy,DatabaseService],
   exports: [PassportModule.register({ defaultStrategy: 'jwt' })],
 })
 export class AuthModule { }
