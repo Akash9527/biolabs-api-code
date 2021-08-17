@@ -2200,6 +2200,7 @@ order by quat;
     select res."productTypeId", sum(res.count), res."productTypeName"
     from (
         select pt.id as "productTypeId",
+        CASE WHEN (op."quantity") is null THEN 0 ELSE (op."quantity") END as quantity,
         CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
         pt."productTypeName"
         from product_type as pt
