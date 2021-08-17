@@ -1735,22 +1735,22 @@ order by year,quarterNo
   async getCompanySizeQuartly(companyId: number) {
     info(`Get Company size quarterly by companyId : ${companyId}`, __filename, `getCompanySizeQuartly()`);
     try {
-  //     const queryStr = `
-  //   SELECT 
-  //      MAX("companySize") as noOfEmployees,
-  //         extract(quarter from "updatedAt")as quarterNo,
-  //         to_char("updatedAt", '"Q"Q.YYYY') AS quat
-  // FROM resident_company_history 
-  //        where "comnpanyId"=${companyId}
-  // group by
-  //           extract(quarter from "updatedAt"),
-  //           to_char("updatedAt", '"Q"Q.YYYY')
-  //           order by quat;
-  //   `;
-    const queryStr=`SELECT 
+      //     const queryStr = `
+      //   SELECT 
+      //      MAX("companySize") as noOfEmployees,
+      //         extract(quarter from "updatedAt")as quarterNo,
+      //         to_char("updatedAt", '"Q"Q.YYYY') AS quat
+      // FROM resident_company_history 
+      //        where "comnpanyId"=${companyId}
+      // group by
+      //           extract(quarter from "updatedAt"),
+      //           to_char("updatedAt", '"Q"Q.YYYY')
+      //           order by quat;
+      //   `;
+      const queryStr = `SELECT 
     MAX("companySize") as noOfEmployees,
        extract(quarter from "updatedAt")as quarterNo,
-   extract(year from "updatedAt") as yyyy ,
+   extract(year from "updatedAt") as year ,
        to_char("updatedAt", '"Q"Q.YYYY') AS quat
 FROM resident_company_history 
       where "comnpanyId"=${companyId}
@@ -1758,7 +1758,8 @@ group by
          extract(quarter from "updatedAt"),
    extract(year from "updatedAt"),
          to_char("updatedAt", '"Q"Q.YYYY')
-         order by yyyy`;
+         order by year`;
+
       debug(`getting companySize Quarterly: ${queryStr}`, __filename, "getCompanySizeQuartly()")
       return await this.residentCompanyHistoryRepository.query(queryStr);
     } catch (err) {
