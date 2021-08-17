@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { diff } from 'json-diff';
+// import { diff } from 'json-diff';
 import { In, Like, Repository } from 'typeorm';
 import { BiolabsSource } from './biolabs-source.entity';
 import { Category } from './category.entity';
@@ -14,15 +14,17 @@ import { COMPANY_STATUS } from '../../../constants/company-status';
 import { USER_TYPE } from '../../../constants/user-type';
 import { COMMITTEE_STATUS } from 'constants/committee_status';
 import { ProductType } from '../order/model/product-type.entity';
+import { FileService } from '../file';
 const { error, info, debug } = require("../../../utils/logger")
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
-const appRoot = require('app-root-path');
-const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
+//const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
 type status_enum = '-1' | '0' | '1' | '99';
+const appRoot = require('app-root-path');
 
 @Injectable()
 export class MasterService {
   constructor(
+    private readonly fileService: FileService,
     @InjectRepository(BiolabsSource)
     private readonly biolabsSourceRepository: Repository<BiolabsSource>,
     @InjectRepository(Category)
@@ -40,6 +42,7 @@ export class MasterService {
     @InjectRepository(ProductType)
     private readonly productTypeRepository: Repository<ProductType>,
   ) { }
+
 
   /**
    * Description: This method will return the sites list.
@@ -93,7 +96,7 @@ export class MasterService {
    * @description This method will store the Product information.
    * @return array of product object 
    */
-  async createProductType() {
+  async createProductType(migrationData: any) {
     info("creating product type", __filename, "createProductType()");
     try {
       const productType = await this.productTypeRepository.find();
@@ -115,7 +118,7 @@ export class MasterService {
    * @description This method will store the sites.
    * @return array of site object
    */
-  async createSites() {
+  async createSites(migrationData: any) {
     const _sites = migrationData['sites'];
     let resp = {};
     for (const _site of _sites) {
@@ -131,18 +134,18 @@ export class MasterService {
    * @return site object
    */
   async createSite(_site: Site) {
-    const existingSite = await this.siteRepository.findOne(_site.id);
-    if (existingSite) {
-      delete existingSite.createdAt;
-      delete existingSite.updatedAt;
-    }
-    // Will compare 2 json and get the difference
-    const changes = diff(existingSite, _site);
-    if (existingSite && changes) {
-      return await this.siteRepository.update(_site.id, _site);
-    } else if (!existingSite) {
+    // const existingSite = await this.siteRepository.findOne(_site.id);
+    // if (existingSite) {
+    //   delete existingSite.createdAt;
+    //   delete existingSite.updatedAt;
+    // }
+    // // Will compare 2 json and get the difference
+    // const changes = diff(existingSite, _site);
+    // if (existingSite && changes) {
+    //   return await this.siteRepository.update(_site.id, _site);
+    // } else if (!existingSite) {
       return await this.siteRepository.save(this.siteRepository.create(_site));
-    }
+    // }
   }
 
   /**
@@ -189,7 +192,7 @@ export class MasterService {
    * @description This method will store the roles.
    * @return array of role object
    */
-  async createRoles() {
+  async createRoles(migrationData: any) {
     info("Creating Roles", __filename, "createRoles()");
     const roles = this.getRoles(new MasterPayload());
     let resp = {};
@@ -292,7 +295,7 @@ export class MasterService {
    * @description This method will store the categories.
    * @return array of category object
    */
-  async createCategories() {
+  async createCategories(migrationData: any) {
     info("creating categories", __filename, "createCategories()");
     try {
       const _categories = migrationData['categories'];
@@ -410,7 +413,7 @@ export class MasterService {
    * @description This method will store the biolabs sources.
    * @return array of biolabs sources object
    */
-  async createBiolabsSources() {
+  async createBiolabsSources(migrationData: any) {
     info("Creating Biolabs Sources", __filename, "creatBiolabsSources()");
     const biolabsSources = this.getBiolabsSource(new MasterPayload());
     let resp = {};
@@ -496,7 +499,7 @@ export class MasterService {
    * @description This method will store the fundings.
    * @return array of fundings object
    */
-  async createFundings() {
+  async createFundings(migrationData: any) {
     error("creating fundings", __filename, "createFundings()");
     const fundings = this.getFundings(new MasterPayload());
     let resp = {};
@@ -582,7 +585,7 @@ export class MasterService {
    * @description This method will store the modalities.
    * @return array of modalities object
    */
-  async createModalities() {
+  async createModalities(migrationData: any) {
     info("creating Modalities", __filename, "createModalities()");
     const modalities = this.getModalities(new MasterPayload());
     let resp = {};
@@ -668,7 +671,7 @@ export class MasterService {
    * @description This method will store the technology stages list.
    * @return array of technology stages object
    */
-  async createTechnologyStages() {
+  async createTechnologyStages(migrationData: any) {
     info("creating Technology Stages", __filename, "createTechnologyStages()");
     const technologyStages = this.getTechnologyStages(new MasterPayload());
     let resp = {};
@@ -748,5 +751,28 @@ export class MasterService {
    */
   getCommitteeStatus() {
     return COMMITTEE_STATUS;
+  }
+
+  /**
+   * Description this function is used to read migration JSON from Azure.
+   * @description this function is used to read migration JSON from Azure.
+   * @returns file Data
+   */
+  async readMigrationJson() {
+    if (process.env.BIOLAB_GET_MASTER_DATA_FROM_AZURE == 'false') {
+      return JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
+    } else {
+      const readableStream = await this.fileService.getfileStream(process.env.BIOLAB_CONFIGURATION_JSON, process.env.BIOLAB_CONFIG_CONTAINER_NAME);
+      const chunks = [];
+      return new Promise(function (resolve, reject) {
+        readableStream.on("data", data => {
+          chunks.push(data.toString());
+        });
+        readableStream.on("end", () => {
+          resolve(JSON.parse(chunks.join('').toString()));
+        });
+        readableStream.on('error', reject);
+      });
+    }
   }
 }

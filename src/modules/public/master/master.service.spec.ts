@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Any, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ProductType } from '../order/model/product-type.entity';
 import { BiolabsSource } from './biolabs-source.entity';
 import { Category } from './category.entity';
@@ -11,20 +11,14 @@ import { Role } from './role.entity';
 import { Site } from './site.entity';
 import { TechnologyStage } from './technology-stage.entity';
 import { MasterPayload } from './master.payload';
-import { COMPANY_STATUS } from '../../../constants/company-status';
-import { USER_TYPE } from '../../../constants/user-type';
-import { COMMITTEE_STATUS } from '../../../constants/committee_status';
-import { of } from 'rxjs';
-import { AnyCnameRecord } from 'node:dns';
+import { FileService } from '../file';
 const appRoot = require('app-root-path');
+const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
-const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/migration.json"));
-
 const mockMasterPayLoad: MasterPayload = {
     q: "test", pagination: true, page: 12, limit: 6, sort: true, sortFiled: "test"
     , siteIdArr: [1, 2], role: 1
 }
-
 describe('MasterService', () => {
     let masterService;
     let siteRepository;
@@ -35,12 +29,18 @@ describe('MasterService', () => {
     let technologyStageRepository;
     let biolabsSourceRepository;
     let productTypeRepository;
+    let fileService;
 
     beforeEach(async () => {
         const module = await Test.createTestingModule({
             providers: [
                 MasterService,
+                {
+                    provide: FileService, useValue: {
+                        getfileStream: jest.fn(),
 
+                    }
+                },
                 {
                     provide: getRepositoryToken(BiolabsSource), useValue: {
                         find: jest.fn(),
@@ -111,6 +111,7 @@ describe('MasterService', () => {
         }).compile();
 
         masterService = await module.get<MasterService>(MasterService);
+        fileService = await module.get<FileService>(FileService);
         siteRepository = await module.get<Repository<Site>>(getRepositoryToken(Site));
         roleRepository = await module.get<Repository<Role>>(getRepositoryToken(Role));
         categoryRepository = await module.get<Repository<Category>>(getRepositoryToken(Category));
@@ -136,8 +137,6 @@ describe('MasterService', () => {
             expect(sites).toBe(mockSites);
         })
     });
-
-
     describe('should test getRoles Functionality', () => {
         let mockRoles: Array<any> = [{ "id": 1, "name": "superadmin" }, { "id": 2, "name": "siteadmin" },
         { "id": 3, "name": "sponsor" }, { "id": 4, "name": "resident" }];
@@ -699,7 +698,7 @@ describe('MasterService', () => {
                 standardizedAddress: '75 Kneeland St, 14th Floor Boston, MA 02111',
                 colorCode: '#6baecf',
                 googleMapUrl: 'https://goo.gl/maps/J6KRZNuGFrWkk7iG6',
-                siteMapBoxImgUrl: '',
+                siteMapBoxImgUrl: 'https://biolabsblobdev.blob.core.windows.net/configuration/Tufts.png',
                 status: '1'
             },
             Ipsen: {
@@ -709,7 +708,7 @@ describe('MasterService', () => {
                 standardizedAddress: '650 E Kendall St 2nd Floor, Cambridge, MA 02142',
                 colorCode: '#26294a',
                 googleMapUrl: 'https://goo.gl/maps/PuKw7cvjxKxsApNN7',
-                siteMapBoxImgUrl: '',
+                siteMapBoxImgUrl: 'https://biolabsblobdev.blob.core.windows.net/configuration/Ipsen.png',
                 status: '1'
             },
             Eisai: {
@@ -719,7 +718,7 @@ describe('MasterService', () => {
                 standardizedAddress: '35 Cambridge Park Drive, Cambridge, MA 02140 2nd Floor',
                 colorCode: '#d80c8c',
                 googleMapUrl: 'https://goo.gl/maps/fvAQF8sMtykEk76Z8',
-                siteMapBoxImgUrl: '',
+                siteMapBoxImgUrl: 'https://biolabsblobdev.blob.core.windows.net/configuration/Eisai.png',
                 status: '1'
             }
         }
@@ -728,7 +727,7 @@ describe('MasterService', () => {
             for (const _site of _sites) {
                 jest.spyOn(masterService, 'createSite').mockResolvedValueOnce(_site);
             }
-            let result = await masterService.createSites();
+            let result = await masterService.createSites(migrationData);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
             expect(result).toEqual(mockSites);
@@ -947,10 +946,10 @@ describe('MasterService', () => {
     describe('should test createRoles Functionality', () => {
         let mockRoles = [];
         const _roles = migrationData['roles'];
-        it('it should return site object', async () => {
+        it('it should return roles object', async () => {
             jest.spyOn(masterService, 'getRoles').mockResolvedValueOnce(mockRoles);
             const resp = Promise.resolve(mockRoles);
-            let result = await masterService.createRoles();
+            let result = await masterService.createRoles(migrationData);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
             expect(_roles.map(_roles => _roles.name)).toEqual([
@@ -1014,7 +1013,7 @@ describe('MasterService', () => {
         it('it should return site object', async () => {
             jest.spyOn(masterService, 'getBiolabsSource').mockResolvedValueOnce(mockbiolabsSource);
             const resp = Promise.resolve(mockbiolabsSource);
-            let result = await masterService.createBiolabsSources();
+            let result = await masterService.createBiolabsSources(migrationData);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
             expect(_biolabsSources.map(_biolabsSources => _biolabsSources.name)).toEqual([
@@ -1149,34 +1148,33 @@ describe('MasterService', () => {
                 jest.spyOn(productTypeRepository, 'create').mockResolvedValueOnce(productTypeMock);
                 jest.spyOn(productTypeRepository, 'save').mockResolvedValueOnce(productTypeMock);
             }
-            await masterService.createProductType(async dbType => {
-                console.log("------dbType---------------", dbType);
+            await masterService.createProductType(migrationData);
 
-            });
+        });
 
-            // expect(dbType).not.toBeNull();
-            // expect(dbType).toBe(productType);
-            // expect(dbType).toMatchObject(productType);
-        });
-        it('should throw exception ', async () => {
-            jest.spyOn(productTypeRepository, 'find').mockImplementation(() => {
-                throw new InternalException('')
-            });
-            try {
-                await masterService.createProductType();
-            } catch (e) {
-                expect(e.name).toBe('InternalException');
-                expect(e instanceof InternalException).toBeTruthy();
-            }
-        });
+        // expect(dbType).not.toBeNull();
+        // expect(dbType).toBe(productType);
+        // expect(dbType).toMatchObject(productType);
     });
+    it('should throw exception ', async () => {
+        jest.spyOn(productTypeRepository, 'find').mockImplementation(() => {
+            throw new InternalException('')
+        });
+        try {
+            await masterService.createProductType();
+        } catch (e) {
+            expect(e.name).toBe('InternalException');
+            expect(e instanceof InternalException).toBeTruthy();
+        }
+    });
+
     describe('should test createFundings Functionality', () => {
         let mockfundings = [];
         const _fundings = migrationData['fundings'];
         it('it should return site object', async () => {
             jest.spyOn(masterService, 'getFundings').mockResolvedValueOnce(mockfundings);
             const resp = Promise.resolve(mockfundings);
-            let result = await masterService.createFundings();
+            let result = await masterService.createFundings(migrationData);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
             expect(_fundings.map(_fundings => _fundings.name)).toEqual([
@@ -1211,7 +1209,7 @@ describe('MasterService', () => {
         it('it should return site object', async () => {
             jest.spyOn(masterService, 'getModalities').mockResolvedValueOnce(mockModalitites);
             const resp = Promise.resolve(mockModalitites);
-            let result = await masterService.createModalities();
+            let result = await masterService.createModalities(migrationData);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
             expect(_modalities.map(_modalities => _modalities.name)).toEqual([
@@ -1245,7 +1243,7 @@ describe('MasterService', () => {
         });
         it('should get error ', async () => {
             jest.spyOn(masterService, 'getModalities').mockRejectedValueOnce(mockModalitites);
-            return await expect( masterService.createModalities()).rejects.toBeTruthy();
+            return await expect(masterService.createModalities()).rejects.toBeTruthy();
         });
     });
     describe('should test createTechnologyStages Functionality', () => {
@@ -1254,7 +1252,7 @@ describe('MasterService', () => {
         it('it should return site object', async () => {
             jest.spyOn(masterService, 'getTechnologyStages').mockResolvedValueOnce(mockTechnologyStage);
             const resp = Promise.resolve(_technologyStages);
-            let result = await masterService.createTechnologyStages();
+            let result = await masterService.createTechnologyStages(migrationData);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
             expect(_technologyStages.map(_technologyStages => _technologyStages.name)).toEqual([
@@ -1286,7 +1284,7 @@ describe('MasterService', () => {
         const _categories = migrationData['categories'];
         it('it should return site object', async () => {
             jest.spyOn(masterService, 'createCategory').mockResolvedValueOnce(_categories);
-            let result = await masterService.createCategories();
+            let result = await masterService.createCategories(migrationData);
             expect(result).not.toBeNull();
             expect(result).not.toBeUndefined();
         });

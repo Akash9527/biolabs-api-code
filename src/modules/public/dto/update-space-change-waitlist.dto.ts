@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsNotEmpty, Min } from "class-validator";
+import { IsEnum, IsNotEmpty, MaxLength, Min } from "class-validator";
+import { ApplicationConstants } from "utils/application-constants";
 import { MembershipChangeEnum } from "../enum/membership-change-enum";
 import { RequestStatusEnum } from "../enum/request-status-enum";
 import { ItemDto } from "./item.dto";
@@ -22,7 +23,8 @@ export class UpdateSpaceChangeWaitlistDto {
     @ApiProperty({ description: 'Plan change summary', required: false, nullable: true, default: 'See Notes' })
     planChangeSummary: string;
 
-    @ApiProperty({ description: 'Plan change summary', required: false, nullable: true})
+    @ApiProperty({ description: 'Graduate Description', required: false, nullable: true })
+    @MaxLength(ApplicationConstants.SPACE_CHANGE_WAITLIST_GRADUATE_DESCRIPTION_COL_LENGTH)
     graduateDescription: string;
 
     @ApiProperty({ description: 'Request status', default: 0, required: true, nullable: false })
@@ -38,6 +40,7 @@ export class UpdateSpaceChangeWaitlistDto {
     isRequestInternal: boolean;
 
     @ApiProperty({ description: 'Request notes', required: false, nullable: true })
+    @MaxLength(ApplicationConstants.SPACE_CHANGE_WAITLIST_REQUEST_NOTES_COL_LENGTH)
     requestNotes: string;
 
     @ApiProperty({ description: 'Internal notes', required: false, nullable: true })

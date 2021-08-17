@@ -12,6 +12,8 @@ import { UserModule } from 'modules/public/user';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { InvoiceSchedulerService } from 'modules/scheduler/invoice.scheduler.service';
+import { EmailSchedulerService } from 'modules/scheduler/email.scheduler.service';
 
 @Module({
   imports: [
@@ -44,6 +46,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     OrderProductModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, InvoiceSchedulerService, EmailSchedulerService],
 })
 export class AppModule { }

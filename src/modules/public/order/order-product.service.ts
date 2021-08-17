@@ -305,4 +305,71 @@ export class OrderProductService {
       throw new BiolabsException('Error in find consolidated Invoice');
     }
   }
+
+  async getDistinctGroupId() {
+    try {
+      info(`getDistinctGroupId `, __filename, "getDistinctGroupId()");
+      const query = `select distinct("groupId") from order_product 
+      where "recurrence" = true and status = 0
+      and (to_char(DATE (year || '-' || month || '-01'), 'YYYY-MM-DD')::date + (1 || ' month')::INTERVAL) >= CURRENT_DATE`;
+      return await this.orderProductRepository.query(query);
+    } catch (err) {
+      error("Error in find getDistinctGroupId from order_product", __filename, "getDistinctGroupId()");
+      throw new BiolabsException('Error in find getDistinctGroupId Invoice');
+    }
+  }
+
+  async getMaxMonthOrderProductByGroupId(groupId: number) {
+    try {
+      info(`maxMonthByGroupId groupId : ${groupId}`, __filename, "maxMonthByGroupId()");
+      const query = `select id , to_char(DATE (month || '/01/' || year), 'MM/DD/YYYY') as maxDate
+                    from order_product where "groupId" = ${groupId}
+                    order by to_char(DATE (month || '/01/' || year), 'MM/DD/YYYY') desc limit 1`;
+      return await this.orderProductRepository.query(query);
+    } catch (err) {
+      error("Error in find maxMonthByGroupId from order_product", __filename, "maxMonthByGroupId()");
+      throw new BiolabsException('Error in find maxMonthByGroupId Invoice');
+    }
+  }
+
+  getFurtureMonthDate() {
+    const date = new Date()
+    return new Date(date.setMonth(date.getMonth() + 4));
+  }
+
+
+  monthDiff(dateFrom, dateTo) {
+    return dateTo.getMonth() - dateFrom.getMonth() +
+      (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
+  }
+
+  async updateRecurrenceInvoice() {
+
+    let groupIds = await this.getDistinctGroupId();
+
+    for (const groupId of groupIds) {
+      let orderProducts = await this.getMaxMonthOrderProductByGroupId(groupId.groupId);
+
+      if (orderProducts && orderProducts.length > 0) {
+        const orderProduct = orderProducts[0];
+        const orderProductMaxDt = new Date(orderProduct.maxdate);
+        const futureDate = this.getFurtureMonthDate();
+
+        if (this.monthDiff(new Date(orderProductMaxDt.getFullYear(), orderProductMaxDt.getMonth()),
+          new Date(futureDate.getFullYear(), futureDate.getMonth())) > 0) {
+
+          const orderProductDB = await this.orderProductRepository.findOne(orderProduct.id);
+          // Set status "0" invoice not created
+          orderProductDB.status = 0;
+          //deleting auto generated keys
+          delete orderProductDB.id;
+          delete orderProductDB.createdAt;
+          delete orderProductDB.updatedAt;
+
+          this.addFutureOrderProducts(orderProductDB);
+        }
+      }
+    }
+    return 'add-invoice-future-months process is running it will take few mins...!';
+  }
 }

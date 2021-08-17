@@ -95,7 +95,7 @@ begin
  			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Intellectual property related to your technology changed  ',  (CASE WHEN ((f1."otherIntellectualProperty" ='') OR (f1."otherIntellectualProperty" is NULL) ) THEN 'INITIALIZED_WITH_NULL' ELSE f1."otherIntellectualProperty" END) ,(CASE WHEN ((f2."otherIntellectualProperty" ='') OR ((f2."otherIntellectualProperty" is NULL)) )THEN 'INITIALIZED_WITH_NULL' ELSE f2."otherIntellectualProperty" END), to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."isAffiliated" != f1."isAffiliated" OR f1."isAffiliated" is NULL) AND f2."isAffiliated" is NOT NULL) then
- 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Affiliated changed ' , (CASE WHEN f2."isAffiliated" = true THEN 'Yes' ELSE 'No' END) ,  to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Affiliated changed ' , (CASE WHEN f1."isAffiliated" = true THEN 'Yes' ELSE 'No' END) ,(CASE WHEN f2."isAffiliated" = true THEN 'Yes' ELSE 'No' END) ,  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."affiliatedInstitution" != f1."affiliatedInstitution" OR f1."affiliatedInstitution" is NULL) AND f2."affiliatedInstitution" is NOT NULL) then
  			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Affiliated Institution changed ' , f1."affiliatedInstitution" ::text , f2."affiliatedInstitution" ::text ,to_char(f2."cdate", 'MM/dd/yyyy'));
@@ -122,7 +122,7 @@ begin
  			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Description for recognized partnerships with academia changed ' , f1."academiaPartnershipDetails" ::text , f2."academiaPartnershipDetails" ::text , to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."industryPartnerships" != f1."industryPartnerships" OR f1."industryPartnerships" is NULL) AND f2."industryPartnerships" is NOT NULL) then
- 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Recognized partnerships with industry changed ' , (CASE WHEN f1."industryPartnerships" = true THEN 'Yes' ELSE 'No' END) ,  to_char(f2."cdate", 'MM/dd/yyyy'));
+ 			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Recognized partnerships with industry changed ' , (CASE WHEN f1."industryPartnerships" = true THEN 'Yes' ELSE 'No' END) ,  (CASE WHEN f2."industryPartnerships" = true THEN 'Yes' ELSE 'No' END) ,  to_char(f2."cdate", 'MM/dd/yyyy'));
         end if;
 		if ((f2."industryPartnershipsDetails" != f1."industryPartnershipsDetails" OR f1."industryPartnershipsDetails" is NULL) AND f2."industryPartnershipsDetails" is NOT NULL) then
  			INSERT INTO biolabsfeed ("feedmsg", "beforevalue","aftervalue","cdate") VALUES ('Description for recognized partnerships with industry changed ' , f1."industryPartnershipsDetails" ::text , f2."industryPartnershipsDetails" ::text , to_char(f2."cdate", 'MM/dd/yyyy'));

@@ -43,6 +43,8 @@ export class FileController {
     }
   }
 
+  // @ApiBearerAuth()
+  // @UseGuards(AuthGuard())
   @Get('read-image')
   @Header('Content-Type', 'image/webp')
   @ApiQuery({ name: 'filename', type: String })
