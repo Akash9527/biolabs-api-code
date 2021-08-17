@@ -139,6 +139,12 @@ export class UsersService {
         } else {
           delete user.password;
         }
+        if(payload.hasOwnProperty('isRequestedMails')){
+          user.isRequestedMails = payload.isRequestedMails;
+        }
+        if(payload.mailsRequestType){
+          user.mailsRequestType = payload.mailsRequestType;
+        }
         await this.userRepository.update(user.id, user);
         info("User updated successfully", __filename, "updateUser(");
         if (user.password) delete user.password;
@@ -187,7 +193,7 @@ export class UsersService {
   async softDeleteUser(id) {
     info("Inside soft delete the user userId " + id, __filename, "softDeleteUser()");
     const FOR_DELETE_USER = "Deleted";
-    const FOR_USER="User";
+    const FOR_USER = "User";
     try {
       const user = await this.get(id);
       if (user) {
@@ -264,7 +270,7 @@ export class UsersService {
     if (user) {
       if (user.companyId) {
         const company = await this.residentCompanyService.getResidentCompany(
-          user.companyId,
+          user.companyId, null
         );
         if (company) user.company = company;
       }
@@ -403,4 +409,5 @@ export class UsersService {
       throw new BiolabsException('Getting error in forget password process', err.message);
     }
   }
+  
 }

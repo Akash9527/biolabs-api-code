@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
-import { ResidentCompany } from '../resident-company';
+import { ResidentCompany, ResidentCompanyService } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { OrderProduct } from './model/order-product.entity';
@@ -20,7 +20,8 @@ export class OrderProductService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(ResidentCompany)
     private readonly residentCompanyRepository: Repository<ResidentCompany>,
-    private readonly moduleRef: ModuleRef
+    private readonly moduleRef: ModuleRef,
+    private readonly residentCompanyService: ResidentCompanyService
   ) { }
 
   /**
@@ -183,8 +184,18 @@ export class OrderProductService {
    * @param endDate 
    * @returns 
    */
-  async fetchOrderProductsBetweenDates(month: number, year: number, companyId: number) {
-    info(`Fetch Order product between dates : ${month} companyId: ${companyId}`, __filename, "fetchOrderProductsBetweenDates()")
+  async fetchOrderProductsBetweenDates(month: number, year: number, companyId: number, siteIdArr: number[]) {
+    info(`Fetch Order product between dates : ${month} companyId: ${companyId}`, __filename, "fetchOrderProductsBetweenDates()");
+    const residentCompany: any = await this.residentCompanyRepository.findOne(companyId);
+    if (residentCompany) {
+      info(`Fetched resident company by id : ${residentCompany.id}`, __filename, "fetchOrderProductsBetweenDates()");
+      this.residentCompanyService.checkIfValidSiteIds(siteIdArr, residentCompany.site);
+    } else {
+      error(`Resident company not found by id: ${companyId}`, __filename, `fetchOrderProductsBetweenDates()`);
+      throw new NotAcceptableException(
+        'Company with provided id not available.',
+      );
+    }
     try {
       return await this.orderProductRepository.createQueryBuilder("order_product")
         .where("order_product.companyId = :companyId", { companyId: companyId })
@@ -194,9 +205,8 @@ export class OrderProductService {
         .getRawMany();
     } catch (err) {
       error("Error in fetching order products between dates", __filename, "fetchOrderProductBetweenDates()");
-      throw new BiolabsException('Error in fetching order products between dates' , err.message);
+      throw new BiolabsException('Error in fetching order products between dates', err.message);
     }
-
   }
 
   /**

@@ -484,11 +484,22 @@ export class ResidentCompanyService {
    * @param payload an id of ResidentCompany
    * @return an objecdt of ResidentCompany
    */
-  public async getResidentCompanySpecificFieldsById(residentCompanyId: number) {
+  public async getResidentCompanySpecificFieldsById(residentCompanyId: number, @Request() req) {
     info(`Get some specific fields of Resident Company by company Id: ${residentCompanyId}`, __filename, `getResidentCompanySpecificFieldsById()`);
+
+    let siteIdArr;
+
+    /** Check if user has permission to view this company */
+    this.CheckCompanyPermissionForUser(req, residentCompanyId);
+    siteIdArr = this.getSiteIdArrFromRequestObject(req);
+
     let response = {};
     let residentCompanyObj = await this.fetchResidentCompanyById(residentCompanyId);
     if (residentCompanyObj) {
+
+      /** Check if sites are accessible to the user */
+      this.checkIfValidSiteIds(siteIdArr, residentCompanyObj.site);
+
       response['residentCompanyId'] = residentCompanyObj.id;
       response['companyStageOfDevelopment'] = residentCompanyObj.companyStage;
       response['fundingToDate'] = residentCompanyObj.funding;
@@ -722,12 +733,12 @@ export class ResidentCompanyService {
 
       let status = {};
       const count: any = await this.residentCompanyRepository.query("select count(*) from public.resident_companies where resident_companies.\"companyStatus\" = '1' and resident_companies.\"companyOnboardingStatus\" = true");
-      if (count && count.length>0) {
-      status["startUpcount"] = count[0]["count"];
+      if (count && count.length > 0) {
+        status["startUpcount"] = count[0]["count"];
       }
       //calculatinng median
       const medainResponse: any = await this.residentCompanyRepository.query("select percentile_cont(0.5) within group ( order by resident_companies.\"companySize\" ) as median from public.resident_companies where resident_companies.\"companySize\" is not null and resident_companies.\"companyStatus\" = '1'  and resident_companies.\"companyOnboardingStatus\" = true");
-      if (medainResponse && medainResponse.length>0) {
+      if (medainResponse && medainResponse.length > 0) {
         status["avgTeamSize"] = Math.round(medainResponse[0].median);
       }
       const categoryStats = await this.getCategoryCount(0);
@@ -736,7 +747,7 @@ export class ResidentCompanyService {
       response['graduate'] = (!graduate) ? 0 : graduate;
       response['categoryStats'] = (!categoryStats) ? 0 : categoryStats;
     } catch (err) {
-      error("Error in find resident company for sponser",err.message, __filename, "getResidentCompanyForSponsor()");
+      error("Error in find resident company for sponser", err.message, __filename, "getResidentCompanyForSponsor()");
     }
     return response;
 
@@ -765,13 +776,13 @@ export class ResidentCompanyService {
 
         let companystats = {};
         const count: any = await this.residentCompanyRepository.query("select count(*) from public.resident_companies where resident_companies.\"companyStatus\" = '1'  and resident_companies.\"companyOnboardingStatus\" = true and " + site.id + " = Any(\"site\")");
-        if(count && count.length>0){
+        if (count && count.length > 0) {
           companystats["count"] = count[0]["count"];
         }
-        
+
         //calculatinng median
-        const medainResponse: any = await this.residentCompanyRepository.query("select percentile_cont(0.5) within group ( order by resident_companies.\"companySize\" ) as median from public.resident_companies where resident_companies.\"companySize\" is not null and " + site.id + " = Any(\"site\") and resident_companies.\"companyStatus\" = '1'  and resident_companies.\"companyOnboardingStatus\" = true"); 
-        if (medainResponse && medainResponse.length>0) {
+        const medainResponse: any = await this.residentCompanyRepository.query("select percentile_cont(0.5) within group ( order by resident_companies.\"companySize\" ) as median from public.resident_companies where resident_companies.\"companySize\" is not null and " + site.id + " = Any(\"site\") and resident_companies.\"companyStatus\" = '1'  and resident_companies.\"companyOnboardingStatus\" = true");
+        if (medainResponse && medainResponse.length > 0) {
           companystats["avg"] = Math.round(medainResponse[0].median);
         }
 
@@ -797,7 +808,7 @@ export class ResidentCompanyService {
         res.push(response);
       }
     } catch (err) {
-      error("Error in find resident company for sponser",err.message, __filename, "getResidentCompanyForSponsorBySite()");
+      error("Error in find resident company for sponser", err.message, __filename, "getResidentCompanyForSponsorBySite()");
     }
     return res;
 
@@ -865,38 +876,76 @@ export class ResidentCompanyService {
    * Description: This method will get the resident company.
    * @description This method will get the resident company.
    * @param id number resident company id
+   * @param req object of Request
    * @return resident company object
    */
-  async getResidentCompany(id) {
+  async getResidentCompany(id: number, @Request() req) {
     info("Getting Resident company by id :" + id, __filename, "getResidentCompany()");
-    try {
-      if (id == null) {
-        debug("Resident company is not fonund by id :" + id, __filename, "getResidentCompany()");
-        return {};
+    let siteIdArr;
+
+    if (id == null) {
+      debug("Resident company is not fonund by id :" + id, __filename, "getResidentCompany()");
+      return {};
+    }
+
+    /** Check if user has permission to view this company */
+    this.CheckCompanyPermissionForUser(req, id);
+    siteIdArr = this.getSiteIdArrFromRequestObject(req);
+    // try {
+    const residentCompany: any = await this.residentCompanyRepository.findOne({
+      where: { id: id }
+    });
+
+    if (residentCompany) {
+
+      info(`Fetched resident company from repository, id : ${residentCompany.id}`, __filename, "getResidentCompany()");
+      /** Check if sites are accessible to the user */
+      this.checkIfValidSiteIds(siteIdArr, residentCompany.site);
+
+      residentCompany.sites = await this.getRcSites(residentCompany.site);
+      residentCompany.categories = await this.getRcCategories(residentCompany.industry);
+      residentCompany.modalities = await this.getRcModalities(residentCompany.modality);
+      residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);
+      residentCompany.companyStages = await this.getRcTechnologyStages(residentCompany.companyStage);
+      residentCompany.biolabsSources = await this.getRcBiolabsSources(residentCompany.biolabsSources);
+      residentCompany.companyMembers = await this.getRcMembers(residentCompany.id);
+      residentCompany.companyAdvisors = await this.getRcAdvisors(residentCompany.id);
+      residentCompany.companyTechnicalTeams = await this.getRcTechnicalTeams(residentCompany.id);
+      return residentCompany;
+    } else {
+      error("Error in find resident company", __filename, "getResidentCompany()");
+      throw new NotAcceptableException(
+        'Company with provided id not available.',
+      );
+    }
+    // } catch (err) {
+    //   error("Error in find resident company", __filename, "getResidentCompany()");
+    //   throw new BiolabsException('Error in find resident company', err.message);
+    // }
+  }
+
+  /**
+   * Description: Checks if the company has the site ids which are accessible to the user.
+   * @description Checks if the company has the site ids which are accessible to the user.
+   * @param siteIdArrReq array
+   * @param siteIdArrComp array
+   */
+  public checkIfValidSiteIds(siteIdArrReq: number[], siteIdArrComp: number[]) {
+    info(`Checking company is accessible to the user by site ids  ${siteIdArrReq}`, __filename, "checkIfValidSiteIds()");
+    if (siteIdArrReq && siteIdArrComp) {
+      let found = false;
+      for (let s of siteIdArrComp) {
+        if (siteIdArrReq.indexOf(s) >= 0) {
+          found = true;
+          break;
+        }
       }
-      const residentCompany: any = await this.residentCompanyRepository.findOne({
-        where: { id: id }
-      });
-      if (residentCompany) {
-        residentCompany.sites = await this.getRcSites(residentCompany.site);
-        residentCompany.categories = await this.getRcCategories(residentCompany.industry);
-        residentCompany.modalities = await this.getRcModalities(residentCompany.modality);
-        residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);
-        residentCompany.companyStages = await this.getRcTechnologyStages(residentCompany.companyStage);
-        residentCompany.biolabsSources = await this.getRcBiolabsSources(residentCompany.biolabsSources);
-        residentCompany.companyMembers = await this.getRcMembers(residentCompany.id);
-        residentCompany.companyAdvisors = await this.getRcAdvisors(residentCompany.id);
-        residentCompany.companyTechnicalTeams = await this.getRcTechnicalTeams(residentCompany.id);
-        return residentCompany;
-      } else {
-        error("Error in find resident company", __filename, "getResidentCompany()");
+      if (!found) {
+        error(`User does not have permission to access this company`, __filename, `checkIfValidSiteIds()`);
         throw new NotAcceptableException(
-          'Company with provided id not available.',
+          'You do not have permission to view this company',
         );
       }
-    } catch (err) {
-      error("Error in find resident company", __filename, "getResidentCompany()");
-      throw new BiolabsException('Error in find resident company', err.message);
     }
   }
 
@@ -997,7 +1046,7 @@ export class ResidentCompanyService {
           await this.sendEmailToSiteAdmin(payload.site, req, residentCompany.companyName, residentCompany.id, ApplicationConstants.EMAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES);
           info(`Email sent regarding Sponsorship contact question change to Yes`, __filename, `updateResidentCompany()`);
         }
-        return await this.getResidentCompany(residentCompany.id);
+        return await this.getResidentCompany(residentCompany.id, req);
       } else {
         error("Company with provided id not available.", __filename, "updateResidentCompany()");
         throw new NotAcceptableException(
@@ -1569,13 +1618,13 @@ export class ResidentCompanyService {
         switch (err.code) {
           case '42883':
             debug(err.message, __filename, "getFeeds()")
-            throw new BiolabsException("Error in executing feeds function with companyId :  ",companyId,err.message);
+            throw new BiolabsException("Error in executing feeds function with companyId :  ", companyId, err.message);
             break;
         }
       });
       return getFeeds;
     } catch (err) {
-      error("Getting error to find the time analysis",err.message, __filename, "getFeeds()");
+      error("Getting error to find the time analysis", err.message, __filename, "getFeeds()");
       throw new BiolabsException('Getting error in updating feeds', err.message);
     }
   }
@@ -1692,6 +1741,11 @@ order by quat;
     });
     debug(`Max priority order: ${maxPriorityOrder}`, __filename, "addResidentCompanyDataInWaitlist()");
 
+    /** Fetch product types from DB to set in waitlist as desiredQty = 0 and currentQty = 0 */
+    let productTypes: any = await this.getProductTypesInitially().then((result) => {
+      return result;
+    });
+
     let spaceChangeWaitlistObj = new SpaceChangeWaitlist();
     spaceChangeWaitlistObj.residentCompany = savedRc;
     spaceChangeWaitlistObj.desiredStartDate = Date.parse(new Date().toString()) / 1000;
@@ -1708,11 +1762,62 @@ order by quat;
     spaceChangeWaitlistObj.membershipChange = MembershipChangeEnum.UpdateMembership;
     spaceChangeWaitlistObj.requestGraduateDate = null;
     spaceChangeWaitlistObj.marketPlace = null;
-    return await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj).catch(err => {
+    const respSaved = await this.spaceChangeWaitlistRepository.save(spaceChangeWaitlistObj).then((result) => {
+      return result;
+    }).catch(err => {
       error("Getting error while Saving Waitlist", __filename, "addResidentCompanyDataInWaitlist()");
       throw new BiolabsException('Getting error while Saving Waitlist ', err.message);
     });
+    /** Save items for the waitlist */
+    if (productTypes && respSaved) {
+      this.saveItemsForWaitlist(productTypes, respSaved);
+    }
+    return respSaved;
+  }
 
+  /**
+   * Description: Fetch product types from DB to set in waitlist as desiredQty = 0 and currentQty = 0.
+   * @description Fetch product types from DB to set in waitlist as desiredQty = 0 and currentQty = 0.
+   * @returns list of product types
+   */
+  private async getProductTypesInitially() {
+    info(`Fetching produt types from db`, __filename, `getProductTypesInitially()`);
+    let productTypes: any = await this.productTypeService.getProductType().then((result) => {
+      return result;
+    }).catch(err => {
+      error(`Error while fetching product types`, __filename, `getProductTypesInitially()`);
+      throw new BiolabsException('Error while fetching product types', err.message);
+    });
+    debug(`Fetched produt types from db, total:  ${productTypes.length}`, __filename, `getProductTypesInitially()`);
+    return productTypes;
+  }
+
+  /**
+   * Description: Save product types in items table for waitlist as desiredQty = 0 and currentQty = 0.
+   * @description Save product types in items table for waitlist as desiredQty = 0 and currentQty = 0.
+   * @param productTypes array of product types
+   * @param savedWaitlist Saved waitlist object
+   */
+  private async saveItemsForWaitlist(productTypes: any[], savedWaitlist: any) {
+    info(`Saving produt types in items table, total product types: ${productTypes.length}`, __filename, `saveItemsForWaitlist()`);
+    for (let index = 0; index < productTypes.length; index++) {
+      let productTypeNameTemp = productTypes[index].productTypeName != undefined && productTypes[index].productTypeName != null && productTypes[index].productTypeName != '' ? productTypes[index].productTypeName.trim() : productTypes[index].productTypeName;
+
+      /** Skip some specifice products to be saved in change request */
+      if (!(ApplicationConstants.SKIP_PRODUCT_TYPE_IDS.includes(productTypes[index].id) || ApplicationConstants.SKIP_PRODUCT_TYPE_NAMES.includes(productTypeNameTemp))) {
+        let item: Item = new Item();
+        item.productTypeId = productTypes[index].id;
+        item.itemName = productTypes[index].productTypeName;
+        item.currentQty = 0;
+        item.desiredQty = 0;
+        item.spaceChangeWaitlist = savedWaitlist;
+        item.spaceChangeWaitlist_id = savedWaitlist.id;
+        await this.itemRepository.save(this.itemRepository.create(item)).catch(err => {
+          error(`Error while saving items`, __filename, `saveItemsForWaitlist()`);
+          throw new BiolabsException('Error while saving items in Waitlist ', err.message);
+        });
+      }
+    }
   }
 
   /**
@@ -1921,7 +2026,7 @@ order by quat;
    * @param companyId id if the company
    * @returns list of Space Change Waitlist
    */
-  public async getSpaceChangeWaitListByStatusSiteIdAndCompanyId(statusArr: number[], siteIdArr: number[], companyId: number): Promise<any> {
+  public async getSpaceChangeWaitListByStatusSiteIdAndCompanyId(statusArr: number[], siteIdArr: number[], companyId: number, @Request() req): Promise<any> {
     info(`Get Space Change Waitlist by status: ${statusArr}, siteId: ${siteIdArr} and companyId: ${companyId}`, __filename, `getSpaceChangeWaitListByStatusSiteIdAndCompanyId()`);
     let response = {};
     let status: number[] = [];
@@ -1947,7 +2052,7 @@ order by quat;
       }
       waitlistQuery.orderBy("space_change_waitlist.priorityOrder", "ASC");
       let spaceChangeWaitlist: any = await waitlistQuery.getRawMany();
-      response = this.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist);
+      response = this.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist, req);
       response['spaceChangeWaitlist'] = (!spaceChangeWaitlist) ? 0 : spaceChangeWaitlist;
     } catch (error) {
       response['status'] = 'Error';
@@ -1964,13 +2069,15 @@ order by quat;
    * Description: Iterates SpaceChangeWaitlist array, fetches items for each iteration and addes to the array.
    * @description Iterates SpaceChangeWaitlist array, fetches items for each iteration and addes to the array.
    * @param spaceChangeWaitlist SpaceChangeWaitlist array
+   * @param req Request object
    * @returns SpaceChangeWaitlist array with Item array
    */
-  public async getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist: any[]) {
+  public async getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist: any[], @Request() req) {
     info(`Getting items of Space Change Waitlist`, __filename, `getItemsOfSpaceChangeWaitlist()`);
     if (spaceChangeWaitlist) {
       for (let index = 0; index < spaceChangeWaitlist.length; index++) {
-        const spaceChangeWaitlistObj = await this.getItems(spaceChangeWaitlist[index].id).then((result) => {
+        const itemsWithUpdatedInvoice: any = await this.getSpaceChangeWaitlistItems(spaceChangeWaitlist[index].residentCompanyId, req);
+        const fetchedItemsArr = await this.getItems(spaceChangeWaitlist[index].id, itemsWithUpdatedInvoice.items).then((result) => {
           return result;
         }).catch(err => {
           error(`Error in getting items of Space Change Waitlist`, __filename, `getItemsOfSpaceChangeWaitlist()`);
@@ -1980,7 +2087,7 @@ order by quat;
             body: err
           }, HttpStatus.INTERNAL_SERVER_ERROR);
         });
-        spaceChangeWaitlist[index].items = spaceChangeWaitlistObj;
+        spaceChangeWaitlist[index].items = fetchedItemsArr;
       }
     }
     return spaceChangeWaitlist;
@@ -1992,13 +2099,21 @@ order by quat;
    * @param spaceChangeWaitlistId SpaceChangeWaitlist Id
    * @returns array of Item
    */
-  public async getItems(spaceChangeWaitlistId: number) {
+  public async getItems(spaceChangeWaitlistId: number, itemsWithUpdatedInvoices: any[]) {
     info(`Getting items by spaceChangeWaitlistId: ${spaceChangeWaitlistId}`, __filename, `getItems()`);
-    const items: any[] = await this.itemRepository.find({
+
+    const waitlistItems: any[] = await this.itemRepository.find({
       where: { spaceChangeWaitlist_id: spaceChangeWaitlistId }
     });
+    for (let index = 0; index < waitlistItems.length; index++) {
+      let result: any = itemsWithUpdatedInvoices.filter(cItem => (cItem.productTypeId == waitlistItems[index].productTypeId));
+
+      if (result && result.length > 0) {
+        waitlistItems[index].currentQty = Number(result[0].sum);
+      }
+    }
     info(`Executed getItems() method`, __filename, `getItems()`);
-    return items;
+    return waitlistItems;
   }
 
   /**
@@ -2021,18 +2136,71 @@ order by quat;
   }
 
   /**
+   * Description: Check if the user has permission to access the company, if not then throw NotAcceptableException.
+   * @description Check if the user has permission to access the company, if not then throw NotAcceptableException.
+   * @param req Request object
+   * @param residentCompanyId Resident Company id
+   */
+  public CheckCompanyPermissionForUser(@Request() req, residentCompanyId: number) {
+    info(`Checking permission to access the resident company id: ${residentCompanyId}`, __filename, "CheckCompanyPermissionForUser()");
+    if (req && req.user && req.user.companyId && req.user.companyId != residentCompanyId) {
+      error(`User does not have permission to view the company: ${residentCompanyId}`, __filename, "CheckCompanyPermissionForUser()");
+      throw new NotAcceptableException(
+        'You do not have permission to view this company',
+      );
+    }
+  }
+
+  /**
+   * Descrition: Get site id array from request object
+   * @description Get site id array from request object.
+   * @param req Request object
+   * @returns 
+   */
+  public getSiteIdArrFromRequestObject(@Request() req): number[] {
+    info(`Get site id array from request object`, __filename, "getSiteIdArrFromRequestObject()");
+    let siteIdArr: number[];
+    if (req && req.user && req.headers) {
+      info(`Fetching site Id array from request header`, __filename, "getSiteIdArrFromRequestObject()");
+      siteIdArr = req.user.site_id;
+      if (req.headers['x-site-id']) {
+        siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+      }
+      info(`Site Id fetched from request header: ${siteIdArr}`, __filename, "getSiteIdArrFromRequestObject()");
+    }
+    return siteIdArr;
+  }
+
+  /**
    * @description Get items for waitlist
    * @param companyId id of Company
    * @returns list of items
    */
-  public async getSpaceChangeWaitlistItems(companyId: number) {
+  public async getSpaceChangeWaitlistItems(companyId: number, @Request() req) {
     info(`Get Space Change Waitlist items by company id: ${companyId}`, __filename, `getSpaceChangeWaitlistItems()`);
     const response = {};
+    let siteIdArr;
+
+    /** Check if user has permission to view this company */
+    this.CheckCompanyPermissionForUser(req, companyId);
+    siteIdArr = this.getSiteIdArrFromRequestObject(req);
+
+    const residentCompany: any = await this.residentCompanyRepository.findOne({
+      where: { id: companyId }
+    });
+
+    if (residentCompany) {
+      info(`Fetched resident company from repository, id : ${residentCompany.id}`, __filename, "getSpaceChangeWaitlistItems()");
+      /** Check if sites are accessible to the user */
+      this.checkIfValidSiteIds(siteIdArr, residentCompany.site);
+    }
+
     const month = new Date().getMonth() + 2; // Getting next month from currect date
     const queryStr = `
     select res."productTypeId", sum(res.count), res."productTypeName"
     from (
         select pt.id as "productTypeId",
+        CASE WHEN (op."quantity") is null THEN 0 ELSE (op."quantity") END as quantity,
         CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
         pt."productTypeName"
         from product_type as pt

@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderProduct, OrderProductFillableFields } from './model/order-product.entity';
 import { OrderProductService } from './order-product.service';
-import { ResidentCompany } from '../resident-company';
+import { ResidentCompany, ResidentCompanyService } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { HttpException, HttpStatus, NotAcceptableException } from '@nestjs/common';
@@ -25,16 +25,59 @@ const createMockRepository = <T = any>(): MockRepository<T> => ({
     })),
 })
 
+const mockRC: ResidentCompany = {
+    id: 1, name: "Biolabs", email: "elon@space.com", companyName: "tesla", site: [2, 1], biolabsSources: 1, otherBiolabsSources: "",
+    technology: "Tech World", rAndDPath: "Tech World", startDate: 1626134400, foundedPlace: "Tech World", companyStage: 1,
+    otherCompanyStage: "", funding: "1", fundingSource: [1], otherFundingSource: "", intellectualProperty: 1,
+    otherIntellectualProperty: "", isAffiliated: false, affiliatedInstitution: "", noOfFullEmp: 0, empExpect12Months: 0,
+    utilizeLab: 0, expect12MonthsUtilizeLab: 0, industry: ["95"], modality: ["3"], equipmentOnsite: "Tech World",
+    preferredMoveIn: 1, otherIndustries: {}, otherModality: {}, "status": "1", companySize: 20,
+    "companyStatus": "1",
+    "companyVisibility": true,
+    "companyOnboardingStatus": true,
+    "elevatorPitch": null,
+    "logoOnWall": null,
+    "logoOnLicensedSpace": null,
+    "bioLabsAssistanceNeeded": null,
+    "technologyPapersPublished": null,
+    "technologyPapersPublishedLinkCount": null,
+    "technologyPapersPublishedLink": null,
+    "patentsFiledGranted": null,
+    "patentsFiledGrantedDetails": null,
+    "foundersBusinessIndustryBefore": null,
+    "academiaPartnerships": null,
+    "academiaPartnershipDetails": null,
+    "industryPartnerships": null,
+    "industryPartnershipsDetails": null,
+    "newsletters": null,
+    "shareYourProfile": false,
+    "website": null,
+    "foundersBusinessIndustryName": null,
+    "createdAt": 2021,
+    "updatedAt": 2021,
+    "pitchdeck": "pitchDeck.img",
+    "logoImgUrl": "logoimgurl.img",
+    "committeeStatus": null,
+    "selectionDate": new Date("2021-07-05T18:30:00.000Z"),
+    "companyStatusChangeDate": 2021,
+}
+
+const mockResidentService = () => ({
+    checkIfValidSiteIds: jest.fn()
+})
+
 describe('Order Product Service', () => {
     let orderProductService;
     let orderProductRepository;
     let productRepository;
     let residentCompanyRepository: Repository<ResidentCompany>;
+    let residentCompanyService;
 
     beforeEach(async () => {
         const module = await Test.createTestingModule({
             providers: [
                 OrderProductService,
+                { provide: ResidentCompanyService, useFactory: mockResidentService },
                 {
                     provide: getRepositoryToken(OrderProduct), useValue: {
                         createQueryBuilder: jest.fn(() =>
@@ -141,6 +184,7 @@ describe('Order Product Service', () => {
         }).compile();
 
         orderProductService = await module.get<OrderProductService>(OrderProductService);
+        residentCompanyService = await module.get<ResidentCompanyService>(ResidentCompanyService);
         residentCompanyRepository = await module.get<Repository<ResidentCompany>>(getRepositoryToken(ResidentCompany));
         orderProductRepository = await module.get<MockRepository>(getRepositoryToken(OrderProduct));
         productRepository = await module.get<MockRepository>(getRepositoryToken(Product));
@@ -320,7 +364,7 @@ describe('Order Product Service', () => {
                 expect(e instanceof InternalException).toBeTruthy();
             }
         })
-      
+
         it('should validate the start date', async () => {
             orderProductDto.startDate = "start date";
             orderProductDto.endDate = "end date"
@@ -341,42 +385,60 @@ describe('Order Product Service', () => {
     });
 
     describe('should fetch the order products between given start date and end date', () => {
-        it(' fetch the order products between given start date and end date', async () => {
-            let mockOrderProduct: [
-                {
-                    productName: 'new',
-                    productId: 1,
-                    productDescription: 'new product launch',
-                    startDate: "2021-07-16",
-                    status: 1,
-                    companyId: 1,
-                    cost: 100,
-                    currentCharge: true,
-                    endDate: "2021-07-16",
-                    manuallyEnteredProduct: true,
-                    recurrence: true,
-                    year: 2000,
-                    month: 12,
-                    quantity: 1
-                }
-            ]
-
+        let siteIdArr: [1, 2];
+        let mockOrderProduct: [
+            {
+                productName: 'new',
+                productId: 1,
+                productDescription: 'new product launch',
+                startDate: "2021-07-16",
+                status: 1,
+                companyId: 1,
+                cost: 100,
+                currentCharge: true,
+                endDate: "2021-07-16",
+                manuallyEnteredProduct: true,
+                recurrence: true,
+                year: 2000,
+                month: 12,
+                quantity: 1
+            }
+        ]
+        // TODO
+        it('fetch the order products between given start date and end date', async () => {
+            jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(mockRC);
+            jest.spyOn(residentCompanyService, 'checkIfValidSiteIds').mockResolvedValue(true);
             orderProductRepository.createQueryBuilder("order_product")
-                .where("order_product.companyId = :companyId", { companyId: 1 })
+                .where("order_product.companyId = :companyId", { companyId: mockRC.id })
                 .andWhere("order_product.month = :month", { month: 12 })
                 .orderBy("order_product.updatedAt", 'DESC')
                 .getRawMany();
-            let dbOrderProduct = await orderProductService.fetchOrderProductsBetweenDates(12, 1);
+            let dbOrderProduct = await orderProductService.fetchOrderProductsBetweenDates(12, 1, mockRC.id, siteIdArr);
             expect(dbOrderProduct).not.toBeNull();
         });
-        it('it should throw exception while fetching order products between dates   ', async () => {
-            jest.spyOn(orderProductRepository, 'createQueryBuilder').mockRejectedValueOnce(null);
+
+        it('it should throw NotAcceptableException if company by id not found while fetching order products between dates   ', async () => {
+            jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(mockRC);
+            jest.spyOn(residentCompanyService, 'checkIfValidSiteIds').mockReturnThis();
+            jest.spyOn(orderProductRepository, 'createQueryBuilder').mockRejectedValue(mockOrderProduct);
+
             try {
-                await orderProductService.fetchOrderProductsBetweenDates(new BiolabsException('Error in fetching order products between dates'));
+                await orderProductService.fetchOrderProductsBetweenDates(12, 1, siteIdArr);
             } catch (e) {
                 expect(e.name).toBe('BiolabsException');
                 expect(e instanceof BiolabsException).toBeTruthy();
                 expect(e.message).toBe('Error in fetching order products between dates');
+            }
+        });
+
+        it('it should throw NotAcceptableException if company by id not found while fetching order products between dates   ', async () => {
+            jest.spyOn(residentCompanyService, 'checkIfValidSiteIds').mockResolvedValue(null);
+            try {
+                await orderProductService.fetchOrderProductsBetweenDates(12, 1, siteIdArr);
+            } catch (e) {
+                expect(e.response.statusCode).toBe(406);
+                expect(e.response.message).toBe('Company with provided id not available.');
+                expect(e.response.error).toBe('Not Acceptable');
             }
         });
     });
