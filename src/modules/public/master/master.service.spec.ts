@@ -13,7 +13,8 @@ import { TechnologyStage } from './technology-stage.entity';
 import { MasterPayload } from './master.payload';
 import { FileService } from '../file';
 const appRoot = require('app-root-path');
-const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
+console.log('configuration file path ----->', appRoot.path + "/configuration.json" );
+const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/configuration.json"));
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 const mockMasterPayLoad: MasterPayload = {
     q: "test", pagination: true, page: 12, limit: 6, sort: true, sortFiled: "test"
