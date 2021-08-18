@@ -2141,9 +2141,17 @@ order by quat;
    * @param req Request object
    * @param residentCompanyId Resident Company id
    */
-  public CheckCompanyPermissionForUser(@Request() req, residentCompanyId: number) {
+  public async CheckCompanyPermissionForUser(@Request() req, residentCompanyId: number) {
     info(`Checking permission to access the resident company id: ${residentCompanyId}`, __filename, "CheckCompanyPermissionForUser()");
+
     if (req && req.user && req.user.companyId && req.user.companyId != residentCompanyId) {
+      // Checking if companyVisibility is true then allow to view those
+      const residentCompanyVisiblityTrue: any = await this.residentCompanyRepository.findOne({
+        where: { id: residentCompanyId, companyVisibility: true }
+      });
+      if (residentCompanyVisiblityTrue) {
+        return false;
+      }
       error(`User does not have permission to view the company: ${residentCompanyId}`, __filename, "CheckCompanyPermissionForUser()");
       throw new NotAcceptableException(
         'You do not have permission to view this company',
