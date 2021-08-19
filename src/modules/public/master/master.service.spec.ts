@@ -13,7 +13,7 @@ import { TechnologyStage } from './technology-stage.entity';
 import { MasterPayload } from './master.payload';
 import { FileService } from '../file';
 const appRoot = require('app-root-path');
-const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
+const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/configuration.json"));
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 const mockMasterPayLoad: MasterPayload = {
     q: "test", pagination: true, page: 12, limit: 6, sort: true, sortFiled: "test"
@@ -770,8 +770,30 @@ describe('MasterService', () => {
         })
     });
     describe('should test getCompanyStatus Functionality', () => {
-        let mockCompanyStatus: Array<any> = [{ "id": 0, "name": "Applied" }, { "id": 1, "name": "Accepted" },
-        { "id": 2, "name": "On Hold" }, { "id": 3, "name": "Rejected" }, { "id": 4, "name": "Graduated" }];
+        let mockCompanyStatus: Array<any> = [{
+            "id": 0,
+            "name": "Applied-New"
+          },
+          {
+            "id": 1,
+            "name": "Current Member"
+          },
+          {
+            "id": 2,
+            "name": "On Hold"
+          },
+          {
+            "id": 3,
+            "name": "Discontinued"
+          },
+          {
+            "id": 4,
+            "name": "Graduated"
+          },
+          {
+            "id": 5,
+            "name": "Applied-Contacted"
+          }];
         it('it should return  array of company status object', async () => {
             let companyStatus = await masterService.getCompanyStatus();
             expect(companyStatus).not.toBeNull();

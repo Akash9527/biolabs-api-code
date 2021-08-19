@@ -191,7 +191,8 @@ export class ResidentCompany {
   @Column({ length: 255, nullable: true })
   logoImgUrl: string;
 
-  @Column({nullable:true})
+ 
+  @Column({nullable:true, default:'0'}) 
   committeeStatus: committee_status;
 
   @UpdateDateColumn({ type: 'timestamptz'})

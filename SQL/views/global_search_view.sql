@@ -61,7 +61,7 @@ SELECT
   rc.status,
   "companyStatus",
   (
-    CASE WHEN "companyStatus" = '0' THEN 'Applied' WHEN "companyStatus" = '1' THEN 'Current Member' WHEN "companyStatus" = '2' THEN 'On Hold' WHEN "companyStatus" = '3' THEN 'Discontinued' WHEN "companyStatus" = '4' THEN 'Graduated' ELSE "companyStatus" END
+    CASE WHEN "companyStatus" = '0' THEN 'Applied-New' WHEN "companyStatus" = '1' THEN 'Current Member' WHEN "companyStatus" = '2' THEN 'On Hold' WHEN "companyStatus" = '3' THEN 'Discontinued' WHEN "companyStatus" = '4' THEN 'Graduated' WHEN "companyStatus" = '5' THEN 'Applied-Contacted' ELSE "companyStatus" END
   ) as companystatustext,
   "companyVisibility",
   (
