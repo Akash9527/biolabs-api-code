@@ -191,7 +191,8 @@ export class ResidentCompany {
   @Column({ length: 255, nullable: true })
   logoImgUrl: string;
 
-  @Column({nullable:true})
+ 
+  @Column({nullable:true, default:'0'}) 
   committeeStatus: committee_status;
 
   @UpdateDateColumn({ type: 'timestamptz'})
@@ -205,6 +206,12 @@ export class ResidentCompany {
 
   @OneToMany(() => SpaceChangeWaitlist , (spaceChangeWaitlist) => spaceChangeWaitlist.residentCompany)
   spaceChangeWaitlist?: SpaceChangeWaitlist[];
+  
+  @Column("int", { array: true, nullable: true })
+  sitesApplied: number[];
+  
+  @Column("int", { array: true, nullable: true })
+  primarySite: number[];
 }
 
 export class ResidentCompanyFillableFields {
