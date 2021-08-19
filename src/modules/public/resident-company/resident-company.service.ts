@@ -903,6 +903,8 @@ export class ResidentCompanyService {
       this.checkIfValidSiteIds(siteIdArr, residentCompany.site);
 
       residentCompany.sites = await this.getRcSites(residentCompany.site);
+      residentCompany.primarySiteArray = await this.getRcSites(residentCompany.primarySite);
+      residentCompany.sitesAppliedArray = await this.getRcSites(residentCompany.sitesApplied);
       residentCompany.categories = await this.getRcCategories(residentCompany.industry);
       residentCompany.modalities = await this.getRcModalities(residentCompany.modality);
       residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);

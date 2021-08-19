@@ -211,4 +211,15 @@ export class AddResidentCompanyPayload {
   @MaxLength(500)
   equipmentOnsite: string;
 
+  @ApiProperty({
+    required: false,
+  })
+  sitesApplied: number[];
+  
+  @ApiProperty({
+    required: true,
+  })
+  @Min(1, { each: true })
+  primarySite: number[];
+
 }
