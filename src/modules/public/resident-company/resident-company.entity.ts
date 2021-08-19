@@ -205,6 +205,12 @@ export class ResidentCompany {
 
   @OneToMany(() => SpaceChangeWaitlist , (spaceChangeWaitlist) => spaceChangeWaitlist.residentCompany)
   spaceChangeWaitlist?: SpaceChangeWaitlist[];
+  
+  @Column("int", { array: true, nullable: true })
+  sitesApplied: number[];
+  
+  @Column("int", { array: true, nullable: true })
+  primarySite: number[];
 }
 
 export class ResidentCompanyFillableFields {

@@ -368,4 +368,14 @@ export class UpdateResidentCompanyPayload {
   @IsOptional()
   foundersBusinessIndustryName: string
 
+  @ApiProperty({
+    required: false,
+  })
+  sitesApplied: number[];
+  
+  @ApiProperty({
+    required: true,
+  })
+  @Min(1, { each: true })
+  primarySite: number[];
 }
