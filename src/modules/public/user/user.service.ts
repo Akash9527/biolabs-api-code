@@ -69,9 +69,15 @@ export class UsersService {
     const user = await this.getByEmail(payload.email);
 
     if (user) {
-      debug("User with provided email already created", __filename, "create()");
-      throw new NotAcceptableException('User with provided email already created.',
-      );
+      if (user.email == 'superadmin@biolabs.io') {
+        // Appending userId to superadmin payload
+        payload = { ...payload, ...{ id: user.id } };
+        return await this.userRepository.save(this.userRepository.create(payload));
+      } else {
+        debug("User with provided email already created", __filename, "create()");
+        throw new NotAcceptableException('User with provided email already created.',
+        );
+      }
     }
     return await this.userRepository.save(this.userRepository.create(payload));
   }
