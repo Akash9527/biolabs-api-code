@@ -1,3 +1,4 @@
+import { userInfo } from 'node:os';
 import { EMAIL } from '../constants/email';
 import { ApplicationConstants } from './application-constants';
 
@@ -5,11 +6,11 @@ const dotenv = require('dotenv');
 const axios = require('axios');
 const qs = require('qs');
 dotenv.config();
-const { info, error } = require('./logger');
-const { BiolabsException } = require('../modules/common/exception/biolabs-error');
+const { info, error, debug } = require('./logger');
 
 const appRoot = require('app-root-path');
 const mailTemplateSponsorQnChange = require('fs').readFileSync(appRoot.path + ApplicationConstants.EMAIL_TEMPLATE_SPONSORSHIP_QN_CHANGE_TO_YES_PATH);
+const mailTemplateSponsorSchedule = require('fs').readFileSync(appRoot.path + ApplicationConstants.EMAIL_TEMPLATE_SPONSORSHIP_PATH);
 
 export class Mail {
 
@@ -789,6 +790,43 @@ export class Mail {
                },
             });
          }
+      } else if (content == ApplicationConstants.EMAIL_PARAM_FOR_SPONSOR_MAIL_SCHEDULED) {
+         debug(`Preparing html to send mail to sponsor users as scheduled`, __filename, `sendEmailGraphAPI()`);
+         let loginLink = userInfo.ui_server_origin + 'login';
+         let htmlOnboarded = this.getCompanyDataHtmlTable(userInfo, ApplicationConstants.ONBOARDED_COMPANIES);
+         console.log(htmlOnboarded);
+         data = {
+            message: {
+               subject: subject,
+               body: {
+                  contentType: EMAIL.CONTENT_TYPE,
+                  content: this.replaceParams(
+                     mailTemplateSponsorSchedule.toString(),
+                     htmlOnboarded,
+                     this.getCompanyDataHtmlTable(userInfo, ApplicationConstants.GRADUATED_COMPANIES),
+                     loginLink,
+                     ApplicationConstants.BIOLABS_CONNECT_PLATFORM,
+                  )
+               },
+               toRecipients: [
+                  {
+                     emailAddress: {
+                        address: tenant.tenantEmail
+                           ? tenant.tenantEmail
+                           : tenant.officialEmail,
+                     },
+                  },
+               ],
+               ccRecipients: [],
+            },
+         };
+         if (EMAIL.CC_EMAIL_USER) {
+            data.message.ccRecipients.push({
+               emailAddress: {
+                  address: EMAIL.CC_EMAIL_USER,
+               },
+            });
+         }
       }
 
       let authToken = token['token_type'] + ' ' + token['access_token'];
@@ -809,6 +847,7 @@ export class Mail {
     * @description This method will send mail
     */
    async sendEmail(tenant: any, subject: string, content: string, userInfo: any) {
+
       /** Graph API Token Generation implementation */
       const tokenGraphAPI = await this.getGrapAPIToken();
       try {
@@ -829,8 +868,190 @@ export class Mail {
     * @returns The formatted html contents.
     */
    replaceParams(string, ...replacements) {
+      info(`Replace contents in html string as per parameters`, __filename, `replaceParams()`);
       return string.replace(/\{(\d+)\}/g, function () {
          return replacements[arguments[1]];
       });
+   }
+
+   /**
+    * Description: Prepares full html table for onboarded/graduated companies.
+    * @description Prepares full html table for onboarded/graduated companies.
+    * @param userInfo An object with user and company data
+    * @returns Prepared html table with company data
+    */
+   getCompanyDataHtmlTable(userInfo: any, forWhat: string) {
+      info(`Get html table for graduated companies`, __filename, `getGraduatedHtmlTable()`);
+      let companyRowData: any;
+      if (forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
+         companyRowData = this.getOnboardedCompanyRows(userInfo.onboardedCompsObj, userInfo.server_origin);
+      } else if (forWhat == ApplicationConstants.GRADUATED_COMPANIES) {
+         companyRowData = this.getGraduatedCompanyRows(userInfo.graduatedCompsObj, userInfo.server_origin);
+      }
+      let htmlTable = `
+         <table style="width:100%">
+            {0}
+         </table>
+         `;
+      return this.replaceParams(htmlTable, companyRowData)
+   }
+
+   /**
+    * Description: Prepares html rows for recently onboarded company data.
+    * @description Prepares html rows for recently onboarded company data.
+    * @param graduatedCompsObj Onboarded company objects
+    * @param origin The server origin
+    * @returns The html string with prepared rows
+    */
+   getOnboardedCompanyRows(onboardedCompsObj: any, origin: any) {
+      let rowData = ``;
+      if (onboardedCompsObj) {
+         for (const siteName in onboardedCompsObj) {
+            if (Object.prototype.hasOwnProperty.call(onboardedCompsObj, siteName)) {
+               rowData +=
+                  `<tr></tr>
+                  <tr>
+                     <td style="padding-top:30px" style="padding-left:20px"><b>${siteName}:</b></td>
+                  </tr>
+                  <tr></tr>
+                  <tr></tr>`;
+
+               const companies = onboardedCompsObj[siteName];
+               if (companies && Array.isArray(companies)) {
+                  if (companies.length < 1) {
+                     rowData +=
+                        `<tr></tr>
+                        <tr>
+                           <td>No recently moved in companies</td>
+                        </tr>
+                        <tr></tr>
+                        <tr></tr>`;
+                  } else {
+                     for (const company of companies) {
+                        let companyUrl = origin + "resident-companies/" + company.id + "/company";
+                        rowData +=
+                           `<tr>
+                              <td>
+                                 <img src= "${this.prepareCompanyLogoUrl(origin, company)}" alt="${company.name}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
+                              </td>
+                              <td>
+                                 <a href = "${companyUrl}">${company.name}</a>
+                              </td>
+                              <td>
+                                 Moved in ${this.getFormattedDateDD_Mon_YYYY(company.onboardingDate)}
+                              </td>
+                           </tr>
+                           `;
+                        companyUrl = ''
+                     }
+                  }
+               } else {
+                  rowData +=
+                     `<tr></tr>
+                   <tr>
+                    <td>${companies}</td>
+                   </tr>
+                   <tr></tr>
+                   <tr></tr>`;
+               }
+            }
+         }
+      }
+      return rowData;
+   }
+
+   /**
+    * Description: Prepares html rows for recently graduated company data.
+    * @description Prepares html rows for recently graduated company data.
+    * @param graduatedCompsObj Graduated company objects
+    * @param origin The server origin
+    * @returns The html string with prepared rows
+    */
+   getGraduatedCompanyRows(graduatedCompsObj: any, origin: any) {
+      info(`Get html rows for graduated companies`, __filename, `getGraduatedCompanyRows()`);
+      let rowData = ``;
+      if (graduatedCompsObj) {
+         for (const siteName in graduatedCompsObj) {
+            if (Object.prototype.hasOwnProperty.call(graduatedCompsObj, siteName)) {
+               rowData +=
+                  `<tr></tr>
+                  <tr>
+                     <td style="padding-top:30px" style="padding-left:20px"><b>${siteName}:</b></td>
+                  </tr>
+                  <tr></tr>
+                  <tr></tr>`;
+
+               const companies = graduatedCompsObj[siteName];
+               debug(`Get html rows for graduated companies for site: ${siteName}`, __filename, `getGraduatedCompanyRows()`);
+               if (companies && Array.isArray(companies)) {
+                  if (companies.length < 1) {
+                     rowData +=
+                        `<tr></tr>
+                        <tr>
+                           <td>No recently graduated companies</td>
+                        </tr>
+                        <tr></tr>
+                        <tr></tr>`;
+                  } else {
+                     for (const company of companies) {
+                        let companyUrl = origin + "resident-companies/" + company.id + "/company";
+                        rowData +=
+                           `<tr>
+                              <td>
+                                 <img src= "${this.prepareCompanyLogoUrl(origin, company)}" alt="${company.name}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
+                              </td>
+                              <td>
+                                 <a href = "${companyUrl}">${company.name}</a>
+                              </td>
+                              <td>
+                                 Graduated on ${this.getFormattedDateDD_Mon_YYYY(company.statusChangeDate)}
+                              </td>
+                           </tr>
+                           `;
+                        companyUrl = ''
+                     }
+                  }
+               } else {
+                  rowData +=
+                     `<tr></tr>
+                   <tr>
+                    <td>${companies}</td>
+                   </tr>
+                   <tr></tr>
+                   <tr></tr>`;
+               }
+            }
+         }
+      }
+      return rowData;
+   }
+
+   /**
+    * Description: Prepares company logo url with server origin, logo path
+    * @description Prepares company logo url with server origin, logo path
+    * @param origin Server origin url
+    * @param company Resident company object
+    * @returns The company logo url
+    */
+   prepareCompanyLogoUrl(origin: string, company: any) {
+      info(`Prepare company logo url, origin ${origin}`, __filename, `prepareCompanyLogoUrl()`);
+      if (company && company.logoUrl) {
+         return `${origin}${ApplicationConstants.LOGO_PATH}${company.logoUrl}`;
+      }
+      return null;
+   }
+
+   /**
+    * Description: Changes date format to "dd Mon yyyy"
+    * @description Changes date format to "dd Mon yyyy"
+    * @param date Date
+    * @returns string date with format dd Mon yyyy
+    */
+   getFormattedDateDD_Mon_YYYY(date: Date) {
+      info(`Change date format to dd Mon yyyy for date: ${date}`, __filename, `getFormattedDateDD_Mon_YYYY()`);
+      if (date) {
+         return `${date.getDate()} ${ApplicationConstants.MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+      }
+      return '';
    }
 }

@@ -121,6 +121,9 @@ export class ResidentCompany {
   @Column({ default: false })
   companyOnboardingStatus: boolean;
 
+  @CreateDateColumn({ type: "timestamp" })
+  companyOnboardingDate: number;
+
   @Column({ length: 1000, default: null, nullable: true })
   elevatorPitch: string;
 
