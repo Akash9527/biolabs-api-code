@@ -39,7 +39,8 @@ export class AuthService {
     await this.masterService.createTechnologyStages(fileData);
     await this.masterService.createProductType(fileData);
     await this.createSuperAdmin(fileData);
-    await this.databaseService.executeScript();
+    // NEEDS to Valid on SIT.
+    // await this.databaseService.executeScript();
   }
 
   /**
