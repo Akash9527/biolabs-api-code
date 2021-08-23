@@ -64,14 +64,15 @@ export class UsersService {
    * @param payload object of type UserFillableFields
    * @return user object
    */
-  async create(payload: UserFillableFields) {
+  async create(payload: UserFillableFields, siteData: any) {
     info("Creating a new biolabs user", __filename, "create()");
     const user = await this.getByEmail(payload.email);
 
     if (user) {
       if (user.email == 'superadmin@biolabs.io') {
+        const siteArr = siteData.map((site) => site.id);
         // Appending userId to superadmin payload
-        payload = { ...payload, ...{ id: user.id } };
+        payload = { ...payload, ...{ id: user.id, site_id: siteArr } };
         return await this.userRepository.save(this.userRepository.create(payload));
       } else {
         debug("User with provided email already created", __filename, "create()");

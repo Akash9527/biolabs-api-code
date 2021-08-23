@@ -39,7 +39,8 @@ export class AuthService {
     await this.masterService.createTechnologyStages(fileData);
     await this.masterService.createProductType(fileData);
     await this.createSuperAdmin(fileData);
-    await this.databaseService.executeScript();
+    // TODO with akhilesh
+    // await this.databaseService.executeScript();
   }
 
   /**
@@ -49,7 +50,7 @@ export class AuthService {
    */
   private async createSuperAdmin(migrationData: any) {
     info("Creating application super admin user with all sites access", __filename, "createSuperAdmin()");
-    await this.userService.create(migrationData['superadmin']);
+    await this.userService.create(migrationData['superadmin'], migrationData['sites']);
   }
 
   /**
