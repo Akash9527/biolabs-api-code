@@ -2499,9 +2499,9 @@ order by quat;
     const MONTHS_3 = 3;
     const MONTHS_1 = 1;
 
-    if (frequency == EmailFrequency.WEEKLY) {
+    if (frequency == EmailFrequency.Weekly) {
       frequencyDate = new Date(currentDate.setDate(currentDate.getDate() - DAYS_7)); //7 Days
-    } else if (frequency == EmailFrequency.QUARTERLY) {
+    } else if (frequency == EmailFrequency.Quarterly) {
       frequencyDate = new Date(currentDate.setMonth(currentDate.getMonth() - MONTHS_3)); //3 Months
     } else {
       /** Set it monthly */
@@ -2530,7 +2530,6 @@ order by quat;
       debug(`Executing query for ${forWhat}, query: ${residentCompanyQuery}`, __filename, `fetchOnboardedCompaniesBySiteId()`);
       return await residentCompanyQuery.getRawMany();
     } catch (err) {
-      console.log(err);
       error(`Error in fetching data for ${forWhat} for sponsor user. ${err.message}`, __filename, "fetchOnboardedCompaniesBySiteId()");
       throw new BiolabsException(`rror in fetching data for ${forWhat} for sponsor user.`, err.message);
     }

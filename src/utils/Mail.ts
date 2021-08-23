@@ -889,8 +889,10 @@ export class Mail {
          companyRowData = this.getGraduatedCompanyRows(userInfo.graduatedCompsObj, userInfo.server_origin);
       }
       let htmlTable = `
-         <table style="width:100%">
-            {0}
+         <table style="width:100%; margin-left:10px; margin-right:10px;" border="0">
+            <tbody>
+               {0}
+            </tbody>
          </table>
          `;
       return this.replaceParams(htmlTable, companyRowData)
@@ -909,47 +911,44 @@ export class Mail {
          for (const siteName in onboardedCompsObj) {
             if (Object.prototype.hasOwnProperty.call(onboardedCompsObj, siteName)) {
                rowData +=
-                  `<tr></tr>
+                  `
                   <tr>
-                     <td style="padding-top:30px" style="padding-left:20px"><b>${siteName}:</b></td>
+                     <td colspan="3" style="padding-top:10px; padding-bottom:20px;"><strong>${siteName}:</strong></td>
                   </tr>
-                  <tr></tr>
-                  <tr></tr>`;
-
+                  `;
                const companies = onboardedCompsObj[siteName];
                if (companies && Array.isArray(companies)) {
                   if (companies.length < 1) {
                      rowData +=
-                        `<tr></tr>
+                        `
                         <tr>
-                           <td>No recently moved in companies</td>
+                           <td colspan="3">No recently moved in companies</td>
                         </tr>
-                        <tr></tr>
-                        <tr></tr>`;
+                        `;
                   } else {
                      for (const company of companies) {
                         let companyUrl = origin + "resident-companies/" + company.id + "/company";
                         rowData +=
                            `<tr>
-                              <td>
+                              <td style="width:18%">
                                  <img src= "${this.prepareCompanyLogoUrl(origin, company)}" alt="${company.name}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
-                              <td>
+                              <td style="width:42%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.name}</a>
                               </td>
-                              <td>
+                              <td style="width:40%">
                                  Moved in ${this.getFormattedDateDD_Mon_YYYY(company.onboardingDate)}
                               </td>
                            </tr>
                            `;
-                        companyUrl = ''
+                        companyUrl = '';
                      }
                   }
                } else {
                   rowData +=
                      `<tr></tr>
                    <tr>
-                    <td>${companies}</td>
+                    <td colspan="3" style="padding-top:5px;">${companies}</td>
                    </tr>
                    <tr></tr>
                    <tr></tr>`;
@@ -974,51 +973,48 @@ export class Mail {
          for (const siteName in graduatedCompsObj) {
             if (Object.prototype.hasOwnProperty.call(graduatedCompsObj, siteName)) {
                rowData +=
-                  `<tr></tr>
-                  <tr>
-                     <td style="padding-top:30px" style="padding-left:20px"><b>${siteName}:</b></td>
-                  </tr>
-                  <tr></tr>
-                  <tr></tr>`;
+                  `
+               <tr>
+                  <td colspan="3" style="padding-top:10px; padding-bottom:20px;"><strong>${siteName}:</strong></td>
+               </tr>
+               `;
 
                const companies = graduatedCompsObj[siteName];
                debug(`Get html rows for graduated companies for site: ${siteName}`, __filename, `getGraduatedCompanyRows()`);
                if (companies && Array.isArray(companies)) {
                   if (companies.length < 1) {
                      rowData +=
-                        `<tr></tr>
+                        `
                         <tr>
-                           <td>No recently graduated companies</td>
+                           <td colspan="3">No recently graduated companies</td>
                         </tr>
-                        <tr></tr>
-                        <tr></tr>`;
+                        `;
                   } else {
                      for (const company of companies) {
                         let companyUrl = origin + "resident-companies/" + company.id + "/company";
                         rowData +=
                            `<tr>
-                              <td>
+                              <td style="width:18%">
                                  <img src= "${this.prepareCompanyLogoUrl(origin, company)}" alt="${company.name}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
-                              <td>
+                              <td style="width:42%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.name}</a>
                               </td>
-                              <td>
+                              <td style="width:40%">
                                  Graduated on ${this.getFormattedDateDD_Mon_YYYY(company.statusChangeDate)}
                               </td>
                            </tr>
                            `;
-                        companyUrl = ''
+                        companyUrl = '';
                      }
                   }
                } else {
                   rowData +=
-                     `<tr></tr>
+                     `
                    <tr>
-                    <td>${companies}</td>
+                    <td colspan="3" style="padding-top:5px;">${companies}</td>
                    </tr>
-                   <tr></tr>
-                   <tr></tr>`;
+                   `;
                }
             }
          }

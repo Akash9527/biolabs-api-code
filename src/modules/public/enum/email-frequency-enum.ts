@@ -1,5 +1,5 @@
 export enum EmailFrequency {
-    WEEKLY = 0,
-    MONTHLY = 1,
-    QUARTERLY = 2
-  }
+  Weekly = 0,
+  Monthly = 1,
+  Quarterly = 2
+}

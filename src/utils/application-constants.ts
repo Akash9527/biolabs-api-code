@@ -17,11 +17,8 @@ export const ApplicationConstants = {
     EMAIL_CONTENT_PARAM_FOR_SPONSORSHIP_QN_CHANGE_TO_YES: 'sponsorshipQuestionChangedToYes',
 
     EMAIL_FOR_SPONSOR_SCHEDULED: 'MAIL_FOR_SPONSOR_SCHEDULED',
-    EMAIL_SUBJECT_FOR_SPONSOR_SCHEDULED: 'Recently Onboarded and Graduated Companies',
+    EMAIL_SUBJECT_FOR_SPONSOR_SCHEDULED: `Biolabs {0} Insights`,
     EMAIL_PARAM_FOR_SPONSOR_MAIL_SCHEDULED: 'onboardedAndGraduatedCompanies',
-
-
-
 
     /** Table column length */
     SPACE_CHANGE_WAITLIST_REQUEST_NOTES_COL_LENGTH: 600,
@@ -47,7 +44,8 @@ export const ApplicationConstants = {
 
     MONTHS: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 
-    COMPANY_LOGO_WIDTH_IN_EMAIL: '30px',
-    COMPANY_LOGO_HEIGHT_IN_EMAIL: '30px'
+    COMPANY_LOGO_WIDTH_IN_EMAIL: '50px',
+    COMPANY_LOGO_HEIGHT_IN_EMAIL: '50px',
+
 
 };

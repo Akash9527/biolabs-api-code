@@ -425,7 +425,6 @@ export class UsersService {
         return result;
       });
 
-      console.log('Sponosr Users: ', sponsorUsers);
       if (sponsorUsers && Array.isArray(sponsorUsers)) {
         debug(`Fetched sponsor users: ${sponsorUsers.length}`, __filename, `handleSponsorEmailSchedule()`);
 
@@ -449,7 +448,6 @@ export class UsersService {
           let onboardedGroupedCompsObj = await this.prepareFilteredArrayOfResidentComps(onboardedComps, user.site_id, sitesArrDb);
 
           info(`Filtered onboarded resident companies`, __filename, `handleSponsorEmailSchedule()`);
-          console.log('onboardedGroupedCompsObj: ', onboardedGroupedCompsObj);
 
           let graduatedComps = await this.residentCompanyService.fetchOnboardedCompaniesBySiteId(user.site_id, ApplicationConstants.GRADUATED_COMPANIES, emailFrequency).then((result) => {
             return result;
@@ -459,10 +457,9 @@ export class UsersService {
           let graduatedGroupedCompsObj = await this.prepareFilteredArrayOfResidentComps(graduatedComps, user.site_id, sitesArrDb);
 
           info(`Filtered onboarded resident companies`, __filename, `handleSponsorEmailSchedule()`);
-          console.log('graduatedGroupedCompsObj: ', graduatedGroupedCompsObj);
 
           /** Send mail to the user */
-          this.sendScheduledMailToSponsor(user, onboardedGroupedCompsObj, graduatedGroupedCompsObj);
+          this.sendScheduledMailToSponsor(user, onboardedGroupedCompsObj, graduatedGroupedCompsObj, emailFrequency);
         } //loop
       } else {
         error(`Sponsor users found: ${sponsorUsers}`, __filename, `handleSponsorEmailSchedule()`);
@@ -528,25 +525,22 @@ export class UsersService {
    * @param onboardedCompanies list of onboarded companies
    * @param graduatedCompanies list of graduated companies
    */
-  sendScheduledMailToSponsor(user: User, onboardedGroupedCompsObj: any, graduatedGroupedCompsObj: any) {
+  sendScheduledMailToSponsor(user: User, onboardedGroupedCompsObj: any, graduatedGroupedCompsObj: any, emailFrequency: EmailFrequency) {
     info(`Prepare email config data`, __filename, `sendScheduledMailToSponsor()`);
     try {
       if (user) {
         const userInfo = {
           userName: user.firstName,
           server_origin: process.env.SERVER_ORIGIN,
-          ui_server_origin: process.env.UI_SERVER_ORIGIN,
           onboardedCompsObj: onboardedGroupedCompsObj,
           graduatedCompsObj: graduatedGroupedCompsObj
         };
         let tenant = { tenantEmail: user.email, role: user.role };
 
         debug(`Server origin in config data : ${userInfo.server_origin}`, __filename, `sendScheduledMailToSponsor()`);
-
         this.mail.sendEmail(
           tenant,
-          // ApplicationConstants.EMAIL_SUBJECT_FOR_SPONSOR_SCHEDULED + '-' + new Date(),
-          user.firstName + ' - ' + new Date(),
+          ApplicationConstants.EMAIL_SUBJECT_FOR_SPONSOR_SCHEDULED.replace('{0}', EmailFrequency[emailFrequency]),
           ApplicationConstants.EMAIL_PARAM_FOR_SPONSOR_MAIL_SCHEDULED,
           userInfo,
         );
