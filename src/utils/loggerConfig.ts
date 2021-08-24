@@ -17,6 +17,7 @@ let logger = createLogger({
     transports: [
         new transports.File({ filename: 'logs/biolabs-error.log', level: 'error', handleExceptions: true }),
         new transports.File({ filename: 'logs/biolabs.log' }),
+        new transports.Console({})
     ],
     exitOnError: false
 });
