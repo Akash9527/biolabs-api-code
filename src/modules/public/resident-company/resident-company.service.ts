@@ -360,6 +360,8 @@ export class ResidentCompanyService {
       let siteAdminEmails = [];
       let userInfo;
       let siteList = [];
+      let primarySite = [];
+      let sitesApplied = [];
 
       let siteAdmin: any = await this.userRepository
         .createQueryBuilder('users')
@@ -386,13 +388,28 @@ export class ResidentCompanyService {
           },
         });
       }
-
+      for (let s in req.body.primarySite) {
+        await this.siteRepository
+          .query(`select name as siteName from sites where id = ${req.body.primarySite[s]}`).then(res => {
+            primarySite.push(res[0].sitename);
+          });
+      }
+      
+      for (let s in req.body.sitesApplied) {
+        await this.siteRepository
+          .query(`select name as siteName from sites where id = ${req.body.sitesApplied[s]}`).then(res => {
+            sitesApplied.push(res[0].sitename);
+          });
+      }
+      
       userInfo = {
         token: req.headers.authorization,
         company_name: companyName,
         site_name: siteList,
         origin: req.headers['origin'],
-        companyId: companyId
+        companyId: companyId,
+        primarySite: primarySite,
+        sitesApplied: sitesApplied
       };
       debug(`userInfo.origin: ${userInfo.origin}`, __filename, `sendEmailToSiteAdmin()`);
 

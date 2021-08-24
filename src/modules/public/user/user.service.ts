@@ -66,14 +66,21 @@ export class UsersService {
    * @param payload object of type UserFillableFields
    * @return user object
    */
-  async create(payload: UserFillableFields) {
+  async create(payload: UserFillableFields, siteData: any) {
     info("Creating a new biolabs user", __filename, "create()");
     const user = await this.getByEmail(payload.email);
 
     if (user) {
-      debug("User with provided email already created", __filename, "create()");
-      throw new NotAcceptableException('User with provided email already created.',
-      );
+      if (user.email == ApplicationConstants.SUPER_ADMIN_EMAIL_ID) {
+        const siteArr = siteData.map((site) => site.id);
+        // Appending userId to superadmin payload
+        payload = { ...payload, ...{ id: user.id, site_id: siteArr } };
+        return await this.userRepository.save(this.userRepository.create(payload));
+      } else {
+        debug("User with provided email already created", __filename, "create()");
+        throw new NotAcceptableException('User with provided email already created.',
+        );
+      }
     }
     return await this.userRepository.save(this.userRepository.create(payload));
   }
@@ -456,10 +463,22 @@ export class UsersService {
           /** Filter graduated resident companies by site */
           let graduatedGroupedCompsObj = await this.prepareFilteredArrayOfResidentComps(graduatedComps, user.site_id, sitesArrDb);
 
+          let companiesCount: any = {
+            onboardedCompsCount: 0,
+            graduatedCompsCount: 0
+          };
+
+          if (onboardedComps && Array.isArray(onboardedComps)) {
+            companiesCount.onboardedCompsCount = onboardedComps.length;
+          }
+          if (graduatedComps && Array.isArray(graduatedComps)) {
+            companiesCount.graduatedCompsCount = graduatedComps.length;
+          }
+
           info(`Filtered onboarded resident companies`, __filename, `handleSponsorEmailSchedule()`);
 
           /** Send mail to the user */
-          this.sendScheduledMailToSponsor(user, onboardedGroupedCompsObj, graduatedGroupedCompsObj, emailFrequency);
+          this.sendScheduledMailToSponsor(user, onboardedGroupedCompsObj, graduatedGroupedCompsObj, companiesCount);
         } //loop
       } else {
         error(`Sponsor users found: ${sponsorUsers}`, __filename, `handleSponsorEmailSchedule()`);
@@ -484,7 +503,7 @@ export class UsersService {
     try {
       if (residentCompanies && Array.isArray(residentCompanies)) {
         for (let userSiteId of userSiteIds) {
-          let siteName = this.getSiteName(siteArray, userSiteId);
+          let siteName = this.getSiteNameBySiteId(siteArray, userSiteId);
           const compsOfSite = residentCompanies.filter((comp) => comp.site.indexOf(userSiteId) >= 0);
           residentCompanyObj[siteName] = compsOfSite;
         }
@@ -525,7 +544,7 @@ export class UsersService {
    * @param onboardedCompanies list of onboarded companies
    * @param graduatedCompanies list of graduated companies
    */
-  sendScheduledMailToSponsor(user: User, onboardedGroupedCompsObj: any, graduatedGroupedCompsObj: any, emailFrequency: EmailFrequency) {
+  sendScheduledMailToSponsor(user: User, onboardedGroupedCompsObj: any, graduatedGroupedCompsObj: any, companiesCount: any) {
     info(`Prepare email config data`, __filename, `sendScheduledMailToSponsor()`);
     try {
       if (user) {
@@ -533,14 +552,16 @@ export class UsersService {
           userName: user.firstName,
           server_origin: process.env.SERVER_ORIGIN,
           onboardedCompsObj: onboardedGroupedCompsObj,
-          graduatedCompsObj: graduatedGroupedCompsObj
+          graduatedCompsObj: graduatedGroupedCompsObj,
+          companiesCount: companiesCount
         };
         let tenant = { tenantEmail: user.email, role: user.role };
 
         debug(`Server origin in config data : ${userInfo.server_origin}`, __filename, `sendScheduledMailToSponsor()`);
+        const currentDate: Date = new Date();
         this.mail.sendEmail(
           tenant,
-          ApplicationConstants.EMAIL_SUBJECT_FOR_SPONSOR_SCHEDULED.replace('{0}', EmailFrequency[emailFrequency]),
+          ApplicationConstants.EMAIL_SUBJECT_FOR_SPONSOR_SCHEDULED.replace('{0}', this.mail.getFormattedDateDD_Mon_YYYY(currentDate)),
           ApplicationConstants.EMAIL_PARAM_FOR_SPONSOR_MAIL_SCHEDULED,
           userInfo,
         );
@@ -575,7 +596,7 @@ export class UsersService {
    * @param siteId A site id
    * @returns Site name
    */
-  getSiteName(siteArrDb: any[], siteId: number) {
+  getSiteNameBySiteId(siteArrDb: any[], siteId: number) {
     info(`Fetching site name from site array`, __filename, `getSiteName()`);
     let filteredArray = siteArrDb.filter((x) => x.id == siteId);
     if (filteredArray && filteredArray.length) {

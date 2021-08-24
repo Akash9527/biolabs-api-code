@@ -17,8 +17,14 @@ export const ApplicationConstants = {
     EMAIL_CONTENT_PARAM_FOR_SPONSORSHIP_QN_CHANGE_TO_YES: 'sponsorshipQuestionChangedToYes',
 
     EMAIL_FOR_SPONSOR_SCHEDULED: 'MAIL_FOR_SPONSOR_SCHEDULED',
-    EMAIL_SUBJECT_FOR_SPONSOR_SCHEDULED: `Biolabs {0} Insights`,
+    /** {0} is for Date of the email sent */
+    EMAIL_SUBJECT_FOR_SPONSOR_SCHEDULED: `BioLabs Network Insights | {0}`,
     EMAIL_PARAM_FOR_SPONSOR_MAIL_SCHEDULED: 'onboardedAndGraduatedCompanies',
+    EMAIL_INTRO_TEXT_FOR_SPONSOR_MAIL_SCHEDULED: 'Here are some key insights from the BioLabs network since your last update:',
+    EMAIL_TEXT_RECENTLY_JOINED_COMPANIES: `{0} companies have recently joined BioLabs:`,
+    EMAIL_TEXT_RECENTLY_JOINED_A_COMPANY: `{0} company has recently joined BioLabs:`,
+    EMAIL_TEXT_RECENTLY_GRADUATED_COMPANIES: `{0} Companies have recently graduated:`,
+    EMAIL_TEXT_RECENTLY_GRADUATED_A_COMPANY: `{0} Company has recently graduated:`,
 
     /** Table column length */
     SPACE_CHANGE_WAITLIST_REQUEST_NOTES_COL_LENGTH: 600,
@@ -48,4 +54,8 @@ export const ApplicationConstants = {
     COMPANY_LOGO_HEIGHT_IN_EMAIL: '50px',
 
 
+    EMAIL_TEMPLATE_RESIDENT_COMPANY_FORM_SUBMISSION_PATH: '/src/modules/public/email-template/resident-company-form-submission.html',
+
+    /** SUPER_ADMIN_EMAIL_ID BIOL-362*/
+    SUPER_ADMIN_EMAIL_ID: 'superadmin@biolabs.io'
 };
