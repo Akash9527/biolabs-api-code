@@ -550,14 +550,15 @@ export class UsersService {
       if (user) {
         const userInfo = {
           userName: user.firstName,
-          server_origin: process.env.SERVER_ORIGIN,
+          api_server_origin: process.env.API_SERVER_ORIGIN,
+          ui_server_origin: process.env.UI_SERVER_ORIGIN,
           onboardedCompsObj: onboardedGroupedCompsObj,
           graduatedCompsObj: graduatedGroupedCompsObj,
           companiesCount: companiesCount
         };
         let tenant = { tenantEmail: user.email, role: user.role };
 
-        debug(`Server origin in config data : ${userInfo.server_origin}`, __filename, `sendScheduledMailToSponsor()`);
+        debug(`API server origin in config data : ${userInfo.api_server_origin}`, __filename, `sendScheduledMailToSponsor()`);
         const currentDate: Date = new Date();
         this.mail.sendEmail(
           tenant,

@@ -21,10 +21,10 @@ export const ApplicationConstants = {
     EMAIL_SUBJECT_FOR_SPONSOR_SCHEDULED: `BioLabs Network Insights | {0}`,
     EMAIL_PARAM_FOR_SPONSOR_MAIL_SCHEDULED: 'onboardedAndGraduatedCompanies',
     EMAIL_INTRO_TEXT_FOR_SPONSOR_MAIL_SCHEDULED: 'Here are some key insights from the BioLabs network since your last update:',
-    EMAIL_TEXT_RECENTLY_JOINED_COMPANIES: `{0} companies have recently joined BioLabs:`,
-    EMAIL_TEXT_RECENTLY_JOINED_A_COMPANY: `{0} company has recently joined BioLabs:`,
-    EMAIL_TEXT_RECENTLY_GRADUATED_COMPANIES: `{0} Companies have recently graduated:`,
-    EMAIL_TEXT_RECENTLY_GRADUATED_A_COMPANY: `{0} Company has recently graduated:`,
+    EMAIL_TEXT_RECENTLY_JOINED_COMPANIES: `{0} companies have recently joined BioLabs{1}`,
+    EMAIL_TEXT_RECENTLY_JOINED_A_COMPANY: `{0} company has recently joined BioLabs{1}`,
+    EMAIL_TEXT_RECENTLY_GRADUATED_COMPANIES: `{0} companies have recently graduated{1}`,
+    EMAIL_TEXT_RECENTLY_GRADUATED_A_COMPANY: `{0} company has recently graduated{1}`,
 
     /** Table column length */
     SPACE_CHANGE_WAITLIST_REQUEST_NOTES_COL_LENGTH: 600,

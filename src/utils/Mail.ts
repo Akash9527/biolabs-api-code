@@ -663,7 +663,7 @@ export class Mail {
          }
       } else if (content == ApplicationConstants.EMAIL_PARAM_FOR_SPONSOR_MAIL_SCHEDULED) {
          debug(`Preparing html to send mail to sponsor users as scheduled`, __filename, `sendEmailGraphAPI()`);
-         let loginLink = userInfo.ui_server_origin + 'login';
+         // let loginLink = userInfo.ui_server_origin + 'login';
          let htmlOnboarded = this.getCompanyDataHtmlTable(userInfo, ApplicationConstants.ONBOARDED_COMPANIES);
          // console.log(htmlOnboarded);
          data = {
@@ -679,7 +679,7 @@ export class Mail {
                      htmlOnboarded,
                      this.getCountText(userInfo, ApplicationConstants.GRADUATED_COMPANIES),
                      this.getCompanyDataHtmlTable(userInfo, ApplicationConstants.GRADUATED_COMPANIES),
-                     loginLink,
+                     userInfo.ui_server_origin,
                      ApplicationConstants.BIOLABS_CONNECT_PLATFORM,
                   )
                },
@@ -760,9 +760,9 @@ export class Mail {
       info(`Get html table for graduated companies`, __filename, `getGraduatedHtmlTable()`);
       let companyRowData: any;
       if (forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
-         companyRowData = this.getOnboardedCompanyRows(userInfo.onboardedCompsObj, userInfo.server_origin);
+         companyRowData = this.getOnboardedCompanyRows(userInfo.onboardedCompsObj, userInfo);
       } else if (forWhat == ApplicationConstants.GRADUATED_COMPANIES) {
-         companyRowData = this.getGraduatedCompanyRows(userInfo.graduatedCompsObj, userInfo.server_origin);
+         companyRowData = this.getGraduatedCompanyRows(userInfo.graduatedCompsObj, userInfo);
       }
       let htmlTable = `
          <table style="width:100%; margin-left:10px; margin-right:10px;" border="0">
@@ -781,7 +781,7 @@ export class Mail {
     * @param origin The server origin
     * @returns The html string with prepared rows
     */
-   getOnboardedCompanyRows(onboardedCompsObj: any, origin: any) {
+   getOnboardedCompanyRows(onboardedCompsObj: any, userInfo: any) {
       let rowData = ``;
       if (onboardedCompsObj) {
          for (const siteName in onboardedCompsObj) {
@@ -804,11 +804,11 @@ export class Mail {
                   // }
                   // if() {
                   for (const company of companies) {
-                     let companyUrl = origin + "resident-companies/" + company.id + "/company";
+                     let companyUrl = userInfo.ui_server_origin + "resident-companies/" + company.id + "/company";
                      rowData +=
                         `<tr>
                               <td style="width:18%">
-                                 <img src= "${this.prepareCompanyLogoUrl(origin, company)}" alt="${company.name}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
+                                 <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, company)}" alt="${company.name}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
                               <td style="width:42%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.name}</a>
@@ -843,7 +843,7 @@ export class Mail {
     * @param origin The server origin
     * @returns The html string with prepared rows
     */
-   getGraduatedCompanyRows(graduatedCompsObj: any, origin: any) {
+   getGraduatedCompanyRows(graduatedCompsObj: any, userInfo: any) {
       info(`Get html rows for graduated companies`, __filename, `getGraduatedCompanyRows()`);
       let rowData = ``;
       if (graduatedCompsObj) {
@@ -868,11 +868,11 @@ export class Mail {
                   //       `;
                   // } else {
                   for (const company of companies) {
-                     let companyUrl = origin + "resident-companies/" + company.id + "/company";
+                     let companyUrl = userInfo.ui_server_origin + "resident-companies/" + company.id + "/company";
                      rowData +=
                         `<tr>
                               <td style="width:18%">
-                                 <img src= "${this.prepareCompanyLogoUrl(origin, company)}" alt="${company.name}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
+                                 <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, company)}" alt="${company.name}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
                               <td style="width:42%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.name}</a>
@@ -938,16 +938,20 @@ export class Mail {
    private getCountText(userInfo: any, flag: string) {
 
       if (flag == ApplicationConstants.ONBOARDED_COMPANIES) {
-         if (userInfo.companiesCount.onboardedCompsCount && userInfo.companiesCount.onboardedCompsCount > 1) {
-            return ApplicationConstants.EMAIL_TEXT_RECENTLY_JOINED_COMPANIES.replace('{0}', userInfo.companiesCount.onboardedCompsCount);
+         if (userInfo.companiesCount.onboardedCompsCount && userInfo.companiesCount.onboardedCompsCount == 1) {
+            return ApplicationConstants.EMAIL_TEXT_RECENTLY_JOINED_A_COMPANY.replace('{0}', userInfo.companiesCount.onboardedCompsCount).replace('{1}', ':');
+         } else if (userInfo.companiesCount.onboardedCompsCount && userInfo.companiesCount.onboardedCompsCount > 1) {
+            return ApplicationConstants.EMAIL_TEXT_RECENTLY_JOINED_COMPANIES.replace('{0}', userInfo.companiesCount.onboardedCompsCount).replace('{1}', ':');
          } else {
-            return ApplicationConstants.EMAIL_TEXT_RECENTLY_JOINED_A_COMPANY.replace('{0}', userInfo.companiesCount.onboardedCompsCount)
+            return ApplicationConstants.EMAIL_TEXT_RECENTLY_JOINED_COMPANIES.replace('{0}', 'No').replace('{1}', '.');
          }
       } else if (flag == ApplicationConstants.GRADUATED_COMPANIES) {
-         if (userInfo.companiesCount.graduatedCompsCount && userInfo.companiesCount.graduatedCompsCount > 1) {
-            return ApplicationConstants.EMAIL_TEXT_RECENTLY_GRADUATED_COMPANIES.replace('{0}', userInfo.companiesCount.graduatedCompsCount);
+         if (userInfo.companiesCount.graduatedCompsCount && userInfo.companiesCount.graduatedCompsCount == 1) {
+            return ApplicationConstants.EMAIL_TEXT_RECENTLY_GRADUATED_A_COMPANY.replace('{0}', userInfo.companiesCount.graduatedCompsCount).replace('{1}', ':');
+         } else if (userInfo.companiesCount.graduatedCompsCount && userInfo.companiesCount.graduatedCompsCount > 1) {
+            return ApplicationConstants.EMAIL_TEXT_RECENTLY_GRADUATED_COMPANIES.replace('{0}', userInfo.companiesCount.graduatedCompsCount).replace('{1}', ':');
          } else {
-            return ApplicationConstants.EMAIL_TEXT_RECENTLY_GRADUATED_A_COMPANY.replace('{0}', userInfo.companiesCount.graduatedCompsCount);
+            return ApplicationConstants.EMAIL_TEXT_RECENTLY_GRADUATED_COMPANIES.replace('{0}', 'No').replace('{1}', '.');
          }
       }
    }
