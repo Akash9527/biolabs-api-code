@@ -14,6 +14,8 @@ import { SITE_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-site-admi
 import { SPONSOR_ACCESSLEVELS } from '../../../constants/privileges-sponsor';
 import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 import { DatabaseService } from '../master/db-script.service';
+import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
+import { Notes } from '../resident-company/rc-notes.entity';
 const mockUser: User = {
     id: 1,
     role: 1,
@@ -69,6 +71,10 @@ const mockRC: ResidentCompany = {
     "committeeStatus": null,
     "selectionDate": new Date("2021-07-05T18:30:00.000Z"),
     "companyStatusChangeDate": 2021,
+    "primarySite": [1,2],
+    "sitesApplied": [1,2],
+    "notes" : [{}as Notes],
+    "spaceChangeWaitlist": [{} as SpaceChangeWaitlist]
   }
 const mockUserService = () => ({
     getByEmail: jest.fn(),

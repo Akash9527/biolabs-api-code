@@ -10,6 +10,8 @@ import { Mail } from '../../../utils/Mail';
 import { EMAIL } from '../../../constants/email';
 import { Request } from 'express';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
+import { ApplicationConstants } from 'utils/application-constants';
+
 const { info, error, debug } = require('../../../utils/logger');
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 
@@ -64,14 +66,21 @@ export class UsersService {
    * @param payload object of type UserFillableFields
    * @return user object
    */
-  async create(payload: UserFillableFields) {
+  async create(payload: UserFillableFields, siteData: any) {
     info("Creating a new biolabs user", __filename, "create()");
     const user = await this.getByEmail(payload.email);
 
     if (user) {
-      debug("User with provided email already created", __filename, "create()");
-      throw new NotAcceptableException('User with provided email already created.',
-      );
+      if (user.email == ApplicationConstants.SUPER_ADMIN_EMAIL_ID) {
+        const siteArr = siteData.map((site) => site.id);
+        // Appending userId to superadmin payload
+        payload = { ...payload, ...{ id: user.id, site_id: siteArr } };
+        return await this.userRepository.save(this.userRepository.create(payload));
+      } else {
+        debug("User with provided email already created", __filename, "create()");
+        throw new NotAcceptableException('User with provided email already created.',
+        );
+      }
     }
     return await this.userRepository.save(this.userRepository.create(payload));
   }

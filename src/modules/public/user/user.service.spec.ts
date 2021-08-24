@@ -16,12 +16,12 @@ import { log } from 'winston';
 import { AddUserPayload } from './add-user.payload';
 
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
-const mockUser: User = {
+let mockUser: User = {
     id: 1,
     role: 1,
     site_id: [1, 2],
     companyId: 1,
-    email: "testadmin@biolabs.io",
+    email: "superadmin@biolabs.io",
     firstName: "adminName",
     lastName: "userLast",
     title: "SuperAdmin",
@@ -45,11 +45,34 @@ const mockMailService = () => ({
 const mockResidentCompanyService = () => ({
     getResidentCompany: jest.fn()
 });
-const mockUserFillable: UserFillableFields = {
+let mockUserFillable: UserFillableFields = {
     email: "testadmin@biolabs.io", password: "test@1234", role: 1, site_id: [1, 2], companyId: 1,
     firstName: "adminName", lastName: "userLast", title: "SuperAdmin", phoneNumber: "2345678902",
     status: '1', userType: '1', imageUrl: "admin.jpg"
 }
+const mockSites: any = [
+    {
+        "id": 1,
+        "name": "Tufts",
+        "longName": "Tufts Launchpad",
+        "standardizedAddress": "75 Kneeland St, 14th Floor Boston, MA 02111",
+        "colorCode": "#6baecf",
+        "googleMapUrl": "https://goo.gl/maps/J6KRZNuGFrWkk7iG6",
+        "siteMapBoxImgUrl": "https://biolabsblobdev.blob.core.windows.net/configuration/Tufts.png",
+        "status": "1"
+    },
+    {
+        "id": 2,
+        "name": "Ipsen",
+        "longName": "Ipsen Innovation Cente",
+        "standardizedAddress": "650 E Kendall St 2nd Floor, Cambridge, MA 02142",
+        "colorCode": "#26294a",
+        "googleMapUrl": "https://goo.gl/maps/PuKw7cvjxKxsApNN7",
+        "siteMapBoxImgUrl": "https://biolabsblobdev.blob.core.windows.net/configuration/Ipsen.png",
+        "status": "1"
+    },
+]
+
 const mockUserToken: UserToken = { id: 1, user_id: 1, token: "mockToken", status: "1", createdAt: 2021, updatedAt: 2021 };
 const req: any = {
     user: { id: 1 },
@@ -187,6 +210,25 @@ describe('UserService', () => {
     });
     describe('create method', () => {
         it('should create user if email already not exist', async () => {
+            mockUser.email = "superadmin@biolabs.io"
+            jest.spyOn(userService, 'getByEmail').mockResolvedValueOnce(mockUser);
+              jest.spyOn(userRepository, 'save').mockResolvedValueOnce(mockUser);
+              await  userService.create(mockUserFillable, mockSites);
+        });
+
+        it('it should throw exception if user id is not provided  ', async () => {
+            mockUser.email = "nonAdmin@account.com"
+            jest.spyOn(userService, 'getByEmail').mockResolvedValueOnce(mockUser);
+            try {
+              await  userService.create(mockUserFillable, mockSites);
+            } catch (e) {
+              expect(e.response.error).toBe('Not Acceptable');
+              expect(e.response.message).toBe('User with provided email already created.');
+              expect(e.response.statusCode).toBe(406);
+            }
+        });
+
+        it('should save user if user type is super-admin', async () => {
             mockUserFillable.email = "admin@gmail.com";
             userRepository.createQueryBuilder('mockUser')
                 .addSelect("mockUser.email")
@@ -194,21 +236,13 @@ describe('UserService', () => {
                 .where('mockUser.email = :email')
                 .setParameter('email', mockUserFillable.email)
                 .getOne();
-            // jest.spyOn(userRepository, 'create').mockReturnValueOnce(mockUserFillable);
+            const siteArr = mockSites.map((site) => site.id);
+            mockUser = { ...mockUser, ...{ id: 1, site_id: siteArr } } as User;
             jest.spyOn(userRepository, 'save').mockResolvedValueOnce(mockUser);
-            let ans = await userService.create(mockUserFillable);
+            let ans = await userService.create(mockUserFillable, mockSites);
             expect(ans).toBe(mockUser);
+            expect(ans.site_id.length).toBe(siteArr.length);
         })
-        it('it should throw exception if user id is not provided  ', async () => {
-            jest.spyOn(userService, 'getByEmail').mockResolvedValueOnce(mockUser);
-            try {
-              await  userService.create(mockUserFillable);
-            } catch (e) {
-              expect(e.response.error).toBe('Not Acceptable');
-              expect(e.response.message).toBe('User with provided email already created.');
-              expect(e.response.statusCode).toBe(406);
-            }
-          });
     });
 
     describe('adduser method', () => {
