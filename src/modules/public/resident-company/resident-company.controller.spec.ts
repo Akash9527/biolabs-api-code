@@ -155,6 +155,7 @@ describe('ResidentCompanyController', () => {
             "otherModality": {},
             "preferredMoveIn": 4,
             "equipmentOnsite": "TestNew",
+            "primarySite":[1],"sitesApplied":[2]
         };
 
         it('it should called residentService addResidentCompany method ', async () => {
@@ -237,7 +238,9 @@ describe('ResidentCompanyController', () => {
             "academiaPartnerships": true, "academiaPartnershipDetails": "ersdf", "industryPartnerships": true,
             "industryPartnershipsDetails": "string", "newsletters": true, "shareYourProfile": true,
             "website": "string", "companyMembers": [], "companyAdvisors": [],
-            "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV"
+            "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV",
+            "primarySite":[1],"sitesApplied":[2]
+
         };
         it('it should call residentService updateResidentCompany method ', async () => {
             await residentController.updateResidentCompany(mockupdateResidentCompany, req);

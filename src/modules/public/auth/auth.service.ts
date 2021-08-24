@@ -50,10 +50,7 @@ export class AuthService {
    */
   private async createSuperAdmin(migrationData: any) {
     info("Creating application super admin user with all sites access", __filename, "createSuperAdmin()");
-    const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
-    if (!superAdmin) {
-      await this.userService.create(migrationData['superadmin']);
-    }
+    await this.userService.create(migrationData['superadmin'], migrationData['sites']);
   }
 
   /**

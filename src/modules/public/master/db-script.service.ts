@@ -27,9 +27,14 @@ export class DatabaseService {
                 for (let f of files) {
                     debug("executing script from file :", f, __filename, 'executeScript()');
                     const fileData = await fsp.readFile(basePath + '/' + folder + '/' + f, 'utf-8');
-                    entityManager.query(fileData).then((result: QueryResult) => {
-                        debug(`Executed query ${result}`, __filename, 'executeQuery()');
-                    });
+                    try {
+                        entityManager.query(fileData).then((result: QueryResult) => {
+                            debug(`Executed query ${result}`, __filename, 'executeQuery()');
+                        });
+                    } catch (err) {
+                        error('Error in getting result or query runner ' + f, __filename, 'executeQuery()');
+                        continue;
+                    }
                 }
             }
             debug('Database updated', __filename, 'executeScript()');
@@ -37,7 +42,6 @@ export class DatabaseService {
             entityManager.connection.close;
         } catch (e) {
             error('Error in executing script to update the databse', e, __filename, 'executeScript()');
-
         }
     }
 }
