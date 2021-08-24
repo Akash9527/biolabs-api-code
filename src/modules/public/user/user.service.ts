@@ -10,6 +10,8 @@ import { Mail } from '../../../utils/Mail';
 import { EMAIL } from '../../../constants/email';
 import { Request } from 'express';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
+import { ApplicationConstants } from 'utils/application-constants';
+
 const { info, error, debug } = require('../../../utils/logger');
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 
@@ -69,7 +71,7 @@ export class UsersService {
     const user = await this.getByEmail(payload.email);
 
     if (user) {
-      if (user.email == 'superadmin@biolabs.io') {
+      if (user.email == ApplicationConstants.SUPER_ADMIN_EMAIL_ID) {
         const siteArr = siteData.map((site) => site.id);
         // Appending userId to superadmin payload
         payload = { ...payload, ...{ id: user.id, site_id: siteArr } };

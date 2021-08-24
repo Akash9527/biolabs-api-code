@@ -26,6 +26,8 @@ export const ApplicationConstants = {
 
     /** Email template paths */
     EMAIL_TEMPLATE_FORGOT_PASSWORD_PATH: '/src/modules/public/email-template/forgot-password.html',
-    EMAIL_TEMPLATE_SPONSORSHIP_QN_CHANGE_TO_YES_PATH: '/src/modules/public/email-template/sponsorship-question-change-to-yes.html'
+    EMAIL_TEMPLATE_SPONSORSHIP_QN_CHANGE_TO_YES_PATH: '/src/modules/public/email-template/sponsorship-question-change-to-yes.html',
 
+    /** SUPER_ADMIN_EMAIL_ID BIOL-362*/
+    SUPER_ADMIN_EMAIL_ID: 'superadmin@biolabs.io'
 };
