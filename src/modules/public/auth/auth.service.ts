@@ -39,8 +39,7 @@ export class AuthService {
     await this.masterService.createTechnologyStages(fileData);
     await this.masterService.createProductType(fileData);
     await this.createSuperAdmin(fileData);
-    // TODO with akhilesh
-    // await this.databaseService.executeScript();
+    await this.databaseService.executeScript();
   }
 
   /**
