@@ -63,7 +63,6 @@ export class Mail {
             sitesAppliedList += `<li> ${userInfo.sitesApplied[i]} </li>`;
          }
       }
-      console.log(userInfo.primarySite,userInfo.sitesApplied)
 
       let data;
       if (content == 'forgotMail') {
