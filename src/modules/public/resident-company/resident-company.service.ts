@@ -2231,7 +2231,8 @@ order by quat;
         CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
         pt."productTypeName"
         from product_type as pt
-        Left Join (select "productTypeId", quantity from order_product where "companyId" = ${companyId} and month = ${month} ) as op
+        Left Join (select "productTypeId", quantity from order_product 
+        where "companyId" = ${companyId} and month = ${month} and "manuallyEnteredProduct" = false) as op
         on pt.id = op."productTypeId"
         where pt."productTypeName" <> 'Decontamination Fee'
         and pt."productTypeName" <> 'Retainer Fee'
