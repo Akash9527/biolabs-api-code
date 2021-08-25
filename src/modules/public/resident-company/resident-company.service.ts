@@ -2550,7 +2550,7 @@ order by quat;
       return await residentCompanyQuery.getRawMany();
     } catch (err) {
       error(`Error in fetching data for ${forWhat} for sponsor user. ${err.message}`, __filename, "fetchOnboardedCompaniesBySiteId()");
-      throw new BiolabsException(`rror in fetching data for ${forWhat} for sponsor user.`, err.message);
+      throw new BiolabsException(`Error in fetching data for ${forWhat} for sponsor user.`, err.message);
     }
   }
 
