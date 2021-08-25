@@ -33,6 +33,8 @@ export class OrderProductService {
   async addOrderProduct(orderProduct: CreateOrderProductDto) {
     info("Add order product ProductName:" + orderProduct.productName, __filename, "addOrderProducts()")
     try {
+      let submittedDate = orderProduct.submittedDate;
+      delete orderProduct.submittedDate;
       const todayDate = new Date();
       // checking StartDate
       if (orderProduct.startDate && isNaN(Date.parse(orderProduct.startDate))) {
@@ -75,6 +77,7 @@ export class OrderProductService {
         /**
          * Add next 4 months Products
          */
+        orderProduct.submittedDate=submittedDate;
         await this.addFutureOrderProducts(orderProduct);
       }
       return { message: 'Added successfully', status: 'success' };
@@ -89,7 +92,8 @@ export class OrderProductService {
     let futureOrderProduct = { ...orderProduct };
     const todayDate = new Date();
     let today = new Date(`${todayDate.getMonth() + 1}/01/${todayDate.getFullYear()} 00:00:00`);
-    let diffMonthsToCurrent = this.monthDiff(today, new Date(futureOrderProduct.startDate));
+    let diffMonthsToCurrent = this.monthDiff(today, new Date(futureOrderProduct.startDate ? 
+      futureOrderProduct.startDate : futureOrderProduct.submittedDate));
     let recursiveLength = 4 - (Number(diffMonthsToCurrent) - 1);
     for (let i = 1; i < recursiveLength; i++) {
       if (futureOrderProduct.month < 12) {
