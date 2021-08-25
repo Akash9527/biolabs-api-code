@@ -2227,8 +2227,8 @@ order by quat;
       /** Check if sites are accessible to the user */
       this.checkIfValidSiteIds(siteIdArr, residentCompany.site);
     }
-
-    const month = new Date().getMonth() + 2; // Getting next month from currect date
+    const today = new Date();
+    const month = today.getMonth() + 2; // Getting next month from currect date
     const queryStr = `
     select res."productTypeId", sum(res.count), res."productTypeName"
     from (
@@ -2238,7 +2238,8 @@ order by quat;
         pt."productTypeName"
         from product_type as pt
         Left Join (select "productTypeId", quantity from order_product 
-        where "companyId" = ${companyId} and month = ${month} and "manuallyEnteredProduct" = false) as op
+        where "companyId" = ${companyId} and month = ${month}
+        and year=${today.getFullYear()} and "manuallyEnteredProduct" = false) as op
         on pt.id = op."productTypeId"
         where pt."productTypeName" <> 'Decontamination Fee'
         and pt."productTypeName" <> 'Retainer Fee'
