@@ -10,6 +10,7 @@ import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-
 import { UpdateWaitlistRequestStatusDto } from '../dto/update-waitlist-request-status.dto';
 import { Item } from '../entity/item.entity';
 import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
+import { EmailFrequency } from '../enum/email-frequency-enum';
 import { MembershipChangeEnum } from '../enum/membership-change-enum';
 import { RequestStatusEnum } from '../enum/request-status-enum';
 import { BiolabsSource } from '../master/biolabs-source.entity';
@@ -34,7 +35,7 @@ import { SearchResidentCompanyPayload } from './search-resident-company.payload'
 import { UpdateNotesDto } from './update-notes.dto';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
-const { error, warn, info, debug } = require("../../../utils/logger")
+const { error, warn, info, debug } = require("../../../utils/logger");
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 
 @Injectable()
@@ -983,8 +984,13 @@ export class ResidentCompanyService {
       if (residentCompany) {
         residentCompany.companyStatus = payload.companyStatus;
         residentCompany.companyVisibility = payload.companyVisibility;
-        residentCompany.companyOnboardingStatus = payload.companyOnboardingStatus;
 
+        /** Set current date as companyOnboardingDate when companyOnboardingStatus comes true in request and false from db  */
+        if (!residentCompany.companyOnboardingStatus && payload.companyOnboardingStatus) {
+          residentCompany.companyOnboardingDate = new Date();
+        }
+
+        residentCompany.companyOnboardingStatus = payload.companyOnboardingStatus;
         residentCompany.committeeStatus = payload.committeeStatus;
         residentCompany.selectionDate = payload.selectionDate;
         // Checking companyStatusChangeDate is the instanceof Date, then only update.
@@ -2491,5 +2497,77 @@ order by quat;
       { id: 3, name: 'Join Biolabs Within : 4 - 6 months' },
       { id: 4, name: 'Join Biolabs Within : More than 6 months' }
     ];
+  }
+
+  // ======================= BIOL-235/BIOL-162 ==========================
+  /**
+   * Description: Fetches resident company data from db by sited id, onboarding/graduated data, company status and other criteria.
+   * @description Fetches resident company data from db by sited id, onboarding/graduated data, company status and other criteria.
+   * @param siteIds sited ids
+   * @param forWhat Onboarded or Graduated
+   * @param frequency Weekly, Monthly, Quarterly to fetch recently onboarded and graduated companies.
+   * @returns list of resident companies
+   */
+  async fetchOnboardedCompaniesBySiteId(siteIds: number[], forWhat: string, frequency: EmailFrequency) {
+    info(`Fetching ${forWhat} data for sites: ${siteIds}, for frequency: ${frequency}`, __filename, `fetchOnboardedCompaniesBySiteId()`);
+
+    const currentDate = new Date();
+    let frequencyDate: Date;
+    const DAYS_7 = 7;
+    const MONTHS_3 = 3;
+    const MONTHS_1 = 1;
+
+    if (frequency == EmailFrequency.Weekly) {
+      frequencyDate = new Date(currentDate.setDate(currentDate.getDate() - DAYS_7)); //7 Days
+    } else if (frequency == EmailFrequency.Quarterly) {
+      frequencyDate = new Date(currentDate.setMonth(currentDate.getMonth() - MONTHS_3)); //3 Months
+    } else {
+      /** Set it monthly */
+      frequencyDate = new Date(currentDate.setMonth(currentDate.getMonth() - MONTHS_1)); //1 Month
+    }
+
+    try {
+      let residentCompanyQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies").
+        select("resident_companies.id", "id")
+        .addSelect("resident_companies.name", "name")
+        .addSelect("resident_companies.logoImgUrl", "logoUrl")
+        .addSelect("resident_companies.companyOnboardingStatus", "onboardingStatus")
+        .addSelect("resident_companies.companyOnboardingDate", "onboardingDate")
+        .addSelect("resident_companies.companyStatus", "companyStatus")
+        .addSelect("resident_companies.companyStatusChangeDate", "statusChangeDate")
+        .addSelect("resident_companies.site", "site")
+        .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIds });
+
+      if (forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
+        residentCompanyQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: true });
+        residentCompanyQuery.andWhere("CAST(resident_companies.companyOnboardingDate AS Date) >= :theDate", { theDate: frequencyDate })
+      } else if (forWhat == ApplicationConstants.GRADUATED_COMPANIES) {
+        residentCompanyQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: 4 });
+        residentCompanyQuery.andWhere("CAST(resident_companies.companyStatusChangeDate AS Date) >= :theDate", { theDate: frequencyDate })
+      }
+      debug(`Executing query for ${forWhat}, query: ${residentCompanyQuery}`, __filename, `fetchOnboardedCompaniesBySiteId()`);
+      return await residentCompanyQuery.getRawMany();
+    } catch (err) {
+      error(`Error in fetching data for ${forWhat} for sponsor user. ${err.message}`, __filename, "fetchOnboardedCompaniesBySiteId()");
+      throw new BiolabsException(`rror in fetching data for ${forWhat} for sponsor user.`, err.message);
+    }
+  }
+
+  /**
+   * Description: Fetches all sites from db.
+   * @description Fetches all sites from db.
+   * @returns Site array
+   */
+  public async getAllSites() {
+    info(`Fetching sites from db`, __filename, `getAllSites()`);
+    const sites = await this.siteRepository.find({
+      select: ["id", "name"]
+    }).then((result) => {
+      return result;
+    }).catch((err) => {
+      error(`Error in fetching all sites. ${err.message}`, __filename, "getAllSites()");
+      throw new BiolabsException(`Error in fetching all sites.`, err.message);
+    });
+    return sites;
   }
 }
