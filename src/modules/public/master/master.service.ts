@@ -96,36 +96,22 @@ export class MasterService {
    * @return array of product object
    */
   async createProductTypes(migrationData: any) {
-    // info("creating product type", __filename, "createProductType()");
-    // try {
-    //   const productType = await this.productTypeRepository.find();
-    //   const ptypeData = migrationData["productTypeName"]
-    //   if (!productType || productType.length == 0) {
-    //     for (let index = 0; index < ptypeData.length; index++) {
-    //       const productType = ptypeData[index];
-    //       await this.productTypeRepository.save(this.productTypeRepository.create(productType));
-    //     }
-    //   }
-    // } catch (err) {
-    //   error("Error in creating product type" + err.message, __filename, "createSite()");
-    //   throw new InternalException(err.message);
-    // }
-    const _product_types = migrationData['productTypeName'];
-    let resp = {};
-    for (const _product_type of _product_types) {
-      resp[_product_type.productTypeName] = await this.createProductType(_product_type);
+  let resp = {};
+    try {
+      const ptypeData = migrationData["productTypeName"];
+      if (ptypeData) {
+        for (const ptypeDataObj of ptypeData) {
+          resp[ptypeDataObj.productTypeName] = await this.productTypeRepository.save(this.productTypeRepository.create(ptypeDataObj));
+        }
+      } else {
+        error(`Error in creating product types.`, __filename, `createProductType()`);
+      }
+    } catch (error) {
+      if (error) {
+        error(`Error in creating product types. ${error.message}`, __filename, `createProductType()`);
+      }
     }
     return resp;
-  }
-
-  /**
-   * Description: This method will store the product type.
-   * @description This method will store the product type.
-   * @param _product_type productType data object
-   * @return productType object
-   */
-  async createProductType(_product_type: ProductType) {
-      return await this.productTypeRepository.save(this.productTypeRepository.create(_product_type));
   }
 
   /**
