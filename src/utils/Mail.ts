@@ -60,8 +60,13 @@ export class Mail {
       }
 
       if (userInfo && userInfo.sitesApplied) {
-         for (let i = 0; i < userInfo.sitesApplied.length; i++) {
-            sitesAppliedList += `<li> ${userInfo.sitesApplied[i]} </li>`;
+         if (userInfo.sitesApplied.length > 0) {
+            for (let i = 0; i < userInfo.sitesApplied.length; i++) {
+               sitesAppliedList += `<li> ${userInfo.sitesApplied[i]} </li>`;
+            }
+            sitesAppliedList = `</p> <ul style="color=#000000;"> ${sitesAppliedList} </ul>`
+         } else {
+            sitesAppliedList += `<label style="color=#000000;">N/A</label> </p>`
          }
       }
 
