@@ -37,7 +37,9 @@ const mockUser: User = {
     password: "test@1234",
     createdAt: 12,
     updatedAt: 12,
-    toJSON: null
+    toJSON: null,
+    isRequestedMails:null,
+    mailsRequestType:null
 }
 
 describe('UserController', () => {
