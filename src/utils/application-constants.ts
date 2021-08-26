@@ -45,6 +45,7 @@ export const ApplicationConstants = {
 
     SPONSOR_USER_ROLE: 3,
 
+    DEFAULT_COMPANY_LOGO_PATH: 'assets/images/blPlaceholder.png',
     LOGO_PATH: 'api/file/read-image?fileType=logo&filename=',
     BIOLABS_CONNECT_PLATFORM: 'BioLabs connect platform',
 
@@ -52,7 +53,6 @@ export const ApplicationConstants = {
 
     COMPANY_LOGO_WIDTH_IN_EMAIL: '50px',
     COMPANY_LOGO_HEIGHT_IN_EMAIL: '50px',
-
 
     EMAIL_TEMPLATE_RESIDENT_COMPANY_FORM_SUBMISSION_PATH: '/src/modules/public/email-template/resident-company-form-submission.html',
 
