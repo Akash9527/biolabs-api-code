@@ -43,7 +43,6 @@ export class MasterService {
     private readonly productTypeRepository: Repository<ProductType>,
   ) { }
 
-
   /**
    * Description: This method will return the sites list.
    * @description This method will return the sites list.
@@ -94,23 +93,39 @@ export class MasterService {
   /**
    * Description: This method will store the Product information.
    * @description This method will store the Product information.
-   * @return array of product object 
+   * @return array of product object
    */
-  async createProductType(migrationData: any) {
-    info("creating product type", __filename, "createProductType()");
-    try {
-      const productType = await this.productTypeRepository.find();
-      const ptypeData = migrationData["productTypeName"]
-      if (!productType || productType.length == 0) {
-        for (let index = 0; index < ptypeData.length; index++) {
-          const productType = ptypeData[index];
-          await this.productTypeRepository.save(this.productTypeRepository.create(productType));
-        }
-      }
-    } catch (err) {
-      error("Error in creating product type" + err.message, __filename, "createSite()");
-      throw new InternalException(err.message);
+  async createProductTypes(migrationData: any) {
+    // info("creating product type", __filename, "createProductType()");
+    // try {
+    //   const productType = await this.productTypeRepository.find();
+    //   const ptypeData = migrationData["productTypeName"]
+    //   if (!productType || productType.length == 0) {
+    //     for (let index = 0; index < ptypeData.length; index++) {
+    //       const productType = ptypeData[index];
+    //       await this.productTypeRepository.save(this.productTypeRepository.create(productType));
+    //     }
+    //   }
+    // } catch (err) {
+    //   error("Error in creating product type" + err.message, __filename, "createSite()");
+    //   throw new InternalException(err.message);
+    // }
+    const _product_types = migrationData['productTypeName'];
+    let resp = {};
+    for (const _product_type of _product_types) {
+      resp[_product_type.productTypeName] = await this.createProductType(_product_type);
     }
+    return resp;
+  }
+
+  /**
+   * Description: This method will store the product type.
+   * @description This method will store the product type.
+   * @param _product_type productType data object
+   * @return productType object
+   */
+  async createProductType(_product_type: ProductType) {
+      return await this.productTypeRepository.save(this.productTypeRepository.create(_product_type));
   }
 
   /**
