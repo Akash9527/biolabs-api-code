@@ -1,16 +1,16 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ListUserPayload } from './list-user.payload';
-
-import { User, UserFillableFields } from './user.entity';
-import { UserToken } from './user-token.entity';
-import { Mail } from '../../../utils/Mail';
-import { EMAIL } from '../../../constants/email';
 import { Request } from 'express';
-import { ResidentCompanyService } from '../resident-company/resident-company.service';
+import { In, Not, Repository } from 'typeorm';
 import { ApplicationConstants } from 'utils/application-constants';
+import { EMAIL } from '../../../constants/email';
+import { Mail } from '../../../utils/Mail';
+import { EmailFrequency } from '../enum/email-frequency-enum';
+import { ResidentCompanyService } from '../resident-company/resident-company.service';
+import { ListUserPayload } from './list-user.payload';
+import { UserToken } from './user-token.entity';
+import { User, UserFillableFields } from './user.entity';
 
 const { info, error, debug } = require('../../../utils/logger');
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
@@ -24,7 +24,7 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserToken)
-    private readonly userTokenRepository: Repository<UserToken>,
+    private readonly userTokenRepository: Repository<UserToken>
   ) { }
 
   /**
@@ -148,10 +148,10 @@ export class UsersService {
         } else {
           delete user.password;
         }
-        if(payload.hasOwnProperty('isRequestedMails')){
+        if (payload.hasOwnProperty('isRequestedMails')) {
           user.isRequestedMails = payload.isRequestedMails;
         }
-        if(payload.mailsRequestType){
+        if (payload.mailsRequestType) {
           user.mailsRequestType = payload.mailsRequestType;
         }
         await this.userRepository.update(user.id, user);
@@ -379,7 +379,6 @@ export class UsersService {
       error("Getting error in generating user token", __filename, "generateToken()");
       throw new BiolabsException('Getting error in generating user token', err.message);
     }
-
   }
 
   /**
@@ -418,5 +417,192 @@ export class UsersService {
       throw new BiolabsException('Getting error in forget password process', err.message);
     }
   }
-  
+
+  // =========================== BIOL-235/BIOL-162 ===========================
+  /**
+   * Description: Fetches sponsor users, fetch their onboared and graduated companies by sites, and send email.
+   * @description Fetches sponsor users, fetch their onboared and graduated companies by sites, and send email.
+   * @param emailFrequency Frequency of sending email like: Weekly, Monthly, Quarterly.
+   */
+  async handleSponsorEmailSchedule(emailFrequency: EmailFrequency) {
+    info(`Fetch sponsor users and company data for email frequency: ${emailFrequency}`, __filename, `handleSponsorEmailSchedule()`);
+
+    try {
+      const sponsorUsers: any = await this.fetchSponsorUsers(emailFrequency).then((result) => {
+        return result;
+      });
+
+      if (sponsorUsers && Array.isArray(sponsorUsers)) {
+        debug(`Fetched sponsor users: ${sponsorUsers.length}`, __filename, `handleSponsorEmailSchedule()`);
+
+        let sitesArrDb: any = await this.residentCompanyService.getAllSites().then((result) => {
+          return result;
+        });
+
+        if (sitesArrDb && Array.isArray(sitesArrDb)) {
+          debug(`Fetched sites from db: ${sitesArrDb.length}`, __filename, `handleSponsorEmailSchedule()`);
+        } else {
+          debug(`Fetched sites from db: ${sitesArrDb}`, __filename, `handleSponsorEmailSchedule()`);
+        }
+
+        for (const user of sponsorUsers) {
+          info(`Fetching company data for userId: ${user.id}`, __filename, `handleSponsorEmailSchedule()`);
+          let onboardedComps = await this.residentCompanyService.fetchOnboardedCompaniesBySiteId(user.site_id, ApplicationConstants.ONBOARDED_COMPANIES, emailFrequency).then((result) => {
+            return result;
+          });
+
+          /** Filter onboarded resident companies by site */
+          let onboardedGroupedCompsObj = await this.prepareFilteredArrayOfResidentComps(onboardedComps, user.site_id, sitesArrDb);
+
+          info(`Filtered onboarded resident companies`, __filename, `handleSponsorEmailSchedule()`);
+
+          let graduatedComps = await this.residentCompanyService.fetchOnboardedCompaniesBySiteId(user.site_id, ApplicationConstants.GRADUATED_COMPANIES, emailFrequency).then((result) => {
+            return result;
+          });
+
+          /** Filter graduated resident companies by site */
+          let graduatedGroupedCompsObj = await this.prepareFilteredArrayOfResidentComps(graduatedComps, user.site_id, sitesArrDb);
+
+          let companiesCount: any = {
+            onboardedCompsCount: 0,
+            graduatedCompsCount: 0
+          };
+
+          if (onboardedComps && Array.isArray(onboardedComps)) {
+            companiesCount.onboardedCompsCount = onboardedComps.length;
+          }
+          if (graduatedComps && Array.isArray(graduatedComps)) {
+            companiesCount.graduatedCompsCount = graduatedComps.length;
+          }
+
+          info(`Filtered onboarded resident companies`, __filename, `handleSponsorEmailSchedule()`);
+
+          /** Send mail to the user */
+          this.sendScheduledMailToSponsor(user, onboardedGroupedCompsObj, graduatedGroupedCompsObj, companiesCount);
+        } //loop
+      } else {
+        error(`Sponsor users found: ${sponsorUsers}`, __filename, `handleSponsorEmailSchedule()`);
+      }
+    } catch (err) {
+      error(`Error in handling scheduled mail sending to sponsor users ${emailFrequency}`, __filename, `handleSponsorEmailSchedule()`);
+      throw new BiolabsException(`Error in handling scheduled mail sending to sponsor users ${emailFrequency}`, err.message);
+    }
+  }
+
+  /**
+   * Description: Prepares filterd array of resident companies by site name.
+   * @description Prepares filterd array of resident companies by site name.
+   * @param residentCompanies Array of resident company objects
+   * @param userSiteIds Site id array of user
+   * @param siteArray Site array 
+   * @returns Filtered array of resident company objects
+   */
+  prepareFilteredArrayOfResidentComps(residentCompanies: any, userSiteIds: number[], siteArray: number[]) {
+    info(`Filtering company data according to sites`, __filename, `prepareFilteredArrayOfResidentComps()`);
+    let residentCompanyObj = {};
+    try {
+      if (residentCompanies && Array.isArray(residentCompanies)) {
+        for (let userSiteId of userSiteIds) {
+          let siteName = this.getSiteNameBySiteId(siteArray, userSiteId);
+          const compsOfSite = residentCompanies.filter((comp) => comp.site.indexOf(userSiteId) >= 0);
+          residentCompanyObj[siteName] = compsOfSite;
+        }
+      } else {
+        error(`Resident companies: ${residentCompanies}`, __filename, `prepareFilteredArrayOfResidentComps()`);
+      }
+    } catch (err) {
+      error(`Error in preparing filtered array.`, __filename, `prepareFilteredArrayOfResidentComps()`);
+      throw new BiolabsException(`Error in preparing filtered array.`, err.message);
+    }
+    return residentCompanyObj;
+  }
+
+  /**
+   * Description: Fetch the Sponsor users who want to receive mails by thier email receiving frequency.
+   * @description Fetch the Sponsor users who want to receive mails by thier email receiving frequency.
+   * @param mailsRequestType Frequency of sending email like: Weekly, Monthly, Quarterly.
+   * @returns list of Sponsor users who wish to receive emails
+   */
+  async fetchSponsorUsers(mailsRequestType: EmailFrequency) {
+    info(`Fetch sponsor users for email frequency: ${mailsRequestType}`, __filename, `fetchSponsorUsers()`);
+    const EXCLUDE_USER_WITH_STATUS = [99, -1]
+    const sponsorUsers = await this.userRepository.find({
+      where: { role: ApplicationConstants.SPONSOR_USER_ROLE, status: Not(In(EXCLUDE_USER_WITH_STATUS)), isRequestedMails: true, mailsRequestType: mailsRequestType }
+    }).then((result) => {
+      return result;
+    }).catch(err => {
+      error(`Error in fetching sponsor users. ${err.message}`, __filename, `fetchSponsorUsers()`);
+      throw new BiolabsException(`Error in fetching sponsor users.`, err.message);
+    });
+    return sponsorUsers;
+  }
+
+  /**
+   * Description: Send mail to Sponsor user with list of onboarded and graduated companies.
+   * @description Send mail to Sponsor user with list of onboarded and graduated companies.
+   * @param user Sponsor User object
+   * @param onboardedCompanies list of onboarded companies
+   * @param graduatedCompanies list of graduated companies
+   */
+  sendScheduledMailToSponsor(user: User, onboardedGroupedCompsObj: any, graduatedGroupedCompsObj: any, companiesCount: any) {
+    info(`Prepare email config data`, __filename, `sendScheduledMailToSponsor()`);
+    try {
+      if (user) {
+        const userInfo = {
+          userName: user.firstName,
+          api_server_origin: process.env.API_SERVER_ORIGIN,
+          ui_server_origin: process.env.UI_SERVER_ORIGIN,
+          onboardedCompsObj: onboardedGroupedCompsObj,
+          graduatedCompsObj: graduatedGroupedCompsObj,
+          companiesCount: companiesCount
+        };
+        let tenant = { tenantEmail: user.email, role: user.role };
+
+        debug(`API server origin in config data : ${userInfo.api_server_origin}`, __filename, `sendScheduledMailToSponsor()`);
+        const currentDate: Date = new Date();
+        this.mail.sendEmail(
+          tenant,
+          ApplicationConstants.EMAIL_SUBJECT_FOR_SPONSOR_SCHEDULED.replace('{0}', this.mail.getFormattedDateDD_Mon_YYYY(currentDate)),
+          ApplicationConstants.EMAIL_PARAM_FOR_SPONSOR_MAIL_SCHEDULED,
+          userInfo,
+        );
+      } else {
+        error(`Not proper user object: ${user}`, __filename, `sendScheduledMailToSponsor()`);
+        throw new NotAcceptableException(
+          `Not proper user object: ${user}`,
+        );
+      }
+    } catch (err) {
+      error(`Error in sending email to sponsor user`, __filename, `sendScheduledMailToSponsor()`);
+      throw new BiolabsException(`Error in sending email to sponsor user.`, err.message);
+    }
+  }
+
+  /**
+   * Description: Filters resident company objects which have the passed site id.
+   * @description Filters resident company objects which have the passed site id. 
+   * @param companies Array of resident company objects
+   * @param siteId A site id
+   * @returns Array of resident companies objects which have passed site id.
+   */
+  filterCompaniesBySiteId(companies: any, siteId: number) {
+    info(`Filtering Error in sending email to sponsor user`, __filename, `sendScheduledMailToSponsor()`);
+    return companies.filter((comp) => comp.site.indexOf(siteId) >= 0);
+  }
+
+  /**
+   * Description: Fetches site name form site array by site id.
+   * @description Fetches site name form site array by site id.
+   * @param siteArrDb Array of site objects.
+   * @param siteId A site id
+   * @returns Site name
+   */
+  getSiteNameBySiteId(siteArrDb: any[], siteId: number) {
+    info(`Fetching site name from site array`, __filename, `getSiteName()`);
+    let filteredArray = siteArrDb.filter((x) => x.id == siteId);
+    if (filteredArray && filteredArray.length) {
+      return filteredArray[0].name;
+    }
+    return null;
+  }
 }
