@@ -2493,7 +2493,7 @@ describe('ResidentCompanyService', () => {
     it('it should return list of onboarded resident companies for weekly frequency', async () => {
 
       jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => createQueryBuilder);
-      let result = await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.ONBOARDED_COMPANIES, EmailFrequency.Weekly);
+      let result = await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.ONBOARDED_COMPANIES, EmailFrequency.Weekly, 'frequency');
       expect(result.length > 0).toBeTruthy();
       expect(result[0].id).toEqual(1);
     });
@@ -2501,7 +2501,7 @@ describe('ResidentCompanyService', () => {
     it('it should return list of graduated resident companies for monthly frequency', async () => {
 
       jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => createQueryBuilder);
-      let result = await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.GRADUATED_COMPANIES, EmailFrequency.Monthly);
+      let result = await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.GRADUATED_COMPANIES, EmailFrequency.Monthly, 'frequency');
       expect(result.length > 0).toBeTruthy();
       expect(result[0].id).toEqual(1);
     });
@@ -2509,7 +2509,7 @@ describe('ResidentCompanyService', () => {
     it('it should return list of onboarded resident companies for quarterly frequency', async () => {
 
       jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => createQueryBuilder);
-      let result = await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.GRADUATED_COMPANIES, EmailFrequency.Quarterly);
+      let result = await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.GRADUATED_COMPANIES, EmailFrequency.Quarterly, 'frequency');
       expect(result.length > 0).toBeTruthy();
       expect(result[0].id).toEqual(1);
     });
@@ -2517,7 +2517,7 @@ describe('ResidentCompanyService', () => {
     it('it should throw BiolabsException', async () => {
       jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockReturnValue(new BiolabsException('Error in fetching data for ONBOARDED_COMPANIES for sponsor user.'));
       try {
-        await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.ONBOARDED_COMPANIES, EmailFrequency.Weekly);
+        await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.ONBOARDED_COMPANIES, EmailFrequency.Weekly, 'frequency');
       } catch (e) {
         expect(e.name).toBe('BiolabsException');
         expect(e instanceof BiolabsException).toBeTruthy();

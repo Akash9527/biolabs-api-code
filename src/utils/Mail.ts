@@ -955,7 +955,7 @@ export class Mail {
          } else if (userInfo.companiesCount.graduatedCompsCount && userInfo.companiesCount.graduatedCompsCount > 1) {
             return ApplicationConstants.EMAIL_TEXT_RECENTLY_GRADUATED_COMPANIES.replace('{0}', userInfo.companiesCount.graduatedCompsCount).replace('{1}', ':');
          } else {
-            return ApplicationConstants.EMAIL_TEXT_RECENTLY_GRADUATED_COMPANIES.replace('{0}', 'No').replace('{1}', '.');
+            return ''; //Dont show anything if no companies have recently graduated
          }
       }
    }

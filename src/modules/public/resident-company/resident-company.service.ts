@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotAcceptableException, Request } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EMAIL } from 'constants/email';
-import { In, Like, Repository } from 'typeorm';
+import { In, Like, Repository, SelectQueryBuilder } from 'typeorm';
 import { ApplicationConstants } from 'utils/application-constants';
 import { Mail } from '../../../utils/Mail';
 import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
@@ -394,14 +394,14 @@ export class ResidentCompanyService {
             primarySite.push(res[0].sitename);
           });
       }
-      
+
       for (let s in req.body.sitesApplied) {
         await this.siteRepository
           .query(`select name as siteName from sites where id = ${req.body.sitesApplied[s]}`).then(res => {
             sitesApplied.push(res[0].sitename);
           });
       }
-      
+
       userInfo = {
         token: req.headers.authorization,
         company_name: companyName,
@@ -2509,7 +2509,7 @@ order by quat;
    * @param frequency Weekly, Monthly, Quarterly to fetch recently onboarded and graduated companies.
    * @returns list of resident companies
    */
-  async fetchOnboardedCompaniesBySiteId(siteIds: number[], forWhat: string, frequency: EmailFrequency) {
+  async fetchOnboardedCompaniesBySiteId(siteIds: number[], forWhat: string, frequency: EmailFrequency, by: string) {
     info(`Fetching ${forWhat} data for sites: ${siteIds}, for frequency: ${frequency}`, __filename, `fetchOnboardedCompaniesBySiteId()`);
 
     const currentDate = new Date();
@@ -2517,6 +2517,7 @@ order by quat;
     const DAYS_7 = 7;
     const MONTHS_3 = 3;
     const MONTHS_1 = 1;
+    const LAST_RECORD_LIMIT: number = 3;
 
     if (frequency == EmailFrequency.Weekly) {
       frequencyDate = new Date(currentDate.setDate(currentDate.getDate() - DAYS_7)); //7 Days
@@ -2541,16 +2542,58 @@ order by quat;
 
       if (forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
         residentCompanyQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: true });
-        residentCompanyQuery.andWhere("CAST(resident_companies.companyOnboardingDate AS Date) >= :theDate", { theDate: frequencyDate })
+        if (by == 'frequency') {
+          residentCompanyQuery.andWhere("CAST(resident_companies.companyOnboardingDate AS Date) >= :theDate", { theDate: frequencyDate });
+        } else {
+          residentCompanyQuery.orderBy("resident_companies.companyOnboardingDate", "DESC");
+          residentCompanyQuery.limit(LAST_RECORD_LIMIT);
+        }
       } else if (forWhat == ApplicationConstants.GRADUATED_COMPANIES) {
         residentCompanyQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: 4 });
-        residentCompanyQuery.andWhere("CAST(resident_companies.companyStatusChangeDate AS Date) >= :theDate", { theDate: frequencyDate })
+        if (by == 'frequency') {
+          residentCompanyQuery.andWhere("CAST(resident_companies.companyStatusChangeDate AS Date) >= :theDate", { theDate: frequencyDate });
+        } else {
+          residentCompanyQuery.orderBy("resident_companies.companyStatusChangeDate", "DESC");
+          residentCompanyQuery.limit(LAST_RECORD_LIMIT);
+        }
       }
       debug(`Executing query for ${forWhat}, query: ${residentCompanyQuery}`, __filename, `fetchOnboardedCompaniesBySiteId()`);
-      return await residentCompanyQuery.getRawMany();
+      // return await residentCompanyQuery.getRawMany();
+      let resp: any = await residentCompanyQuery.getRawMany();
+      console.log('resP1 ', resp);
+      if (resp && resp.length == 0 && by == 'frequency') {
+        by = 'lastThree';
+        resp = this.fetchOnboardedCompaniesBySiteId(siteIds, forWhat, frequency, by).then((result) => {
+          return result;
+        });
+        console.log('resP2 ', resp);
+      }
+      return resp;
     } catch (err) {
       error(`Error in fetching data for ${forWhat} for sponsor user. ${err.message}`, __filename, "fetchOnboardedCompaniesBySiteId()");
       throw new BiolabsException(`Error in fetching data for ${forWhat} for sponsor user.`, err.message);
+    }
+  }
+  // rcQuery.orderBy("resident_companies.companyStatusChangeDate", "DESC");
+
+  async getQueryPrepared(siteIds: number[], forWhat: string, frequencyDate: Date) {
+    let residentCompanyQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies").
+      select("resident_companies.id", "id")
+      .addSelect("resident_companies.companyName", "companyName")
+      .addSelect("resident_companies.logoImgUrl", "logoUrl")
+      .addSelect("resident_companies.companyOnboardingStatus", "onboardingStatus")
+      .addSelect("resident_companies.companyOnboardingDate", "onboardingDate")
+      .addSelect("resident_companies.companyStatus", "companyStatus")
+      .addSelect("resident_companies.companyStatusChangeDate", "statusChangeDate")
+      .addSelect("resident_companies.site", "site")
+      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIds });
+
+    if (forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
+      residentCompanyQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: true });
+      residentCompanyQuery.andWhere("CAST(resident_companies.companyOnboardingDate AS Date) >= :onboardingDate", { onboardingDate: frequencyDate })
+    } else if (forWhat == ApplicationConstants.GRADUATED_COMPANIES) {
+      residentCompanyQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: 4 });
+      residentCompanyQuery.andWhere("CAST(resident_companies.companyStatusChangeDate AS Date) >= :theDate", { theDate: frequencyDate })
     }
   }
 
@@ -2565,9 +2608,6 @@ order by quat;
       select: ["id", "name"]
     }).then((result) => {
       return result;
-    }).catch((err) => {
-      error(`Error in fetching all sites. ${err.message}`, __filename, "getAllSites()");
-      throw new BiolabsException(`Error in fetching all sites.`, err.message);
     });
     return sites;
   }

@@ -447,7 +447,7 @@ export class UsersService {
 
         for (const user of sponsorUsers) {
           info(`Fetching company data for userId: ${user.id}`, __filename, `handleSponsorEmailSchedule()`);
-          let onboardedComps = await this.residentCompanyService.fetchOnboardedCompaniesBySiteId(user.site_id, ApplicationConstants.ONBOARDED_COMPANIES, emailFrequency).then((result) => {
+          let onboardedComps = await this.residentCompanyService.fetchOnboardedCompaniesBySiteId(user.site_id, ApplicationConstants.ONBOARDED_COMPANIES, emailFrequency, 'frequency').then((result) => {
             return result;
           });
 
@@ -456,7 +456,7 @@ export class UsersService {
 
           info(`Filtered onboarded resident companies`, __filename, `handleSponsorEmailSchedule()`);
 
-          let graduatedComps = await this.residentCompanyService.fetchOnboardedCompaniesBySiteId(user.site_id, ApplicationConstants.GRADUATED_COMPANIES, emailFrequency).then((result) => {
+          let graduatedComps = await this.residentCompanyService.fetchOnboardedCompaniesBySiteId(user.site_id, ApplicationConstants.GRADUATED_COMPANIES, emailFrequency, 'frequency').then((result) => {
             return result;
           });
 
