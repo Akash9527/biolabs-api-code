@@ -62,7 +62,7 @@ export class User {
   })
   password: string;
 
-  @Column({ length: 255, enum: ['0', '1', '2'], default: '0' })
+  @Column({ length: 255, enum: ['0', '1', '2'], default: '1' })
   mailsRequestType: emailRequestType;
 
   @Column({ default: null })

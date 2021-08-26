@@ -60,8 +60,13 @@ export class Mail {
       }
 
       if (userInfo && userInfo.sitesApplied) {
-         for (let i = 0; i < userInfo.sitesApplied.length; i++) {
-            sitesAppliedList += `<li> ${userInfo.sitesApplied[i]} </li>`;
+         if (userInfo.sitesApplied.length > 0) {
+            for (let i = 0; i < userInfo.sitesApplied.length; i++) {
+               sitesAppliedList += `<li> ${userInfo.sitesApplied[i]} </li>`;
+            }
+            sitesAppliedList = `</p> <ul style="color=#000000;"> ${sitesAppliedList} </ul>`
+         } else {
+            sitesAppliedList += `<label style="color=#000000;">N/A</label> </p>`
          }
       }
 
@@ -663,9 +668,7 @@ export class Mail {
          }
       } else if (content == ApplicationConstants.EMAIL_PARAM_FOR_SPONSOR_MAIL_SCHEDULED) {
          debug(`Preparing html to send mail to sponsor users as scheduled`, __filename, `sendEmailGraphAPI()`);
-         // let loginLink = userInfo.ui_server_origin + 'login';
          let htmlOnboarded = this.getCompanyDataHtmlTable(userInfo, ApplicationConstants.ONBOARDED_COMPANIES);
-         // console.log(htmlOnboarded);
          data = {
             message: {
                subject: subject,
@@ -808,7 +811,7 @@ export class Mail {
                      rowData +=
                         `<tr>
                               <td style="width:18%">
-                                 <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
+                                 <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, userInfo.ui_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
                               <td style="width:42%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.companyName}</a>
@@ -872,7 +875,7 @@ export class Mail {
                      rowData +=
                         `<tr>
                               <td style="width:18%">
-                                 <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
+                                 <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, userInfo.ui_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
                               <td style="width:42%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.companyName}</a>
@@ -906,12 +909,13 @@ export class Mail {
     * @param company Resident company object
     * @returns The company logo url
     */
-   prepareCompanyLogoUrl(origin: string, company: any) {
-      info(`Prepare company logo url, origin ${origin}`, __filename, `prepareCompanyLogoUrl()`);
+   prepareCompanyLogoUrl(apiServerOrigin: string, uiServerOrigin: string, company: any) {
+      info(`Prepare company logo url, origin ${apiServerOrigin}`, __filename, `prepareCompanyLogoUrl()`);
       if (company && company.logoUrl) {
-         return `${origin}${ApplicationConstants.LOGO_PATH}${company.logoUrl}`;
+         return `${apiServerOrigin}${ApplicationConstants.LOGO_PATH}${company.logoUrl}`;
+      } else {
+         return `${uiServerOrigin}${ApplicationConstants.DEFAULT_COMPANY_LOGO_PATH}`;
       }
-      return null;
    }
 
    /**
