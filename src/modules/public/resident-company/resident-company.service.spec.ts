@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { Repository, SelectQueryBuilder } from "typeorm";
 import { ResidentCompany } from "./resident-company.entity";
 import { ResidentCompanyService } from "./resident-company.service";
 import { Test } from '@nestjs/testing';
@@ -34,6 +34,8 @@ import { UpdateSpaceChangeWaitlistDto } from "../dto/update-space-change-waitlis
 import { AddSpaceChangeWaitlistDto } from "../dto/add-space-change-waitlist.dto";
 import { NotAcceptableException } from "@nestjs/common";
 import { UpdateNotesDto } from "./update-notes.dto";
+import { ApplicationConstants } from "../../../utils/application-constants";
+import { EmailFrequency } from "../enum/email-frequency-enum";
 const { InternalException, HttpException, BiolabsException } = require('../../common/exception/biolabs-error');
 const mockCompany: any = { id: 1 };
 const mockAddResidentCompany: AddResidentCompanyPayload = {
@@ -2466,9 +2468,86 @@ describe('ResidentCompanyService', () => {
       expect(siteResult).toStrictEqual(categoryStats);
     });
   });
+
+
+
+
+
+
+
+  /** *********** BIOL-235/BIOL-162 ************** */
+  describe('fetchOnboardedCompaniesBySiteId() method', () => {
+
+    const mockRcArray: any[] = [];
+    mockRcArray.push(mockRC);
+
+    const createQueryBuilder: any = {
+      select: () => createQueryBuilder,
+      addSelect: () => createQueryBuilder,
+      groupBy: () => createQueryBuilder,
+      where: () => createQueryBuilder,
+      andWhere: () => createQueryBuilder,
+      getRawMany: () => mockRcArray,
+    };
+
+    it('it should return list of onboarded resident companies for weekly frequency', async () => {
+
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => createQueryBuilder);
+      let result = await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.ONBOARDED_COMPANIES, EmailFrequency.Weekly);
+      expect(result.length > 0).toBeTruthy();
+      expect(result[0].id).toEqual(1);
+    });
+
+    it('it should return list of graduated resident companies for monthly frequency', async () => {
+
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => createQueryBuilder);
+      let result = await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.GRADUATED_COMPANIES, EmailFrequency.Monthly);
+      expect(result.length > 0).toBeTruthy();
+      expect(result[0].id).toEqual(1);
+    });
+
+    it('it should return list of onboarded resident companies for quarterly frequency', async () => {
+
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => createQueryBuilder);
+      let result = await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.GRADUATED_COMPANIES, EmailFrequency.Quarterly);
+      expect(result.length > 0).toBeTruthy();
+      expect(result[0].id).toEqual(1);
+    });
+
+    it('it should throw BiolabsException', async () => {
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockReturnValue(new BiolabsException('Error in fetching data for ONBOARDED_COMPANIES for sponsor user.'));
+      try {
+        await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.ONBOARDED_COMPANIES, EmailFrequency.Weekly);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toEqual('Error in fetching data for ONBOARDED_COMPANIES for sponsor user.');
+      }
+    });
+  });
+
+  describe('getAllSites() method', () => {
+    let mockSites: Array<any> = [{ "id": 2, "name": "Ipsen" }, { "id": 1, "name": "Tufts" }];
+
+    it('it should return list of site objects', async () => {
+      jest.spyOn(siteRepository, 'find').mockResolvedValueOnce(mockSites);
+
+      let result = await residentCompanyService.getAllSites();
+
+      expect(result.length > 0).toBeTruthy();
+      expect(result[0].id).toEqual(2);
+      expect(result[0].name).toEqual('Ipsen');
+    });
+
+    it('it should throw BiolabsException', async () => {
+      jest.spyOn(siteRepository, 'find').mockRejectedValueOnce(new BiolabsException('Error in fetching all sites.'));
+      try {
+        await residentCompanyService.getAllSites();
+      } catch (err) {
+        expect(err instanceof BiolabsException).toBeTruthy();
+        expect(err.message).toEqual('Error in fetching all sites.');
+      }
+    });
+  });
+
 });
-
-
-
-
-

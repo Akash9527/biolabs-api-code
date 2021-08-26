@@ -813,10 +813,10 @@ export class Mail {
                      rowData +=
                         `<tr>
                               <td style="width:18%">
-                                 <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, company)}" alt="${company.name}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
+                                 <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
                               <td style="width:42%; padding-top:5px; padding-bottom:5px;">
-                                 <a href = "${companyUrl}">${company.name}</a>
+                                 <a href = "${companyUrl}">${company.companyName}</a>
                               </td>
                               <td style="width:40%">
                                  ${siteName}
@@ -877,10 +877,10 @@ export class Mail {
                      rowData +=
                         `<tr>
                               <td style="width:18%">
-                                 <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, company)}" alt="${company.name}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
+                                 <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
                               <td style="width:42%; padding-top:5px; padding-bottom:5px;">
-                                 <a href = "${companyUrl}">${company.name}</a>
+                                 <a href = "${companyUrl}">${company.companyName}</a>
                               </td>
                               <td style="width:40%">
                                 ${siteName}
