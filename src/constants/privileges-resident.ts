@@ -19,7 +19,41 @@ export const RESIDENT_ACCESSLEVELS = {
       create: false,
       view: false,
       update: false,
-      delete: false
+      delete: false,
+      child: {
+        'sponsor': {
+          name: 'Sponsor',
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
+        },
+        'search': {
+          name: 'Resident Companies',
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
+        },
+        'explore': {
+          name: 'Explore Page',
+          action: false,
+          create: false,
+          view: false,
+          update: false,
+          delete: false,
+          dynamic: {
+            name: 'Dynamic Numeric Value',
+            action: false,
+            create: false,
+            view: false,
+            update: false,
+            delete: false
+          }
+        }
+      }
     },
     'application-form': {
       name: 'Application Form',
