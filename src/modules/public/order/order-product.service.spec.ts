@@ -62,10 +62,11 @@ const mockRC: ResidentCompany = {
     "committeeStatus": null,
     "selectionDate": new Date("2021-07-05T18:30:00.000Z"),
     "companyStatusChangeDate": 2021,
-    "primarySite": [1,2],
-    "sitesApplied": [1,2],
-    "notes" : [{}as Notes],
-    "spaceChangeWaitlist": [{} as SpaceChangeWaitlist]
+    "primarySite": [1, 2],
+    "sitesApplied": [1, 2],
+    "notes": [{} as Notes],
+    "spaceChangeWaitlist": [{} as SpaceChangeWaitlist],
+    "companyOnboardingDate": 0
 }
 
 const mockResidentService = () => ({

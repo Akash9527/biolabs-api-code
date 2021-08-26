@@ -205,7 +205,8 @@ describe('ResidentCompanyController', () => {
             "companyOnboardingStatus": true,
             "committeeStatus": "2",
             "selectionDate": new Date("2021-07-14"),
-            "companyStatusChangeDate": new Date("2021-07-14")
+            "companyStatusChangeDate": new Date("2021-07-14"),
+            "companyOnboardingDate": new Date()
         };
         it('it should called residentService updateResidentCompanyStatus method ', async () => {
             await residentController.updateResidentCompanyStatus(mockUpdateResidentCompanyStatusPayload);
