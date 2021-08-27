@@ -22,7 +22,7 @@ export const SPONSOR_ACCESSLEVELS = {
       delete: true,
       child: {
         'sponsor': {
-          name: 'Sponser',
+          name: 'Sponsor',
           action: true,
           create: true,
           view: true,
