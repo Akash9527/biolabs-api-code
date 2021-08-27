@@ -106,6 +106,7 @@ describe('UserService', () => {
                     useValue:
                     {
                         findOne: jest.fn(),
+                        find: jest.fn(),
                         create: jest.fn(() => mockUser),
                         save: jest.fn(),
                         update: jest.fn(),
@@ -530,6 +531,53 @@ describe('UserService', () => {
                 expect(e.name).toBe('BiolabsException');
                 expect(e instanceof BiolabsException).toBeTruthy();  
                 expect(e.message).toBe('Error in soft delete user');
+            }
+        });
+    });
+    describe('getSiteNameBySiteId method', () => {
+        it('should call getSiteNameBySiteId method', async () => {
+            expect(await userService.getSiteNameBySiteId([1,2], 1)).toBeDefined();
+        })
+    });
+    describe('fetchSponsorUsers method', () => {
+        const mockSponsorList:any=[
+            {
+             id: 1,
+             role: 3,
+             site_id: [ 2, 1 ],
+             companyId: null,
+             email: 'spo_week@mailinator.com',
+             firstName: 'SpoWeek',
+             lastName: 'Week',
+             title: 'Sponsor User',
+             phoneNumber: '8787875487',
+             status: '1',
+             imageUrl: null,
+             userType: '4',
+             mailsRequestType: '0',
+             isRequestedMails: true,
+             createdAt: 2021,
+             updatedAt: 2021,
+             
+           }
+        ]
+        it('should call fetchSponsorUsers method', async () => {
+           
+            jest.spyOn(userRepository,'find').mockResolvedValueOnce(mockSponsorList);
+            let result=await userService.fetchSponsorUsers(1);
+            expect(result).not.toBeUndefined();
+            expect(result).not.toBeNull();
+            expect(result.length).toEqual(mockSponsorList.length)
+            
+        })
+        it('should throw error when  fetching sponsor users.', async () => {
+            jest.spyOn(userRepository,'find').mockRejectedValueOnce(mockSponsorList);
+            try {
+                await userService.fetchSponsorUsers(1);
+            } catch (e) {
+                expect(e.name).toBe('BiolabsException');
+                expect(e instanceof BiolabsException).toBeTruthy();
+                expect(e.message).toEqual("Error in fetching sponsor users.");
             }
         });
     });
