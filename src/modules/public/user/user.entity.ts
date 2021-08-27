@@ -11,6 +11,7 @@ import { PasswordTransformer } from './password.transformer';
  */
 type status_enum = '-1' | '0' | '1' | '99';
 type user_type = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
+type emailRequestType = '0' | '1' | '2';
 
 @Entity({
   name: 'users',
@@ -60,6 +61,12 @@ export class User {
     select: false
   })
   password: string;
+
+  @Column({ length: 255, enum: ['0', '1', '2'], default: '1' })
+  mailsRequestType: emailRequestType;
+
+  @Column({ default: null })
+  isRequestedMails: boolean;
 
   toJSON() {
     const { ...self } = this;
