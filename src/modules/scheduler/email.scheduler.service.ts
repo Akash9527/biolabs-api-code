@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { EmailFrequency } from 'modules/public/enum/email-frequency-enum';
 import { UsersService } from 'modules/public/user';
 const { info, error, debug } = require('../../utils/logger');
