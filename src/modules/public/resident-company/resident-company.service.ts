@@ -2532,7 +2532,7 @@ order by quat;
     try {
       let residentCompanyQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies").
         select("resident_companies.id", "id")
-        .addSelect("resident_companies.name", "name")
+        .addSelect("resident_companies.companyName", "companyName")
         .addSelect("resident_companies.logoImgUrl", "logoUrl")
         .addSelect("resident_companies.companyOnboardingStatus", "onboardingStatus")
         .addSelect("resident_companies.companyOnboardingDate", "onboardingDate")
@@ -2552,7 +2552,7 @@ order by quat;
       return await residentCompanyQuery.getRawMany();
     } catch (err) {
       error(`Error in fetching data for ${forWhat} for sponsor user. ${err.message}`, __filename, "fetchOnboardedCompaniesBySiteId()");
-      throw new BiolabsException(`rror in fetching data for ${forWhat} for sponsor user.`, err.message);
+      throw new BiolabsException(`Error in fetching data for ${forWhat} for sponsor user.`, err.message);
     }
   }
 
