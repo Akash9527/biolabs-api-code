@@ -106,9 +106,9 @@ export class MasterService {
       } else {
         error(`Error in creating product types.`, __filename, `createProductType()`);
       }
-    } catch (error) {
-      if (error) {
-        error(`Error in creating product types. ${error.message}`, __filename, `createProductType()`);
+    } catch (err) {
+      if (err) {
+        error(`Error in creating product types. ${err.message}`, __filename, `createProductType()`);
       }
     }
     return resp;
