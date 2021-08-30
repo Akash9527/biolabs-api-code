@@ -489,6 +489,10 @@ export class ResidentCompanyService {
         }
         rcQuery.skip(skip).take(take)
       }
+      // BIOL-372
+      if(!payload.companyStatus){
+         rcQuery.andWhere("resident_companies.companyStatus != '3'")
+      }
       return await rcQuery.getRawMany();
     } catch (err) {
       error("Error in find resident companies", __filename, "getResidentCompanies()");
