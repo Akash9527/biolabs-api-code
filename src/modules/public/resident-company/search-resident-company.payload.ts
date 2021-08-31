@@ -2,9 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, Min, ValidateIf } from 'class-validator';
 import { GreaterThanEqualsTo } from '../../common/validator/greater-than-equals-to.validator';
 import { LessThanEqualsTo } from '../../common/validator/less-than-equals-to.validator';
+import {MemberShipStatus} from '../enum/memberShipStatus'
 
 type company_status = '0' | '1' | '2' | '3' | '4' | '5';
-type sortOrderType = 'ASC' | 'DESC'
+type sortOrderType = 'ASC' | 'DESC';
 export class SearchResidentCompanyPayload {
   @ApiProperty({
     required: false,
@@ -120,5 +121,10 @@ export class SearchResidentCompanyPayload {
   @ValidateIf(o => o.sort == 'true')
   @IsNotEmpty()
   sortOrder: sortOrderType;
+
+  @ApiProperty({
+    required: false,
+  })
+  memberShip: MemberShipStatus;
 
 }
