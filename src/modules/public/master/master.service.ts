@@ -43,7 +43,6 @@ export class MasterService {
     private readonly productTypeRepository: Repository<ProductType>,
   ) { }
 
-
   /**
    * Description: This method will return the sites list.
    * @description This method will return the sites list.
@@ -96,23 +95,25 @@ export class MasterService {
   /**
    * Description: This method will store the Product information.
    * @description This method will store the Product information.
-   * @return array of product object 
+   * @return array of product object
    */
-  async createProductType(migrationData: any) {
-    info("creating product type", __filename, "createProductType()");
+  async createProductTypes(migrationData: any) {
+  let resp = {};
     try {
-      const productType = await this.productTypeRepository.find();
-      const ptypeData = migrationData["productTypeName"]
-      if (!productType || productType.length == 0) {
-        for (let index = 0; index < ptypeData.length; index++) {
-          const productType = ptypeData[index];
-          await this.productTypeRepository.save(this.productTypeRepository.create(productType));
+      const ptypeData = migrationData["productTypeName"];
+      if (ptypeData) {
+        for (const ptypeDataObj of ptypeData) {
+          resp[ptypeDataObj.productTypeName] = await this.productTypeRepository.save(this.productTypeRepository.create(ptypeDataObj));
         }
+      } else {
+        error(`Error in creating product types.`, __filename, `createProductType()`);
       }
     } catch (err) {
-      error("Error in creating product type" + err.message, __filename, "createSite()");
-      throw new InternalException(err.message);
+      if (err) {
+        error(`Error in creating product types. ${err.message}`, __filename, `createProductType()`);
+      }
     }
+    return resp;
   }
 
   /**
