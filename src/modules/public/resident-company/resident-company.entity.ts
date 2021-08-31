@@ -121,6 +121,9 @@ export class ResidentCompany {
   @Column({ default: false })
   companyOnboardingStatus: boolean;
 
+  @CreateDateColumn({ type: "timestamp" })
+  companyOnboardingDate: number;
+
   @Column({ length: 1000, default: null, nullable: true })
   elevatorPitch: string;
 
@@ -191,10 +194,11 @@ export class ResidentCompany {
   @Column({ length: 255, nullable: true })
   logoImgUrl: string;
 
-  @Column({nullable:true})
+ 
+  @Column({nullable:true, default:'0'}) 
   committeeStatus: committee_status;
 
-  @UpdateDateColumn({ type: 'timestamptz'})
+  @UpdateDateColumn({ type: 'timestamptz',nullable: true})
   selectionDate: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -205,6 +209,12 @@ export class ResidentCompany {
 
   @OneToMany(() => SpaceChangeWaitlist , (spaceChangeWaitlist) => spaceChangeWaitlist.residentCompany)
   spaceChangeWaitlist?: SpaceChangeWaitlist[];
+  
+  @Column("int", { array: true, nullable: true })
+  sitesApplied: number[];
+  
+  @Column("int", { array: true, nullable: true })
+  primarySite: number[];
 }
 
 export class ResidentCompanyFillableFields {

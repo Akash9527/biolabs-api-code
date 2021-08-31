@@ -199,11 +199,17 @@ export class ResidentCompanyHistory {
   @Column({nullable:true})
   committeeStatus: committee_status;
 
-  @UpdateDateColumn({ type: 'timestamptz'})
+  @UpdateDateColumn({ type: 'timestamptz',nullable:true})
   selectionDate: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
   companyStatusChangeDate: number;
+  
+  @Column("int", { array: true, nullable: true })
+  sitesApplied: number[];
+  
+  @Column("int", { array: true, nullable: true })
+  primarySite: number[];
 }
 
 export class ResidentCompanyHistoryFillableFields {

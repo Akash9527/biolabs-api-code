@@ -4,22 +4,23 @@ import { SITE_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-site-admi
 import { SPONSOR_ACCESSLEVELS } from '../../../constants/privileges-sponsor';
 import { SUPER_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-super-admin';
 import { Hash } from '../../../utils/Hash';
-import { ConfigService } from '../../config';
 import { User, UsersService } from '../user';
 import { LoginPayload } from './login.payload';
 import { MasterService } from '../master';
 import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
+import { refreshTokenPayload } from './refreshToken.payload';
+import { DatabaseService } from '../master/db-script.service';
 const { info } = require('../../../utils/logger');
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
     private readonly userService: UsersService,
     private readonly masterService: MasterService,
-    private readonly residentCompanyService: ResidentCompanyService
+    private readonly residentCompanyService: ResidentCompanyService,
+    private readonly databaseService:DatabaseService
   ) { }
 
   /**
@@ -36,8 +37,9 @@ export class AuthService {
     await this.masterService.createBiolabsSources(fileData);
     await this.masterService.createCategories(fileData);
     await this.masterService.createTechnologyStages(fileData);
-    await this.masterService.createProductType(fileData);
+    await this.masterService.createProductTypes(fileData);
     await this.createSuperAdmin(fileData);
+    await this.databaseService.executeScript();
   }
 
   /**
@@ -47,10 +49,7 @@ export class AuthService {
    */
   private async createSuperAdmin(migrationData: any) {
     info("Creating application super admin user with all sites access", __filename, "createSuperAdmin()");
-    const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
-    if (!superAdmin) {
-      await this.userService.create(migrationData['superadmin']);
-    }
+    await this.userService.create(migrationData['superadmin'], migrationData['sites']);
   }
 
   /**
@@ -99,7 +98,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials!');
     }
     if (user.companyId) {
-      const company = await this.residentCompanyService.getResidentCompany(user.companyId);
+      const company = await this.residentCompanyService.getResidentCompany(user.companyId, null);
       if (company)
         user.company = company;
     }
@@ -125,5 +124,26 @@ export class AuthService {
    */
   async forgotPassword(payload, req) {
     return this.userService.forgotPassword(payload, req);
+  }
+
+
+  /**
+   * Description: This method is used to decode the token.
+   * @description This method is used to decode the token.
+   * @param payload object of refreshTokenPayload
+   * @return user object
+   */
+   async decodeToken(payload: refreshTokenPayload): Promise<any> {
+     const token= this.jwtService.decode(payload.accessToken)
+     const user: any = await this.userService.get(token['id'])
+    if (!user || user.status != '1') {
+      throw new UnauthorizedException('Invalid token!');
+    }
+    if (user.companyId) {
+      const company = await this.residentCompanyService.getResidentCompany(user.companyId, null);
+      if (company)
+        user.company = company;
+    }
+    return user;
   }
 }
