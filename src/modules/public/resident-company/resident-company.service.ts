@@ -330,8 +330,9 @@ export class ResidentCompanyService {
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
 
+          /** feature/BIOL-371 New applications will not create an entry on the waitlist. */
           /** Create waitlist entry while saving Resident Company */
-          await this.addResidentCompanyDataInWaitlist(savedRc);
+          // await this.addResidentCompanyDataInWaitlist(savedRc);
         }
       }
       await this.sendEmailToSiteAdmin(sites, req, payload.companyName, savedResidentCompanyId, ApplicationConstants.EMAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION);
@@ -2065,6 +2066,7 @@ order by quat;
       let waitlistQuery = await this.spaceChangeWaitlistRepository.createQueryBuilder("space_change_waitlist")
         .select("space_change_waitlist.*")
         .addSelect("rc.companyName", "residentCompanyName")
+        .addSelect("rc.companyStatus", "companyStatus")
         .addSelect("u.firstName", "firstName")
         .addSelect("u.lastName", "lastName")
         .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
