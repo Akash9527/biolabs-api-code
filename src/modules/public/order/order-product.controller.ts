@@ -40,9 +40,14 @@ export class OrderProductController {
     return await this.orderProductService.updateOrderProduct(id, payload);
   }
 
-  /**
+ /**
   * Description: This method is used to fetch a resident company order product details of given month and year.
   * @description This method is used to fetch a resident company order product details of given month and year.
+  * @param companyId Id of the company
+  * @param month month value in numeric
+  * @param year year value
+  * @param req Request object
+  * @returns Resident company order product details
   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -50,12 +55,15 @@ export class OrderProductController {
   @ApiResponse({ status: 200, description: 'Successful Response' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiQuery({ name: 'companyId', required: true, type: 'string' })
-  async fetchOrderProductsBetweenDates(@Query('companyId') companyId: number, @Query('month') month: number, @Query('year') year: number): Promise<any> {
-    return await this.orderProductService.fetchOrderProductsBetweenDates(month, year, companyId);
+  async fetchOrderProductsBetweenDates(@Query('companyId') companyId: number, @Query('month') month: number, @Query('year') year: number, @Request() req): Promise<any> {
+    let siteIdArr = req.user.site_id;
+    if (req.headers['x-site-id']) {
+      siteIdArr = JSON.parse(req.headers['x-site-id'].toString());
+    }
+    return await this.orderProductService.fetchOrderProductsBetweenDates(month, year, companyId, siteIdArr);
   }
 
-
-  /**
+/**
  * Description: This method is used to delete a resident company order product details .
  * @description This method is used to delete a resident company order product details .
  */

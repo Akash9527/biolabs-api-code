@@ -204,6 +204,12 @@ export class ResidentCompanyHistory {
 
   @CreateDateColumn({ type: 'timestamp' })
   companyStatusChangeDate: number;
+  
+  @Column("int", { array: true, nullable: true })
+  sitesApplied: number[];
+  
+  @Column("int", { array: true, nullable: true })
+  primarySite: number[];
 }
 
 export class ResidentCompanyHistoryFillableFields {

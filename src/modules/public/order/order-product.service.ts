@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
-import { ResidentCompany } from '../resident-company';
+import { ResidentCompany, ResidentCompanyService } from '../resident-company';
 import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { OrderProduct } from './model/order-product.entity';
@@ -20,7 +20,8 @@ export class OrderProductService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(ResidentCompany)
     private readonly residentCompanyRepository: Repository<ResidentCompany>,
-    private readonly moduleRef: ModuleRef
+    private readonly moduleRef: ModuleRef,
+    private readonly residentCompanyService: ResidentCompanyService
   ) { }
 
   /**
@@ -32,6 +33,8 @@ export class OrderProductService {
   async addOrderProduct(orderProduct: CreateOrderProductDto) {
     info("Add order product ProductName:" + orderProduct.productName, __filename, "addOrderProducts()")
     try {
+      let submittedDate = orderProduct.submittedDate;
+      delete orderProduct.submittedDate;
       const todayDate = new Date();
       // checking StartDate
       if (orderProduct.startDate && isNaN(Date.parse(orderProduct.startDate))) {
@@ -74,6 +77,7 @@ export class OrderProductService {
         /**
          * Add next 4 months Products
          */
+        orderProduct.submittedDate=submittedDate;
         await this.addFutureOrderProducts(orderProduct);
       }
       return { message: 'Added successfully', status: 'success' };
@@ -86,7 +90,12 @@ export class OrderProductService {
   private async addFutureOrderProducts(orderProduct: any) {
     info("Add future order products", __filename, "addFutureOrderProducts()")
     let futureOrderProduct = { ...orderProduct };
-    for (let i = 1; i < 4; i++) {
+    const todayDate = new Date();
+    let today = new Date(`${todayDate.getMonth() + 1}/01/${todayDate.getFullYear()} 00:00:00`);
+    let diffMonthsToCurrent = this.monthDiff(today, new Date(futureOrderProduct.startDate ? 
+      futureOrderProduct.startDate : futureOrderProduct.submittedDate));
+    let recursiveLength = 4 - (Number(diffMonthsToCurrent) - 1);
+    for (let i = 1; i < recursiveLength; i++) {
       if (futureOrderProduct.month < 12) {
         futureOrderProduct.month = futureOrderProduct.month + 1;
       } else {
@@ -183,8 +192,18 @@ export class OrderProductService {
    * @param endDate 
    * @returns 
    */
-  async fetchOrderProductsBetweenDates(month: number, year: number, companyId: number) {
-    info(`Fetch Order product between dates : ${month} companyId: ${companyId}`, __filename, "fetchOrderProductsBetweenDates()")
+  async fetchOrderProductsBetweenDates(month: number, year: number, companyId: number, siteIdArr: number[]) {
+    info(`Fetch Order product between dates : ${month} companyId: ${companyId}`, __filename, "fetchOrderProductsBetweenDates()");
+    const residentCompany: any = await this.residentCompanyRepository.findOne(companyId);
+    if (residentCompany) {
+      info(`Fetched resident company by id : ${residentCompany.id}`, __filename, "fetchOrderProductsBetweenDates()");
+      this.residentCompanyService.checkIfValidSiteIds(siteIdArr, residentCompany.site);
+    } else {
+      error(`Resident company not found by id: ${companyId}`, __filename, `fetchOrderProductsBetweenDates()`);
+      throw new NotAcceptableException(
+        'Company with provided id not available.',
+      );
+    }
     try {
       return await this.orderProductRepository.createQueryBuilder("order_product")
         .where("order_product.companyId = :companyId", { companyId: companyId })
@@ -194,9 +213,8 @@ export class OrderProductService {
         .getRawMany();
     } catch (err) {
       error("Error in fetching order products between dates", __filename, "fetchOrderProductBetweenDates()");
-      throw new BiolabsException('Error in fetching order products between dates' , err.message);
+      throw new BiolabsException('Error in fetching order products between dates', err.message);
     }
-
   }
 
   /**
