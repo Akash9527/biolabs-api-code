@@ -236,7 +236,7 @@ const mockResidentHistory: ResidentCompanyHistory = {
   newsletters: null, shareYourProfile: null, website: null, foundersBusinessIndustryName: null,
   createdAt: 2021, updatedAt: 2021, pitchdeck: "pitchDeck.img", logoImgUrl: "logoimgurl.img",
   committeeStatus: '1', selectionDate: new Date("2021-07-05T18:30:00.000Z"), companyStatusChangeDate: 2021, comnpanyId: 1, intellectualProperty: null,
-  sitesApplied: [2], primarySite: [1]
+  sitesApplied: [2], primarySite: [1], companyOnboardingDate: 1626134400
 }
 const mockResidentDocument: ResidentCompanyDocuments = {
   id: 1, company_id: 1, doc_type: "Document", name: "ResidentDocument",
