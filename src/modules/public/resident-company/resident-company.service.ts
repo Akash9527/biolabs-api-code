@@ -308,6 +308,8 @@ export class ResidentCompanyService {
     info("Adding resident company " + payload.companyName, __filename, "addResidentCompany()");
     const rc = await this.getByEmail(payload.email);
     const sites = payload.site;
+    //Selection comiitee date should be null while creating new application-form
+    payload.selectionDate = null;
     if (rc) {
       error("User with provided email already created.", __filename, "addResidentCompany()");
       throw new NotAcceptableException(
@@ -329,8 +331,9 @@ export class ResidentCompanyService {
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
 
+          /** feature/BIOL-371 New applications will not create an entry on the waitlist. */
           /** Create waitlist entry while saving Resident Company */
-          await this.addResidentCompanyDataInWaitlist(savedRc);
+          // await this.addResidentCompanyDataInWaitlist(savedRc);
         }
       }
       await this.sendEmailToSiteAdmin(sites, req, payload.companyName, savedResidentCompanyId, ApplicationConstants.EMAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION);
@@ -395,14 +398,14 @@ export class ResidentCompanyService {
             primarySite.push(res[0].sitename);
           });
       }
-      
+
       for (let s in req.body.sitesApplied) {
         await this.siteRepository
           .query(`select name as siteName from sites where id = ${req.body.sitesApplied[s]}`).then(res => {
             sitesApplied.push(res[0].sitename);
           });
       }
-      
+
       userInfo = {
         token: req.headers.authorization,
         company_name: companyName,
@@ -2081,6 +2084,7 @@ order by quat;
       let waitlistQuery = await this.spaceChangeWaitlistRepository.createQueryBuilder("space_change_waitlist")
         .select("space_change_waitlist.*")
         .addSelect("rc.companyName", "residentCompanyName")
+        .addSelect("rc.companyStatus", "companyStatus")
         .addSelect("u.firstName", "firstName")
         .addSelect("u.lastName", "lastName")
         .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
