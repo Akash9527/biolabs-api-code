@@ -307,6 +307,8 @@ export class ResidentCompanyService {
     info("Adding resident company " + payload.companyName, __filename, "addResidentCompany()");
     const rc = await this.getByEmail(payload.email);
     const sites = payload.site;
+    //Selection comiitee date should be null while creating new application-form
+    payload.selectionDate = null;
     if (rc) {
       error("User with provided email already created.", __filename, "addResidentCompany()");
       throw new NotAcceptableException(
@@ -394,14 +396,14 @@ export class ResidentCompanyService {
             primarySite.push(res[0].sitename);
           });
       }
-      
+
       for (let s in req.body.sitesApplied) {
         await this.siteRepository
           .query(`select name as siteName from sites where id = ${req.body.sitesApplied[s]}`).then(res => {
             sitesApplied.push(res[0].sitename);
           });
       }
-      
+
       userInfo = {
         token: req.headers.authorization,
         company_name: companyName,
