@@ -155,7 +155,7 @@ describe('ResidentCompanyController', () => {
             "otherModality": {},
             "preferredMoveIn": 4,
             "equipmentOnsite": "TestNew",
-            "primarySite":[1],"sitesApplied":[2]
+            "primarySite":[1],"sitesApplied":[2],"selectionDate":new Date("2021-07-14")
         };
 
         it('it should called residentService addResidentCompany method ', async () => {

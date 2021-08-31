@@ -44,7 +44,7 @@ const mockAddResidentCompany: AddResidentCompanyPayload = {
   otherCompanyStage: "", funding: "1", fundingSource: [1], otherFundingSource: "", intellectualProperty: 1,
   otherIntellectualProperty: "", isAffiliated: false, affiliatedInstitution: "", noOfFullEmp: 0, empExpect12Months: 0,
   utilizeLab: 0, expect12MonthsUtilizeLab: 0, industry: ["95"], modality: ["3"], equipmentOnsite: "Tech World",
-  preferredMoveIn: 1, otherIndustries: {}, otherModality: {}, sitesApplied: [2], primarySite: [1]
+  preferredMoveIn: 1, otherIndustries: {}, otherModality: {}, sitesApplied: [2], primarySite: [1],"selectionDate":new Date("2021-07-14")
 }
 const listRCPayload: ListResidentCompanyPayload = {
   q: "test", role: 1, pagination: true, page: 3, limit: 3, companyStatus: '1', committeeStatus: '1', companyVisibility: true,
