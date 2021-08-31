@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 // import { diff } from 'json-diff';
-import { In, Like, Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { BiolabsSource } from './biolabs-source.entity';
 import { Category } from './category.entity';
 import { Funding } from './funding.entity';
@@ -56,11 +56,13 @@ export class MasterService {
       let search: any = {};
       let skip;
       let take;
-      // filtering site list. Use payload.role if role is required.
-      if (payload.siteIdArr) {
-        payload.siteIdArr = this.parseToArray(payload.siteIdArr);
-        search = { id: In(payload.siteIdArr) };
-      }
+
+      /* BIOL-351:removed below filter to return all sites */
+      //filtering site list. Use payload.role if role is required.
+      // if (payload.siteIdArr) {
+      //   payload.siteIdArr = this.parseToArray(payload.siteIdArr);
+      //   search = { id: In(payload.siteIdArr) };
+      // }
 
       if (payload.q && payload.q != "") {
         search = { ...search, ...{ name: Like("%" + payload.q + "%"), status: '1' } };
@@ -144,7 +146,7 @@ export class MasterService {
     // if (existingSite && changes) {
     //   return await this.siteRepository.update(_site.id, _site);
     // } else if (!existingSite) {
-      return await this.siteRepository.save(this.siteRepository.create(_site));
+    return await this.siteRepository.save(this.siteRepository.create(_site));
     // }
   }
 
