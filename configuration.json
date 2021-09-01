@@ -18,37 +18,37 @@
         }
     ],
     "productTypeName": [
-        {
+        {   "id" : 1,
             "productTypeName": "Membership Fee",
             "createdBy": 1,
             "modifiedBy": 1
         },
-        {
+        {   "id" : 2,
             "productTypeName": "Lab Bench",
             "createdBy": 1,
             "modifiedBy": 1
         },
-        {
+        {   "id" : 3,
             "productTypeName": "Workstation",
             "createdBy": 1,
             "modifiedBy": 1
         },
-        {
+        {   "id" : 4,
             "productTypeName": "Private Office",
             "createdBy": 1,
             "modifiedBy": 1
         },
-        {
+        {   "id" : 5,
             "productTypeName": "Private Lab",
             "createdBy": 1,
             "modifiedBy": 1
         },
-        {
+        {   "id" : 6,
             "productTypeName": "Retainer Fee",
             "createdBy": 1,
             "modifiedBy": 1
         },
-        {
+        {   "id" : 7,
             "productTypeName": "Decontamination Fee",
             "createdBy": 1,
             "modifiedBy": 1

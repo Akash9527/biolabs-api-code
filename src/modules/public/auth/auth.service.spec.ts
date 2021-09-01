@@ -14,6 +14,8 @@ import { SITE_ADMIN_ACCESSLEVELS } from '../../../constants/privileges-site-admi
 import { SPONSOR_ACCESSLEVELS } from '../../../constants/privileges-sponsor';
 import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 import { DatabaseService } from '../master/db-script.service';
+import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
+import { Notes } from '../resident-company/rc-notes.entity';
 const mockUser: User = {
     id: 1,
     role: 1,
@@ -31,8 +33,8 @@ const mockUser: User = {
     createdAt: 12,
     updatedAt: 12,
     toJSON: null,
-    isRequestedMails:null,
-    mailsRequestType:null
+    isRequestedMails: null,
+    mailsRequestType: null
 }
 const mockRC: ResidentCompany = {
     id: 1, name: "Biolabs", email: "elon@space.com", companyName: "tesla", site: [2, 1], biolabsSources: 1, otherBiolabsSources: "",
@@ -69,13 +71,18 @@ const mockRC: ResidentCompany = {
     "committeeStatus": null,
     "selectionDate": new Date("2021-07-05T18:30:00.000Z"),
     "companyStatusChangeDate": 2021,
-  }
+    "primarySite": [1, 2],
+    "sitesApplied": [1, 2],
+    "notes": [{} as Notes],
+    "spaceChangeWaitlist": [{} as SpaceChangeWaitlist],
+    "companyOnboardingDate": 0
+}
 const mockUserService = () => ({
     getByEmail: jest.fn(),
     validateToken: jest.fn(),
     forgotPassword: jest.fn(),
-    create:jest.fn(),
-    get:jest.fn()
+    create: jest.fn(),
+    get: jest.fn()
 })
 
 const mockConfigService = () => { }
@@ -87,15 +94,15 @@ const mockJwtService = () => ({
     decode: jest.fn()
 })
 const mockMasterService = () => ({
-    createRoles:jest.fn(),
-    createSites:jest.fn(),
-    createFundings:jest.fn(),
-    createModalities:jest.fn(),
-    createBiolabsSources:jest.fn(),
-    createCategories:jest.fn(),
-    createTechnologyStages:jest.fn(),
-    createProductType:jest.fn(),
-    readMigrationJson:jest.fn()
+    createRoles: jest.fn(),
+    createSites: jest.fn(),
+    createFundings: jest.fn(),
+    createModalities: jest.fn(),
+    createBiolabsSources: jest.fn(),
+    createCategories: jest.fn(),
+    createTechnologyStages: jest.fn(),
+    createProductType: jest.fn(),
+    readMigrationJson: jest.fn()
 });
 const mockResidentCompanyService = () => ({
     getResidentCompany: jest.fn()
@@ -260,19 +267,19 @@ describe('AuthService', () => {
             let permissions = outcome.permissions;
             switch (permissions.role) {
                 case 1:
-                  permissions = SUPER_ADMIN_ACCESSLEVELS;
-                  break;
+                    permissions = SUPER_ADMIN_ACCESSLEVELS;
+                    break;
                 case 2:
-                  permissions = SITE_ADMIN_ACCESSLEVELS;
-                  break;
+                    permissions = SITE_ADMIN_ACCESSLEVELS;
+                    break;
                 case 3:
-                  permissions = SPONSOR_ACCESSLEVELS;
-                  break;
+                    permissions = SPONSOR_ACCESSLEVELS;
+                    break;
                 case 4:
-                  permissions = RESIDENT_ACCESSLEVELS;
-                  break;
+                    permissions = RESIDENT_ACCESSLEVELS;
+                    break;
                 default:
-                  break;
+                    break;
             }
             expect(Object.entries(permissions).length).not.toBe(0);
             expect(outcome).toHaveProperty('expiresIn');
@@ -290,12 +297,12 @@ describe('AuthService', () => {
     });
 
     describe('should decode Token functionality', () => {
-        const mockTokenPayload = {accessToken:"tokenString"};
+        const mockTokenPayload = { accessToken: "tokenString" };
         const mockdecodedToken = { id: 1, iat: 1628585535, exp: 1628671935 }
         it('should decode token', async () => {
             await jwtService.decode.mockResolvedValueOnce(mockdecodedToken);
-            jest.spyOn(usersService,'get').mockResolvedValue(mockUser);
-            jest.spyOn(residentCompanyService,'getResidentCompany').mockResolvedValueOnce(mockRC)
+            jest.spyOn(usersService, 'get').mockResolvedValue(mockUser);
+            jest.spyOn(residentCompanyService, 'getResidentCompany').mockResolvedValueOnce(mockRC)
             let outcome = await authService.decodeToken(mockTokenPayload);
             expect(outcome).not.toBeNull();
             expect(outcome).not.toBeUndefined();
@@ -304,16 +311,16 @@ describe('AuthService', () => {
         });
         it('should validate user and check companyId is present', async () => {
             await jwtService.decode.mockRejectedValueOnce(mockdecodedToken);
-            mockUser.status='1';
-            jest.spyOn(usersService,'get').mockResolvedValue(null);
-                try {
+            mockUser.status = '1';
+            jest.spyOn(usersService, 'get').mockResolvedValue(null);
+            try {
                 await authService.decodeToken(mockTokenPayload);
-                } catch (e) {
-                    expect(e.response.message).toEqual('Invalid token!');
-                    expect(e.response.error).toEqual('Unauthorized');
-                    expect(e.status).toEqual(401);
-                    expect(e instanceof UnauthorizedException).toBeTruthy();
-                }
+            } catch (e) {
+                expect(e.response.message).toEqual('Invalid token!');
+                expect(e.response.error).toEqual('Unauthorized');
+                expect(e.status).toEqual(401);
+                expect(e instanceof UnauthorizedException).toBeTruthy();
+            }
         });
     });
 });

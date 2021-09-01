@@ -22,13 +22,37 @@ export const SITE_ADMIN_ACCESSLEVELS = {
       delete: true,
       child: {
         'sponsor': {
-          name: 'Sponser',
+          name: 'Sponsor',
           action: true,
           create: true,
           view: true,
           update: true,
           delete: true,
         },
+        'search': {
+          name: 'Resident Companies',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+        },
+        'explore': {
+          name: 'Explore Page',
+          action: true,
+          create: true,
+          view: true,
+          update: true,
+          delete: true,
+          dynamic: {
+            name: 'Dynamic Numeric Value',
+            action: true,
+            create: true,
+            view: true,
+            update: true,
+            delete: true
+          }
+        }
       }
     },
     'application-form': {

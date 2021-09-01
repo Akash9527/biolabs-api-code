@@ -37,7 +37,7 @@ export class AuthService {
     await this.masterService.createBiolabsSources(fileData);
     await this.masterService.createCategories(fileData);
     await this.masterService.createTechnologyStages(fileData);
-    await this.masterService.createProductType(fileData);
+    await this.masterService.createProductTypes(fileData);
     await this.createSuperAdmin(fileData);
     await this.databaseService.executeScript();
   }
@@ -49,10 +49,7 @@ export class AuthService {
    */
   private async createSuperAdmin(migrationData: any) {
     info("Creating application super admin user with all sites access", __filename, "createSuperAdmin()");
-    const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
-    if (!superAdmin) {
-      await this.userService.create(migrationData['superadmin']);
-    }
+    await this.userService.create(migrationData['superadmin'], migrationData['sites']);
   }
 
   /**
@@ -129,7 +126,7 @@ export class AuthService {
     return this.userService.forgotPassword(payload, req);
   }
 
-  
+
   /**
    * Description: This method is used to decode the token.
    * @description This method is used to decode the token.
