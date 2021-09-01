@@ -215,11 +215,16 @@ export class AddResidentCompanyPayload {
     required: false,
   })
   sitesApplied: number[];
-  
+
   @ApiProperty({
     required: true,
   })
   @Min(1, { each: true })
   primarySite: number[];
 
+  @ApiProperty({
+    required: false,
+    nullable: true
+  })
+  selectionDate: Date;
 }

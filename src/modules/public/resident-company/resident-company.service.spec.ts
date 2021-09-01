@@ -44,7 +44,7 @@ const mockAddResidentCompany: AddResidentCompanyPayload = {
   otherCompanyStage: "", funding: "1", fundingSource: [1], otherFundingSource: "", intellectualProperty: 1,
   otherIntellectualProperty: "", isAffiliated: false, affiliatedInstitution: "", noOfFullEmp: 0, empExpect12Months: 0,
   utilizeLab: 0, expect12MonthsUtilizeLab: 0, industry: ["95"], modality: ["3"], equipmentOnsite: "Tech World",
-  preferredMoveIn: 1, otherIndustries: {}, otherModality: {}, sitesApplied: [2], primarySite: [1]
+  preferredMoveIn: 1, otherIndustries: {}, otherModality: {}, sitesApplied: [2], primarySite: [1],"selectionDate":new Date("2021-07-14")
 }
 const listRCPayload: ListResidentCompanyPayload = {
   q: "test", role: 1, pagination: true, page: 3, limit: 3, companyStatus: '1', committeeStatus: '1', companyVisibility: true,
@@ -236,7 +236,7 @@ const mockResidentHistory: ResidentCompanyHistory = {
   newsletters: null, shareYourProfile: null, website: null, foundersBusinessIndustryName: null,
   createdAt: 2021, updatedAt: 2021, pitchdeck: "pitchDeck.img", logoImgUrl: "logoimgurl.img",
   committeeStatus: '1', selectionDate: new Date("2021-07-05T18:30:00.000Z"), companyStatusChangeDate: 2021, comnpanyId: 1, intellectualProperty: null,
-  sitesApplied: [2], primarySite: [1]
+  sitesApplied: [2], primarySite: [1], companyOnboardingDate: 1626134400
 }
 const mockResidentDocument: ResidentCompanyDocuments = {
   id: 1, company_id: 1, doc_type: "Document", name: "ResidentDocument",

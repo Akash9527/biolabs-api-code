@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 // import { diff } from 'json-diff';
-import { In, Like, Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { BiolabsSource } from './biolabs-source.entity';
 import { Category } from './category.entity';
 import { Funding } from './funding.entity';
@@ -43,7 +43,6 @@ export class MasterService {
     private readonly productTypeRepository: Repository<ProductType>,
   ) { }
 
-
   /**
    * Description: This method will return the sites list.
    * @description This method will return the sites list.
@@ -56,11 +55,13 @@ export class MasterService {
       let search: any = {};
       let skip;
       let take;
-      // filtering site list. Use payload.role if role is required.
-      if (payload.siteIdArr) {
-        payload.siteIdArr = this.parseToArray(payload.siteIdArr);
-        search = { id: In(payload.siteIdArr) };
-      }
+
+      /* BIOL-351:removed below filter to return all sites */
+      //filtering site list. Use payload.role if role is required.
+      // if (payload.siteIdArr) {
+      //   payload.siteIdArr = this.parseToArray(payload.siteIdArr);
+      //   search = { id: In(payload.siteIdArr) };
+      // }
 
       if (payload.q && payload.q != "") {
         search = { ...search, ...{ name: Like("%" + payload.q + "%"), status: '1' } };
@@ -94,23 +95,25 @@ export class MasterService {
   /**
    * Description: This method will store the Product information.
    * @description This method will store the Product information.
-   * @return array of product object 
+   * @return array of product object
    */
-  async createProductType(migrationData: any) {
-    info("creating product type", __filename, "createProductType()");
+  async createProductTypes(migrationData: any) {
+  let resp = {};
     try {
-      const productType = await this.productTypeRepository.find();
-      const ptypeData = migrationData["productTypeName"]
-      if (!productType || productType.length == 0) {
-        for (let index = 0; index < ptypeData.length; index++) {
-          const productType = ptypeData[index];
-          await this.productTypeRepository.save(this.productTypeRepository.create(productType));
+      const ptypeData = migrationData["productTypeName"];
+      if (ptypeData) {
+        for (const ptypeDataObj of ptypeData) {
+          resp[ptypeDataObj.productTypeName] = await this.productTypeRepository.save(this.productTypeRepository.create(ptypeDataObj));
         }
+      } else {
+        error(`Error in creating product types.`, __filename, `createProductType()`);
       }
     } catch (err) {
-      error("Error in creating product type" + err.message, __filename, "createSite()");
-      throw new InternalException(err.message);
+      if (err) {
+        error(`Error in creating product types. ${err.message}`, __filename, `createProductType()`);
+      }
     }
+    return resp;
   }
 
   /**
@@ -144,7 +147,7 @@ export class MasterService {
     // if (existingSite && changes) {
     //   return await this.siteRepository.update(_site.id, _site);
     // } else if (!existingSite) {
-      return await this.siteRepository.save(this.siteRepository.create(_site));
+    return await this.siteRepository.save(this.siteRepository.create(_site));
     // }
   }
 
