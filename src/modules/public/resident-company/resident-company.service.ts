@@ -35,6 +35,7 @@ import { SearchResidentCompanyPayload } from './search-resident-company.payload'
 import { UpdateNotesDto } from './update-notes.dto';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
+import {MemberShipStatus} from '../enum/memberShipStatus';
 const { error, warn, info, debug } = require("../../../utils/logger");
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 
@@ -1208,7 +1209,24 @@ export class ResidentCompanyService {
     info(`global search companies`, __filename, "gloabalSearchCompanies()")
     try {
       let globalSearch = `SELECT * FROM global_search_view AS gsv`;
-      globalSearch += ` where "status" IN ('1', '0')  `;
+      if (!payload.memberShip) {
+        globalSearch += ` where "companyStatus" IN ('1')  `;
+      }else if (payload.memberShip == MemberShipStatus.GraduatingSoon){
+        let graduatesoon_ids: any = await this.spaceChangeWaitlistRepository
+        .createQueryBuilder('space_change_waitlist')
+        .select("DISTINCT space_change_waitlist.residentCompanyId", 'company')
+        .where(`space_change_waitlist.requestStatus IN (${RequestStatusEnum.Open},${RequestStatusEnum.ApprovedInProgress})`)
+        .andWhere(`space_change_waitlist.membershipChange = ${MembershipChangeEnum.Graduate}`)
+        .andWhere("space_change_waitlist.site && ARRAY[:...site]::int[]", { site: siteIdArr })
+        .getRawMany();
+        if(graduatesoon_ids.length==0){
+          return [];
+        }
+        graduatesoon_ids = graduatesoon_ids.map((waitlist: any) => waitlist.company);
+        globalSearch += ` where "id" IN (${graduatesoon_ids.toString()})  `;
+      }else if (payload.memberShip == MemberShipStatus.Graduated){
+        globalSearch += ` where "companyStatus" IN ('4')  `;
+      }
 
       if (payload.siteIdArr && payload.siteIdArr.length > 0) {
         payload.siteIdArr = this.parseToArray(payload.siteIdArr)
@@ -1343,7 +1361,7 @@ export class ResidentCompanyService {
       }
 
       globalSearch += ` ORDER BY \"id\" DESC `;
-      info(`globalSearch query: ${globalSearch}`, __filename, "gloabalSearchCompanies()")
+      info(`globalSearch query: ${globalSearch}`, __filename, "gloabalSearchCompanies()");
 
       return await this.residentCompanyRepository.query(globalSearch);
     } catch (err) {
