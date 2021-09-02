@@ -2535,7 +2535,7 @@ group by
       frequencyDate = new Date(currentDate.setMonth(currentDate.getMonth() - MONTHS_1)); //1 Month
     }
 
-    try {
+    try 
       let residentCompanyQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies").
         select("resident_companies.id", "id")
         .addSelect("resident_companies.companyName", "companyName")
