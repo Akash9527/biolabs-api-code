@@ -260,7 +260,7 @@ describe('ResidentCompanyController', () => {
             companyVisibility: true, companyOnboardingStatus: true, siteIdArr: [1, 2],
             industries: [1, 2, 3], modalities: [2, 3, 4], fundingSource: [1, 2, 3,], minFund: 12,
             maxFund: 20, minCompanySize: 10, maxCompanySize: 200, sort: true,
-            sortFiled: "test", sortOrder: "ASC"
+            sortFiled: "test", sortOrder: "ASC", memberShip: 1
         };
         it('it should called residentService gloabalSearchCompanies method ', async () => {
             await residentController.gloabalSearchCompanies(mockSearchResidentCompany, req);

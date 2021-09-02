@@ -394,7 +394,7 @@ describe('ResidentCompanyService', () => {
               return {
                 catch: jest.fn(),
               }
-            }),
+            })
           }
         },
         {
@@ -485,6 +485,7 @@ describe('ResidentCompanyService', () => {
               getRawMany: jest.fn(),
               addOrderBy: jest.fn().mockReturnThis(),
               orderBy: jest.fn().mockReturnThis(),
+              select : jest.fn().mockReturnThis()
 
             })),
             findOne: jest.fn(),
@@ -1276,7 +1277,8 @@ describe('ResidentCompanyService', () => {
     let mockSearchPayload: SearchResidentCompanyPayload = {
       q: "test", role: 1, pagination: true, page: 1, limit: 10,
       companyStatus: "1", companyVisibility: true, companyOnboardingStatus: true, siteIdArr: [1, 2], industries: [1, 2], modalities: [1, 2],
-      fundingSource: [1, 2], minFund: 1, maxFund: 1000, minCompanySize: 1, maxCompanySize: 100, sort: true, sortFiled: "", sortOrder: "ASC"
+      fundingSource: [1, 2], minFund: 1, maxFund: 1000, minCompanySize: 1, maxCompanySize: 100, sort: true, sortFiled: "", sortOrder: "ASC",
+      memberShip: 0
     }
 
     it('should return array of old global resident companies', async () => {
@@ -1304,9 +1306,26 @@ describe('ResidentCompanyService', () => {
     let mockSearchPayload: SearchResidentCompanyPayload = {
       q: "test", role: 1, pagination: true, page: 1, limit: 10,
       companyStatus: "1", companyVisibility: true, companyOnboardingStatus: true, siteIdArr: [1, 2], industries: [1, 2], modalities: [1, 2],
-      fundingSource: [1, 2], minFund: 1, maxFund: 1000, minCompanySize: 1, maxCompanySize: 100, sort: true, sortFiled: "", sortOrder: "ASC"
+      fundingSource: [1, 2], minFund: 1, maxFund: 1000, minCompanySize: 1, maxCompanySize: 100, sort: true, sortFiled: "", sortOrder: "ASC",
+      memberShip: 0
     }
+    let mockSiteIdArr = [1,2,3]
     const mockResidentCompanyArray = [mockRC];
+    it('should return array of graduated soon resident companies', async () => {
+      spaceChangeWaitlistRepository
+        .createQueryBuilder('space_change_waitlist')
+        .select("DISTINCT space_change_waitlist.residentCompanyId", 'company')
+        .where('space_change_waitlist.requestStatus IN (0,1)')
+        .andWhere('space_change_waitlist.membershipChange = 1')
+        .andWhere("space_change_waitlist.site && ARRAY[:...site]::int[]", { site: mockSiteIdArr })
+        .getRawMany();
+      jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockResidentCompanyArray);
+      let result = await residentCompanyService.gloabalSearchCompanies(mockSearchPayload, [1, 2])
+      expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined();
+      expect(result.length).toEqual(mockResidentCompanyArray.length);
+      expect(result).toEqual(mockResidentCompanyArray);
+    })
     it('should return array of resident company Object', async () => {
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockResidentCompanyArray);
       let result = await residentCompanyService.gloabalSearchCompanies(mockSearchPayload, [1, 2])
