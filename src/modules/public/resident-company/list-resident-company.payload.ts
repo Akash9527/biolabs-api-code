@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 type company_status = '0' | '1' | '2' | '3' | '4' | '5';
-type committeeStatus = '0' | '1' | '2' | '3';
+type committeeStatus = '0' | '1' | '2' | '3' | '4';
 
 export class ListResidentCompanyPayload {
   @ApiProperty({
