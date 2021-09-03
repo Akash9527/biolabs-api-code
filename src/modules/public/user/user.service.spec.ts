@@ -64,7 +64,7 @@ const mockSites: any = [
     {
         "id": 2,
         "name": "Ipsen",
-        "longName": "Ipsen Innovation Cente",
+        "longName": "Ipsen Innovation Center",
         "standardizedAddress": "650 E Kendall St 2nd Floor, Cambridge, MA 02142",
         "colorCode": "#26294a",
         "googleMapUrl": "https://goo.gl/maps/PuKw7cvjxKxsApNN7",

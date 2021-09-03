@@ -449,6 +449,7 @@ export class ResidentCompanyService {
       let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
         .select("resident_companies.* ")
         .addSelect("s.name", "siteName")
+        .addSelect("s.longName", "siteLongName")
         .addSelect("s.id", "siteId")
         .leftJoin('sites', 's', 's.id = Any(resident_companies.site)')
         .where("resident_companies.status IN (:...status)", { status: [1, 0] });
