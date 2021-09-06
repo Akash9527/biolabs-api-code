@@ -817,7 +817,7 @@ describe('MasterService', () => {
     });
 
     describe('should test getCommitteeStatus Functionality', () => {
-        let mockCommiteeeStatus: Array<any> = [{ "id": 0, "name": "Unscheduled" }, { "id": 1, "name": "Scheduled" }, { "id": 2, "name": "Accepted" }, { "id": 3, "name": "Rejected" }];
+        let mockCommiteeeStatus: Array<any> = [{ "id": 0, "name": "Unscheduled" }, { "id": 1, "name": "Scheduled" }, { "id": 2, "name": "Accepted" }, { "id": 3, "name": "Rejected" }, { "id": 4, "name": "Alternate" }];
         it('it should return  array of Committee status object', async () => {
             let commiteeeStatus = await masterService.getCommitteeStatus();
             expect(commiteeeStatus).not.toBeNull();
