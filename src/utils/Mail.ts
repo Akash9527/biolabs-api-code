@@ -1,3 +1,4 @@
+import { MemberShipStatus } from 'modules/public/enum/memberShipStatus';
 import { userInfo } from 'node:os';
 import { EMAIL } from '../constants/email';
 import { ApplicationConstants } from './application-constants';
@@ -676,14 +677,26 @@ export class Mail {
                   contentType: EMAIL.CONTENT_TYPE,
                   content: this.replaceParams(
                      mailTemplateSponsorSchedule.toString(),
-                     userInfo.userName,
-                     ApplicationConstants.EMAIL_INTRO_TEXT_FOR_SPONSOR_MAIL_SCHEDULED,
-                     this.getCountText(userInfo, ApplicationConstants.ONBOARDED_COMPANIES),
-                     htmlOnboarded,
-                     this.getCountText(userInfo, ApplicationConstants.GRADUATED_COMPANIES),
-                     this.getCompanyDataHtmlTable(userInfo, ApplicationConstants.GRADUATED_COMPANIES),
-                     userInfo.ui_server_origin,
-                     ApplicationConstants.BIOLABS_CONNECT_PLATFORM,
+                     userInfo.userName, //{0}
+                     ApplicationConstants.EMAIL_INTRO_TEXT_FOR_SPONSOR_MAIL_SCHEDULED, //{1}
+
+                     //For recently joined companies
+                     this.getCountText(userInfo, ApplicationConstants.ONBOARDED_COMPANIES), //{2}
+                     htmlOnboarded, //{3}
+                     this.getClickHereToSeeMoreLink(userInfo, ApplicationConstants.ONBOARDED_COMPANIES), //{4}
+
+                     //For Graduating soon companies
+                     this.getCountText(userInfo, ApplicationConstants.GRADUATING_SOON_COMPANIES), //{5}
+                     this.getCompanyDataHtmlTable(userInfo, ApplicationConstants.GRADUATING_SOON_COMPANIES), //{6}
+                     this.getClickHereToSeeMoreLink(userInfo, ApplicationConstants.GRADUATING_SOON_COMPANIES), //{7}
+
+                     //For Graduated companies
+                     this.getCountText(userInfo, ApplicationConstants.GRADUATED_COMPANIES), //{8}
+                     this.getCompanyDataHtmlTable(userInfo, ApplicationConstants.GRADUATED_COMPANIES), //{9}
+                     this.getClickHereToSeeMoreLink(userInfo, ApplicationConstants.GRADUATED_COMPANIES), //{10}
+
+                     userInfo.ui_server_origin, //{11}
+                     ApplicationConstants.BIOLABS_CONNECT_PLATFORM //{12}
                   )
                },
                toRecipients: [
@@ -766,9 +779,11 @@ export class Mail {
          companyRowData = this.getOnboardedCompanyRows(userInfo.onboardedCompsObj, userInfo);
       } else if (forWhat == ApplicationConstants.GRADUATED_COMPANIES) {
          companyRowData = this.getGraduatedCompanyRows(userInfo.graduatedCompsObj, userInfo);
+      } else if (forWhat == ApplicationConstants.GRADUATING_SOON_COMPANIES) {
+         companyRowData = this.getGraduatingSoonCompanyRows(userInfo.graduatingSoonCompsObj, userInfo);
       }
       let htmlTable = `
-         <table style="width:100%; margin-left:10px; margin-right:10px;" border="0">
+         <table style="width:100%; margin-left:10px; margin-right:10px; padding-bottom:0px" border="0">
             <tbody>
                {0}
             </tbody>
@@ -789,41 +804,29 @@ export class Mail {
       if (onboardedCompsObj) {
          for (const siteName in onboardedCompsObj) {
             if (Object.prototype.hasOwnProperty.call(onboardedCompsObj, siteName)) {
-               // rowData +=
-               //    `
-               //    <tr>
-               //       <td colspan="3" style="padding-top:10px; padding-bottom:20px;"><strong>${siteName}:</strong></td>
-               //    </tr>
-               //    `;
                const companies = onboardedCompsObj[siteName];
                if (companies && Array.isArray(companies)) {
-                  // if (companies.length < 1) {
-                  //    rowData +=
-                  //       `
-                  //       <tr>
-                  //          <td colspan="3">No recently moved in companies</td>
-                  //       </tr>
-                  //       `;
-                  // }
-                  // if() {
+
                   for (const company of companies) {
                      let companyUrl = userInfo.ui_server_origin + "resident-companies/" + company.id + "/company";
                      rowData +=
                         `<tr>
-                              <td style="width:18%">
+                              <td style="width:12%">
                                  <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, userInfo.ui_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
-                              <td style="width:42%; padding-top:5px; padding-bottom:5px;">
+                              <td style="width:32%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.companyName}</a>
                               </td>
-                              <td style="width:40%">
+                              <td style="width:38%">
+                               ${this.arrayToCommaSeparatedString(company.industryNames)}
+                              </td>
+                              <td style="width:18%">
                                  ${siteName}
                               </td>
                            </tr>
                            `;
                      companyUrl = '';
                   }
-                  // }
                } else {
                   rowData +=
                      `<tr></tr>
@@ -852,42 +855,79 @@ export class Mail {
       if (graduatedCompsObj) {
          for (const siteName in graduatedCompsObj) {
             if (Object.prototype.hasOwnProperty.call(graduatedCompsObj, siteName)) {
-               // rowData +=
-               //    `
-               // <tr>
-               //    <td colspan="3" style="padding-top:10px; padding-bottom:20px;"><strong>${siteName}:</strong></td>
-               // </tr>
-               // `;
-
                const companies = graduatedCompsObj[siteName];
                debug(`Get html rows for graduated companies for site: ${siteName}`, __filename, `getGraduatedCompanyRows()`);
                if (companies && Array.isArray(companies)) {
-                  // if (companies.length < 1) {
-                  //    rowData +=
-                  //       `
-                  //       <tr>
-                  //          <td colspan="3">No recently graduated companies</td>
-                  //       </tr>
-                  //       `;
-                  // } else {
                   for (const company of companies) {
                      let companyUrl = userInfo.ui_server_origin + "resident-companies/" + company.id + "/company";
                      rowData +=
                         `<tr>
-                              <td style="width:18%">
+                              <td style="width:12%">
                                  <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, userInfo.ui_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
-                              <td style="width:42%; padding-top:5px; padding-bottom:5px;">
+                              <td style="width:32%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.companyName}</a>
                               </td>
-                              <td style="width:40%">
+                              <td style="width:38%">
+                              ${this.arrayToCommaSeparatedString(company.industryNames)}
+                              </td>
+                              <td style="width:18%">
                                 ${siteName}
                               </td>
                            </tr>
                            `;
                      companyUrl = '';
                   }
-                  // }
+               } else {
+                  rowData +=
+                     `
+                   <tr>
+                    <td colspan="3" style="padding-top:5px;">${companies}</td>
+                   </tr>
+                   `;
+               }
+            }
+         }
+      }
+      return rowData;
+   }
+
+   /**
+    * Description: Prepares html rows for recently graduated company data.
+    * @description Prepares html rows for recently graduated company data.
+    * @param graduatedCompsObj Graduated company objects
+    * @param origin The server origin
+    * @returns The html string with prepared rows
+    */
+   getGraduatingSoonCompanyRows(graduatingSoonCompsObj: any, userInfo: any) {
+      info(`Get html rows for graduated companies`, __filename, `getGraduatedCompanyRows()`);
+      let rowData = ``;
+      if (graduatingSoonCompsObj) {
+         for (const siteName in graduatingSoonCompsObj) {
+            if (Object.prototype.hasOwnProperty.call(graduatingSoonCompsObj, siteName)) {
+               const companies = graduatingSoonCompsObj[siteName];
+               debug(`Get html rows for graduating soon companies for site: ${siteName}`, __filename, `getGradugetGraduatingSoonCompanyRowsatedCompanyRows()`);
+               if (companies && Array.isArray(companies)) {
+                  for (const company of companies) {
+                     let companyUrl = userInfo.ui_server_origin + "resident-companies/" + company.id + "/company";
+                     rowData +=
+                        `<tr>
+                              <td style="width:12%">
+                                 <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, userInfo.ui_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
+                              </td>
+                              <td style="width:32%; padding-top:5px; padding-bottom:5px;">
+                                 <a href = "${companyUrl}">${company.companyName}</a>
+                              </td>
+                              <td style="width:43%">
+                                Graduating on ${this.getGraduatingSoonDate(company.graduatingOn)}
+                              </td>
+                              <td style="width:13%">
+                                ${siteName}
+                              </td>
+                           </tr>
+                           `;
+                     companyUrl = '';
+                  }
                } else {
                   rowData +=
                      `
@@ -957,6 +997,60 @@ export class Mail {
          } else {
             return ''; //Dont show anything if no companies have recently graduated
          }
+      } else if (flag == ApplicationConstants.GRADUATING_SOON_COMPANIES) {
+         if (userInfo.companiesCount.graduatingSoonCompsCount && userInfo.companiesCount.graduatingSoonCompsCount == 1) {
+            return ApplicationConstants.EMAIL_TEXT_GRADUATING_SOON_COMPANIES.replace('{0}', userInfo.companiesCount.graduatingSoonCompsCount).replace('{1}', 'company').replace('{2}', ':');
+         } else if (userInfo.companiesCount.graduatingSoonCompsCount && userInfo.companiesCount.graduatingSoonCompsCount > 1) {
+            return ApplicationConstants.EMAIL_TEXT_GRADUATING_SOON_COMPANIES.replace('{0}', userInfo.companiesCount.graduatingSoonCompsCount).replace('{1}', 'companies').replace('{2}', ':');
+         } else {
+            return ''; //Dont show anything if no companies graduating soon
+         }
+      }
+   }
+
+   /**
+    * Description: Prepares a link for text: Click here to see more with on membership status.
+    * @description Prepares a link for text: Click here to see more with on membership status.
+    * @param userInfo 
+    * @param flag 
+    * @returns 
+    */
+   getClickHereToSeeMoreLink(userInfo: any, flag: string) {
+      let urlString = `<p style="text-align:right;padding-top:0px;padding-bottom:10px;"> <a href="${userInfo.ui_server_origin}${EMAIL.SPONSOR_SEARCH_PAGE}${EMAIL.SPONSOR_SEARCH_PAGE_PARAM}{0}"> Click here to see more...</a> </p>`;;
+      if (userInfo.companiesCount.onboardedCompsCount && userInfo.companiesCount.onboardedCompsCount > 0 && flag == ApplicationConstants.ONBOARDED_COMPANIES) {
+         return urlString.replace('{0}', MemberShipStatus.Current.toString());
+      } else if (userInfo.companiesCount.graduatedCompsCount && userInfo.companiesCount.graduatedCompsCount > 0 && flag == ApplicationConstants.GRADUATED_COMPANIES) {
+         return urlString.replace('{0}', MemberShipStatus.Graduated.toString());
+      } else if (userInfo.companiesCount.graduatingSoonCompsCount && userInfo.companiesCount.graduatingSoonCompsCount > 0 && flag == ApplicationConstants.GRADUATING_SOON_COMPANIES) {
+         return urlString.replace('{0}', MemberShipStatus.GraduatingSoon.toString());
+      }
+   }
+
+   /**
+    * Description: Get graduating soon companies.
+    * @description Get graduating soon companies.
+    * @param date numeric value of a date
+    * @returns date of Date
+    */
+   getGraduatingSoonDate(date: number) {
+      if (date) {
+         let graduatingSoonDate: Date = new Date(date * 1000);
+         return this.getFormattedDateDD_Mon_YYYY(graduatingSoonDate);
+      }
+      return '-';
+   }
+
+   /**
+    * Description: Make a string array as comma separated values.
+    * @description Make a string array as comma separated values.
+    * @param array an array of string
+    * @returns comma separated string values
+    */
+   arrayToCommaSeparatedString(array) {
+      if (array) {
+         return array.join(', ');
+      } else {
+         return '-';
       }
    }
 }

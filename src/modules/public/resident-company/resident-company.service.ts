@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotAcceptableException, Request } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EMAIL } from 'constants/email';
-import { In, Like, Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import { ApplicationConstants } from 'utils/application-constants';
 import { Mail } from '../../../utils/Mail';
 import { AddSpaceChangeWaitlistDto } from '../dto/add-space-change-waitlist.dto';
@@ -2521,22 +2521,7 @@ group by
    */
   async fetchOnboardedCompaniesBySiteId(siteIds: number[], forWhat: string, frequency: EmailFrequency, by: string) {
     info(`Fetching ${forWhat} data for sites: ${siteIds}, for frequency: ${frequency}`, __filename, `fetchOnboardedCompaniesBySiteId()`);
-
-    const currentDate = new Date();
-    let frequencyDate: Date;
-    const DAYS_7 = 7;
-    const MONTHS_3 = 3;
-    const MONTHS_1 = 1;
-    const LAST_RECORD_LIMIT: number = 3;
-
-    if (frequency == EmailFrequency.Weekly) {
-      frequencyDate = new Date(currentDate.setDate(currentDate.getDate() - DAYS_7)); //7 Days
-    } else if (frequency == EmailFrequency.Quarterly) {
-      frequencyDate = new Date(currentDate.setMonth(currentDate.getMonth() - MONTHS_3)); //3 Months
-    } else {
-      /** Set it monthly */
-      frequencyDate = new Date(currentDate.setMonth(currentDate.getMonth() - MONTHS_1)); //1 Month
-    }
+    let frequencyDate: Date = this.getFrequencyDate(frequency);
 
     try {
       let residentCompanyQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies").
@@ -2548,62 +2533,40 @@ group by
         .addSelect("resident_companies.companyStatus", "companyStatus")
         .addSelect("resident_companies.companyStatusChangeDate", "statusChangeDate")
         .addSelect("resident_companies.site", "site")
+        .addSelect("resident_companies.industry", "industry")
+        .addSelect("resident_companies.otherIndustries", "otherIndustries")
         .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIds });
 
       if (forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
         residentCompanyQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: true });
-        if (by == 'frequency') {
+        if (by == ApplicationConstants.FREQUENCY) {
           residentCompanyQuery.andWhere("CAST(resident_companies.companyOnboardingDate AS Date) >= :theDate", { theDate: frequencyDate });
         } else {
           residentCompanyQuery.orderBy("resident_companies.companyOnboardingDate", "DESC");
-          residentCompanyQuery.limit(LAST_RECORD_LIMIT);
         }
       } else if (forWhat == ApplicationConstants.GRADUATED_COMPANIES) {
         residentCompanyQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: 4 });
-        if (by == 'frequency') {
+        if (by == ApplicationConstants.FREQUENCY) {
           residentCompanyQuery.andWhere("CAST(resident_companies.companyStatusChangeDate AS Date) >= :theDate", { theDate: frequencyDate });
         } else {
           residentCompanyQuery.orderBy("resident_companies.companyStatusChangeDate", "DESC");
-          residentCompanyQuery.limit(LAST_RECORD_LIMIT);
         }
       }
+      residentCompanyQuery.limit(ApplicationConstants.SPONSOR_MAIL_RECORD_LIMIT);
+
       debug(`Executing query for ${forWhat}, query: ${residentCompanyQuery}`, __filename, `fetchOnboardedCompaniesBySiteId()`);
-      // return await residentCompanyQuery.getRawMany();
       let resp: any = await residentCompanyQuery.getRawMany();
-      console.log('resP1 ', resp);
-      if (resp && resp.length == 0 && by == 'frequency') {
-        by = 'lastThree';
-        resp = this.fetchOnboardedCompaniesBySiteId(siteIds, forWhat, frequency, by).then((result) => {
+
+      if (resp && resp.length == 0 && by == ApplicationConstants.FREQUENCY && forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
+        by = 'LAST_RECORDS';
+        resp = await this.fetchOnboardedCompaniesBySiteId(siteIds, forWhat, frequency, by).then((result) => {
           return result;
         });
-        console.log('resP2 ', resp);
       }
       return resp;
     } catch (err) {
       error(`Error in fetching data for ${forWhat} for sponsor user. ${err.message}`, __filename, "fetchOnboardedCompaniesBySiteId()");
       throw new BiolabsException(`Error in fetching data for ${forWhat} for sponsor user.`, err.message);
-    }
-  }
-  // rcQuery.orderBy("resident_companies.companyStatusChangeDate", "DESC");
-
-  async getQueryPrepared(siteIds: number[], forWhat: string, frequencyDate: Date) {
-    let residentCompanyQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies").
-      select("resident_companies.id", "id")
-      .addSelect("resident_companies.companyName", "companyName")
-      .addSelect("resident_companies.logoImgUrl", "logoUrl")
-      .addSelect("resident_companies.companyOnboardingStatus", "onboardingStatus")
-      .addSelect("resident_companies.companyOnboardingDate", "onboardingDate")
-      .addSelect("resident_companies.companyStatus", "companyStatus")
-      .addSelect("resident_companies.companyStatusChangeDate", "statusChangeDate")
-      .addSelect("resident_companies.site", "site")
-      .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIds });
-
-    if (forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
-      residentCompanyQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: true });
-      residentCompanyQuery.andWhere("CAST(resident_companies.companyOnboardingDate AS Date) >= :onboardingDate", { onboardingDate: frequencyDate })
-    } else if (forWhat == ApplicationConstants.GRADUATED_COMPANIES) {
-      residentCompanyQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: 4 });
-      residentCompanyQuery.andWhere("CAST(resident_companies.companyStatusChangeDate AS Date) >= :theDate", { theDate: frequencyDate })
     }
   }
 
@@ -2620,5 +2583,80 @@ group by
       return result;
     });
     return sites;
+  }
+
+  /**
+   * Description: Fetches industreis(categories) by parent id.
+   * @description Fetches industreis(categories) by parent id.
+   * @param parentId parentId of an industry
+   * @returns list of industries
+   */
+  public async getIndustriesByParentId(parentId: number) {
+    info(`Fetching industsy names from db`, __filename, `getCompanyIndustrysById()`);
+    return await this.categoryRepository.find({
+      select: ["id", "name", "parent_id"],
+      where: { parent_id: parentId }
+    }).then((result) => {
+      return result;
+    });
+  }
+
+  /**
+   * Description: Fetches the companies which are going to be graduate soon.
+   * @description Fetches the companies which are going to be graduate soon.
+   * @param siteIds SiteId array of a company
+   * @param frequency Monthly/Quarterly
+   * @returns list of graduating soon companies
+   */
+  public async getGraduatingSoonCompanies(siteIds: number[], frequency: EmailFrequency) {
+    info(`Fetch graduating soon companies: ${frequency}`, __filename, `getGraduatingSoonCompanies()`);
+    let frequencyDate = this.getFrequencyDate(frequency);
+
+    try {
+      let graduatingSoonComps = await this.spaceChangeWaitlistRepository.createQueryBuilder("space_change_waitlist")
+        .select("space_change_waitlist.requestGraduateDate", "graduatingOn")
+        .addSelect("rc.id", "id")
+        .addSelect("rc.logoImgUrl", "logoUrl")
+        .addSelect("rc.companyName", "companyName")
+        .addSelect("rc.companyStatus", "companyStatus")
+        .addSelect("rc.site", "site")
+        .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
+        .where(`space_change_waitlist.requestStatus IN (${RequestStatusEnum.Open},${RequestStatusEnum.ApprovedInProgress})`)
+        .andWhere(`space_change_waitlist.membershipChange = ${MembershipChangeEnum.Graduate}`)
+        .andWhere(`space_change_waitlist.site && ARRAY[:...site]::int[]`, { site: siteIds })
+        .andWhere("CAST(space_change_waitlist.dateRequested AS Date) >= :theDate", { theDate: frequencyDate })
+        .limit(ApplicationConstants.SPONSOR_MAIL_RECORD_LIMIT)
+        .getRawMany();
+      return graduatingSoonComps;
+    } catch (err) {
+      error(`Error in fetching graduating soon comps for frequency ${EmailFrequency[frequency]} for sponsor user. ${err.message}`, __filename, "getGraduatingSoonCompanies()");
+      throw new BiolabsException(`Error in fetching graduating soon comps for frequency ${frequency} for sponsor user.`, err.message);
+    }
+  }
+
+  /**
+   * Description: Calculates a frequency date based on email frequency.
+   * @description Calculates a frequency date based on email frequency.
+   * @param frequency Monthly/Quarterly
+   * @returns return a frequency date
+   */
+  getFrequencyDate(frequency: EmailFrequency) {
+    info(`Calculating frequency date based on email frequency: ${frequency}`, __filename, `getFrequencyDate()`);
+    const currentDate = new Date();
+    let frequencyDate: Date;
+    const DAYS_7 = 7;
+    const MONTHS_3 = 3;
+    const MONTHS_1 = 1;
+
+    if (frequency == EmailFrequency.Weekly) {
+      frequencyDate = new Date(currentDate.setDate(currentDate.getDate() - DAYS_7)); //7 Days
+    } else if (frequency == EmailFrequency.Quarterly) {
+      frequencyDate = new Date(currentDate.setMonth(currentDate.getMonth() - MONTHS_3)); //3 Months
+    } else {
+      /** Set it monthly */
+      frequencyDate = new Date(currentDate.setMonth(currentDate.getMonth() - MONTHS_1)); //1 Month
+    }
+    info(`After calculating frequency date: ${frequencyDate}`, __filename, `getFrequencyDate()`);
+    return frequencyDate;
   }
 }

@@ -12,5 +12,7 @@ export const EMAIL = {
   EMAIL_SUBMITTED_SPACE_CHANGE_WAITLIST: '/invoice-waitlist/waitlist',
   RESIDENT_COMPANIES: '/resident-companies/',
   COMPANY_ADMIN: '/companyadmin',
-  COMPANY_PROFILE: '/company'
+  COMPANY_PROFILE: '/company',
+  SPONSOR_SEARCH_PAGE: 'sponsor-view/explore/',
+  SPONSOR_SEARCH_PAGE_PARAM: 'email-'
 };
