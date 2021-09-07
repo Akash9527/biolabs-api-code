@@ -69,13 +69,20 @@ export class UsersService {
   async create(payload: UserFillableFields, siteData: any) {
     info("Creating a new biolabs user", __filename, "create()");
     const user = await this.getByEmail(payload.email);
-
     if (user) {
       if (user.email == ApplicationConstants.SUPER_ADMIN_EMAIL_ID) {
         const siteArr = siteData.map((site) => site.id);
-        // Appending userId to superadmin payload
-        payload = { ...payload, ...{ id: user.id, site_id: siteArr } };
-        return await this.userRepository.save(this.userRepository.create(payload));
+        const userObj = {
+          "email": payload.email,
+          "role": payload.role,
+          "site_id": siteArr,
+          "firstName": payload.firstName,
+          "lastName": payload.lastName,
+          "title": payload.title,
+          "phoneNumber": payload.phoneNumber,
+          "status": payload.status
+        }
+        return await this.userRepository.update(user.id, userObj)
       } else {
         debug("User with provided email already created", __filename, "create()");
         throw new NotAcceptableException('User with provided email already created.',

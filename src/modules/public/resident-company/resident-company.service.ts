@@ -533,6 +533,7 @@ export class ResidentCompanyService {
       response['fundingSource'] = residentCompanyObj.fundingSource;
       response['TotalCompanySize'] = residentCompanyObj.companySize;
       response['canWeShareYourDataWithSponsorsEtc'] = residentCompanyObj.shareYourProfile;
+      response['company'] = residentCompanyObj.companyName;
       return response;
     } else {
       error(`Resident Company not found by company Id: ${residentCompanyId}`, __filename, `getResidentCompanySpecificFieldsById()`);
