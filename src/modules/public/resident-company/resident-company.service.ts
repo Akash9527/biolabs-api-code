@@ -517,7 +517,7 @@ export class ResidentCompanyService {
     let siteIdArr;
 
     /** Check if user has permission to view this company */
-    this.CheckCompanyPermissionForUser(req, residentCompanyId);
+    await this.CheckCompanyPermissionForUser(req, residentCompanyId);
     siteIdArr = this.getSiteIdArrFromRequestObject(req);
 
     let response = {};
@@ -916,7 +916,7 @@ export class ResidentCompanyService {
     }
 
     /** Check if user has permission to view this company */
-    this.CheckCompanyPermissionForUser(req, id);
+    await this.CheckCompanyPermissionForUser(req, id);
     siteIdArr = this.getSiteIdArrFromRequestObject(req);
     // try {
     const residentCompany: any = await this.residentCompanyRepository.findOne({
@@ -2224,7 +2224,7 @@ group by
     let siteIdArr;
 
     /** Check if user has permission to view this company */
-    this.CheckCompanyPermissionForUser(req, companyId);
+    await this.CheckCompanyPermissionForUser(req, companyId);
     siteIdArr = this.getSiteIdArrFromRequestObject(req);
 
     const residentCompany: any = await this.residentCompanyRepository.findOne({
