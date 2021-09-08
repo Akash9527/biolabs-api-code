@@ -35,7 +35,7 @@ import { SearchResidentCompanyPayload } from './search-resident-company.payload'
 import { UpdateNotesDto } from './update-notes.dto';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
-import {MemberShipStatus} from '../enum/memberShipStatus';
+import { MemberShipStatus } from '../enum/memberShipStatus';
 const { error, warn, info, debug } = require("../../../utils/logger");
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 
@@ -449,6 +449,7 @@ export class ResidentCompanyService {
       let rcQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies")
         .select("resident_companies.* ")
         .addSelect("s.name", "siteName")
+        .addSelect("s.longName", "siteLongName")
         .addSelect("s.id", "siteId")
         .leftJoin('sites', 's', 's.id = Any(resident_companies.site)')
         .where("resident_companies.status IN (:...status)", { status: [1, 0] });
@@ -532,6 +533,7 @@ export class ResidentCompanyService {
       response['fundingSource'] = residentCompanyObj.fundingSource;
       response['TotalCompanySize'] = residentCompanyObj.companySize;
       response['canWeShareYourDataWithSponsorsEtc'] = residentCompanyObj.shareYourProfile;
+      response['company'] = residentCompanyObj.companyName;
       return response;
     } else {
       error(`Resident Company not found by company Id: ${residentCompanyId}`, __filename, `getResidentCompanySpecificFieldsById()`);
@@ -1211,20 +1213,20 @@ export class ResidentCompanyService {
       let globalSearch = `SELECT * FROM global_search_view AS gsv`;
       if (!payload.memberShip) {
         globalSearch += ` where "companyStatus" IN ('1')  `;
-      }else if (payload.memberShip == MemberShipStatus.GraduatingSoon){
+      } else if (payload.memberShip == MemberShipStatus.GraduatingSoon) {
         let graduatesoon_ids: any = await this.spaceChangeWaitlistRepository
-        .createQueryBuilder('space_change_waitlist')
-        .select("DISTINCT space_change_waitlist.residentCompanyId", 'company')
-        .where(`space_change_waitlist.requestStatus IN (${RequestStatusEnum.Open},${RequestStatusEnum.ApprovedInProgress})`)
-        .andWhere(`space_change_waitlist.membershipChange = ${MembershipChangeEnum.Graduate}`)
-        .andWhere("space_change_waitlist.site && ARRAY[:...site]::int[]", { site: siteIdArr })
-        .getRawMany();
-        if(graduatesoon_ids.length==0){
+          .createQueryBuilder('space_change_waitlist')
+          .select("DISTINCT space_change_waitlist.residentCompanyId", 'company')
+          .where(`space_change_waitlist.requestStatus IN (${RequestStatusEnum.Open},${RequestStatusEnum.ApprovedInProgress})`)
+          .andWhere(`space_change_waitlist.membershipChange = ${MembershipChangeEnum.Graduate}`)
+          .andWhere("space_change_waitlist.site && ARRAY[:...site]::int[]", { site: siteIdArr })
+          .getRawMany();
+        if (graduatesoon_ids.length == 0) {
           return [];
         }
         graduatesoon_ids = graduatesoon_ids.map((waitlist: any) => waitlist.company);
         globalSearch += ` where "id" IN (${graduatesoon_ids.toString()})  `;
-      }else if (payload.memberShip == MemberShipStatus.Graduated){
+      } else if (payload.memberShip == MemberShipStatus.Graduated) {
         globalSearch += ` where "companyStatus" IN ('4')  `;
       }
 
