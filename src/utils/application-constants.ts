@@ -25,6 +25,7 @@ export const ApplicationConstants = {
     EMAIL_TEXT_RECENTLY_JOINED_A_COMPANY: `{0} company has recently joined BioLabs{1}`,
     EMAIL_TEXT_RECENTLY_GRADUATED_COMPANIES: `{0} companies have recently graduated{1}`,
     EMAIL_TEXT_RECENTLY_GRADUATED_A_COMPANY: `{0} company has recently graduated{1}`,
+    EMAIL_TEXT_GRADUATING_SOON_COMPANIES: `{0} {1} graduating soon{2}`,
 
     /** Table column length */
     SPACE_CHANGE_WAITLIST_REQUEST_NOTES_COL_LENGTH: 600,
@@ -42,6 +43,9 @@ export const ApplicationConstants = {
     /** Flags to check company */
     ONBOARDED_COMPANIES: 'ONBOARDED_COMPANIES',
     GRADUATED_COMPANIES: 'GRADUATED_COMPANIES',
+    GRADUATING_SOON_COMPANIES: 'GRADUATING_SOON_COMPANIES',
+    FREQUENCY: 'FREQUENCY',
+    SPONSOR_MAIL_RECORD_LIMIT : 3,
 
     SPONSOR_USER_ROLE: 3,
 
