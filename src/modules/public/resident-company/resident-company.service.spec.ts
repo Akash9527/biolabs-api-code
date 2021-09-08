@@ -1657,7 +1657,7 @@ describe('ResidentCompanyService', () => {
         await residentCompanyService.getResidentCompany(mockRC.id, req);
       } catch (e) {
         expect(e.response.error).toBe('Not Acceptable');
-        expect(e.response.message).toBe("Company with provided id not available.")
+        expect(e.response.message).toBe("You do not have permission to view this company")
       }
     });
   });
