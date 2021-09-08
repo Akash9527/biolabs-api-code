@@ -767,7 +767,8 @@ export class ResidentCompanyService {
       if (medainResponse && medainResponse.length > 0) {
         status["avgTeamSize"] = Math.round(medainResponse[0].median);
       }
-      const categoryStats = await this.getCategoryCount(0);
+      let industries:any  = await this.getCategoriesandSubCategories();
+      const categoryStats = await this.getCategoryCount(0,industries);
 
       response['companyStats'] = (!status) ? 0 : status;
       response['graduate'] = (!graduate) ? 0 : graduate;
@@ -790,7 +791,7 @@ export class ResidentCompanyService {
     let res = [];
     try {
       const sites = await this.siteRepository.find();
-
+      let industries: any = await this.getCategoriesandSubCategories();
       for (let site of sites) {
         let response = {};
 
@@ -811,8 +812,8 @@ export class ResidentCompanyService {
         if (medainResponse && medainResponse.length > 0) {
           companystats["avg"] = Math.round(medainResponse[0].median);
         }
-
-        const categoryStats = await this.getCategoryCount(site.id);
+        industries.forEach((category:any) =>category.industrycount = 0);
+        const categoryStats = await this.getCategoryCount(site.id,[...industries]);
 
         let newStartUps: any = {};
         newStartUps = await this.residentCompanyRepository.
@@ -840,62 +841,89 @@ export class ResidentCompanyService {
 
   }
 
-  /**
+ /**
+  * @description This method to get sub categories of parent.
+  * @param parentId Category id 
+  * @returns This method return sub categories of parent.
+  */
+  public async getIndustriesByParentId(parentId: number) {
+    info(`Fetching industsy names from db`, __filename, `getCompanyIndustrysById()`);
+    return await this.categoryRepository.find({
+      select: ["id", "name", "parent_id"],
+      where: { parent_id: parentId }
+    }).then((result) => {
+      return result;
+    });
+  }
+
+ /**
+  * @description This method will return categories and subcategories.
+  * @returns This method will return categories and subcategories.
+  */
+  async getCategoriesandSubCategories() {
+    let firstLevelIndustries = await this.getIndustriesByParentId(0);
+    for (let industry in firstLevelIndustries) {
+      firstLevelIndustries[industry]['industrycount'] = 0;
+      firstLevelIndustries[industry]['child'] = await this.getIndustriesByParentId(firstLevelIndustries[industry].id)
+      if (firstLevelIndustries[industry]['child'] && firstLevelIndustries[industry]['child'].length > 0) {
+        for (let third_level in firstLevelIndustries[industry]['child']) {
+          firstLevelIndustries[industry]['child'][third_level]['child'] = await this.getIndustriesByParentId(firstLevelIndustries[industry]['child'][third_level].id);
+        }
+      }
+    }
+    return firstLevelIndustries;
+  }
+
+ /**
   * @description This method will get top 3 count of resident conpanies associated with industries.
-  * @param siteId site id 
+  * @param site site id 
+  * @param industries Categories Array 
   * @returns resident conpanies associated with industries.
   */
-  async getCategoryCount(siteId) {
-    let siteFilter = "(select count(rc.*) FROM public.resident_companies as rc where rc.\"companyStatus\" = '1'  and rc.\"companyOnboardingStatus\" = true  and p.id = ANY(rc.industry::int[]) ) as industryCount ";
-    if (siteId && siteId > 0) {
-      siteFilter = "(select count(rc.*) FROM public.resident_companies as rc  where  rc.\"companyStatus\" = '1'  and rc.\"companyOnboardingStatus\" = true and p.id = ANY(rc.industry::int[]) and  " + siteId + " = ANY(rc.site::int[]) ) as industryCount ";
+  async getCategoryCount(site, industries: any) {
+    let query = null;
+    if (site != null && site > 0) {
+      query = "select id, industry FROM public.resident_companies as rc  where  rc.\"companyStatus\" = '1'  and rc.\"companyOnboardingStatus\" = true and  " + site + " = ANY(rc.site::int[]) ;"
+    } else {
+      query = "select id, industry FROM public.resident_companies as rc  where  rc.\"companyStatus\" = '1'  and rc.\"companyOnboardingStatus\" = true ;"
     }
-    let query =
-      " with CTE as"
-      + "("
-      + " select p.id,p.parent_id cid,p.name as cname ,p1.parent_id as c1id,p1.name as c1name ,p2.parent_id as c2id, p2.name as c2name,"
-      + siteFilter
-      + " from public.categories as p left join public.categories as p1 on p1.id=p.parent_id "
-      + " left join  public.categories as p2 on p2.id=p1.parent_id "
-      + " order by industryCount desc)"
-      + ",CTE1 as"
-      + "("
-      + " select C.c2name as c2name, sum(C.industryCount) as c2count from CTE C"
-      + " where C.c2id is not null and C.c2id=0 and C.industryCount>0"
-      + " group by C.c2name"
-      + ")"
-      + ",CTE2 as"
-      + "("
-      + " select C.c1name as c1name, sum(C.industryCount) as c1count from CTE C"
-      + " where C.c1id is not null and C.c1id=0 and C.industryCount>0"
-      + " group by C.c1name"
-      + ")"
-      + ",CTE3  as"
-      + "("
-      + " select C.cname as cname, sum(C.industryCount) as ccount from CTE C"
-      + " where C.cid is not null and C.cid=0 and C.industryCount>0"
-      + " group by C.cname"
-      + ")"
-      + " select c2name as name,c2count as industryCount from CTE1 union "
-      + " select c1name,c1count from CTE2 union "
-      + " select cname,ccount from CTE3 "
-      + " order by industryCount desc;"
-    info("Query excecuting ", query, __filename, "getCategoryCount()");
-    const categoryStats = await this.categoryRepository.query(query);
-    let holder = {};
-    categoryStats.forEach(function (d) {
-      if (holder.hasOwnProperty(d.name)) {
-        holder[d.name] = holder[d.name] + parseInt(d.industrycount);
-      } else {
-        holder[d.name] = parseInt(d.industrycount);
+    let residentCompanies = await this.residentCompanyRepository.query(query);
+    let firstLevelIndustries: any = [...industries];
+    let count = [];
+    for (let company of residentCompanies) {
+      for (let industry in firstLevelIndustries) {
+        let checkCount = { parent: false, child: false, sub_child: false };
+        let first_levelCheck = company.industry.includes(firstLevelIndustries[industry].id);
+        if (first_levelCheck) {
+          checkCount.parent = true;
+        }
+        if (firstLevelIndustries[industry]['child'] && firstLevelIndustries[industry]['child'].length > 0) {
+          for (let third_level in firstLevelIndustries[industry]['child']) {
+            let second_levelCheck = company.industry.includes(firstLevelIndustries[industry]['child'][third_level].id);
+            if (second_levelCheck) {
+              checkCount.child = true;
+            }
+            if (firstLevelIndustries[industry]['child'][third_level]['child'] && firstLevelIndustries[industry]['child'][third_level]['child'].length > 0) {
+              for (let child_level in firstLevelIndustries[industry]['child'][third_level]['child']) {
+                let third_levelCheck = company.industry.includes(firstLevelIndustries[industry]['child'][third_level]['child'][child_level].id)
+                if (third_levelCheck) {
+                  checkCount.sub_child = true;
+                }
+              }
+            }
+          }
+        }
+        if (checkCount.parent || checkCount.child || checkCount.sub_child) {
+          firstLevelIndustries[industry]['industrycount'] += 1;
+        }
       }
-    });
-    let catogaryObj = [];
-    for (let prop in holder) {
-      if (catogaryObj.length < 3)
-        catogaryObj.push({ name: prop, industrycount: holder[prop] });
     }
-    return catogaryObj;
+    firstLevelIndustries = firstLevelIndustries.sort((a: any, b: any) => a.industrycount > b.industrycount ? -1 : 1);
+    firstLevelIndustries = firstLevelIndustries.slice(0, 3)
+    for (let industry of firstLevelIndustries) {
+      count.push({ name: industry.name, industrycount: industry.industrycount })
+    }
+    return count;
   }
 
   /**
@@ -1200,6 +1228,23 @@ export class ResidentCompanyService {
     }
   }
   /**
+   * Description: This method will return which companies has opened & inprogress graduated requests resident companies id's as array.
+   * @description This method will return which companies has opened & inprogress graduated requests resident companies id's as array.
+   * @param siteIdArr Array of Site id's
+   * @return array of resident companies id's.
+   */
+  async getOpenedandInprogressSpaceChangeWaitListIds(siteIdArr: any){
+    let requests= await this.spaceChangeWaitlistRepository
+        .createQueryBuilder('space_change_waitlist')
+        .select("DISTINCT space_change_waitlist.residentCompanyId", 'company')
+        .where(`space_change_waitlist.requestStatus IN (${RequestStatusEnum.Open},${RequestStatusEnum.ApprovedInProgress})`)
+        .andWhere(`space_change_waitlist.membershipChange = ${MembershipChangeEnum.Graduate}`)
+        .andWhere("space_change_waitlist.site && ARRAY[:...site]::int[]", { site: siteIdArr })
+        .getRawMany();
+      return requests.length>0 ? requests.map((waitlist: any) => waitlist.company) : [];
+  }
+
+  /**
    * Description: This method will return the resident companies list.
    * @description This method will return the resident companies list.
    * @param payload object of ListResidentCompanyPayload
@@ -1209,22 +1254,23 @@ export class ResidentCompanyService {
     info(`global search companies`, __filename, "gloabalSearchCompanies()")
     try {
       let globalSearch = `SELECT * FROM global_search_view AS gsv`;
+      let site: any;
+      if (payload.siteIdArr && payload.siteIdArr.length > 0) {
+        site = this.parseToArray(payload.siteIdArr)
+      } else if (siteIdArr && siteIdArr.length) {
+        site = siteIdArr
+      }
       if (!payload.memberShip) {
-        globalSearch += ` where "companyStatus" IN ('1')  `;
-      }else if (payload.memberShip == MemberShipStatus.GraduatingSoon){
-        let graduatesoon_ids: any = await this.spaceChangeWaitlistRepository
-        .createQueryBuilder('space_change_waitlist')
-        .select("DISTINCT space_change_waitlist.residentCompanyId", 'company')
-        .where(`space_change_waitlist.requestStatus IN (${RequestStatusEnum.Open},${RequestStatusEnum.ApprovedInProgress})`)
-        .andWhere(`space_change_waitlist.membershipChange = ${MembershipChangeEnum.Graduate}`)
-        .andWhere("space_change_waitlist.site && ARRAY[:...site]::int[]", { site: siteIdArr })
-        .getRawMany();
-        if(graduatesoon_ids.length==0){
+        let graduated_ids: any = await this.getOpenedandInprogressSpaceChangeWaitListIds(site);
+        globalSearch += ` where "companyStatus" IN ('1')`;
+        if (graduated_ids.length > 0) globalSearch += `OR id IN (${graduated_ids.toString()})`;
+      } else if (payload.memberShip == MemberShipStatus.GraduatingSoon) {
+        let graduatesoon_ids: any = await this.getOpenedandInprogressSpaceChangeWaitListIds(site);
+        if (graduatesoon_ids.length == 0) {
           return [];
         }
-        graduatesoon_ids = graduatesoon_ids.map((waitlist: any) => waitlist.company);
         globalSearch += ` where "id" IN (${graduatesoon_ids.toString()})  `;
-      }else if (payload.memberShip == MemberShipStatus.Graduated){
+      } else if (payload.memberShip == MemberShipStatus.Graduated) {
         globalSearch += ` where "companyStatus" IN ('4')  `;
       }
 
@@ -1232,6 +1278,7 @@ export class ResidentCompanyService {
         payload.siteIdArr = this.parseToArray(payload.siteIdArr)
         globalSearch += ` and gsv."site" && ARRAY[` + payload.siteIdArr + `]::int[] `;
       } else if (siteIdArr && siteIdArr.length) {
+        console.log(siteIdArr)
         globalSearch += ` and gsv."site" && ARRAY[` + siteIdArr + `]::int[] `;
       }
 
