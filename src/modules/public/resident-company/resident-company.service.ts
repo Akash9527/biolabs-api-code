@@ -844,32 +844,17 @@ export class ResidentCompanyService {
   }
 
  /**
-  * @description This method to get sub categories of parent.
-  * @param parentId Category id 
-  * @returns This method return sub categories of parent.
-  */
-  public async getIndustriesByParentId(parentId: number) {
-    info(`Fetching industsy names from db`, __filename, `getCompanyIndustrysById()`);
-    return await this.categoryRepository.find({
-      select: ["id", "name", "parent_id"],
-      where: { parent_id: parentId }
-    }).then((result) => {
-      return result;
-    });
-  }
-
- /**
   * @description This method will return categories and subcategories.
   * @returns This method will return categories and subcategories.
   */
   async getCategoriesandSubCategories() {
     let firstLevelIndustries = await this.getIndustriesByParentId(0);
-    for (let industry in firstLevelIndustries) {
-      firstLevelIndustries[industry]['industrycount'] = 0;
-      firstLevelIndustries[industry]['child'] = await this.getIndustriesByParentId(firstLevelIndustries[industry].id)
-      if (firstLevelIndustries[industry]['child'] && firstLevelIndustries[industry]['child'].length > 0) {
-        for (let third_level in firstLevelIndustries[industry]['child']) {
-          firstLevelIndustries[industry]['child'][third_level]['child'] = await this.getIndustriesByParentId(firstLevelIndustries[industry]['child'][third_level].id);
+    for (const industry of firstLevelIndustries) {
+      industry['industrycount'] = 0;
+      industry['child'] = await this.getIndustriesByParentId(industry.id)
+      if (industry['child'] && industry['child'].length > 0) {
+        for (let third_level in industry['child']) {
+          industry['child'][third_level]['child'] = await this.getIndustriesByParentId(industry['child'][third_level].id);
         }
       }
     }
@@ -2633,7 +2618,7 @@ group by
   }
 
   /**
-   * Description: Fetches industreis(categories) by parent id.
+   * Description: Fetches industries(categories) by parent id.
    * @description Fetches industreis(categories) by parent id.
    * @param parentId parentId of an industry
    * @returns list of industries
