@@ -927,6 +927,13 @@ export class ResidentCompanyService {
     if (residentCompany) {
 
       info(`Fetched resident company from repository, id : ${residentCompany.id}`, __filename, "getResidentCompany()");
+      if(req && req.user && req.user.role == 3)  {
+        if(!residentCompany.companyVisibility) {
+          throw new NotAcceptableException(
+            'You do not have permission to view this company',
+          );
+        }
+      }
       /** Check if sites are accessible to the user */
       this.checkIfValidSiteIds(siteIdArr, residentCompany.site);
 
@@ -1209,6 +1216,8 @@ export class ResidentCompanyService {
    */
   async gloabalSearchCompanies(payload: SearchResidentCompanyPayload, siteIdArr: number[]) {
     info(`global search companies`, __filename, "gloabalSearchCompanies()")
+    console.log("payload",payload);
+    console.log("siteIdArr",siteIdArr);
     try {
       let globalSearch = `SELECT * FROM global_search_view AS gsv`;
       if (!payload.memberShip) {
