@@ -1353,7 +1353,6 @@ export class ResidentCompanyService {
       }
 
       if (typeof payload.companyVisibility !== 'undefined') {
-        console.log(payload.companyVisibility)
         globalSearch += ` and gsv."companyVisibility" = ${payload.companyVisibility}`;
       }
 
