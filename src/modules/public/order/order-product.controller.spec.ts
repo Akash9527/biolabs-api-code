@@ -53,7 +53,7 @@ describe('OrderProductController', () => {
             companyId: 1, productName: 'TestProduct', productDescription: 'This is TestProduct 1',
             startDate: '2021-08-02', endDate: '2021-08-18',
             month: 7, year: 2021, quantity: 10, cost: 90, recurrence: true, groupId: 1, productTypeId: 1,
-            currentCharge: true, status: 1, manuallyEnteredProduct: false, productId: 10
+            currentCharge: true, status: 1, manuallyEnteredProduct: false, productId: 10, submittedDate: new Date() 
         };
         it('it should called orderProductService addOrderProduct method ', async () => {
             expect(mockCreateOrderProductPayload).not.toBe(null);

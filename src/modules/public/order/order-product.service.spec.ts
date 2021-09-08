@@ -8,6 +8,8 @@ import { CreateOrderProductDto } from './dto/order-product.create.dto';
 import { UpdateOrderProductDto } from './dto/order-product.update.dto';
 import { HttpException, HttpStatus, NotAcceptableException } from '@nestjs/common';
 import { Product } from './model/product.entity';
+import { Notes } from '../resident-company/rc-notes.entity';
+import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 const createMockRepository = <T = any>(): MockRepository<T> => ({
@@ -60,6 +62,11 @@ const mockRC: ResidentCompany = {
     "committeeStatus": null,
     "selectionDate": new Date("2021-07-05T18:30:00.000Z"),
     "companyStatusChangeDate": 2021,
+    "primarySite": [1, 2],
+    "sitesApplied": [1, 2],
+    "notes": [{} as Notes],
+    "spaceChangeWaitlist": [{} as SpaceChangeWaitlist],
+    "companyOnboardingDate": 0
 }
 
 const mockResidentService = () => ({

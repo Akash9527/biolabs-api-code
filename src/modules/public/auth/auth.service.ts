@@ -10,6 +10,7 @@ import { MasterService } from '../master';
 import { RESIDENT_ACCESSLEVELS } from '../../../constants/privileges-resident';
 import { ResidentCompanyService } from '../resident-company/resident-company.service';
 import { refreshTokenPayload } from './refreshToken.payload';
+import { DatabaseService } from '../master/db-script.service';
 const { info } = require('../../../utils/logger');
 
 @Injectable()
@@ -18,7 +19,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly userService: UsersService,
     private readonly masterService: MasterService,
-    private readonly residentCompanyService: ResidentCompanyService
+    private readonly residentCompanyService: ResidentCompanyService,
+    private readonly databaseService:DatabaseService
   ) { }
 
   /**
@@ -35,8 +37,9 @@ export class AuthService {
     await this.masterService.createBiolabsSources(fileData);
     await this.masterService.createCategories(fileData);
     await this.masterService.createTechnologyStages(fileData);
-    await this.masterService.createProductType(fileData);
+    await this.masterService.createProductTypes(fileData);
     await this.createSuperAdmin(fileData);
+    await this.databaseService.executeScript();
   }
 
   /**
@@ -46,10 +49,7 @@ export class AuthService {
    */
   private async createSuperAdmin(migrationData: any) {
     info("Creating application super admin user with all sites access", __filename, "createSuperAdmin()");
-    const superAdmin = await this.userService.getByEmail('superadmin@biolabs.io');
-    if (!superAdmin) {
-      await this.userService.create(migrationData['superadmin']);
-    }
+    await this.userService.create(migrationData['superadmin'], migrationData['sites']);
   }
 
   /**
@@ -126,7 +126,7 @@ export class AuthService {
     return this.userService.forgotPassword(payload, req);
   }
 
-  
+
   /**
    * Description: This method is used to decode the token.
    * @description This method is used to decode the token.

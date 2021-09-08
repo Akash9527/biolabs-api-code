@@ -13,7 +13,7 @@ import { TechnologyStage } from './technology-stage.entity';
 import { MasterPayload } from './master.payload';
 import { FileService } from '../file';
 const appRoot = require('app-root-path');
-const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
+const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/configuration.json"));
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 const mockMasterPayLoad: MasterPayload = {
     q: "test", pagination: true, page: 12, limit: 6, sort: true, sortFiled: "test"
@@ -770,8 +770,30 @@ describe('MasterService', () => {
         })
     });
     describe('should test getCompanyStatus Functionality', () => {
-        let mockCompanyStatus: Array<any> = [{ "id": 0, "name": "Applied" }, { "id": 1, "name": "Accepted" },
-        { "id": 2, "name": "On Hold" }, { "id": 3, "name": "Rejected" }, { "id": 4, "name": "Graduated" }];
+        let mockCompanyStatus: Array<any> = [{
+            "id": 0,
+            "name": "Applied-New"
+          },
+          {
+            "id": 1,
+            "name": "Current Member"
+          },
+          {
+            "id": 2,
+            "name": "On Hold"
+          },
+          {
+            "id": 3,
+            "name": "Discontinued"
+          },
+          {
+            "id": 4,
+            "name": "Graduated"
+          },
+          {
+            "id": 5,
+            "name": "Applied-Contacted"
+          }];
         it('it should return  array of company status object', async () => {
             let companyStatus = await masterService.getCompanyStatus();
             expect(companyStatus).not.toBeNull();
@@ -1137,36 +1159,36 @@ describe('MasterService', () => {
         });
     });
 
-    describe('should test ProductType Functionality', () => {
-        let productTypes = [];
-        let productType = migrationData["productTypeName"][0] as Category;
-        it('it should return ProductType object', async () => {
-            jest.spyOn(productTypeRepository, 'find').mockResolvedValueOnce(productTypes);
-            let mockTypes = migrationData["productTypeName"];
-            for (let index = 0; index < mockTypes.length; index++) {
-                const productTypeMock = mockTypes[index];
-                jest.spyOn(productTypeRepository, 'create').mockResolvedValueOnce(productTypeMock);
-                jest.spyOn(productTypeRepository, 'save').mockResolvedValueOnce(productTypeMock);
-            }
-            await masterService.createProductType(migrationData);
+    // describe.skip('should test ProductType Functionality', () => {
+    //     let productTypes = [];
+    //     let productType = migrationData["productTypeName"][0] as Category;
+    //     it('it should return ProductType object', async () => {
+    //         jest.spyOn(productTypeRepository, 'find').mockResolvedValueOnce(productTypes);
+    //         let mockTypes = migrationData["productTypeName"];
+    //         for (let index = 0; index < mockTypes.length; index++) {
+    //             const productTypeMock = mockTypes[index];
+    //             jest.spyOn(productTypeRepository, 'create').mockResolvedValueOnce(productTypeMock);
+    //             jest.spyOn(productTypeRepository, 'save').mockResolvedValueOnce(productTypeMock);
+    //         }
+    //         await masterService.createProductType(migrationData);
 
-        });
+    //     });
 
-        // expect(dbType).not.toBeNull();
-        // expect(dbType).toBe(productType);
-        // expect(dbType).toMatchObject(productType);
-    });
-    it('should throw exception ', async () => {
-        jest.spyOn(productTypeRepository, 'find').mockImplementation(() => {
-            throw new InternalException('')
-        });
-        try {
-            await masterService.createProductType();
-        } catch (e) {
-            expect(e.name).toBe('InternalException');
-            expect(e instanceof InternalException).toBeTruthy();
-        }
-    });
+    //     // expect(dbType).not.toBeNull();
+    //     // expect(dbType).toBe(productType);
+    //     // expect(dbType).toMatchObject(productType);
+    // });
+    // it('should throw exception ', async () => {
+    //     jest.spyOn(productTypeRepository, 'find').mockImplementation(() => {
+    //         throw new InternalException('')
+    //     });
+    //     try {
+    //         await masterService.createProductType();
+    //     } catch (e) {
+    //         expect(e.name).toBe('InternalException');
+    //         expect(e instanceof InternalException).toBeTruthy();
+    //     }
+    // });
 
     describe('should test createFundings Functionality', () => {
         let mockfundings = [];

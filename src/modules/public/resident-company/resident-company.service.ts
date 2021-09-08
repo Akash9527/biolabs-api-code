@@ -10,6 +10,7 @@ import { UpdateWaitlistPriorityOrderDto } from '../dto/update-waitlist-priority-
 import { UpdateWaitlistRequestStatusDto } from '../dto/update-waitlist-request-status.dto';
 import { Item } from '../entity/item.entity';
 import { SpaceChangeWaitlist } from '../entity/space-change-waitlist.entity';
+import { EmailFrequency } from '../enum/email-frequency-enum';
 import { MembershipChangeEnum } from '../enum/membership-change-enum';
 import { RequestStatusEnum } from '../enum/request-status-enum';
 import { BiolabsSource } from '../master/biolabs-source.entity';
@@ -34,7 +35,7 @@ import { SearchResidentCompanyPayload } from './search-resident-company.payload'
 import { UpdateNotesDto } from './update-notes.dto';
 import { UpdateResidentCompanyStatusPayload } from './update-resident-company-status.payload';
 import { UpdateResidentCompanyPayload } from './update-resident-company.payload';
-const { error, warn, info, debug } = require("../../../utils/logger")
+const { error, warn, info, debug } = require("../../../utils/logger");
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 
 @Injectable()
@@ -306,6 +307,8 @@ export class ResidentCompanyService {
     info("Adding resident company " + payload.companyName, __filename, "addResidentCompany()");
     const rc = await this.getByEmail(payload.email);
     const sites = payload.site;
+    //Selection comiitee date should be null while creating new application-form
+    payload.selectionDate = null;
     if (rc) {
       error("User with provided email already created.", __filename, "addResidentCompany()");
       throw new NotAcceptableException(
@@ -327,8 +330,9 @@ export class ResidentCompanyService {
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
 
+          /** feature/BIOL-371 New applications will not create an entry on the waitlist. */
           /** Create waitlist entry while saving Resident Company */
-          await this.addResidentCompanyDataInWaitlist(savedRc);
+          // await this.addResidentCompanyDataInWaitlist(savedRc);
         }
       }
       await this.sendEmailToSiteAdmin(sites, req, payload.companyName, savedResidentCompanyId, ApplicationConstants.EMAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION);
@@ -359,6 +363,8 @@ export class ResidentCompanyService {
       let siteAdminEmails = [];
       let userInfo;
       let siteList = [];
+      let primarySite = [];
+      let sitesApplied = [];
 
       let siteAdmin: any = await this.userRepository
         .createQueryBuilder('users')
@@ -385,13 +391,28 @@ export class ResidentCompanyService {
           },
         });
       }
+      for (let s in req.body.primarySite) {
+        await this.siteRepository
+          .query(`select name as siteName from sites where id = ${req.body.primarySite[s]}`).then(res => {
+            primarySite.push(res[0].sitename);
+          });
+      }
+
+      for (let s in req.body.sitesApplied) {
+        await this.siteRepository
+          .query(`select name as siteName from sites where id = ${req.body.sitesApplied[s]}`).then(res => {
+            sitesApplied.push(res[0].sitename);
+          });
+      }
 
       userInfo = {
         token: req.headers.authorization,
         company_name: companyName,
         site_name: siteList,
         origin: req.headers['origin'],
-        companyId: companyId
+        companyId: companyId,
+        primarySite: primarySite,
+        sitesApplied: sitesApplied
       };
       debug(`userInfo.origin: ${userInfo.origin}`, __filename, `sendEmailToSiteAdmin()`);
 
@@ -470,6 +491,10 @@ export class ResidentCompanyService {
           }
         }
         rcQuery.skip(skip).take(take)
+      }
+      // BIOL-372
+      if (!payload.companyStatus) {
+        rcQuery.andWhere("resident_companies.companyStatus != '3'")
       }
       return await rcQuery.getRawMany();
     } catch (err) {
@@ -903,6 +928,8 @@ export class ResidentCompanyService {
       this.checkIfValidSiteIds(siteIdArr, residentCompany.site);
 
       residentCompany.sites = await this.getRcSites(residentCompany.site);
+      residentCompany.primarySiteArray = await this.getRcSites(residentCompany.primarySite);
+      residentCompany.sitesAppliedArray = await this.getRcSites(residentCompany.sitesApplied);
       residentCompany.categories = await this.getRcCategories(residentCompany.industry);
       residentCompany.modalities = await this.getRcModalities(residentCompany.modality);
       residentCompany.fundingSources = await this.getRcFundings(residentCompany.fundingSource);
@@ -964,8 +991,13 @@ export class ResidentCompanyService {
       if (residentCompany) {
         residentCompany.companyStatus = payload.companyStatus;
         residentCompany.companyVisibility = payload.companyVisibility;
-        residentCompany.companyOnboardingStatus = payload.companyOnboardingStatus;
 
+        /** Set current date as companyOnboardingDate when companyOnboardingStatus comes true in request and false from db  */
+        if (!residentCompany.companyOnboardingStatus && payload.companyOnboardingStatus) {
+          residentCompany.companyOnboardingDate = new Date();
+        }
+
+        residentCompany.companyOnboardingStatus = payload.companyOnboardingStatus;
         residentCompany.committeeStatus = payload.committeeStatus;
         residentCompany.selectionDate = payload.selectionDate;
         // Checking companyStatusChangeDate is the instanceof Date, then only update.
@@ -1544,6 +1576,7 @@ export class ResidentCompanyService {
                  FROM public.resident_company_history AS rch  WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId})
                  select coalesce(result.stage, 0),result.name, result.quarterno,result.quat, result.yyyy from finalResult result, starty s where result.yyyy >= s.startyyyy AND result.quarterno >= S.startQuaterNumber
                  ORDER BY result.yyyy ,result.quarterno ;`;
+     
       info(`query: ${queryStr}`, __filename, "getStagesOfTechnologyBySiteId()")
       const compResidentHistory = await this.residentCompanyHistoryRepository.query(queryStr);
       for (let i = 0; i < compResidentHistory.length; i++) {
@@ -1570,15 +1603,6 @@ export class ResidentCompanyService {
     info(`get fundings by siteId: ${siteId} companyId: ${companyId}`, __filename, "getFundingBySiteIdAndCompanyId()")
     const response = {};
     try {
-      // const queryStr = " SELECT MAX(\"funding\" ::Decimal) as \"Funding\", " +
-      //   " extract(quarter from rch.\"createdAt\") as \"quarterNo\", " +
-      //   " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quaterText\" " +
-      //   " FROM public.resident_company_history as rch " +
-      //   " WHERE rch.\"site\" = \'{" + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
-      //   " group by " +
-      //   " extract(quarter from rch.\"createdAt\"), " +
-      //   " to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
-      //   " order by to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') ";
       const queryStr = ` SELECT MAX("funding" ::Decimal) as "Funding",
       EXTRACT(quarter FROM rch."createdAt") AS  quarterNo,
        extract(year from rch."createdAt") as yyyy ,
@@ -1710,35 +1734,6 @@ sub1.year,
  to_char(TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD'), '"Q"Q.YYYY')
 order by year,quarterNo
      `;
-    //     const queryStr = `
-    //     SELECT
-    //       "productTypeId",
-    //       MAX("total") as sumofquantity,
-    //       -- month, year,
-    //       -- TO_DATE(year ::text || '-' || month ::text || '-' || '01','YYYY-MM-DD'),
-    //       extract(quarter from TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD')) as quarterNo,
-    //       to_char(TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD'), '"Q"Q.YYYY') AS quat
-    //     FROM
-    //       (SELECT
-    //           p."productTypeId", SUM(o.quantity) as total,
-    //           o.month,o.year
-    //         fROM
-    //           order_product as o
-    //           INNER JOIN product as p ON p.id = o."productId"
-    //         where
-    //           p.id = o."productId"
-    //           AND "companyId" =${companyId}
-    //           AND p."productTypeId" IN (2, 4)
-    //         group by
-    //           p."productTypeId",o.month, o.year
-    //       ) as sub1
-    //     GROUP BY
-    //   sub1."productTypeId",
-    //   --  sub1.month,sub1.year,
-    //    extract(quarter from TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD')),
-    //    to_char(TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD'), '"Q"Q.YYYY')
-    // order by quat;
-    //     `;
     return await this.residentCompanyHistoryRepository.query(queryStr);
   }
   /**
@@ -1751,18 +1746,6 @@ order by year,quarterNo
   async getCompanySizeQuartly(companyId: number) {
     info(`Get Company size quarterly by companyId : ${companyId}`, __filename, `getCompanySizeQuartly()`);
     try {
-      //     const queryStr = `
-      //   SELECT 
-      //      MAX("companySize") as noOfEmployees,
-      //         extract(quarter from "updatedAt")as quarterNo,
-      //         to_char("updatedAt", '"Q"Q.YYYY') AS quat
-      // FROM resident_company_history 
-      //        where "comnpanyId"=${companyId}
-      // group by
-      //           extract(quarter from "updatedAt"),
-      //           to_char("updatedAt", '"Q"Q.YYYY')
-      //           order by quat;
-      //   `;
       const queryStr = `SELECT 
     MAX("companySize") as noOfEmployees,
        extract(quarter from "updatedAt")as quarterNo,
@@ -2101,6 +2084,7 @@ group by
       let waitlistQuery = await this.spaceChangeWaitlistRepository.createQueryBuilder("space_change_waitlist")
         .select("space_change_waitlist.*")
         .addSelect("rc.companyName", "residentCompanyName")
+        .addSelect("rc.companyStatus", "companyStatus")
         .addSelect("u.firstName", "firstName")
         .addSelect("u.lastName", "lastName")
         .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
@@ -2204,9 +2188,17 @@ group by
    * @param req Request object
    * @param residentCompanyId Resident Company id
    */
-  public CheckCompanyPermissionForUser(@Request() req, residentCompanyId: number) {
+  public async CheckCompanyPermissionForUser(@Request() req, residentCompanyId: number) {
     info(`Checking permission to access the resident company id: ${residentCompanyId}`, __filename, "CheckCompanyPermissionForUser()");
+
     if (req && req.user && req.user.companyId && req.user.companyId != residentCompanyId) {
+      // Checking if companyVisibility is true then allow to view those
+      const residentCompanyVisiblityTrue: any = await this.residentCompanyRepository.findOne({
+        where: { id: residentCompanyId, companyVisibility: true }
+      });
+      if (residentCompanyVisiblityTrue) {
+        return false;
+      }
       error(`User does not have permission to view the company: ${residentCompanyId}`, __filename, "CheckCompanyPermissionForUser()");
       throw new NotAcceptableException(
         'You do not have permission to view this company',
@@ -2257,23 +2249,25 @@ group by
       /** Check if sites are accessible to the user */
       this.checkIfValidSiteIds(siteIdArr, residentCompany.site);
     }
-
-    const month = new Date().getMonth() + 2; // Getting next month from currect date
+    const today = new Date();
+    const month = today.getMonth() + 2; // Getting next month from currect date
     const queryStr = `
-    select res."productTypeId", sum(res.count), res."quantity", res."productTypeName"
+    select res."productTypeId", sum(res.count), res."productTypeName"
     from (
         select pt.id as "productTypeId",
         CASE WHEN (op."quantity") is null THEN 0 ELSE (op."quantity") END as quantity,
         CASE WHEN (COUNT(op."productTypeId") * op."quantity") is null THEN 0 ELSE (COUNT(op."productTypeId") * op."quantity") END as count,
         pt."productTypeName"
         from product_type as pt
-        Left Join (select "productTypeId", quantity from order_product where "companyId" = ${companyId} and month = ${month} ) as op
+        Left Join (select "productTypeId", quantity from order_product 
+        where "companyId" = ${companyId} and month = ${month}
+        and year=${today.getFullYear()} and "manuallyEnteredProduct" = false) as op
         on pt.id = op."productTypeId"
         where pt."productTypeName" <> 'Decontamination Fee'
         and pt."productTypeName" <> 'Retainer Fee'
         group by op."quantity", op."productTypeId", pt."productTypeName", pt.id
         ) as res
-    group by res."productTypeId", res."productTypeName", res."quantity"
+    group by res."productTypeId", res."productTypeName"
     `;
 
     const items = await this.residentCompanyHistoryRepository.query(queryStr);
@@ -2526,6 +2520,78 @@ group by
       { id: 3, name: 'Join Biolabs Within : 4 - 6 months' },
       { id: 4, name: 'Join Biolabs Within : More than 6 months' }
     ];
+  }
+
+  // ======================= BIOL-235/BIOL-162 ==========================
+  /**
+   * Description: Fetches resident company data from db by sited id, onboarding/graduated data, company status and other criteria.
+   * @description Fetches resident company data from db by sited id, onboarding/graduated data, company status and other criteria.
+   * @param siteIds sited ids
+   * @param forWhat Onboarded or Graduated
+   * @param frequency Weekly, Monthly, Quarterly to fetch recently onboarded and graduated companies.
+   * @returns list of resident companies
+   */
+  async fetchOnboardedCompaniesBySiteId(siteIds: number[], forWhat: string, frequency: EmailFrequency) {
+    info(`Fetching ${forWhat} data for sites: ${siteIds}, for frequency: ${frequency}`, __filename, `fetchOnboardedCompaniesBySiteId()`);
+
+    const currentDate = new Date();
+    let frequencyDate: Date;
+    const DAYS_7 = 7;
+    const MONTHS_3 = 3;
+    const MONTHS_1 = 1;
+
+    if (frequency == EmailFrequency.Weekly) {
+      frequencyDate = new Date(currentDate.setDate(currentDate.getDate() - DAYS_7)); //7 Days
+    } else if (frequency == EmailFrequency.Quarterly) {
+      frequencyDate = new Date(currentDate.setMonth(currentDate.getMonth() - MONTHS_3)); //3 Months
+    } else {
+      /** Set it monthly */
+      frequencyDate = new Date(currentDate.setMonth(currentDate.getMonth() - MONTHS_1)); //1 Month
+    }
+
+    try {
+      let residentCompanyQuery = await this.residentCompanyRepository.createQueryBuilder("resident_companies").
+        select("resident_companies.id", "id")
+        .addSelect("resident_companies.companyName", "companyName")
+        .addSelect("resident_companies.logoImgUrl", "logoUrl")
+        .addSelect("resident_companies.companyOnboardingStatus", "onboardingStatus")
+        .addSelect("resident_companies.companyOnboardingDate", "onboardingDate")
+        .addSelect("resident_companies.companyStatus", "companyStatus")
+        .addSelect("resident_companies.companyStatusChangeDate", "statusChangeDate")
+        .addSelect("resident_companies.site", "site")
+        .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIds });
+
+      if (forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
+        residentCompanyQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: true });
+        residentCompanyQuery.andWhere("CAST(resident_companies.companyOnboardingDate AS Date) >= :theDate", { theDate: frequencyDate })
+      } else if (forWhat == ApplicationConstants.GRADUATED_COMPANIES) {
+        residentCompanyQuery.andWhere("resident_companies.companyStatus = :companyStatus", { companyStatus: 4 });
+        residentCompanyQuery.andWhere("CAST(resident_companies.companyStatusChangeDate AS Date) >= :theDate", { theDate: frequencyDate })
+      }
+      debug(`Executing query for ${forWhat}, query: ${residentCompanyQuery}`, __filename, `fetchOnboardedCompaniesBySiteId()`);
+      return await residentCompanyQuery.getRawMany();
+    } catch (err) {
+      error(`Error in fetching data for ${forWhat} for sponsor user. ${err.message}`, __filename, "fetchOnboardedCompaniesBySiteId()");
+      throw new BiolabsException(`Error in fetching data for ${forWhat} for sponsor user.`, err.message);
+    }
+  }
+
+  /**
+   * Description: Fetches all sites from db.
+   * @description Fetches all sites from db.
+   * @returns Site array
+   */
+  public async getAllSites() {
+    info(`Fetching sites from db`, __filename, `getAllSites()`);
+    const sites = await this.siteRepository.find({
+      select: ["id", "name"]
+    }).then((result) => {
+      return result;
+    }).catch((err) => {
+      error(`Error in fetching all sites. ${err.message}`, __filename, "getAllSites()");
+      throw new BiolabsException(`Error in fetching all sites.`, err.message);
+    });
+    return sites;
   }
 }
 

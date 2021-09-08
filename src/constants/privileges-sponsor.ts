@@ -22,7 +22,7 @@ export const SPONSOR_ACCESSLEVELS = {
       delete: true,
       child: {
         'sponsor': {
-          name: 'Sponser',
+          name: 'Sponsor',
           action: true,
           create: true,
           view: true,
@@ -169,8 +169,8 @@ export const SPONSOR_ACCESSLEVELS = {
       name: 'My Profile',
       action: false,
       create: false,
-      view: false,
-      update: false,
+      view: true,
+      update: true,
       delete: false,
     },
     'resident-companies': {
