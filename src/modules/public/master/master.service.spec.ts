@@ -773,27 +773,27 @@ describe('MasterService', () => {
         let mockCompanyStatus: Array<any> = [{
             "id": 0,
             "name": "Applied-New"
-          },
-          {
+        },
+        {
             "id": 1,
             "name": "Current Member"
-          },
-          {
+        },
+        {
             "id": 2,
             "name": "On Hold"
-          },
-          {
+        },
+        {
             "id": 3,
             "name": "Discontinued"
-          },
-          {
+        },
+        {
             "id": 4,
             "name": "Graduated"
-          },
-          {
+        },
+        {
             "id": 5,
             "name": "Applied-Contacted"
-          }];
+        }];
         it('it should return  array of company status object', async () => {
             let companyStatus = await masterService.getCompanyStatus();
             expect(companyStatus).not.toBeNull();
@@ -817,7 +817,7 @@ describe('MasterService', () => {
     });
 
     describe('should test getCommitteeStatus Functionality', () => {
-        let mockCommiteeeStatus: Array<any> = [{ "id": 0, "name": "Unscheduled" }, { "id": 1, "name": "Scheduled" }, { "id": 2, "name": "Accepted" }, { "id": 3, "name": "Rejected" }];
+        let mockCommiteeeStatus: Array<any> = [{ "id": 0, "name": "Unscheduled" }, { "id": 1, "name": "Scheduled" }, { "id": 2, "name": "Accepted" }, { "id": 3, "name": "Rejected" }, { "id": 4, "name": "Alternate" }];
         it('it should return  array of Committee status object', async () => {
             let commiteeeStatus = await masterService.getCommitteeStatus();
             expect(commiteeeStatus).not.toBeNull();
@@ -1133,7 +1133,7 @@ describe('MasterService', () => {
         it('it should return Category object', async () => {
             jest.spyOn(categoryRepository, 'find').mockResolvedValueOnce(mockCategory);
             jest.spyOn(categoryRepository, 'save').mockResolvedValueOnce(mockCategory);
-            let dbCategory = await masterService.saveCategory(mockCategory.name, mockCategory.id, mockCategory.parent_id);
+            let dbCategory = await masterService.createCategory(mockCategory.id, mockCategories.name, mockCategory.parent_id);
             expect(dbCategory).not.toBeNull();
             expect(dbCategory).toBe(mockCategory);
             expect(dbCategory).toMatchObject(mockCategory);
@@ -1151,7 +1151,7 @@ describe('MasterService', () => {
                 throw new InternalException('')
             });
             try {
-                await masterService.saveCategory(mockCategory.name, mockCategory.id, mockCategory.parent_id);
+                await masterService.createCategory(mockCategory.id, mockCategories.name, mockCategory.parent_id);
             } catch (e) {
                 expect(e.name).toBe('InternalException');
                 expect(e instanceof InternalException).toBeTruthy();

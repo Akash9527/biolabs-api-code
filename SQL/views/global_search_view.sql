@@ -96,7 +96,7 @@ SELECT
   "logoImgUrl",
   "committeeStatus",
   (
-    CASE WHEN "committeeStatus" = '0' THEN 'Unscheduled' WHEN "committeeStatus" = '1' THEN 'Scheduled' WHEN "committeeStatus" = '2' THEN 'Accepted' WHEN "committeeStatus" = '3' THEN 'Rejected' ELSE "committeeStatus" END
+    CASE WHEN "committeeStatus" = '0' THEN 'Unscheduled' WHEN "committeeStatus" = '1' THEN 'Scheduled' WHEN "committeeStatus" = '2' THEN 'Accepted' WHEN "committeeStatus" = '3' THEN 'Rejected' WHEN "committeeStatus" = '4' THEN 'Alternate' ELSE "committeeStatus" END
   ) as committeestatustext,
   "selectionDate",
   "companyStatusChangeDate"
