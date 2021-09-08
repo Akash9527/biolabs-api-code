@@ -789,7 +789,11 @@ export class Mail {
             </tbody>
          </table>
          `;
-      return this.replaceParams(htmlTable, companyRowData)
+      if (companyRowData) {
+         return this.replaceParams(htmlTable, companyRowData);
+      } else {
+         return '';
+      }
    }
 
    /**
@@ -820,7 +824,7 @@ export class Mail {
                               <td style="width:40%">
                                ${this.arrayToCommaSeparatedString(company.industryNames)}
                               </td>
-                              <td style="width:18%;padding-left:2px">
+                              <td style="width:18%;padding-left:3px">
                                  ${siteName}
                               </td>
                            </tr>
@@ -871,7 +875,7 @@ export class Mail {
                               <td style="width:40%">
                               ${this.arrayToCommaSeparatedString(company.industryNames)}
                               </td>
-                              <td style="width:18%;padding-left:2px">
+                              <td style="width:18%;padding-left:3px">
                                 ${siteName}
                               </td>
                            </tr>
@@ -918,10 +922,10 @@ export class Mail {
                               <td style="width:30%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.companyName}</a>
                               </td>
-                              <td style="width:45%">
+                              <td style="width:40%">
                                 Graduating on ${this.getGraduatingSoonDate(company.graduatingOn)}
                               </td>
-                              <td style="width:13%;padding-left:2px">
+                              <td style="width:18%;padding-left:3px">
                                 ${siteName}
                               </td>
                            </tr>
