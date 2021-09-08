@@ -1248,9 +1248,7 @@ export class ResidentCompanyService {
         site = siteIdArr
       }
       if (!payload.memberShip) {
-        let graduated_ids: any = await this.getOpenedandInprogressSpaceChangeWaitListIds(site);
         globalSearch += ` where "companyStatus" IN ('1')`;
-        if (graduated_ids.length > 0) globalSearch += `OR id IN (${graduated_ids.toString()})`;
       } else if (payload.memberShip == MemberShipStatus.GraduatingSoon) {
         let graduatesoon_ids: any = await this.getOpenedandInprogressSpaceChangeWaitListIds(site);
         if (graduatesoon_ids.length == 0) {
@@ -1265,7 +1263,6 @@ export class ResidentCompanyService {
         payload.siteIdArr = this.parseToArray(payload.siteIdArr)
         globalSearch += ` and gsv."site" && ARRAY[` + payload.siteIdArr + `]::int[] `;
       } else if (siteIdArr && siteIdArr.length) {
-        console.log(siteIdArr)
         globalSearch += ` and gsv."site" && ARRAY[` + siteIdArr + `]::int[] `;
       }
 
@@ -1356,6 +1353,7 @@ export class ResidentCompanyService {
       }
 
       if (typeof payload.companyVisibility !== 'undefined') {
+        console.log(payload.companyVisibility)
         globalSearch += ` and gsv."companyVisibility" = ${payload.companyVisibility}`;
       }
 
@@ -1393,7 +1391,10 @@ export class ResidentCompanyService {
       if (payload.maxCompanySize >= 0) {
         globalSearch += ` and gsv.\"companySize\" ::int <= ${payload.maxCompanySize}`;
       }
-
+      if (!payload.memberShip) {
+        let graduated_ids: any = await this.getOpenedandInprogressSpaceChangeWaitListIds(site);
+        if (graduated_ids.length > 0){ globalSearch += `OR id IN (${graduated_ids.toString()})`; }
+      }
       globalSearch += ` ORDER BY \"id\" DESC `;
       info(`globalSearch query: ${globalSearch}`, __filename, "gloabalSearchCompanies()");
 
