@@ -2571,6 +2571,7 @@ group by
 
       if (forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
         residentCompanyQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: true });
+        residentCompanyQuery.andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: true });
         if (by == ApplicationConstants.FREQUENCY) {
           residentCompanyQuery.andWhere("CAST(resident_companies.companyOnboardingDate AS Date) >= :theDate", { theDate: frequencyDate });
         } else {
@@ -2654,6 +2655,8 @@ group by
         .addSelect("rc.site", "site")
         .leftJoin('resident_companies', 'rc', 'rc.id = space_change_waitlist.residentCompanyId')
         .where(`space_change_waitlist.requestStatus IN (${RequestStatusEnum.Open},${RequestStatusEnum.ApprovedInProgress})`)
+        .andWhere("rc.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: true })
+        .andWhere("rc.companyVisibility = :companyVisibility", { companyVisibility: true })
         .andWhere(`space_change_waitlist.membershipChange = ${MembershipChangeEnum.Graduate}`)
         .andWhere(`space_change_waitlist.site && ARRAY[:...site]::int[]`, { site: siteIds })
         .andWhere("CAST(space_change_waitlist.dateRequested AS Date) >= :theDate", { theDate: frequencyDate })
