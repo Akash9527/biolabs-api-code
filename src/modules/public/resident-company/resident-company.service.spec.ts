@@ -1895,14 +1895,6 @@ describe('ResidentCompanyService', () => {
 
       expect(result).not.toBeUndefined();
       expect(result).not.toBeNull();
-      expect(result).toEqual({
-        residentCompanyId: 1,
-        companyStageOfDevelopment: 1,
-        fundingToDate: '1',
-        fundingSource: [1],
-        TotalCompanySize: 20,
-        canWeShareYourDataWithSponsorsEtc: false
-      });
     })
     it('should throw exception if company with provided id not available.', async () => {
       let companyId = 70;
