@@ -1787,7 +1787,7 @@ export class ResidentCompanyService {
       UNION
       SELECT 4 AS QNo,'Q4' AS QuarterName
       ) ,finalquater as ( select QNo, concat(Q.QuarterName ,'.', StartYear) as quatNumber  , StartYear from YEARCTE as G,QUATCTE as Q)
-      Select t.productTypeId as productTypeId, t.sumofquantity as sumofquantity,f. StartYear as year,f.QNo as quarterno, f.quatNumber as quat  from  finalquater as f left join (
+      Select coalesce( t.productTypeId, 0) as productTypeId, coalesce( t.sumofquantity, 0) as sumofquantity,f. StartYear as year,f.QNo as quarterno, f.quatNumber as quat  from  finalquater as f left join (
       SELECT
   "productTypeId" as productTypeId,
   MAX("total") as sumofquantity,
@@ -1816,7 +1816,13 @@ to_char(TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD
 order by year,quarterNo) as t on t.quat= f.quatNumber
       ORDER BY f.StartYear , QNo;
      `;
-    return await this.residentCompanyHistoryRepository.query(queryStr);
+   const timelineData= await this.residentCompanyHistoryRepository.query(queryStr);
+    let companyHistory: any;
+      if (timelineData.length > 0) {
+        companyHistory = timelineData.findIndex((company: any) => company.sumofquantity);
+        timelineData.splice(0, companyHistory);
+      }
+      return timelineData;
   }
   /**
  * Description: This method returns companySize Quarterly.
@@ -1840,7 +1846,7 @@ order by year,quarterNo) as t on t.quat= f.quatNumber
       UNION
       SELECT 4 AS QNo,'Q4' AS QuarterName
       ) ,finalquater as ( select QNo, concat(Q.QuarterName ,'.', StartYear) as quatNumber  , StartYear from YEARCTE as G,QUATCTE as Q)
-      Select f. StartYear as year, f.quatNumber as quat,coalesce( t.noOfEmployees, 0) as stage,f.QNo as quarterno  from  finalquater as f left join (
+      Select f. StartYear as year, f.quatNumber as quat,coalesce( t.noOfEmployees, 0) as noofemployees,f.QNo as quarterno  from  finalquater as f left join (
       SELECT
   MAX("companySize") as noOfEmployees,
      extract(quarter from "updatedAt")as quarterNo,
@@ -1857,7 +1863,6 @@ group by
 
       debug(`getting companySize Quarterly: ${queryStr}`, __filename, "getCompanySizeQuartly()")
       const companySizeData = await this.residentCompanyHistoryRepository.query(queryStr);
-     
       let companyHistory: any;
       if (companySizeData.length > 0) {
         companyHistory = companySizeData.findIndex((company: any) => company.noofemployees);
@@ -1870,9 +1875,7 @@ group by
       }
       return companySizeData;
       
-    } catch (err) {
-      console.log(err);
-      
+    } catch (err) { 
       error("Getting error in find theget company size quartly", __filename, "getCompanySizeQuartly()");
       throw new BiolabsException('Getting error in find company size quartly', err.message);
     }
