@@ -1259,8 +1259,7 @@ export class ResidentCompanyService {
         globalSearch += ` where "companyStatus" IN ('1') AND "id" IN (${graduatesoon_ids.toString()}) AND 
         "companyVisibility"=true AND "companyOnboardingStatus"=true `;
       } else if (payload.memberShip == MemberShipStatus.Graduated) {
-        globalSearch += ` where "companyStatus" IN ('4') AND "companyVisibility"=true 
-        AND "companyOnboardingStatus"=true `;
+        globalSearch += ` where "companyStatus" IN ('4') AND "companyVisibility"=true`;
       }
 
       if (payload.siteIdArr && payload.siteIdArr.length > 0) {
@@ -2618,11 +2617,11 @@ group by
         .addSelect("resident_companies.site", "site")
         .addSelect("resident_companies.industry", "industry")
         .addSelect("resident_companies.otherIndustries", "otherIndustries")
-        .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIds });
+        .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIds })
+        .andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: true });
 
       if (forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
         residentCompanyQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: true });
-        residentCompanyQuery.andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: true });
         if (by == ApplicationConstants.FREQUENCY) {
           residentCompanyQuery.andWhere("CAST(resident_companies.companyOnboardingDate AS Date) >= :theDate", { theDate: frequencyDate });
         } else {
