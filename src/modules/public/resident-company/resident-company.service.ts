@@ -2617,11 +2617,11 @@ group by
         .addSelect("resident_companies.site", "site")
         .addSelect("resident_companies.industry", "industry")
         .addSelect("resident_companies.otherIndustries", "otherIndustries")
-        .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIds });
+        .andWhere("resident_companies.site && ARRAY[:...siteIdArr]::int[]", { siteIdArr: siteIds })
+        .andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: true });
 
       if (forWhat == ApplicationConstants.ONBOARDED_COMPANIES) {
         residentCompanyQuery.andWhere("resident_companies.companyOnboardingStatus = :companyOnboardingStatus", { companyOnboardingStatus: true });
-        residentCompanyQuery.andWhere("resident_companies.companyVisibility = :companyVisibility", { companyVisibility: true });
         if (by == ApplicationConstants.FREQUENCY) {
           residentCompanyQuery.andWhere("CAST(resident_companies.companyOnboardingDate AS Date) >= :theDate", { theDate: frequencyDate });
         } else {
