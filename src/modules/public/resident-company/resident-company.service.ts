@@ -1776,35 +1776,72 @@ export class ResidentCompanyService {
   async timelineAnalysis(companyId: number) {
     info(`Timeline analysis by companyId : ${companyId}`, __filename, `timelineAnalysis()`);
     const queryStr = `
-    SELECT
-    "productTypeId",
-    MAX("total") as sumofquantity,
-   year,
-    -- TO_DATE(year ::text || '-' || month ::text || '-' || '01','YYYY-MM-DD'),
-    extract(quarter from TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD')) as quarterNo,
-    to_char(TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD'), '"Q"Q.YYYY') AS quat
-  FROM
-    (SELECT
-        p."productTypeId", SUM(o.quantity) as total,
-        o.month,o.year
-      fROM
-        order_product as o
-        INNER JOIN product as p ON p.id = o."productId"
-      where
-        p.id = o."productId"
-        AND "companyId" =${companyId}
-        AND p."productTypeId" IN (2, 4)
-      group by
-        p."productTypeId",o.month, o.year
-    ) as sub1
-  GROUP BY
+    WITH RECURSIVE YEARCTE AS (
+      SELECT  MIN(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch WHERE rch."comnpanyId"=${companyId}
+      UNION ALL
+      SELECT StartYear+1 FROM YEARCTE WHERE StartYear+1<=(SELECT  MAX(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch WHERE  rch."comnpanyId"=${companyId})) ,
+      QUATCTE AS (
+      SELECT 1 AS QNo,'Q1' AS QuarterName
+      UNION
+      SELECT 2 AS QNo,'Q2' AS QuarterName
+      UNION
+      SELECT 3 AS QNo,'Q3' AS QuarterName
+      UNION
+      SELECT 4 AS QNo,'Q4' AS QuarterName
+      ) ,finalquater as ( select QNo, concat(Q.QuarterName ,'.', StartYear) as quatNumber  , StartYear from YEARCTE as G,QUATCTE as Q)
+      , productTypeData as (SELECT distinct p."productTypeId"
+        fROM
+          order_product as o
+      INNER JOIN product as p ON p.id = o."productId"
+        where  p.id = o."productId"
+      AND "companyId" = ${companyId}
+      AND p."productTypeId" IN (2, 4))
+      , benchData as (select p1."productTypeId" , f.qNo,f.quatNumber,StartYear from productTypeData p1,finalquater f )
+      , resultData as (Select t.productTypeId as producttypeid,  t.sumofquantity as sumofquantity,f. StartYear as year,f.QNo as quarterno, f.quatNumber as quat  from  finalquater as f left join (
+      SELECT
+  "productTypeId" as productTypeId,
+  MAX("total") as sumofquantity,
+ year,
+  extract(quarter from TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD')) as quarterNo,
+  to_char(TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD'), '"Q"Q.YYYY') AS quat
+FROM
+  (SELECT
+      p."productTypeId", SUM(o.quantity) as total,
+      o.month,o.year
+    fROM
+      order_product as o
+      INNER JOIN product as p ON p.id = o."productId"
+    where
+      p.id = o."productId"
+      AND "companyId" =${companyId}
+      AND p."productTypeId" IN (2, 4)
+    group by
+      p."productTypeId",o.month, o.year
+  ) as sub1
+GROUP BY
 sub1."productTypeId",
 sub1.year,
- extract(quarter from TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD')),
- to_char(TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD'), '"Q"Q.YYYY')
-order by year,quarterNo
+extract(quarter from TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD')),
+to_char(TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD'), '"Q"Q.YYYY')
+order by year,quarterNo) as t on t.quat= f.quatNumber
+      ORDER BY f.StartYear , QNo)
+      select b.qNo as quarterno,b.quatNumber as quat,b.StartYear as year , b."productTypeId" ,
+       r.sumofquantity as sumofquantity
+       from benchData b left join resultData r on b.qNo=r.quarterno and
+       b.quatNumber = r. quat and b.StartYear = r.year and b."productTypeId" = r.productTypeId order by b.StartYear,b.qNo,b."productTypeId";
      `;
-    return await this.residentCompanyHistoryRepository.query(queryStr);
+    const timelineData = await this.residentCompanyHistoryRepository.query(queryStr);
+    let companyHistory: any;
+    if (timelineData.length > 0) {
+      companyHistory = timelineData.findIndex((company: any) => company.sumofquantity);
+      timelineData.splice(0, companyHistory);
+    }
+    for (let i = 0; i < timelineData.length; i++) {
+      if ( timelineData[i].sumofquantity == null) {
+        timelineData[i].sumofquantity = 0;
+      }
+    }
+    return timelineData;
   }
   /**
  * Description: This method returns companySize Quarterly.
@@ -1816,21 +1853,47 @@ order by year,quarterNo
   async getCompanySizeQuartly(companyId: number) {
     info(`Get Company size quarterly by companyId : ${companyId}`, __filename, `getCompanySizeQuartly()`);
     try {
-      const queryStr = `SELECT 
-    MAX("companySize") as noOfEmployees,
-       extract(quarter from "updatedAt")as quarterNo,
-   extract(year from "updatedAt") as year ,
-       to_char("updatedAt", '"Q"Q.YYYY') AS quat
-FROM resident_company_history 
-      where "comnpanyId"=${companyId}
+      const queryStr = `WITH RECURSIVE YEARCTE AS (SELECT  MIN(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch WHERE  rch."comnpanyId"=${companyId}
+      UNION ALL
+      SELECT StartYear+1 FROM YEARCTE WHERE StartYear+1<=(SELECT  MAX(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch WHERE   rch."comnpanyId"=${companyId})) ,
+      QUATCTE AS (
+      SELECT 1 AS QNo,'Q1' AS QuarterName
+      UNION
+      SELECT 2 AS QNo,'Q2' AS QuarterName
+      UNION
+      SELECT 3 AS QNo,'Q3' AS QuarterName
+      UNION
+      SELECT 4 AS QNo,'Q4' AS QuarterName
+      ) ,finalquater as ( select QNo, concat(Q.QuarterName ,'.', StartYear) as quatNumber  , StartYear from YEARCTE as G,QUATCTE as Q)
+      Select f. StartYear as year, f.quatNumber as quat,coalesce( t.noOfEmployees, 0) as noofemployees,f.QNo as quarterno  from  finalquater as f left join (
+      SELECT
+  MAX("companySize") as noOfEmployees,
+     extract(quarter from "updatedAt")as quarterNo,
+ extract(year from "updatedAt") as year ,
+     to_char("updatedAt", '"Q"Q.YYYY') AS quat
+FROM resident_company_history
+    where "comnpanyId"=${companyId}
 group by
-         extract(quarter from "updatedAt"),
-   extract(year from "updatedAt"),
-         to_char("updatedAt", '"Q"Q.YYYY')
-         order by year`;
+       extract(quarter from "updatedAt"),
+ extract(year from "updatedAt"),
+       to_char("updatedAt", '"Q"Q.YYYY')
+       order by year) as t on t.quat= f.quatNumber
+      ORDER BY f.StartYear , QNo`;
 
       debug(`getting companySize Quarterly: ${queryStr}`, __filename, "getCompanySizeQuartly()")
-      return await this.residentCompanyHistoryRepository.query(queryStr);
+      const companySizeData = await this.residentCompanyHistoryRepository.query(queryStr);
+      let companyHistory: any;
+      if (companySizeData.length > 0) {
+        companyHistory = companySizeData.findIndex((company: any) => company.noofemployees);
+        companySizeData.splice(0, companyHistory);
+      }
+      for (let i = 0; i < companySizeData.length; i++) {
+        if (companySizeData[i].noofemployees == 0) {
+          companySizeData[i].noofemployees = companySizeData[i - 1].noofemployees;
+        }
+      }
+      return companySizeData;
+
     } catch (err) {
       error("Getting error in find theget company size quartly", __filename, "getCompanySizeQuartly()");
       throw new BiolabsException('Getting error in find company size quartly', err.message);
