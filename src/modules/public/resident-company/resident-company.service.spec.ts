@@ -1591,21 +1591,48 @@ describe('ResidentCompanyService', () => {
   });
   describe('getFundingBySiteIdAndCompanyId method', () => {
     const mockfundings =
-      [
-        {
-          "Funding": "12",
-          "quarterNo": 3,
-          "quaterText": "Q3.2021"
-        }
-      ]
+     [
+      {
+        yyyy: 2019,
+        quatertext: 'Q1.2019',
+        funding: null,
+        name: null,
+        quarterno: 1
+      },
+      {
+        yyyy: 2019,
+        quatertext: 'Q2.2019',
+        funding: 690,
+        name: null,
+        quarterno: 2
+      },
+      {
+        yyyy: 2019,
+        quatertext: 'Q3.2019',
+        funding: 689,
+        name: null,
+        quarterno: 3
+      },
+      {
+        yyyy: 2019,
+        quatertext: 'Q4.2019',
+        funding: 690,
+        name: null,
+        quarterno: 4
+      },
+      {
+        yyyy: 2020,
+        quatertext: 'Q1.2020',
+        funding: 769,
+        name: null,
+        quarterno: 1
+      }]
 
     it('should return object', async () => {
       jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockfundings);
       let result = await residentCompanyService.getFundingBySiteIdAndCompanyId(1, 1);
       expect(result).not.toBeNull();
-      expect(result).toEqual({
-        fundings: [{ Funding: '12', quarterNo: 3, quaterText: 'Q3.2021' }]
-      });
+      expect(result).not.toBeUndefined();
     })
     it('should throw exception if Getting error in find the fundings', async () => {
       jest.spyOn(residentCompanyHistoryRepository, 'query').mockImplementation(() => {
