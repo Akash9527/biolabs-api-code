@@ -1565,26 +1565,10 @@ export class ResidentCompanyService {
     info(`Get stages of technology by siteId: ${siteId} companyId: ${companyId}`, __filename, "getStagesOfTechnologyBySiteId()");
     const response = {};
     try {
-      // const queryStr = " SELECT \"stage\", \"name\", \"quarterno\", \"yyyy\",\"quat\" " +
-      //   " FROM " +
-      //   " (SELECT MAX(rch.\"companyStage\") AS stage, " +
-      //   "EXTRACT(quarter FROM rch.\"createdAt\") AS \"quarterno\", " +
-      // "extract(year from rch.\"createdAt\") as  \"yyyy\", " +
-      //   "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') AS \"quat\" " +
-      //   "FROM public.resident_company_history AS rch " +
-      //   "WHERE rch.\"site\" = \'{ " + siteId + "}\' and rch.\"comnpanyId\" = " + companyId +
-      //   "GROUP BY " +
-      //   "EXTRACT(quarter FROM rch.\"createdAt\")," +
-      // "extract(year from rch.\"createdAt\")" " +
-      //   "to_char(rch.\"createdAt\", \'\"Q\"Q.YYYY\') " +
-      //   " ) AS csg " +
-      //   " LEFT JOIN technology_stages AS ts ON ts.id = csg.\"stage\" " +
-      //   " ORDER BY yyyy,quat";
-      const queryStr = ` WITH RECURSIVE Gen AS (
-        SELECT  MIN(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch  WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
+      const queryStr = `WITH RECURSIVE YEARCTE AS (
+        SELECT  MIN(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
         UNION ALL
-        SELECT StartYear+1 FROM Gen WHERE StartYear+1<=(SELECT  MAX(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch  WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId})
-        ) ,
+        SELECT StartYear+1 FROM YEARCTE WHERE StartYear+1<=(SELECT  MAX(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId})) ,
         QUATCTE AS (
         SELECT 1 AS QNo,'Q1' AS QuarterName
         UNION
@@ -1593,29 +1577,37 @@ export class ResidentCompanyService {
         SELECT 3 AS QNo,'Q3' AS QuarterName
         UNION
         SELECT 4 AS QNo,'Q4' AS QuarterName
-        )
-        ,finalquater as ( select QNo, concat(Q.QuarterName ,'.', StartYear) as quatNumber  , StartYear from Gen as G,QUATCTE as Q) 
-        ,finalResult as ( Select  f. StartYear as yyyy, f.quatNumber as quat,  t.stage,t.name, f.QNo as quarterno  from  finalquater as f left join
-                ( SELECT "stage", "name", "quarterno", "quat" ,"yyyy" FROM 
-                     (SELECT MAX(rch."companyStage") AS stage, EXTRACT(quarter FROM rch."createdAt") AS  quarterNo,extract(year from rch."createdAt") as yyyy ,
-                     to_char(rch."createdAt", '"Q"Q.YYYY') AS quat FROM public.resident_company_history AS rch  WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
-                     GROUP BY EXTRACT(quarter FROM rch."createdAt"), extract(year from rch."createdAt") ,to_char(rch."createdAt", '"Q"Q.YYYY')
-                      ) AS csg LEFT JOIN technology_stages AS ts ON ts.id = csg."stage") as t on t.quat= f.quatNumber),starty as
-                ( select  extract(quarter FROM min( rch."createdAt" )) startQuaterNumber,min(extract(year from rch."createdAt") )as startyyyy 
-                 FROM public.resident_company_history AS rch  WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId})
-                 select coalesce(result.stage, 0),result.name, result.quarterno,result.quat, result.yyyy from finalResult result, starty s where result.yyyy >= s.startyyyy AND result.quarterno >= S.startQuaterNumber
-                 ORDER BY result.yyyy ,result.quarterno ;`;
-     
+        ) ,finalquater as ( select QNo, concat(Q.QuarterName ,'.', StartYear) as quatNumber  , StartYear from YEARCTE as G,QUATCTE as Q) 
+        Select f. StartYear as yyyy, f.quatNumber as quat, coalesce( t.stage, 0) as stage,t.name, f.QNo as quarterno  from  finalquater as f left join (
+        SELECT "stage", "name", "quarterno", "quat" ,"yyyy" FROM 
+               (SELECT MAX(rch."companyStage") AS stage,
+               EXTRACT(quarter FROM rch."createdAt") AS  quarterNo,
+               EXTRACT(year from rch."createdAt") as yyyy ,
+               to_char(rch."createdAt", '"Q"Q.YYYY') AS quat
+               FROM public.resident_company_history AS rch 
+               WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
+               GROUP BY 
+               EXTRACT(quarter FROM rch."createdAt"),
+               extract(year from rch."createdAt") ,
+               to_char(rch."createdAt", '"Q"Q.YYYY')) AS csg 
+               LEFT JOIN technology_stages AS ts ON ts.id = csg."stage") as t on t.quat= f.quatNumber
+        ORDER BY f.StartYear , QNo ;`;
+
       info(`query: ${queryStr}`, __filename, "getStagesOfTechnologyBySiteId()")
       const compResidentHistory = await this.residentCompanyHistoryRepository.query(queryStr);
+      let companyHistory: any;
+      if (compResidentHistory.length > 0) {
+        companyHistory = compResidentHistory.findIndex((company: any) => company.stage);
+        compResidentHistory.splice(0, companyHistory);
+      }
       for (let i = 0; i < compResidentHistory.length; i++) {
-        if(compResidentHistory[i].stage==0 && compResidentHistory[i].yyyy==compResidentHistory[i-1].yyyy && compResidentHistory[i]>1){
-          compResidentHistory[i].stage = compResidentHistory[i-1].stage;
+        if (compResidentHistory[i].stage == 0) {
+          compResidentHistory[i].stage = compResidentHistory[i - 1].stage;
         }
       }
       response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
     } catch (err) {
-      error("Getting error in find the stages of technology", __filename, "getStagesOfTechnologySiteId()");
+      error("Getting error in find the stages of technology" + err, __filename, "getStagesOfTechnologySiteId()");
       throw new BiolabsException('Getting error in find the stages of technology', err.message);
     }
     return response;
