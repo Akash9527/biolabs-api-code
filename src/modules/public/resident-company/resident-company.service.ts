@@ -1255,7 +1255,7 @@ export class ResidentCompanyService {
         if (graduatesoon_ids.length == 0) {
           return [];
         }
-        globalSearch += ` where "id" IN (${graduatesoon_ids.toString()})  `;
+        globalSearch += ` where "companyStatus" IN ('1') AND "id" IN (${graduatesoon_ids.toString()})  `;
       } else if (payload.memberShip == MemberShipStatus.Graduated) {
         globalSearch += ` where "companyStatus" IN ('4')  `;
       }
@@ -1390,10 +1390,6 @@ export class ResidentCompanyService {
 
       if (payload.maxCompanySize >= 0) {
         globalSearch += ` and gsv.\"companySize\" ::int <= ${payload.maxCompanySize}`;
-      }
-      if (!payload.memberShip) {
-        let graduated_ids: any = await this.getOpenedandInprogressSpaceChangeWaitListIds(site);
-        if (graduated_ids.length > 0){ globalSearch += `OR id IN (${graduated_ids.toString()})`; }
       }
       globalSearch += ` ORDER BY \"id\" DESC `;
       info(`globalSearch query: ${globalSearch}`, __filename, "gloabalSearchCompanies()");
