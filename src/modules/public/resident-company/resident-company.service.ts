@@ -1259,8 +1259,7 @@ export class ResidentCompanyService {
         globalSearch += ` where "companyStatus" IN ('1') AND "id" IN (${graduatesoon_ids.toString()}) AND 
         "companyVisibility"=true AND "companyOnboardingStatus"=true `;
       } else if (payload.memberShip == MemberShipStatus.Graduated) {
-        globalSearch += ` where "companyStatus" IN ('4') AND "companyVisibility"=true 
-        AND "companyOnboardingStatus"=true `;
+        globalSearch += ` where "companyStatus" IN ('4') AND "companyVisibility"=true`;
       }
 
       if (payload.siteIdArr && payload.siteIdArr.length > 0) {
