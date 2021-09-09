@@ -789,7 +789,11 @@ export class Mail {
             </tbody>
          </table>
          `;
-      return this.replaceParams(htmlTable, companyRowData)
+      if (companyRowData) {
+         return this.replaceParams(htmlTable, companyRowData);
+      } else {
+         return '';
+      }
    }
 
    /**
@@ -814,13 +818,13 @@ export class Mail {
                               <td style="width:12%">
                                  <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, userInfo.ui_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
-                              <td style="width:32%; padding-top:5px; padding-bottom:5px;">
+                              <td style="width:30%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.companyName}</a>
                               </td>
-                              <td style="width:38%">
+                              <td style="width:40%">
                                ${this.arrayToCommaSeparatedString(company.industryNames)}
                               </td>
-                              <td style="width:18%">
+                              <td style="width:18%;padding-left:3px">
                                  ${siteName}
                               </td>
                            </tr>
@@ -865,13 +869,13 @@ export class Mail {
                               <td style="width:12%">
                                  <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, userInfo.ui_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
-                              <td style="width:32%; padding-top:5px; padding-bottom:5px;">
+                              <td style="width:30%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.companyName}</a>
                               </td>
-                              <td style="width:38%">
+                              <td style="width:40%">
                               ${this.arrayToCommaSeparatedString(company.industryNames)}
                               </td>
-                              <td style="width:18%">
+                              <td style="width:18%;padding-left:3px">
                                 ${siteName}
                               </td>
                            </tr>
@@ -915,13 +919,13 @@ export class Mail {
                               <td style="width:12%">
                                  <img src= "${this.prepareCompanyLogoUrl(userInfo.api_server_origin, userInfo.ui_server_origin, company)}" alt="${company.companyName}" width="${ApplicationConstants.COMPANY_LOGO_WIDTH_IN_EMAIL}" height="${ApplicationConstants.COMPANY_LOGO_HEIGHT_IN_EMAIL}"/>
                               </td>
-                              <td style="width:32%; padding-top:5px; padding-bottom:5px;">
+                              <td style="width:30%; padding-top:5px; padding-bottom:5px;">
                                  <a href = "${companyUrl}">${company.companyName}</a>
                               </td>
-                              <td style="width:43%">
+                              <td style="width:40%">
                                 Graduating on ${this.getGraduatingSoonDate(company.graduatingOn)}
                               </td>
-                              <td style="width:13%">
+                              <td style="width:18%;padding-left:3px">
                                 ${siteName}
                               </td>
                            </tr>
@@ -1016,13 +1020,15 @@ export class Mail {
     * @returns 
     */
    getClickHereToSeeMoreLink(userInfo: any, flag: string) {
-      let urlString = `<p style="text-align:right;padding-top:0px;padding-bottom:10px;"> <a href="${userInfo.ui_server_origin}${EMAIL.SPONSOR_SEARCH_PAGE}${EMAIL.SPONSOR_SEARCH_PAGE_PARAM}{0}"> Click here to see more...</a> </p>`;;
+      let urlString = `<p style="text-align:right;padding-top:0px;padding-bottom:10px;"> <a href="${userInfo.ui_server_origin}${EMAIL.SPONSOR_SEARCH_PAGE}${EMAIL.SPONSOR_SEARCH_PAGE_PARAM}{0}"> Click here to see more...</a> </p>`;
       if (userInfo.companiesCount.onboardedCompsCount && userInfo.companiesCount.onboardedCompsCount > 0 && flag == ApplicationConstants.ONBOARDED_COMPANIES) {
          return urlString.replace('{0}', MemberShipStatus.Current.toString());
       } else if (userInfo.companiesCount.graduatedCompsCount && userInfo.companiesCount.graduatedCompsCount > 0 && flag == ApplicationConstants.GRADUATED_COMPANIES) {
          return urlString.replace('{0}', MemberShipStatus.Graduated.toString());
       } else if (userInfo.companiesCount.graduatingSoonCompsCount && userInfo.companiesCount.graduatingSoonCompsCount > 0 && flag == ApplicationConstants.GRADUATING_SOON_COMPANIES) {
          return urlString.replace('{0}', MemberShipStatus.GraduatingSoon.toString());
+      } else {
+         return '';
       }
    }
 

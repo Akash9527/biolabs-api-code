@@ -469,7 +469,7 @@ export class UsersService {
           });
 
           /** Fetch and set industry names for onboarded companies */
-          this.traverseAndSetIndustryNames(onboardedComps, firstLevelIndustries);
+          await this.traverseAndSetIndustryNames(onboardedComps, firstLevelIndustries);
 
           /** Filter onboarded resident companies by site */
           let onboardedGroupedCompsObj = await this.prepareFilteredArrayOfResidentComps(onboardedComps, user.site_id, sitesArrDb);
@@ -482,7 +482,7 @@ export class UsersService {
           });
 
           /** Fetch and set industry names for graduated companies */
-          this.traverseAndSetIndustryNames(graduatedComps, firstLevelIndustries);
+          await this.traverseAndSetIndustryNames(graduatedComps, firstLevelIndustries);
 
           /** Filter graduated resident companies by site */
           let graduatedGroupedCompsObj = await this.prepareFilteredArrayOfResidentComps(graduatedComps, user.site_id, sitesArrDb);
