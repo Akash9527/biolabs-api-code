@@ -1249,15 +1249,18 @@ export class ResidentCompanyService {
         site = siteIdArr
       }
       if (!payload.memberShip) {
-        globalSearch += ` where "companyStatus" IN ('1')`;
+        globalSearch += ` where "companyStatus" IN ('1') AND "companyVisibility"=true 
+        AND "companyOnboardingStatus"=true`;
       } else if (payload.memberShip == MemberShipStatus.GraduatingSoon) {
         let graduatesoon_ids: any = await this.getOpenedandInprogressSpaceChangeWaitListIds(site);
         if (graduatesoon_ids.length == 0) {
           return [];
         }
-        globalSearch += ` where "companyStatus" IN ('1') AND "id" IN (${graduatesoon_ids.toString()})  `;
+        globalSearch += ` where "companyStatus" IN ('1') AND "id" IN (${graduatesoon_ids.toString()}) AND 
+        "companyVisibility"=true AND "companyOnboardingStatus"=true `;
       } else if (payload.memberShip == MemberShipStatus.Graduated) {
-        globalSearch += ` where "companyStatus" IN ('4')  `;
+        globalSearch += ` where "companyStatus" IN ('4') AND "companyVisibility"=true 
+        AND "companyOnboardingStatus"=true `;
       }
 
       if (payload.siteIdArr && payload.siteIdArr.length > 0) {
