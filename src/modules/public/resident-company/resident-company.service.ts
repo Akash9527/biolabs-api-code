@@ -1787,7 +1787,15 @@ export class ResidentCompanyService {
       UNION
       SELECT 4 AS QNo,'Q4' AS QuarterName
       ) ,finalquater as ( select QNo, concat(Q.QuarterName ,'.', StartYear) as quatNumber  , StartYear from YEARCTE as G,QUATCTE as Q)
-      Select coalesce( t.productTypeId, 0) as productTypeId, coalesce( t.sumofquantity, 0) as sumofquantity,f. StartYear as year,f.QNo as quarterno, f.quatNumber as quat  from  finalquater as f left join (
+      , productTypeData as (SELECT distinct p."productTypeId"
+        fROM
+          order_product as o
+      INNER JOIN product as p ON p.id = o."productId"
+        where  p.id = o."productId"
+      AND "companyId" = ${companyId}
+      AND p."productTypeId" IN (2, 4))
+      , benchData as (select p1."productTypeId" , f.qNo,f.quatNumber,StartYear from productTypeData p1,finalquater f )
+      , resultData as (Select t.productTypeId as producttypeid,  t.sumofquantity as sumofquantity,f. StartYear as year,f.QNo as quarterno, f.quatNumber as quat  from  finalquater as f left join (
       SELECT
   "productTypeId" as productTypeId,
   MAX("total") as sumofquantity,
@@ -1814,15 +1822,24 @@ sub1.year,
 extract(quarter from TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD')),
 to_char(TO_DATE(year :: text || '-' || month :: text || '-' || '01', 'YYYY-MM-DD'), '"Q"Q.YYYY')
 order by year,quarterNo) as t on t.quat= f.quatNumber
-      ORDER BY f.StartYear , QNo;
+      ORDER BY f.StartYear , QNo)
+      select b.qNo as quarterno,b.quatNumber as quat,b.StartYear as year , b."productTypeId" ,
+       r.sumofquantity as sumofquantity
+       from benchData b left join resultData r on b.qNo=r.quarterno and
+       b.quatNumber = r. quat and b.StartYear = r.year and b."productTypeId" = r.productTypeId order by b.StartYear,b.qNo,b."productTypeId";
      `;
-   const timelineData= await this.residentCompanyHistoryRepository.query(queryStr);
+    const timelineData = await this.residentCompanyHistoryRepository.query(queryStr);
     let companyHistory: any;
-      if (timelineData.length > 0) {
-        companyHistory = timelineData.findIndex((company: any) => company.sumofquantity);
-        timelineData.splice(0, companyHistory);
+    if (timelineData.length > 0) {
+      companyHistory = timelineData.findIndex((company: any) => company.sumofquantity);
+      timelineData.splice(0, companyHistory);
+    }
+    for (let i = 0; i < timelineData.length; i++) {
+      if ( timelineData[i].sumofquantity == null) {
+        timelineData[i].sumofquantity = 0;
       }
-      return timelineData;
+    }
+    return timelineData;
   }
   /**
  * Description: This method returns companySize Quarterly.
@@ -1869,13 +1886,13 @@ group by
         companySizeData.splice(0, companyHistory);
       }
       for (let i = 0; i < companySizeData.length; i++) {
-        if (companySizeData[i].noofemployees == 0 ) {
+        if (companySizeData[i].noofemployees == 0) {
           companySizeData[i].noofemployees = companySizeData[i - 1].noofemployees;
         }
       }
       return companySizeData;
-      
-    } catch (err) { 
+
+    } catch (err) {
       error("Getting error in find theget company size quartly", __filename, "getCompanySizeQuartly()");
       throw new BiolabsException('Getting error in find company size quartly', err.message);
     }
