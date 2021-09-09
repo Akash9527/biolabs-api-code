@@ -1020,7 +1020,8 @@ export class ResidentCompanyService {
         if (payload.companyStatusChangeDate && payload.companyStatusChangeDate instanceof Date) {
           residentCompany.companyStatusChangeDate = payload.companyStatusChangeDate;
         }
-        if (Number(residentCompany.companyStatus) !== 1) {
+        // BIOL-390 setting companyOnboardingStatus & companyVisibility to false for all except current-member and graduate
+        if (!['1', '4'].includes(residentCompany.companyStatus)) {
           residentCompany.companyOnboardingStatus = false;
           residentCompany.companyVisibility = false;
         }
@@ -1587,25 +1588,49 @@ export class ResidentCompanyService {
     info(`Get stages of technology by siteId: ${siteId} companyId: ${companyId}`, __filename, "getStagesOfTechnologyBySiteId()");
     const response = {};
     try {
-      const queryStr = ` SELECT "stage", "name", "quarterno", "quat" ,"yyyy" FROM 
-         (SELECT MAX(rch."companyStage") AS stage,
-       EXTRACT(quarter FROM rch."createdAt") AS  quarterNo,
-      extract(year from rch."createdAt") as yyyy ,
-         to_char(rch."createdAt", '"Q"Q.YYYY') AS quat
-         FROM public.resident_company_history AS rch 
-         WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
-         GROUP BY 
-          EXTRACT(quarter FROM rch."createdAt"),
-         extract(year from rch."createdAt") ,
-        to_char(rch."createdAt", '"Q"Q.YYYY')
-          ) AS csg 
-         LEFT JOIN technology_stages AS ts ON ts.id = csg."stage" 
-         ORDER BY yyyy,quarterNo`;
+      const queryStr = `WITH RECURSIVE YEARCTE AS (
+        SELECT  MIN(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
+        UNION ALL
+        SELECT StartYear+1 FROM YEARCTE WHERE StartYear+1<=(SELECT  MAX(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId})) ,
+        QUATCTE AS (
+        SELECT 1 AS QNo,'Q1' AS QuarterName
+        UNION
+        SELECT 2 AS QNo,'Q2' AS QuarterName
+        UNION
+        SELECT 3 AS QNo,'Q3' AS QuarterName
+        UNION
+        SELECT 4 AS QNo,'Q4' AS QuarterName
+        ) ,finalquater as ( select QNo, concat(Q.QuarterName ,'.', StartYear) as quatNumber  , StartYear from YEARCTE as G,QUATCTE as Q) 
+        Select f. StartYear as yyyy, f.quatNumber as quat, coalesce( t.stage, 0) as stage,t.name, f.QNo as quarterno  from  finalquater as f left join (
+        SELECT "stage", "name", "quarterno", "quat" ,"yyyy" FROM 
+               (SELECT MAX(rch."companyStage") AS stage,
+               EXTRACT(quarter FROM rch."createdAt") AS  quarterNo,
+               EXTRACT(year from rch."createdAt") as yyyy ,
+               to_char(rch."createdAt", '"Q"Q.YYYY') AS quat
+               FROM public.resident_company_history AS rch 
+               WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
+               GROUP BY 
+               EXTRACT(quarter FROM rch."createdAt"),
+               extract(year from rch."createdAt") ,
+               to_char(rch."createdAt", '"Q"Q.YYYY')) AS csg 
+               LEFT JOIN technology_stages AS ts ON ts.id = csg."stage") as t on t.quat= f.quatNumber
+        ORDER BY f.StartYear , QNo ;`;
+
       info(`query: ${queryStr}`, __filename, "getStagesOfTechnologyBySiteId()")
       const compResidentHistory = await this.residentCompanyHistoryRepository.query(queryStr);
+      let companyHistory: any;
+      if (compResidentHistory.length > 0) {
+        companyHistory = compResidentHistory.findIndex((company: any) => company.stage);
+        compResidentHistory.splice(0, companyHistory);
+      }
+      for (let i = 0; i < compResidentHistory.length; i++) {
+        if (compResidentHistory[i].stage == 0) {
+          compResidentHistory[i].stage = compResidentHistory[i - 1].stage;
+        }
+      }
       response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
     } catch (err) {
-      error("Getting error in find the stages of technology", __filename, "getStagesOfTechnologySiteId()");
+      error("Getting error in find the stages of technology" + err, __filename, "getStagesOfTechnologySiteId()");
       throw new BiolabsException('Getting error in find the stages of technology', err.message);
     }
     return response;
@@ -1622,19 +1647,46 @@ export class ResidentCompanyService {
     info(`get fundings by siteId: ${siteId} companyId: ${companyId}`, __filename, "getFundingBySiteIdAndCompanyId()")
     const response = {};
     try {
-      const queryStr = ` SELECT MAX("funding" ::Decimal) as "Funding",
+      const queryStr = ` WITH RECURSIVE YEARCTE AS (
+        SELECT  MIN(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
+        UNION ALL
+        SELECT StartYear+1 FROM YEARCTE WHERE StartYear+1<=(SELECT  MAX(extract(year from rch."createdAt")) AS StartYear FROM public.resident_company_history as rch WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId})) ,
+        QUATCTE AS (
+        SELECT 1 AS QNo,'Q1' AS QuarterName
+        UNION
+        SELECT 2 AS QNo,'Q2' AS QuarterName
+        UNION
+        SELECT 3 AS QNo,'Q3' AS QuarterName
+        UNION
+        SELECT 4 AS QNo,'Q4' AS QuarterName
+        ) ,finalquater as ( select QNo, concat(Q.QuarterName ,'.', StartYear) as quatNumber  , StartYear from YEARCTE as G,QUATCTE as Q) 
+        Select f. StartYear as yyyy, f.quatNumber as quatertext,cast (coalesce(nullif(t.funding,0)) as float) as funding,t.name, f.QNo as quarterno  from  finalquater as f left join (
+        SELECT "funding", "name", "quarterno", "quatertext" ,"yyyy" FROM 
+               ( SELECT MAX("funding" ::Decimal) as "funding",
       EXTRACT(quarter FROM rch."createdAt") AS  quarterNo,
        extract(year from rch."createdAt") as yyyy ,
-      to_char(rch."createdAt", '"Q"Q.YYYY') AS quaterText
+      to_char(rch."createdAt", '"Q"Q.YYYY') AS quatertext
           FROM public.resident_company_history as rch 
-         WHERE  rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
+         WHERE   rch.site='{ ${siteId}}' and rch."comnpanyId"=${companyId}
           group by 
        EXTRACT(quarter FROM rch."createdAt"),
         extract(year from rch."createdAt"),
-        to_char(rch."createdAt", '"Q"Q.YYYY')
-          order by  yyyy;`
+        to_char(rch."createdAt", '"Q"Q.YYYY')) AS csg 
+               LEFT JOIN fundings AS ts ON ts.id = csg."funding") as t on t.quatertext= f.quatNumber
+        ORDER BY f.StartYear , QNo ;
+      `
       debug(`Fetching funds by query: ${queryStr}`, __filename, "getFundingBySiteIdAndCompanyId()");
       const fundigs = await this.residentCompanyHistoryRepository.query(queryStr);
+      let companyHistory: any;
+      if (fundigs.length > 0) {
+        companyHistory = fundigs.findIndex((company: any) => company.funding);
+        fundigs.splice(0, companyHistory);
+      }
+      for (let i = 0; i < fundigs.length; i++) {
+        if (fundigs[i].funding == 0 || fundigs[i].funding == null) {
+          fundigs[i].funding = fundigs[i - 1].funding;
+        }
+      }
       response['fundings'] = (!fundigs) ? 0 : fundigs;
     } catch (err) {
       error("Getting error in find the fundings", __filename, "getFundingBySiteIdAndCompanyId()");
@@ -2694,3 +2746,11 @@ group by
     return frequencyDate;
   }
 }
+
+
+
+
+
+
+
+
