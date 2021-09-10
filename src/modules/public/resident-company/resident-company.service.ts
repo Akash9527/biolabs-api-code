@@ -1829,18 +1829,19 @@ order by year,quarterNo) as t on t.quat= f.quatNumber
        b.quatNumber = r. quat and b.StartYear = r.year and b."productTypeId" = r.productTypeId order by b.StartYear,b.qNo,b."productTypeId";
      `;
     const timelineData = await this.residentCompanyHistoryRepository.query(queryStr);
-    // let companyHistory: any;
+    let companyHistory: any;
     if (timelineData.length > 0) {
-      // companyHistory = timelineData.findIndex((company: any) => company.sumofquantity);
-      // timelineData.splice(0, companyHistory);
-      for (let i = 0; i < timelineData.length; i++) {
-        if (timelineData[i].sumofquantity == null) {
-          timelineData[i].sumofquantity = 0;
-        }
+      companyHistory = timelineData.findIndex((company: any) => company.sumofquantity);
+      timelineData.splice(0, companyHistory);
+    }
+    for (let i = 0; i < timelineData.length; i++) {
+      if (timelineData[i].sumofquantity == null) {
+        timelineData[i].sumofquantity = 0;
       }
     }
     return timelineData;
   }
+
   /**
  * Description: This method returns companySize Quarterly.
  * @description This method returns current month fee details.
