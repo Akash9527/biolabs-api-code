@@ -416,7 +416,7 @@ export class ResidentCompanyService {
         companyId: companyId,
         primarySite: primarySite,
         sitesApplied: sitesApplied,
-        companyURLSTR:req.body.company_site_str
+        companyURLSTR: req.body.company_site_str
       };
       debug(`userInfo.origin: ${userInfo.origin}`, __filename, `sendEmailToSiteAdmin()`);
 
@@ -1095,6 +1095,9 @@ export class ResidentCompanyService {
         /** BIOL-308: Notify Site Admin if the sponsorship question changes to Yes. shareYourProfile = true */
         if (!residentCompany.shareYourProfile && payload.shareYourProfile) {
           debug(`Sponsor ship contact question changed to: ${payload.shareYourProfile}`, __filename, `updateResidentCompany()`);
+          let qryStr = '';
+          qryStr = residentCompany.id + '_' + residentCompany.site[0] + '@';
+          req.body['company_site_str'] = qryStr;
           await this.sendEmailToSiteAdmin(payload.site, req, residentCompany.companyName, residentCompany.id, ApplicationConstants.EMAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES);
           info(`Email sent regarding Sponsorship contact question change to Yes`, __filename, `updateResidentCompany()`);
         }
@@ -2159,6 +2162,9 @@ group by
     /** BIOL-308: Notify Site Admin if the sponsorship question changes to Yes. shareYourProfile = true */
     if (!shareYourProfileTemp && payload.shareYourProfile) {
       debug(`Sponsor ship contact question changed to: ${payload.shareYourProfile}`, __filename, `addToSpaceChangeWaitList()`);
+      let qryStr = '';
+      qryStr = residentCompany.id + '_' + residentCompany.site[0] + '@';
+      req.body['company_site_str'] = qryStr;
       await this.sendEmailToSiteAdmin(siteIdArr, req, residentCompany.companyName, residentCompany.id, ApplicationConstants.EMAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES).catch(() => {
         error(`Error in sending email notification to site admin for sponsorship question changes to Yes`, __filename, `addToSpaceChangeWaitList()`);
       });
