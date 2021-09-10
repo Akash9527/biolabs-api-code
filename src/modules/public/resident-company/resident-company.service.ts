@@ -318,24 +318,26 @@ export class ResidentCompanyService {
     }
     let response = {};
     let savedResidentCompanyId: number;
-
+    let qryStr = '';
     try {
       for await (const site of payload.site) {
         payload.site = [site];
         const newRc = await this.residentCompanyRepository.create(payload);
         const savedRc = await this.residentCompanyRepository.save(newRc);
+        qryStr +=savedRc.id+'_'+site+'@';
         if (savedRc.id) {
           savedResidentCompanyId = savedRc.id;
           const historyData: any = JSON.parse(JSON.stringify(savedRc));
           historyData.comnpanyId = savedRc.id;
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
-
+          
           /** feature/BIOL-371 New applications will not create an entry on the waitlist. */
           /** Create waitlist entry while saving Resident Company */
           // await this.addResidentCompanyDataInWaitlist(savedRc);
         }
       }
+      req.body['company_site_str'] = qryStr;
       await this.sendEmailToSiteAdmin(sites, req, payload.companyName, savedResidentCompanyId, ApplicationConstants.EMAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION);
     } catch {
       response['status'] = 'error';
@@ -413,7 +415,8 @@ export class ResidentCompanyService {
         origin: req.headers['origin'],
         companyId: companyId,
         primarySite: primarySite,
-        sitesApplied: sitesApplied
+        sitesApplied: sitesApplied,
+        companyURLSTR:req.body.company_site_str
       };
       debug(`userInfo.origin: ${userInfo.origin}`, __filename, `sendEmailToSiteAdmin()`);
 

@@ -464,8 +464,8 @@ export class Mail {
                   content: this.replaceParams(
                      residentCompanyFormSubmission.toString(),
                      userInfo.company_name,
-                     userInfo.origin + EMAIL.RESIDENT_COMPANIES + userInfo.companyId + EMAIL.COMPANY_PROFILE,
-                     userInfo.origin + EMAIL.RESIDENT_COMPANIES + userInfo.companyId + EMAIL.COMPANY_PROFILE,
+                     userInfo.origin + EMAIL.RESIDENT_COMPANIES + userInfo.companyURLSTR + EMAIL.COMPANY_PROFILE,
+                     userInfo.origin + EMAIL.RESIDENT_COMPANIES + userInfo.companyURLSTR + EMAIL.COMPANY_PROFILE,
                      userInfo.primarySite.toString(),
                      sitesAppliedList
                   ),
