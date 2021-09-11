@@ -318,24 +318,26 @@ export class ResidentCompanyService {
     }
     let response = {};
     let savedResidentCompanyId: number;
-
+    let qryStr = '';
     try {
       for await (const site of payload.site) {
         payload.site = [site];
         const newRc = await this.residentCompanyRepository.create(payload);
         const savedRc = await this.residentCompanyRepository.save(newRc);
+        qryStr +=savedRc.id+'_'+site+'@';
         if (savedRc.id) {
           savedResidentCompanyId = savedRc.id;
           const historyData: any = JSON.parse(JSON.stringify(savedRc));
           historyData.comnpanyId = savedRc.id;
           delete historyData.id;
           await this.residentCompanyHistoryRepository.save(historyData);
-
+          
           /** feature/BIOL-371 New applications will not create an entry on the waitlist. */
           /** Create waitlist entry while saving Resident Company */
           // await this.addResidentCompanyDataInWaitlist(savedRc);
         }
       }
+      req.body['company_site_str'] = qryStr;
       await this.sendEmailToSiteAdmin(sites, req, payload.companyName, savedResidentCompanyId, ApplicationConstants.EMAIL_FOR_RESIDENT_COMPANY_FORM_SUBMISSION);
     } catch {
       response['status'] = 'error';
@@ -413,7 +415,8 @@ export class ResidentCompanyService {
         origin: req.headers['origin'],
         companyId: companyId,
         primarySite: primarySite,
-        sitesApplied: sitesApplied
+        sitesApplied: sitesApplied,
+        companyURLSTR: req.body.company_site_str
       };
       debug(`userInfo.origin: ${userInfo.origin}`, __filename, `sendEmailToSiteAdmin()`);
 
@@ -1092,6 +1095,9 @@ export class ResidentCompanyService {
         /** BIOL-308: Notify Site Admin if the sponsorship question changes to Yes. shareYourProfile = true */
         if (!residentCompany.shareYourProfile && payload.shareYourProfile) {
           debug(`Sponsor ship contact question changed to: ${payload.shareYourProfile}`, __filename, `updateResidentCompany()`);
+          let qryStr = '';
+          qryStr = residentCompany.id + '_' + residentCompany.site[0] + '@';
+          req.body['company_site_str'] = qryStr;
           await this.sendEmailToSiteAdmin(payload.site, req, residentCompany.companyName, residentCompany.id, ApplicationConstants.EMAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES);
           info(`Email sent regarding Sponsorship contact question change to Yes`, __filename, `updateResidentCompany()`);
         }
@@ -1837,12 +1843,13 @@ order by year,quarterNo) as t on t.quat= f.quatNumber
       timelineData.splice(0, companyHistory);
     }
     for (let i = 0; i < timelineData.length; i++) {
-      if ( timelineData[i].sumofquantity == null) {
+      if (timelineData[i].sumofquantity == null) {
         timelineData[i].sumofquantity = 0;
       }
     }
     return timelineData;
   }
+
   /**
  * Description: This method returns companySize Quarterly.
  * @description This method returns current month fee details.
@@ -2156,6 +2163,9 @@ group by
     /** BIOL-308: Notify Site Admin if the sponsorship question changes to Yes. shareYourProfile = true */
     if (!shareYourProfileTemp && payload.shareYourProfile) {
       debug(`Sponsor ship contact question changed to: ${payload.shareYourProfile}`, __filename, `addToSpaceChangeWaitList()`);
+      let qryStr = '';
+      qryStr = residentCompany.id + '_' + residentCompany.site[0] + '@';
+      req.body['company_site_str'] = qryStr;
       await this.sendEmailToSiteAdmin(siteIdArr, req, residentCompany.companyName, residentCompany.id, ApplicationConstants.EMAIL_FOR_SPONSORSHIP_QN_CHANGE_TO_YES).catch(() => {
         error(`Error in sending email notification to site admin for sponsorship question changes to Yes`, __filename, `addToSpaceChangeWaitList()`);
       });
