@@ -1727,16 +1727,19 @@ describe('ResidentCompanyService', () => {
   });
   describe('updateResidentCompany method', () => {
     it('should return object of resident companies', async () => {
+      mockRC.shareYourProfile = true;
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
       if (mockRC) {
         jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
         jest.spyOn(residentCompanyService, 'getResidentCompany').mockResolvedValueOnce(mockRC);
         jest.spyOn(residentCompanyService, 'sendEmailToSiteAdmin').mockReturnThis();
       }
-      let result = await residentCompanyService.updateResidentCompany(mock, req);
-      expect(result).not.toBeNull();
-      expect(result).not.toBeUndefined();
-      expect(result).toBe(mockRC);
+      try {
+        await residentCompanyService.updateResidentCompany(mock, req);
+      } catch (err) {
+        expect(err.name).toBe('InternalException');
+        expect(err instanceof InternalException).toBeTruthy();
+      }
     })
     it('should throw exception ', async () => {
       jest.spyOn(residentCompanyHistoryRepository, 'save').mockImplementation(() => {
@@ -3004,9 +3007,8 @@ describe('ResidentCompanyService', () => {
 
       jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => createQueryBuilder);
       try {
-        let result = await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.GRADUATED_COMPANIES, EmailFrequency.Quarterly, 'frequency');
+        await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.GRADUATED_COMPANIES, EmailFrequency.Quarterly, 'frequency');
       } catch (err) {
-        console.log(err);
         expect(err instanceof BiolabsException).toBeTruthy();
         expect(err.message).toEqual('Error in fetching data for GRADUATED_COMPANIES for sponsor user.');
       }
