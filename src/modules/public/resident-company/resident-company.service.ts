@@ -1843,12 +1843,13 @@ order by year,quarterNo) as t on t.quat= f.quatNumber
       timelineData.splice(0, companyHistory);
     }
     for (let i = 0; i < timelineData.length; i++) {
-      if ( timelineData[i].sumofquantity == null) {
+      if (timelineData[i].sumofquantity == null) {
         timelineData[i].sumofquantity = 0;
       }
     }
     return timelineData;
   }
+
   /**
  * Description: This method returns companySize Quarterly.
  * @description This method returns current month fee details.
