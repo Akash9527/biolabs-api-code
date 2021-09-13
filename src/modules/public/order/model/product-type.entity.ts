@@ -5,7 +5,7 @@ import { Product } from './product.entity';
   name: 'product_type',
 })
 export class ProductType {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('rowid')
   id: number;
 
   @Column({ nullable: true })

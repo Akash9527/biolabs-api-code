@@ -127,6 +127,9 @@ export class ResidentCompanyHistory {
   @Column({ default: false })
   companyOnboardingStatus: boolean;
 
+  @CreateDateColumn({ type: "timestamp" })
+  companyOnboardingDate: number;
+
   @Column({ length: 1000, default: null, nullable: true })
   elevatorPitch: string;
 
@@ -182,7 +185,7 @@ export class ResidentCompanyHistory {
   website: string;
 
   @Column({ length: 110, default: null, nullable: true })
-  foundersBusinessIndustryName:string;
+  foundersBusinessIndustryName: string;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: number;
@@ -196,18 +199,18 @@ export class ResidentCompanyHistory {
   @Column({ length: 255, nullable: true })
   logoImgUrl: string;
 
-  @Column({nullable:true})
+  @Column({ nullable: true, default: '0' })
   committeeStatus: committee_status;
 
-  @UpdateDateColumn({ type: 'timestamptz'})
+  @UpdateDateColumn({ type: 'timestamptz', nullable: true })
   selectionDate: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
   companyStatusChangeDate: number;
-  
+
   @Column("int", { array: true, nullable: true })
   sitesApplied: number[];
-  
+
   @Column("int", { array: true, nullable: true })
   primarySite: number[];
 }
@@ -265,7 +268,7 @@ export class ResidentCompanyHistoryFillableFields {
   companySize: number;
   website: string;
   foundersBusinessIndustryName: string;
-  pitchdeck : string;
-  logoImgUrl : string;
-  technologyPapersPublishedLinkCount : number;
+  pitchdeck: string;
+  logoImgUrl: string;
+  technologyPapersPublishedLinkCount: number;
 }
