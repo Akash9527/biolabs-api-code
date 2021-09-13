@@ -135,12 +135,8 @@ describe('PasswordTransformer', () => {
         expect(mail.getGraduatingSoonDate(10000000000000)).toBeDefined();
     });
     
-    it('should test getGraduatingSoonDate method ', () => {
+    it('should test getFormattedDateDD_Mon_YYYY method ', () => {
         expect(mail.getFormattedDateDD_Mon_YYYY(new Date())).toBeDefined();
     });
     
-    
-
-    
-
 });
