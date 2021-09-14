@@ -1626,14 +1626,17 @@ export class ResidentCompanyService {
       let companyHistory: any;
       if (compResidentHistory.length > 0) {
         companyHistory = compResidentHistory.findIndex((company: any) => company.stage);
-        compResidentHistory.splice(0, companyHistory);
+        compResidentHistory.splice(0, companyHistory == -1 ? compResidentHistory.length : companyHistory);
       }
-      for (let i = 0; i < compResidentHistory.length; i++) {
-        if (compResidentHistory[i].stage == 0) {
-          compResidentHistory[i].stage = compResidentHistory[i - 1].stage;
+      if (compResidentHistory.length > 0) {
+        for (let i = 0; i < compResidentHistory.length; i++) {
+          if (compResidentHistory[i].stage == 0) {
+            compResidentHistory[i].stage = compResidentHistory[i - 1].stage;
+          }
         }
-      }
-      response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
+        response['stagesOfTechnology'] = (!compResidentHistory) ? 0 : compResidentHistory;
+      } else
+        response['stagesOfTechnology'] = [];
     } catch (err) {
       error("Getting error in find the stages of technology" + err, __filename, "getStagesOfTechnologySiteId()");
       throw new BiolabsException('Getting error in find the stages of technology', err.message);
@@ -1685,14 +1688,17 @@ export class ResidentCompanyService {
       let companyHistory: any;
       if (fundigs.length > 0) {
         companyHistory = fundigs.findIndex((company: any) => company.funding);
-        fundigs.splice(0, companyHistory);
+        fundigs.splice(0, companyHistory == -1 ? fundigs.length : companyHistory);
       }
-      for (let i = 0; i < fundigs.length; i++) {
-        if (fundigs[i].funding == 0 || fundigs[i].funding == null) {
-          fundigs[i].funding = fundigs[i - 1].funding;
+      if (fundigs.length > 0) {
+        for (let i = 0; i < fundigs.length; i++) {
+          if (fundigs[i].funding == 0 || fundigs[i].funding == null) {
+            fundigs[i].funding = fundigs[i - 1].funding;
+          }
         }
-      }
-      response['fundings'] = (!fundigs) ? 0 : fundigs;
+        response['fundings'] = (!fundigs) ? 0 : fundigs;
+      } else
+        response['fundings'] = [];
     } catch (err) {
       error("Getting error in find the fundings", __filename, "getFundingBySiteIdAndCompanyId()");
       throw new BiolabsException('Getting error in find the fundings', err.message);
@@ -1840,14 +1846,17 @@ order by year,quarterNo) as t on t.quat= f.quatNumber
     let companyHistory: any;
     if (timelineData.length > 0) {
       companyHistory = timelineData.findIndex((company: any) => company.sumofquantity);
-      timelineData.splice(0, companyHistory);
+      timelineData.splice(0, companyHistory == -1 ? timelineData.length : companyHistory);
     }
-    for (let i = 0; i < timelineData.length; i++) {
-      if (timelineData[i].sumofquantity == null) {
-        timelineData[i].sumofquantity = 0;
+    if (timelineData.length > 0) {
+      for (let i = 0; i < timelineData.length; i++) {
+        if (timelineData[i].sumofquantity == null) {
+          timelineData[i].sumofquantity = 0;
+        }
       }
-    }
-    return timelineData;
+      return timelineData;
+    } else
+      return [];
   }
 
   /**
@@ -1892,14 +1901,17 @@ group by
       let companyHistory: any;
       if (companySizeData.length > 0) {
         companyHistory = companySizeData.findIndex((company: any) => company.noofemployees);
-        companySizeData.splice(0, companyHistory);
+        companySizeData.splice(0, companyHistory == -1 ? companySizeData.length : companyHistory);
       }
-      for (let i = 0; i < companySizeData.length; i++) {
-        if (companySizeData[i].noofemployees == 0) {
-          companySizeData[i].noofemployees = companySizeData[i - 1].noofemployees;
+      if (companySizeData.length > 0) {
+        for (let i = 0; i < companySizeData.length; i++) {
+          if (companySizeData[i].noofemployees == 0) {
+            companySizeData[i].noofemployees = companySizeData[i - 1].noofemployees;
+          }
         }
-      }
-      return companySizeData;
+        return companySizeData;
+      } else
+        return [];
 
     } catch (err) {
       error("Getting error in find theget company size quartly", __filename, "getCompanySizeQuartly()");
