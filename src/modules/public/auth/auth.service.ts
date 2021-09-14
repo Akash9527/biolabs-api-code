@@ -37,10 +37,9 @@ export class AuthService {
     await this.masterService.createBiolabsSources(fileData);
     await this.masterService.createCategories(fileData);
     await this.masterService.createTechnologyStages(fileData);
-    await this.masterService.createProductType(fileData);
+    await this.masterService.createProductTypes(fileData);
     await this.createSuperAdmin(fileData);
-    // NEEDS to Valid on SIT.
-    // await this.databaseService.executeScript();
+    await this.databaseService.executeScript();
   }
 
   /**
@@ -127,7 +126,7 @@ export class AuthService {
     return this.userService.forgotPassword(payload, req);
   }
 
-  
+
   /**
    * Description: This method is used to decode the token.
    * @description This method is used to decode the token.

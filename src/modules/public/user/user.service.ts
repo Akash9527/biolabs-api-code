@@ -12,7 +12,7 @@ import { ListUserPayload } from './list-user.payload';
 import { UserToken } from './user-token.entity';
 import { User, UserFillableFields } from './user.entity';
 
-const { info, error, debug } = require('../../../utils/logger');
+const { info, error, debug, warn } = require('../../../utils/logger');
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 
 @Injectable()
@@ -69,13 +69,20 @@ export class UsersService {
   async create(payload: UserFillableFields, siteData: any) {
     info("Creating a new biolabs user", __filename, "create()");
     const user = await this.getByEmail(payload.email);
-
     if (user) {
       if (user.email == ApplicationConstants.SUPER_ADMIN_EMAIL_ID) {
         const siteArr = siteData.map((site) => site.id);
-        // Appending userId to superadmin payload
-        payload = { ...payload, ...{ id: user.id, site_id: siteArr } };
-        return await this.userRepository.save(this.userRepository.create(payload));
+        const userObj = {
+          "email": payload.email,
+          "role": payload.role,
+          "site_id": siteArr,
+          "firstName": payload.firstName,
+          "lastName": payload.lastName,
+          "title": payload.title,
+          "phoneNumber": payload.phoneNumber,
+          "status": payload.status
+        }
+        return await this.userRepository.update(user.id, userObj)
       } else {
         debug("User with provided email already created", __filename, "create()");
         throw new NotAcceptableException('User with provided email already created.',
@@ -420,10 +427,10 @@ export class UsersService {
 
   // =========================== BIOL-235/BIOL-162 ===========================
   /**
-   * Description: Fetches sponsor users, fetch their onboared and graduated companies by sites, and send email.
-   * @description Fetches sponsor users, fetch their onboared and graduated companies by sites, and send email.
-   * @param emailFrequency Frequency of sending email like: Weekly, Monthly, Quarterly.
-   */
+  * Description: Fetches sponsor users, fetch their onboared and graduated companies by sites, and send email.
+  * @description Fetches sponsor users, fetch their onboared and graduated companies by sites, and send email.
+  * @param emailFrequency Frequency of sending email like: Weekly, Monthly, Quarterly.
+  */
   async handleSponsorEmailSchedule(emailFrequency: EmailFrequency) {
     info(`Fetch sponsor users and company data for email frequency: ${emailFrequency}`, __filename, `handleSponsorEmailSchedule()`);
 
@@ -435,6 +442,7 @@ export class UsersService {
       if (sponsorUsers && Array.isArray(sponsorUsers)) {
         debug(`Fetched sponsor users: ${sponsorUsers.length}`, __filename, `handleSponsorEmailSchedule()`);
 
+        //Fetch all sites from DB.
         let sitesArrDb: any = await this.residentCompanyService.getAllSites().then((result) => {
           return result;
         });
@@ -445,40 +453,50 @@ export class UsersService {
           debug(`Fetched sites from db: ${sitesArrDb}`, __filename, `handleSponsorEmailSchedule()`);
         }
 
+        //Fetch all first level industries from DB.
+        let firstLevelIndustries = await this.residentCompanyService.getIndustriesByParentId(0);
+        if (firstLevelIndustries && Array.isArray(firstLevelIndustries)) {
+          debug(`Fetched first level industries from db: ${firstLevelIndustries.length}`, __filename, `handleSponsorEmailSchedule()`);
+        } else {
+          debug(`Fetched first level industries from db: ${firstLevelIndustries}`, __filename, `handleSponsorEmailSchedule()`);
+        }
+
         for (const user of sponsorUsers) {
+
           info(`Fetching company data for userId: ${user.id}`, __filename, `handleSponsorEmailSchedule()`);
-          let onboardedComps = await this.residentCompanyService.fetchOnboardedCompaniesBySiteId(user.site_id, ApplicationConstants.ONBOARDED_COMPANIES, emailFrequency).then((result) => {
+          let onboardedComps = await this.residentCompanyService.fetchOnboardedCompaniesBySiteId(user.site_id, ApplicationConstants.ONBOARDED_COMPANIES, emailFrequency, ApplicationConstants.FREQUENCY).then((result) => {
             return result;
           });
+
+          /** Fetch and set industry names for onboarded companies */
+          await this.traverseAndSetIndustryNames(onboardedComps, firstLevelIndustries);
 
           /** Filter onboarded resident companies by site */
           let onboardedGroupedCompsObj = await this.prepareFilteredArrayOfResidentComps(onboardedComps, user.site_id, sitesArrDb);
 
           info(`Filtered onboarded resident companies`, __filename, `handleSponsorEmailSchedule()`);
 
-          let graduatedComps = await this.residentCompanyService.fetchOnboardedCompaniesBySiteId(user.site_id, ApplicationConstants.GRADUATED_COMPANIES, emailFrequency).then((result) => {
+          /** Graduated resident companies */
+          let graduatedComps = await this.residentCompanyService.fetchOnboardedCompaniesBySiteId(user.site_id, ApplicationConstants.GRADUATED_COMPANIES, emailFrequency, ApplicationConstants.FREQUENCY).then((result) => {
             return result;
           });
+
+          /** Fetch and set industry names for graduated companies */
+          await this.traverseAndSetIndustryNames(graduatedComps, firstLevelIndustries);
 
           /** Filter graduated resident companies by site */
           let graduatedGroupedCompsObj = await this.prepareFilteredArrayOfResidentComps(graduatedComps, user.site_id, sitesArrDb);
 
-          let companiesCount: any = {
-            onboardedCompsCount: 0,
-            graduatedCompsCount: 0
-          };
+          /** Graduating soon resident companies */
+          let graduatingSoonComps = await this.residentCompanyService.getGraduatingSoonCompanies(user.site_id, emailFrequency);
+          let graduatingSoonGroupedCompsObj = await this.prepareFilteredArrayOfResidentComps(graduatingSoonComps, user.site_id, sitesArrDb);
 
-          if (onboardedComps && Array.isArray(onboardedComps)) {
-            companiesCount.onboardedCompsCount = onboardedComps.length;
-          }
-          if (graduatedComps && Array.isArray(graduatedComps)) {
-            companiesCount.graduatedCompsCount = graduatedComps.length;
-          }
+          let companiesCount = this.getCompanyCount(onboardedComps, graduatedComps, graduatingSoonComps);
 
           info(`Filtered onboarded resident companies`, __filename, `handleSponsorEmailSchedule()`);
 
           /** Send mail to the user */
-          this.sendScheduledMailToSponsor(user, onboardedGroupedCompsObj, graduatedGroupedCompsObj, companiesCount);
+          this.sendScheduledMailToSponsor(user, onboardedGroupedCompsObj, graduatedGroupedCompsObj, graduatingSoonGroupedCompsObj, companiesCount);
         } //loop
       } else {
         error(`Sponsor users found: ${sponsorUsers}`, __filename, `handleSponsorEmailSchedule()`);
@@ -508,7 +526,7 @@ export class UsersService {
           residentCompanyObj[siteName] = compsOfSite;
         }
       } else {
-        error(`Resident companies: ${residentCompanies}`, __filename, `prepareFilteredArrayOfResidentComps()`);
+        warn(`Resident companies: ${residentCompanies}`, __filename, `prepareFilteredArrayOfResidentComps()`);
       }
     } catch (err) {
       error(`Error in preparing filtered array.`, __filename, `prepareFilteredArrayOfResidentComps()`);
@@ -544,7 +562,7 @@ export class UsersService {
    * @param onboardedCompanies list of onboarded companies
    * @param graduatedCompanies list of graduated companies
    */
-  sendScheduledMailToSponsor(user: User, onboardedGroupedCompsObj: any, graduatedGroupedCompsObj: any, companiesCount: any) {
+  sendScheduledMailToSponsor(user: User, onboardedGroupedCompsObj: any, graduatedGroupedCompsObj: any, graduatingSoonGroupedCompsObj: any, companiesCount: any) {
     info(`Prepare email config data`, __filename, `sendScheduledMailToSponsor()`);
     try {
       if (user) {
@@ -554,6 +572,7 @@ export class UsersService {
           ui_server_origin: process.env.UI_SERVER_ORIGIN,
           onboardedCompsObj: onboardedGroupedCompsObj,
           graduatedCompsObj: graduatedGroupedCompsObj,
+          graduatingSoonCompsObj: graduatingSoonGroupedCompsObj,
           companiesCount: companiesCount
         };
         let tenant = { tenantEmail: user.email, role: user.role };
@@ -604,5 +623,119 @@ export class UsersService {
       return filteredArray[0].name;
     }
     return null;
+  }
+
+  /**
+   * Description: Counts onboarded, graduated, graduating soon companies based on their list size.
+   * @description Counts onboarded, graduated, graduating soon companies based on their list size.
+   * @param onboardedComps list of onboarded companies
+   * @param graduatedComps list of graduated companies
+   * @param graduatingSoonComps list of graduating soon companies
+   * @returns return an object with count of the resident companies
+   */
+  getCompanyCount(onboardedComps, graduatedComps, graduatingSoonComps) {
+    info(`Get company count by size of list`, __filename, `getCompanyCount()`);
+    let companiesCount: any = {
+      onboardedCompsCount: 0,
+      graduatedCompsCount: 0,
+      graduatingSoonCompsCount: 0
+    };
+
+    if (onboardedComps && Array.isArray(onboardedComps)) {
+      companiesCount.onboardedCompsCount = onboardedComps.length;
+      debug(`Onboarded companies size: ${onboardedComps.length}`, __filename, `getCompanyCount()`);
+    }
+    if (graduatedComps && Array.isArray(graduatedComps)) {
+      companiesCount.graduatedCompsCount = graduatedComps.length;
+      debug(`Graduated companies size: ${graduatedComps.length}`, __filename, `getCompanyCount()`);
+    }
+    if (graduatingSoonComps && Array.isArray(graduatingSoonComps)) {
+      companiesCount.graduatingSoonCompsCount = graduatingSoonComps.length;
+      debug(`Graduating soon companies size: ${graduatingSoonComps.length}`, __filename, `getCompanyCount()`);
+    }
+    return companiesCount;
+  }
+
+  /**
+   * Description: Finds out the selected industry names as per resident companies.
+   * @description Finds out the selected industry names as per resident companies.
+   * @param residentCompanies list of resident companies
+   * @param firstLevelIndustries industry list which dont have parent(first level industries)
+   */
+  async traverseAndSetIndustryNames(residentCompanies, firstLevelIndustries) {
+    info(`Traversing the industries to fetch selected industries`, __filename, `traverseAndSetIndustryNames()`);
+    if (residentCompanies && Array.isArray(residentCompanies)) {
+      for (const company of residentCompanies) {
+        let firstLevelSelected = [];
+        if (firstLevelIndustries) {
+          for (const firstLevelIndustry of firstLevelIndustries) {
+            let secondLevelIndustries = await this.residentCompanyService.getIndustriesByParentId(firstLevelIndustry.id);
+            let secondLevelSelected = [];
+            if (secondLevelIndustries) {
+              for (const secondLevelIndustry of secondLevelIndustries) {
+                let thirdLevelIndustries = await this.residentCompanyService.getIndustriesByParentId(secondLevelIndustry.id);
+                let thirdLevelSelected = [];
+                if (thirdLevelIndustries) {
+                  for (const thirdLevelIndustry of thirdLevelIndustries) {
+                    if (company.industry.indexOf(thirdLevelIndustry.id) >= 0) {
+                      if (thirdLevelIndustry.name == 'Other') {
+                        let key = Object.keys(company.otherIndustries).find(key => {
+                          if (key == thirdLevelIndustry.id.toString()) {
+                            return key
+                          }
+                        });
+                        thirdLevelIndustry.name = company.otherIndustries[key];
+                      }
+                      thirdLevelSelected.push(thirdLevelIndustry);
+                    }
+                    if (thirdLevelSelected.length > 1) { break; }
+                  } //Third level loop
+                }
+                if (company.industry.indexOf(secondLevelIndustry.id) >= 0) {
+                  if (secondLevelIndustry.name == 'Other') {
+                    let key = Object.keys(company.otherIndustries).find(key => {
+                      if (key == secondLevelIndustry.id.toString()) {
+                        return key
+                      }
+                    });
+                    secondLevelIndustry.name = company.otherIndustries[key];
+                  }
+                  secondLevelSelected.push(secondLevelIndustry);
+                }
+                if (thirdLevelSelected.length > 1) {
+                  secondLevelSelected.push(secondLevelIndustry);
+                } else if (thirdLevelSelected.length == 1) {
+                  secondLevelSelected.push(thirdLevelSelected[0]);
+                }
+                if (secondLevelSelected.length > 1) { break; }
+              } //Second level loop
+            }
+            if (company.industry.indexOf(firstLevelIndustry.id) >= 0) {
+              if (firstLevelIndustry.name == 'Other') {
+                let key = Object.keys(company.otherIndustries).find(key => {
+                  if (key == firstLevelIndustry.id.toString()) {
+                    return key
+                  }
+                });
+                firstLevelIndustry.name = company.otherIndustries[key];
+              }
+              firstLevelSelected.push(firstLevelIndustry);
+            }
+            if (secondLevelSelected.length > 1) {
+              firstLevelSelected.push(firstLevelIndustry);
+            } else if (secondLevelSelected.length == 1) {
+              firstLevelSelected.push(secondLevelSelected[0]);
+            }
+          }
+        }
+        let finalSelected = firstLevelSelected.map((cat) => {
+          return cat.name;
+        });
+        company.industryNames = finalSelected;
+        debug(`After traversing the industries selected industries are: ${finalSelected}`, __filename, `traverseAndSetIndustryNames()`);
+      }
+    } else {
+      warn(`Onboarded resident companies: ${residentCompanies}`, __filename, `traverseAndSetIndustryNames()`);
+    }
   }
 }
