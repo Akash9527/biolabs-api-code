@@ -121,6 +121,9 @@ export class ResidentCompany {
   @Column({ default: false })
   companyOnboardingStatus: boolean;
 
+  @CreateDateColumn({ type: "timestamp" })
+  companyOnboardingDate: number;
+
   @Column({ length: 1000, default: null, nullable: true })
   elevatorPitch: string;
 
@@ -136,7 +139,7 @@ export class ResidentCompany {
   @Column({ default: null })
   technologyPapersPublished: boolean;
 
-  
+
   @Column({ default: null })
   technologyPapersPublishedLinkCount: number;
 
@@ -177,7 +180,7 @@ export class ResidentCompany {
   website: string;
 
   @Column({ length: 110, default: null, nullable: true })
-  foundersBusinessIndustryName:string;
+  foundersBusinessIndustryName: string;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: number;
@@ -191,20 +194,26 @@ export class ResidentCompany {
   @Column({ length: 255, nullable: true })
   logoImgUrl: string;
 
-  @Column({nullable:true})
+  @Column({ nullable: true, default: '0' })
   committeeStatus: committee_status;
 
-  @UpdateDateColumn({ type: 'timestamptz'})
+  @UpdateDateColumn({ type: 'timestamptz', nullable: true })
   selectionDate: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
   companyStatusChangeDate: number;
 
-  @OneToMany(() => Notes , (notes) => notes.residentCompany)
+  @OneToMany(() => Notes, (notes) => notes.residentCompany)
   notes?: Notes[];
 
-  @OneToMany(() => SpaceChangeWaitlist , (spaceChangeWaitlist) => spaceChangeWaitlist.residentCompany)
+  @OneToMany(() => SpaceChangeWaitlist, (spaceChangeWaitlist) => spaceChangeWaitlist.residentCompany)
   spaceChangeWaitlist?: SpaceChangeWaitlist[];
+
+  @Column("int", { array: true, nullable: true })
+  sitesApplied: number[];
+
+  @Column("int", { array: true, nullable: true })
+  primarySite: number[];
 }
 
 export class ResidentCompanyFillableFields {
@@ -260,7 +269,7 @@ export class ResidentCompanyFillableFields {
   equipmentOnsite: string;
   website: string;
   foundersBusinessIndustryName: string;
-  pitchdeck : string;
-  logoImgUrl : string;
-  technologyPapersPublishedLinkCount : number;
+  pitchdeck: string;
+  logoImgUrl: string;
+  technologyPapersPublishedLinkCount: number;
 }

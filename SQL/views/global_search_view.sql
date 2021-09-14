@@ -61,7 +61,7 @@ SELECT
   rc.status,
   "companyStatus",
   (
-    CASE WHEN "companyStatus" = '0' THEN 'Applied' WHEN "companyStatus" = '1' THEN 'Current Member' WHEN "companyStatus" = '2' THEN 'On Hold' WHEN "companyStatus" = '3' THEN 'Discontinued' WHEN "companyStatus" = '4' THEN 'Graduated' ELSE "companyStatus" END
+    CASE WHEN "companyStatus" = '0' THEN 'Applied-New' WHEN "companyStatus" = '1' THEN 'Current Member' WHEN "companyStatus" = '2' THEN 'On Hold' WHEN "companyStatus" = '3' THEN 'Discontinued' WHEN "companyStatus" = '4' THEN 'Graduated' WHEN "companyStatus" = '5' THEN 'Applied-Contacted' ELSE "companyStatus" END
   ) as companystatustext,
   "companyVisibility",
   (
@@ -96,7 +96,7 @@ SELECT
   "logoImgUrl",
   "committeeStatus",
   (
-    CASE WHEN "committeeStatus" = '0' THEN 'Unscheduled' WHEN "committeeStatus" = '1' THEN 'Scheduled' WHEN "committeeStatus" = '2' THEN 'Accepted' WHEN "committeeStatus" = '3' THEN 'Rejected' ELSE "committeeStatus" END
+    CASE WHEN "committeeStatus" = '0' THEN 'Unscheduled' WHEN "committeeStatus" = '1' THEN 'Scheduled' WHEN "committeeStatus" = '2' THEN 'Accepted' WHEN "committeeStatus" = '3' THEN 'Rejected' WHEN "committeeStatus" = '4' THEN 'Alternate' ELSE "committeeStatus" END
   ) as committeestatustext,
   "selectionDate",
   "companyStatusChangeDate"

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 // import { diff } from 'json-diff';
-import { In, Like, Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { BiolabsSource } from './biolabs-source.entity';
 import { Category } from './category.entity';
 import { Funding } from './funding.entity';
@@ -15,7 +15,7 @@ import { USER_TYPE } from '../../../constants/user-type';
 import { COMMITTEE_STATUS } from 'constants/committee_status';
 import { ProductType } from '../order/model/product-type.entity';
 import { FileService } from '../file';
-const { error, info, debug } = require("../../../utils/logger")
+const { error, info } = require("../../../utils/logger")
 const { InternalException, BiolabsException } = require('../../common/exception/biolabs-error');
 //const migrationData = JSON.parse(require("fs").readFileSync(appRoot.path + "/" + process.env.BIOLAB_CONFIGURATION_JSON));
 type status_enum = '-1' | '0' | '1' | '99';
@@ -43,7 +43,6 @@ export class MasterService {
     private readonly productTypeRepository: Repository<ProductType>,
   ) { }
 
-
   /**
    * Description: This method will return the sites list.
    * @description This method will return the sites list.
@@ -56,11 +55,13 @@ export class MasterService {
       let search: any = {};
       let skip;
       let take;
-      // filtering site list. Use payload.role if role is required.
-      if (payload.siteIdArr) {
-        payload.siteIdArr = this.parseToArray(payload.siteIdArr);
-        search = { id: In(payload.siteIdArr) };
-      }
+
+      /* BIOL-351:removed below filter to return all sites */
+      //filtering site list. Use payload.role if role is required.
+      // if (payload.siteIdArr) {
+      //   payload.siteIdArr = this.parseToArray(payload.siteIdArr);
+      //   search = { id: In(payload.siteIdArr) };
+      // }
 
       if (payload.q && payload.q != "") {
         search = { ...search, ...{ name: Like("%" + payload.q + "%"), status: '1' } };
@@ -94,23 +95,25 @@ export class MasterService {
   /**
    * Description: This method will store the Product information.
    * @description This method will store the Product information.
-   * @return array of product object 
+   * @return array of product object
    */
-  async createProductType(migrationData: any) {
-    info("creating product type", __filename, "createProductType()");
+  async createProductTypes(migrationData: any) {
+    let resp = {};
     try {
-      const productType = await this.productTypeRepository.find();
-      const ptypeData = migrationData["productTypeName"]
-      if (!productType || productType.length == 0) {
-        for (let index = 0; index < ptypeData.length; index++) {
-          const productType = ptypeData[index];
-          await this.productTypeRepository.save(this.productTypeRepository.create(productType));
+      const ptypeData = migrationData["productTypeName"];
+      if (ptypeData) {
+        for (const ptypeDataObj of ptypeData) {
+          resp[ptypeDataObj.productTypeName] = await this.productTypeRepository.save(this.productTypeRepository.create(ptypeDataObj));
         }
+      } else {
+        error(`Error in creating product types.`, __filename, `createProductType()`);
       }
     } catch (err) {
-      error("Error in creating product type" + err.message, __filename, "createSite()");
-      throw new InternalException(err.message);
+      if (err) {
+        error(`Error in creating product types. ${err.message}`, __filename, `createProductType()`);
+      }
     }
+    return resp;
   }
 
   /**
@@ -144,7 +147,7 @@ export class MasterService {
     // if (existingSite && changes) {
     //   return await this.siteRepository.update(_site.id, _site);
     // } else if (!existingSite) {
-      return await this.siteRepository.save(this.siteRepository.create(_site));
+    return await this.siteRepository.save(this.siteRepository.create(_site));
     // }
   }
 
@@ -298,17 +301,29 @@ export class MasterService {
   async createCategories(migrationData: any) {
     info("creating categories", __filename, "createCategories()");
     try {
-      const _categories = migrationData['categories'];
-      // for (const _category of _categories) {
-      //   await this.createCategory(_category, 0);
-      // }
-      const promises = _categories.map(
-        async _category => {
-          return await this.createCategory(_category, 0);
+      const categories = migrationData['categories']
+      let resp = {};
+      if (categories) {
+        for (const category of categories) {
+          resp[category.name] = await this.createCategory(category.id, category.name, 0);
+          if ('subcategories' in category && category.subcategories.length > 0) {
+            const subcategories = category['subcategories'];
+            for (const subCategory of subcategories) {
+              resp[subCategory.name] = await this.createCategory(subCategory.id, subCategory.name, category.id);
+              if ('subcategories' in subCategory && subCategory.subcategories.length > 0) {
+                const innerSubCategories = subCategory['subcategories'];
+                for (const innerSubCategory of innerSubCategories) {
+                  resp[innerSubCategory.name] = await this.createCategory(innerSubCategory.id, innerSubCategory.name, subCategory.id);
+                }
+              }
+            }
+          }
         }
-      );
-      const categories = await Promise.all(promises);
-      return categories;
+      }
+      else {
+        error("Error in creating categories, categories:" + categories, __filename, "createCategories()");
+      }
+      return resp
     } catch (err) {
       error("Error in creating categories" + err.message, __filename, "createCategories()");
       throw new InternalException(err.message);
@@ -316,56 +331,20 @@ export class MasterService {
   }
 
   /**
-   * Description: This method will store the category.
-   * @description This method will store the category.
-   * @param category object of category
-   * @param parent_id number
-   * @return category object
-   */
-  async createCategory(category: { name: string, id: number, subcategories?: [] }, parent_id: number) {
-    info("creating category", __filename, "createCategory()");
+    * Description: This method will store the category.
+    * @description This method will store the category.
+    * @param category object of category
+    * @param parent_id number
+    * @return category object
+    */
+  async createCategory(id, name, parent_id) {
+    const status: status_enum = '1'
     try {
-      this.saveCategory(category.name, category.id, parent_id);
-      if (('subcategories' in category) && category.subcategories.length > 0) {
-        const promises = category.subcategories.map(
-          async _subcategories => {
-            return await this.createCategory(_subcategories, category.id);
-          }
-        );
-        const subCategories = await Promise.all(promises);
-        return subCategories;
-      }
-    } catch (err) {
-      error("Error in creating category", __filename, "createCategory()");
-      throw new InternalException(err.message);
+      let payload = { id: id, name: name, parent_id: parent_id, status: status }
+      return await this.categoryRepository.save(this.categoryRepository.create(payload))
     }
-  }
-
-  /**
-   * Description: This method will store the category.
-   * @description This method will store the category.
-   * @param name string
-   * @param id number
-   * @param parent_id number
-   * @return category object
-   */
-  async saveCategory(name: string, id: number, parent_id: number) {
-    info("creating category by Name: " + name, __filename, "saveCategory()");
-    try {
-      const status: status_enum = '1';
-      const payload = { id: id, name: name, parent_id: parent_id, status: status }
-      const checkDuplicateCategory = await this.categoryRepository.find(
-        { where: { name: name, parent_id: parent_id } }
-      );
-      if (checkDuplicateCategory && checkDuplicateCategory.length > 0) {
-        debug("Category already existed", __filename, "saveCategory()");
-        return false;
-      } else {
-        return await this.categoryRepository.save(payload);
-      }
-    } catch (err) {
-      error("Error in creating category", __filename, "saveCategory()");
-      throw new InternalException(err.message);
+    catch (err) {
+      error('Error creating category' + err.message, __filename, 'createCategory()')
     }
   }
 

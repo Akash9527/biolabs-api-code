@@ -102,4 +102,10 @@ export class CreateOrderProductDto {
   })
   manuallyEnteredProduct: boolean;
 
+  @ApiProperty({
+    required: false,
+    nullable: false,
+  })
+  submittedDate: any;
+
 }

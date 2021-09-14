@@ -1,9 +1,8 @@
-import { Repository } from "typeorm";
+import { Repository, SelectQueryBuilder } from "typeorm";
 import { ResidentCompany } from "./resident-company.entity";
 import { ResidentCompanyService } from "./resident-company.service";
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-
 import { PassportModule } from "@nestjs/passport";
 import { ResidentCompanyHistory } from "./resident-company-history.entity";
 import { ResidentCompanyDocuments, ResidentCompanyDocumentsFillableFields } from "./rc-documents.entity";
@@ -35,6 +34,8 @@ import { UpdateSpaceChangeWaitlistDto } from "../dto/update-space-change-waitlis
 import { AddSpaceChangeWaitlistDto } from "../dto/add-space-change-waitlist.dto";
 import { NotAcceptableException } from "@nestjs/common";
 import { UpdateNotesDto } from "./update-notes.dto";
+import { ApplicationConstants } from "../../../utils/application-constants";
+import { EmailFrequency } from "../enum/email-frequency-enum";
 const { InternalException, HttpException, BiolabsException } = require('../../common/exception/biolabs-error');
 const mockCompany: any = { id: 1 };
 const mockAddResidentCompany: AddResidentCompanyPayload = {
@@ -43,7 +44,7 @@ const mockAddResidentCompany: AddResidentCompanyPayload = {
   otherCompanyStage: "", funding: "1", fundingSource: [1], otherFundingSource: "", intellectualProperty: 1,
   otherIntellectualProperty: "", isAffiliated: false, affiliatedInstitution: "", noOfFullEmp: 0, empExpect12Months: 0,
   utilizeLab: 0, expect12MonthsUtilizeLab: 0, industry: ["95"], modality: ["3"], equipmentOnsite: "Tech World",
-  preferredMoveIn: 1, otherIndustries: {}, otherModality: {}
+  preferredMoveIn: 1, otherIndustries: {}, otherModality: {}, sitesApplied: [2], primarySite: [1],"selectionDate":new Date("2021-07-14")
 }
 const listRCPayload: ListResidentCompanyPayload = {
   q: "test", role: 1, pagination: true, page: 3, limit: 3, companyStatus: '1', committeeStatus: '1', companyVisibility: true,
@@ -85,7 +86,11 @@ const mockRC: ResidentCompany = {
   "committeeStatus": null,
   "selectionDate": new Date("2021-07-05T18:30:00.000Z"),
   "companyStatusChangeDate": 2021,
+  sitesApplied: [2],
+  primarySite: [1],
+  companyOnboardingDate: 0
 }
+
 let mockUpdateSpaceChangeWaitlistDto: UpdateSpaceChangeWaitlistDto = {
   spaceChangeWaitlistId: 1,
   requestStatus: 0,
@@ -230,7 +235,8 @@ const mockResidentHistory: ResidentCompanyHistory = {
   academiaPartnershipDetails: null, industryPartnerships: null, industryPartnershipsDetails: null,
   newsletters: null, shareYourProfile: null, website: null, foundersBusinessIndustryName: null,
   createdAt: 2021, updatedAt: 2021, pitchdeck: "pitchDeck.img", logoImgUrl: "logoimgurl.img",
-  committeeStatus: '1', selectionDate: new Date("2021-07-05T18:30:00.000Z"), companyStatusChangeDate: 2021, comnpanyId: 1, intellectualProperty: null
+  committeeStatus: '1', selectionDate: new Date("2021-07-05T18:30:00.000Z"), companyStatusChangeDate: 2021, comnpanyId: 1, intellectualProperty: null,
+  sitesApplied: [2], primarySite: [1], companyOnboardingDate: 1626134400
 }
 const mockResidentDocument: ResidentCompanyDocuments = {
   id: 1, company_id: 1, doc_type: "Document", name: "ResidentDocument",
@@ -267,13 +273,546 @@ const mock: UpdateResidentCompanyPayload = {
   "academiaPartnerships": true, "academiaPartnershipDetails": "ersdf", "industryPartnerships": true,
   "industryPartnershipsDetails": "string", "newsletters": true, "shareYourProfile": true,
   "website": "string", "companyMembers": [], "companyAdvisors": [],
-  "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV"
+  "companyTechnicalTeams": [], "foundersBusinessIndustryName": "TestNV", "primarySite": [1], "sitesApplied": [2]
 };
 const mockNotes: Notes = { id: 1, createdBy: 1, createdAt: new Date(), residentCompany: new ResidentCompany(), notesStatus: 1, notes: "this is note 1" };
 const req: any = {
-  user: { site_id: [1, 2], role: 1 },
+  user: { site_id: [1, 2], role: 1, companyId: 70 },
   headers: { 'x-site-id': [2] }
 }
+
+let itemsWithUpdatedInvoices = [
+  {
+    "productTypeId": 5,
+    "sum": "0",
+    "productTypeName": "Private Lab"
+  },
+  {
+    "productTypeId": 4,
+    "sum": "0",
+    "productTypeName": "Private Office"
+  },
+  {
+    "productTypeId": 3,
+    "sum": "0",
+    "productTypeName": "Workstation"
+  },
+  {
+    "productTypeId": 2,
+    "sum": "20",
+    "productTypeName": "Lab Bench"
+  },
+  {
+    "productTypeId": 1,
+    "sum": "10",
+    "productTypeName": "Membership Fee"
+  }
+];
+
+const mockSpaceChangeWaitlistItems = [
+  {
+    "productTypeId": 5,
+    "sum": "0",
+    "productTypeName": "Private Lab"
+  },
+  {
+    "productTypeId": 4,
+    "sum": "2",
+    "productTypeName": "Private Office"
+  },
+  {
+    "productTypeId": 3,
+    "sum": "4",
+    "productTypeName": "Workstation"
+  },
+  {
+    "productTypeId": 2,
+    "sum": "1",
+    "productTypeName": "Lab Bench"
+  },
+  {
+    "productTypeId": 1,
+    "sum": "0",
+    "productTypeName": "Membership Fee"
+  }
+];
+const mockCatCount: any =[
+  {
+      "name": "Therapeutics (Biopharma)",
+      "id": 1,
+      "child": [
+          {
+              "name": "Cardiovascular & Metabolism",
+              "id": 2,
+              "child": [
+                  {
+                      "name": "Diabetes and related disorders",
+                      "id": 3
+                  },
+                  {
+                      "name": "Chronic Kidney Disease (CKD)",
+                      "id": 4
+                  },
+                  {
+                      "name": "Cardiovascular Disease (CVD)",
+                      "id": 5
+                  },
+                  {
+                      "name": "NAFLD, NASH, or cirrhosis",
+                      "id": 6
+                  },
+                  {
+                      "name": "Obesity",
+                      "id": 7
+                  },
+                  {
+                      "name": "Cachexia",
+                      "id": 8
+                  },
+                  {
+                      "name": "Atherosclerosis and vascular diseases",
+                      "id": 9
+                  },
+                  {
+                      "name": "Dyslipidemia",
+                      "id": 10
+                  },
+                  {
+                      "name": "Cardiac arrhythmias and associated disorders",
+                      "id": 11
+                  },
+                  {
+                      "name": "Pulmonary hypertension",
+                      "id": 12
+                  },
+                  {
+                      "name": "Other",
+                      "id": 29999
+                  }
+              ]
+          },
+          {
+              "name": "Oncology",
+              "id": 13,
+              "child": [
+                  {
+                      "name": "Hematological malignancies",
+                      "id": 14
+                  },
+                  {
+                      "name": "Chronic lymphocytic leukemia (CLL)",
+                      "id": 15
+                  },
+                  {
+                      "name": "Mantle cell lymphoma (MCL)",
+                      "id": 16
+                  },
+                  {
+                      "name": "Prostate cancer",
+                      "id": 17
+                  },
+                  {
+                      "name": "Lung Cancer",
+                      "id": 18
+                  },
+                  {
+                      "name": "Pancreatic cancer",
+                      "id": 19
+                  },
+                  {
+                      "name": "GI stromal tumors",
+                      "id": 20
+                  },
+                  {
+                      "name": "Breast cancer",
+                      "id": 21
+                  },
+                  {
+                      "name": "Renal cell carcinoma",
+                      "id": 22
+                  },
+                  {
+                      "name": "Kidney cancer",
+                      "id": 23
+                  },
+                  {
+                      "name": "Ovarian cancer",
+                      "id": 24
+                  },
+                  {
+                      "name": "Bladder cancer",
+                      "id": 25
+                  },
+                  {
+                      "name": "Liver cancer",
+                      "id": 26
+                  },
+                  {
+                      "name": "Melanoma",
+                      "id": 27
+                  },
+                  {
+                      "name": "Bone metastasis",
+                      "id": 28
+                  },
+                  {
+                      "name": "SEGA tumors",
+                      "id": 29
+                  },
+                  {
+                      "name": "Neuroendocrine tumors",
+                      "id": 30
+                  },
+                  {
+                      "name": "Glioblastoma",
+                      "id": 31
+                  },
+                  {
+                      "name": "Other",
+                      "id": 139999
+                  }
+              ]
+          },
+          {
+              "name": "Neuroscience",
+              "id": 32,
+              "child": [
+                  {
+                      "name": "Schizophrenia",
+                      "id": 33
+                  },
+                  {
+                      "name": "Major Depressive Disorder (MDD)",
+                      "id": 34
+                  },
+                  {
+                      "name": "Alzheimer’s Disease",
+                      "id": 35
+                  },
+                  {
+                      "name": "Spinal muscular atrophy",
+                      "id": 36
+                  },
+                  {
+                      "name": "Huntington’s disease",
+                      "id": 37
+                  },
+                  {
+                      "name": "Autism or Autism Spectrum Disorder",
+                      "id": 38
+                  },
+                  {
+                      "name": "Parkinson’s disease",
+                      "id": 39
+                  },
+                  {
+                      "name": "Down syndrome",
+                      "id": 40
+                  },
+                  {
+                      "name": "Multiple sclerosis",
+                      "id": 41
+                  },
+                  {
+                      "name": "Other",
+                      "id": 329999
+                  }
+              ]
+          },
+          {
+              "name": "Infectious Diseases",
+              "id": 42,
+              "child": [
+                  {
+                      "name": "HIV",
+                      "id": 43
+                  },
+                  {
+                      "name": "Tuberculosis (TB)",
+                      "id": 44
+                  },
+                  {
+                      "name": "Respiratory Syncytial Virus (RSV)",
+                      "id": 45
+                  },
+                  {
+                      "name": "Hepatitis B",
+                      "id": 46
+                  },
+                  {
+                      "name": "Global health crisis pathogens Ebola, Zika, Dengue, SARS-COV2",
+                      "id": 47
+                  },
+                  {
+                      "name": "Malaria",
+                      "id": 48
+                  },
+                  {
+                      "name": "Multi-drug Resistant Bacteria",
+                      "id": 49
+                  },
+                  {
+                      "name": "Influenza",
+                      "id": 50
+                  },
+                  {
+                      "name": "Cryptosporidiosis",
+                      "id": 51
+                  },
+                  {
+                      "name": "Kinetoplastid diseases",
+                      "id": 52
+                  },
+                  {
+                      "name": "Other",
+                      "id": 429999
+                  }
+              ]
+          },
+          {
+              "name": "Immunology and Inflammation",
+              "id": 53,
+              "child": [
+                  {
+                      "name": "Rheumatoid arthritis",
+                      "id": 54
+                  },
+                  {
+                      "name": "Psoriatic arthritis",
+                      "id": 55
+                  },
+                  {
+                      "name": "Lupus",
+                      "id": 56
+                  },
+                  {
+                      "name": "Ulcerative colitis",
+                      "id": 57
+                  },
+                  {
+                      "name": "Crohn’s disease",
+                      "id": 58
+                  },
+                  {
+                      "name": "NAFLD, NASH, or cirrhosis",
+                      "id": 59
+                  },
+                  {
+                      "name": "Atopic dermatitis",
+                      "id": 60
+                  },
+                  {
+                      "name": "Psoriasis",
+                      "id": 61
+                  },
+                  {
+                      "name": "Vitiligo",
+                      "id": 62
+                  },
+                  {
+                      "name": "Alopecia areata",
+                      "id": 63
+                  },
+                  {
+                      "name": "Other",
+                      "id": 539999
+                  }
+              ]
+          },
+          {
+              "name": "Vaccines",
+              "id": 64,
+              "child": [
+                  {
+                      "name": "Pneumococcal disease",
+                      "id": 65
+                  },
+                  {
+                      "name": "Meningococcal disease",
+                      "id": 66
+                  },
+                  {
+                      "name": "Influenza",
+                      "id": 67
+                  },
+                  {
+                      "name": "Coronavirus",
+                      "id": 68
+                  },
+                  {
+                      "name": "Dengue",
+                      "id": 69
+                  },
+                  {
+                      "name": "Cancer",
+                      "id": 70
+                  },
+                  {
+                      "name": "Group B streptococcus",
+                      "id": 71
+                  },
+                  {
+                      "name": "Other",
+                      "id": 649999
+                  }
+              ]
+          },
+          {
+              "name": "Ophthalmology",
+              "id": 72,
+              "child": [
+                  {
+                      "name": "Retinal vein occlusion (RVO)",
+                      "id": 73
+                  },
+                  {
+                      "name": "Age-related macular degeneration (AMD)",
+                      "id": 74
+                  },
+                  {
+                      "name": "Diabetic eye disease",
+                      "id": 75
+                  },
+                  {
+                      "name": "Cataracts",
+                      "id": 76
+                  },
+                  {
+                      "name": "Conjunctivitis",
+                      "id": 77
+                  },
+                  {
+                      "name": "Dry Eye Disease",
+                      "id": 78
+                  },
+                  {
+                      "name": "Glaucoma",
+                      "id": 79
+                  },
+                  {
+                      "name": "Macular Edema",
+                      "id": 80
+                  },
+                  {
+                      "name": "Myopia",
+                      "id": 81
+                  },
+                  {
+                      "name": "Ocular disease",
+                      "id": 82
+                  },
+                  {
+                      "name": "Retinal Diseases",
+                      "id": 83
+                  },
+                  {
+                      "name": "Other",
+                      "id": 729999
+                  }
+              ]
+          },
+          {
+              "name": "Rare diseases",
+              "id": 98,
+              "child": []
+          },
+          {
+              "name": "Genetic diseases",
+              "id": 99,
+              "child": []
+          },
+          {
+              "name": "Other",
+              "id": 19999,
+              "child": [],
+          }
+      ],
+      "industrycount":0
+  },
+  {
+      "name": "Medical Devices",
+      "id": 84,
+      "child": [
+          {
+              "name": "Surgery",
+              "id": 85
+          },
+          {
+              "name": "Vision Care",
+              "id": 86
+          },
+          {
+              "name": "Orthopedics",
+              "id": 87
+          },
+          {
+              "name": "Cardiovascular & Specialty Solutions",
+              "id": 88
+          },
+          {
+              "name": "Other",
+              "id": 849999
+          }
+      ],
+      "industrycount":0
+  },
+  {
+      "name": "Diagnostics/Biomarkers",
+      "id": 89,
+      "child": [],
+      "industrycount":0
+  },
+  {
+      "name": "Lab/Research Tools",
+      "id": 90,
+      "child": [],
+      "industrycount":0
+  },
+  {
+      "name": "Consumer Product",
+      "id": 91,
+      "child": [
+          {
+              "name": "Skin Health",
+              "id": 92
+          },
+          {
+              "name": "Self Care",
+              "id": 93
+          },
+          {
+              "name": "Other",
+              "id": 919999
+          }
+      ],
+      "industrycount":0
+  },
+  {
+      "name": "Digital Health",
+      "id": 94,
+      "child": [],
+      "industrycount":0
+  },
+  {
+      "name": "Agriculture",
+      "id": 95,
+      "child": [],
+      "industrycount":0
+  },
+  {
+      "name": "Veterinary Medicine",
+      "id": 96,
+      "child": [],
+      "industrycount":0
+  },
+  {
+      "name": "Advanced Materials",
+      "id": 97,
+      "child": [],
+      "industrycount":0
+  }
+]
+
 describe('ResidentCompanyService', () => {
   let residentCompanyService: ResidentCompanyService;
   let productTypeService;
@@ -331,7 +870,7 @@ describe('ResidentCompanyService', () => {
               return {
                 catch: jest.fn(),
               }
-            }),
+            })
           }
         },
         {
@@ -422,6 +961,7 @@ describe('ResidentCompanyService', () => {
               getRawMany: jest.fn(),
               addOrderBy: jest.fn().mockReturnThis(),
               orderBy: jest.fn().mockReturnThis(),
+              select : jest.fn().mockReturnThis()
 
             })),
             findOne: jest.fn(),
@@ -679,9 +1219,7 @@ describe('ResidentCompanyService', () => {
       if (companyMembers.length > 0) {
         for (let i = 0; i < companyMembers.length; i++) {
           let companyMember = companyMembers[i];
-          //console.log("companyMember =========", companyMember);
           if (residentCompanyService.checkEmptyVal('managements', companyMember))
-            //console.log("in if block =========", companyMember);
             jest.spyOn(residentCompanyService, 'addResidentCompanyManagement').mockImplementation();
         }
       }
@@ -690,6 +1228,7 @@ describe('ResidentCompanyService', () => {
       expect(result).not.toBeNull();
     });
   });
+
   describe('addResidentCompanyAdvisor method', () => {
     let payload: ResidentCompanyAdvisoryFillableFields = {
       id: 1,
@@ -914,6 +1453,7 @@ describe('ResidentCompanyService', () => {
         where("resident_companies.companyStatus = :status", { status: '4' }).getRawOne();
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockCount);
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockMedian);
+      jest.spyOn(residentCompanyService, 'getCategoriesandSubCategories').mockResolvedValue(mockCatCount)
       jest.spyOn(residentCompanyService, 'getCategoryCount').mockResolvedValue(mockcatStatus);
       let result = await residentCompanyService.getResidentCompanyForSponsor();
       expect(result).not.toBeNull();
@@ -921,20 +1461,20 @@ describe('ResidentCompanyService', () => {
       expect(result).toEqual({
         companyStats: {},
         graduate: 0,
-         categoryStats: [
-            {
-              "name": "Diagnostics/Biomarkers",
-              "industrycount": 55
-            },
-            {
-              "name": "Digital Health",
-              "industrycount": 38
-            },
-            {
-              "name": "Veterinary Medicine",
-              "industrycount": 36
-            }
-          ]
+        categoryStats: [
+          {
+            "name": "Diagnostics/Biomarkers",
+            "industrycount": 55
+          },
+          {
+            "name": "Digital Health",
+            "industrycount": 38
+          },
+          {
+            "name": "Veterinary Medicine",
+            "industrycount": 36
+          }
+        ]
       })
     })
     it('should throw exception if company with provided id not available.', async () => {
@@ -1050,7 +1590,7 @@ describe('ResidentCompanyService', () => {
 
     const mockCount = 2;
     const mockMedian = 4;
-    const mockcatStatus= [
+    const mockcatStatus = [
       {
         "name": "Diagnostics/Biomarkers",
         "industrycount": 55
@@ -1074,7 +1614,7 @@ describe('ResidentCompanyService', () => {
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockCount);
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockMedian);
       jest.spyOn(residentCompanyService, 'getCategoryCount').mockResolvedValue(mockcatStatus);
-      
+
       let result = await residentCompanyService.getResidentCompanyForSponsorBySite();
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
@@ -1092,23 +1632,53 @@ describe('ResidentCompanyService', () => {
   });
 
   describe('getResidentCompany method', () => {
-    it('should return array of resident companies', async () => {
+    it('should return an object of resident company', async () => {
+      jest.spyOn(residentCompanyService, 'checkIfValidSiteIds').mockReturnThis();
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
-      let result = await residentCompanyService.getResidentCompany(mockRC.id)
+      let result = await residentCompanyService.getResidentCompany(70, req);
       expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined();
+      expect(result).toBe(mockRC);
     })
+
     it('should throw exception if company with provided id not available.', async () => {
-      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValue(null);
+      jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(null);
       try {
-        await residentCompanyService.getResidentCompany(new BiolabsException(
-          'Company with provided id not available.'));
+        await residentCompanyService.getResidentCompany(70, req);
       } catch (e) {
-        expect(e.name).toBe('BiolabsException');
-        expect(e instanceof BiolabsException).toBeTruthy();
-        expect(e.message).toBe('Error in find resident company');
+        expect(e.response.statusCode).toBe(406);
+        expect(e.response.message).toBe('Company with provided id not available.');
+        expect(e.response.error).toBe('Not Acceptable');
+      }
+    });
+
+    it('should throw NotAcceptableException company Ids are not equal.', async () => {
+      try {
+        await residentCompanyService.getResidentCompany(mockRC.id, req);
+      } catch (e) {
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe("You do not have permission to view this company")
       }
     });
   });
+
+  /**
+   * Test cases for public checkIfValidSiteIds(siteIdArrReq: number[], siteIdArrComp: number[]) method
+   */
+  describe('checkIfValidSiteIds method', () => {
+    it('Should throw NotAcceptableException exception', async () => {
+      try {
+        const siteIdArr = [1, 2];
+        const siteIdArrCompany = [3, 4];
+        residentCompanyService.checkIfValidSiteIds(siteIdArr, siteIdArrCompany);
+      } catch (e) {
+        expect(e.response.statusCode).toBe(406);
+        expect(e.response.error).toBe('Not Acceptable');
+        expect(e.response.message).toBe("You do not have permission to view this company")
+      }
+    })
+  });
+
   describe('updateResidentCompanyStatus method', () => {
     let payload: UpdateResidentCompanyStatusPayload = {
       "companyId": 3,
@@ -1117,7 +1687,8 @@ describe('ResidentCompanyService', () => {
       "companyOnboardingStatus": true,
       "committeeStatus": "2",
       "selectionDate": new Date("2021-07-14"),
-      "companyStatusChangeDate": new Date("2021-07-14")
+      "companyStatusChangeDate": new Date("2021-07-14"),
+      "companyOnboardingDate": new Date()
     };
     it('should return array of resident companies', async () => {
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
@@ -1156,16 +1727,19 @@ describe('ResidentCompanyService', () => {
   });
   describe('updateResidentCompany method', () => {
     it('should return object of resident companies', async () => {
+      mockRC.shareYourProfile = true;
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
       if (mockRC) {
         jest.spyOn(residentCompanyHistoryRepository, 'save').mockResolvedValueOnce(mockResidentHistory);
         jest.spyOn(residentCompanyService, 'getResidentCompany').mockResolvedValueOnce(mockRC);
         jest.spyOn(residentCompanyService, 'sendEmailToSiteAdmin').mockReturnThis();
       }
-      let result = await residentCompanyService.updateResidentCompany(mock, req);
-      expect(result).not.toBeNull();
-      expect(result).not.toBeUndefined();
-      expect(result).toBe(mockRC);
+      try {
+        await residentCompanyService.updateResidentCompany(mock, req);
+      } catch (err) {
+        expect(err.name).toBe('InternalException');
+        expect(err instanceof InternalException).toBeTruthy();
+      }
     })
     it('should throw exception ', async () => {
       jest.spyOn(residentCompanyHistoryRepository, 'save').mockImplementation(() => {
@@ -1183,7 +1757,8 @@ describe('ResidentCompanyService', () => {
     let mockSearchPayload: SearchResidentCompanyPayload = {
       q: "test", role: 1, pagination: true, page: 1, limit: 10,
       companyStatus: "1", companyVisibility: true, companyOnboardingStatus: true, siteIdArr: [1, 2], industries: [1, 2], modalities: [1, 2],
-      fundingSource: [1, 2], minFund: 1, maxFund: 1000, minCompanySize: 1, maxCompanySize: 100, sort: true, sortFiled: "", sortOrder: "ASC"
+      fundingSource: [1, 2], minFund: 1, maxFund: 1000, minCompanySize: 1, maxCompanySize: 100, sort: true, sortFiled: "", sortOrder: "ASC",
+      memberShip: 0
     }
 
     it('should return array of old global resident companies', async () => {
@@ -1211,10 +1786,23 @@ describe('ResidentCompanyService', () => {
     let mockSearchPayload: SearchResidentCompanyPayload = {
       q: "test", role: 1, pagination: true, page: 1, limit: 10,
       companyStatus: "1", companyVisibility: true, companyOnboardingStatus: true, siteIdArr: [1, 2], industries: [1, 2], modalities: [1, 2],
-      fundingSource: [1, 2], minFund: 1, maxFund: 1000, minCompanySize: 1, maxCompanySize: 100, sort: true, sortFiled: "", sortOrder: "ASC"
+      fundingSource: [1, 2], minFund: 1, maxFund: 1000, minCompanySize: 1, maxCompanySize: 100, sort: true, sortFiled: "", sortOrder: "ASC",
+      memberShip: 0
     }
+    let mockSiteIdArr = [1,2,3]
+    let mockGraduatedCompanies =[1,3]
     const mockResidentCompanyArray = [mockRC];
+    it('should return array of graduated soon resident companies', async () => {
+      jest.spyOn(residentCompanyService, 'getOpenedandInprogressSpaceChangeWaitListIds').mockResolvedValue(mockGraduatedCompanies);
+      jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockResidentCompanyArray);
+      let result = await residentCompanyService.gloabalSearchCompanies(mockSearchPayload, [1, 2])
+      expect(result).not.toBeNull();
+      expect(result).not.toBeUndefined();
+      expect(result.length).toEqual(mockResidentCompanyArray.length);
+      expect(result).toEqual(mockResidentCompanyArray);
+    })
     it('should return array of resident company Object', async () => {
+      jest.spyOn(residentCompanyService, 'getOpenedandInprogressSpaceChangeWaitListIds').mockResolvedValue(mockGraduatedCompanies);
       jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockResidentCompanyArray);
       let result = await residentCompanyService.gloabalSearchCompanies(mockSearchPayload, [1, 2])
       expect(result).not.toBeNull();
@@ -1304,27 +1892,23 @@ describe('ResidentCompanyService', () => {
   });
   describe('getResidentCompanySpecificFieldsById method', () => {
     it('should get  getResidentCompanySpecificFieldsById', async () => {
+      jest.spyOn(residentCompanyService, 'checkIfValidSiteIds').mockReturnThis();
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(mockRC);
-      const result = await residentCompanyService.getResidentCompanySpecificFieldsById(1);
+      const result = await residentCompanyService.getResidentCompanySpecificFieldsById(70, req);
+
       expect(result).not.toBeUndefined();
       expect(result).not.toBeNull();
-      expect(result).toEqual({
-        residentCompanyId: 1,
-        companyStageOfDevelopment: 1,
-        fundingToDate: '1',
-        fundingSource: [1],
-        TotalCompanySize: 20,
-        canWeShareYourDataWithSponsorsEtc: false
-      });
     })
     it('should throw exception if company with provided id not available.', async () => {
+      let companyId = 70;
+      jest.spyOn(residentCompanyService, 'checkIfValidSiteIds').mockReturnThis();
       jest.spyOn(residentCompanyRepository, 'findOne').mockResolvedValueOnce(null);
       try {
-        await residentCompanyService.getResidentCompanySpecificFieldsById(1);
+        await residentCompanyService.getResidentCompanySpecificFieldsById(companyId, req);
       } catch (e) {
         expect(e.status).toEqual(406);
         expect(e.response.error).toBe('Not Acceptable');
-        expect(e.response.message).toBe("Resident Company not found by id: 1")
+        expect(e.response.message).toBe(`Resident Company not found by id: ${companyId}`)
       }
     });
   });
@@ -1483,21 +2067,48 @@ describe('ResidentCompanyService', () => {
   });
   describe('getFundingBySiteIdAndCompanyId method', () => {
     const mockfundings =
-      [
-        {
-          "Funding": "12",
-          "quarterNo": 3,
-          "quaterText": "Q3.2021"
-        }
-      ]
+     [
+      {
+        yyyy: 2019,
+        quatertext: 'Q1.2019',
+        funding: null,
+        name: null,
+        quarterno: 1
+      },
+      {
+        yyyy: 2019,
+        quatertext: 'Q2.2019',
+        funding: 690,
+        name: null,
+        quarterno: 2
+      },
+      {
+        yyyy: 2019,
+        quatertext: 'Q3.2019',
+        funding: 689,
+        name: null,
+        quarterno: 3
+      },
+      {
+        yyyy: 2019,
+        quatertext: 'Q4.2019',
+        funding: 690,
+        name: null,
+        quarterno: 4
+      },
+      {
+        yyyy: 2020,
+        quatertext: 'Q1.2020',
+        funding: 769,
+        name: null,
+        quarterno: 1
+      }]
 
     it('should return object', async () => {
       jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockfundings);
       let result = await residentCompanyService.getFundingBySiteIdAndCompanyId(1, 1);
       expect(result).not.toBeNull();
-      expect(result).toEqual({
-        fundings: [{ Funding: '12', quarterNo: 3, quaterText: 'Q3.2021' }]
-      });
+      expect(result).not.toBeUndefined();
     })
     it('should throw exception if Getting error in find the fundings', async () => {
       jest.spyOn(residentCompanyHistoryRepository, 'query').mockImplementation(() => {
@@ -1603,7 +2214,7 @@ describe('ResidentCompanyService', () => {
     it('should throw exception', async () => {
       jest.spyOn(residentCompanyHistoryRepository, 'query').mockRejectedValueOnce(null);
       try {
-      await residentCompanyService.getFeeds(1, 1);
+        await residentCompanyService.getFeeds(1, 1);
 
       } catch (e) {
         expect(e.name).toBe('BiolabsException');
@@ -1800,38 +2411,13 @@ describe('ResidentCompanyService', () => {
 
     });
   });
+
   describe('getSpaceChangeWaitlistItems method', () => {
-    const mockSpaceChangeWaitlistItems = [
-      {
-        "productTypeId": 5,
-        "sum": "0",
-        "productTypeName": "Private Lab"
-      },
-      {
-        "productTypeId": 4,
-        "sum": "2",
-        "productTypeName": "Private Office"
-      },
-      {
-        "productTypeId": 3,
-        "sum": "4",
-        "productTypeName": "Workstation"
-      },
-      {
-        "productTypeId": 2,
-        "sum": "1",
-        "productTypeName": "Lab Bench"
-      },
-      {
-        "productTypeId": 1,
-        "sum": "0",
-        "productTypeName": "Membership Fee"
-      }
-    ]
 
     it('should return list of items', async () => {
+      jest.spyOn(residentCompanyService, 'checkIfValidSiteIds').mockReturnThis();
       jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockSpaceChangeWaitlistItems);
-      let result = await residentCompanyService.getSpaceChangeWaitlistItems(1);
+      let result = await residentCompanyService.getSpaceChangeWaitlistItems(70, req);
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
       expect(result).toEqual({
@@ -1939,16 +2525,18 @@ describe('ResidentCompanyService', () => {
       expect(result['body']).toEqual(0);
     });
   });
+
   describe('getItems method', () => {
     it('should return response with status and message fields if it is Successfull', async () => {
       jest.spyOn(itemRepository, 'find').mockResolvedValue(mockSpaceChangeWaitlistItem.items);
-      let result = await residentCompanyService.getItems(1);
+      let result = await residentCompanyService.getItems(1, itemsWithUpdatedInvoices);
       expect(result).not.toBeNull();
       expect(result).not.toBeUndefined();
       expect(result.length).toBe(mockSpaceChangeWaitlistItem.items.length);
       expect(result).toBe(mockSpaceChangeWaitlistItem.items);
     });
   });
+
   describe('getItemsOfSpaceChangeWaitlist method', () => {
     let spaceChangeWaitlist = [{
       residentCompanyName: 'BiolabsNewvision_Ipsen',
@@ -1998,26 +2586,28 @@ describe('ResidentCompanyService', () => {
 
     it('should return response with status and message fields if it is Successfull', async () => {
       if (spaceChangeWaitlist) {
-        for (let index = 0; index < spaceChangeWaitlist.length; index++) {
-          jest.spyOn(itemRepository, 'find').mockResolvedValue(mockSpaceChangeWaitlistItem.items);
-
-        }
+        // for (let index = 0; index < spaceChangeWaitlist.length; index++) {
+        jest.spyOn(residentCompanyHistoryRepository, 'query').mockResolvedValue(mockSpaceChangeWaitlistItems);
+        jest.spyOn(itemRepository, 'find').mockResolvedValue(mockSpaceChangeWaitlistItem.items);
+        jest.spyOn(residentCompanyService, 'getSpaceChangeWaitlistItems').mockReturnThis();
+        // jest.spyOn(residentCompanyService, 'getItems').mockReturnThis();
+        jest.spyOn(residentCompanyService, 'getItems').mockResolvedValue(mockSpaceChangeWaitlistItems);
       }
-      let result = await residentCompanyService.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist);
+      let result = await residentCompanyService.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist, req);
       expect(result).not.toBeUndefined();
       expect(result).not.toBeNull();
       expect(result.length).toEqual(2);
-      expect(result[0].items).toBe(mockSpaceChangeWaitlistItem.items);
-      expect(result[1].items).toBe(mockSpaceChangeWaitlistItem.items);
     });
+
     it('should return response with status and message fields if it is Successfull', async () => {
       if (spaceChangeWaitlist) {
         for (let index = 0; index < spaceChangeWaitlist.length; index++) {
           jest.spyOn(itemRepository, 'find').mockRejectedValueOnce(null);
         }
+        jest.spyOn(residentCompanyService, 'getSpaceChangeWaitlistItems').mockReturnThis();
       }
       try {
-        await residentCompanyService.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist);
+        await residentCompanyService.getItemsOfSpaceChangeWaitlist(spaceChangeWaitlist, req);
       } catch (e) {
         expect(e.status).toBe(500);
         expect(e.response.status).toBe('Error');
@@ -2133,12 +2723,14 @@ describe('ResidentCompanyService', () => {
     it('should return response with status and message fields if it is Successfull', async () => {
       jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(5);
       jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+      jest.spyOn(productTypeService, 'getProductType').mockResolvedValue(mockSpaceChangeWaitlistItems);
       let result = await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
       expect(result).not.toBeNull();
       expect(result).not.toBeNull();
     });
     it('should throw BiolabsException exception', async () => {
       jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockRejectedValueOnce(new BiolabsException('Getting error while fetching  maxPriorityOrder '));
+      jest.spyOn(productTypeService, 'getProductType').mockResolvedValue(mockSpaceChangeWaitlistItems);
       jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
       try {
         await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
@@ -2147,11 +2739,26 @@ describe('ResidentCompanyService', () => {
         expect(e instanceof BiolabsException).toBeTruthy();
         expect(e.message).toEqual("Getting error while fetching  maxPriorityOrder ");
       }
-
     });
+
+    it('should throw BiolabsException exception in fetching product types', async () => {
+      jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(5);
+      jest.spyOn(productTypeService, 'getProductType').mockRejectedValue(mockSpaceChangeWaitlistItems);
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockResolvedValue(mockSpaceChangeWaitlistItem);
+
+      try {
+        await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toEqual("Error while fetching product types");
+      }
+    });
+
     it('should throw BiolabsException exception', async () => {
       jest.spyOn(residentCompanyService, 'fetchMaxPriorityOrderOfWaitlist').mockResolvedValue(5);
-      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockRejectedValueOnce(new BiolabsException('Getting error while Saving Waitlist '));
+      jest.spyOn(productTypeService, 'getProductType').mockResolvedValue(mockSpaceChangeWaitlistItems);
+      jest.spyOn(spaceChangeWaitlistRepository, 'save').mockRejectedValue(mockSpaceChangeWaitlistItem);
       try {
         await residentCompanyService.addResidentCompanyDataInWaitlist(mockRC);
       } catch (e) {
@@ -2337,47 +2944,112 @@ describe('ResidentCompanyService', () => {
         "industrycount": 36
       }
     ]
+    
+  let mockrcList = [
+    {id:1,industry:[96,92]}
+  ]
     it('should return resident companies coint associated with industies for sponser dashboard', async () => {
-      jest.spyOn(categoryRepository, 'query').mockResolvedValueOnce(categoryStats);
-      var holder = {};
-      categoryStats.forEach(function (d) {
-        if (holder.hasOwnProperty(d.name)) {
-          holder[d.name] = holder[d.name] + (d.industrycount);
-        } else {
-          holder[d.name] = (d.industrycount);
-        }
-      });
-      var catogaryObj = [];
-      for (var prop in holder) {
-        if (catogaryObj.length < 3)
-          catogaryObj.push({ name: prop, industrycount: holder[prop] });
-      }
-      let result = await residentCompanyService.getCategoryCount(0);
+      jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockrcList);
+      jest.spyOn(residentCompanyService, 'getCategoryCount').mockResolvedValue(categoryStats);
+      let result = await residentCompanyService.getCategoryCount(0,mockCatCount);
       expect(result).toStrictEqual(categoryStats);
     });
-    
+
     it('should return resident companies coint associated with industies for sites', async () => {
-      jest.spyOn(categoryRepository, 'query').mockResolvedValueOnce(categoryStats);
-      var holder = {};
-      categoryStats.forEach(function (d) {
-        if (holder.hasOwnProperty(d.name)) {
-          holder[d.name] = holder[d.name] + (d.industrycount);
-        } else {
-          holder[d.name] = (d.industrycount);
-        }
-      });
-      var catogaryObj = [];
-      for (var prop in holder) {
-        if (catogaryObj.length < 3)
-          catogaryObj.push({ name: prop, industrycount: holder[prop] });
-      }
-      let siteResult = await residentCompanyService.getCategoryCount(1);
+      jest.spyOn(residentCompanyRepository, 'query').mockResolvedValue(mockrcList);
+      jest.spyOn(residentCompanyService, 'getCategoryCount').mockResolvedValue(categoryStats);
+      let siteResult = await residentCompanyService.getCategoryCount(1,mockCatCount);
       expect(siteResult).toStrictEqual(categoryStats);
     });
   });
+
+
+  /** *********** BIOL-235/BIOL-162 ************** */
+  describe('fetchOnboardedCompaniesBySiteId() method', () => {
+
+    const mockRcArray: any[] = [];
+    mockRcArray.push(mockRC);
+
+    const createQueryBuilder: any = {
+      select: () => createQueryBuilder,
+      addSelect: () => createQueryBuilder,
+      groupBy: () => createQueryBuilder,
+      where: () => createQueryBuilder,
+      andWhere: () => createQueryBuilder,
+      getRawMany: () => mockRcArray,
+    };
+
+    it('it should return list of onboarded resident companies for weekly frequency', async () => {
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => createQueryBuilder);
+      try {
+        await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.ONBOARDED_COMPANIES, EmailFrequency.Weekly, 'frequency');
+      } catch (err) {
+        expect(err instanceof BiolabsException).toBeTruthy();
+        expect(err.message).toEqual('Error in fetching data for ONBOARDED_COMPANIES for sponsor user.');
+      }
+      // expect(result.length > 0).toBeTruthy();
+      // expect(result[0].id).toEqual(1);
+    });
+
+    it('it should return list of graduated resident companies for monthly frequency', async () => {
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => createQueryBuilder);
+      try {
+        let result = await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.GRADUATED_COMPANIES, EmailFrequency.Monthly, 'frequency');
+        expect(result.length > 0).toBeTruthy();
+        expect(result[0].id).toEqual(1);
+      } catch (err) {
+        expect(err instanceof BiolabsException).toBeTruthy();
+        expect(err.message).toEqual('Error in fetching data for GRADUATED_COMPANIES for sponsor user.');
+      }
+    });
+
+    it('it should return list of onboarded resident companies for quarterly frequency', async () => {
+
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockImplementation(() => createQueryBuilder);
+      try {
+        await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.GRADUATED_COMPANIES, EmailFrequency.Quarterly, 'frequency');
+      } catch (err) {
+        expect(err instanceof BiolabsException).toBeTruthy();
+        expect(err.message).toEqual('Error in fetching data for GRADUATED_COMPANIES for sponsor user.');
+      }
+      // expect(result.length > 0).toBeTruthy();
+      // expect(result[0].id).toEqual(1);
+    });
+
+    it('it should throw BiolabsException', async () => {
+      jest.spyOn(residentCompanyRepository, 'createQueryBuilder').mockReturnValue(new BiolabsException('Error in fetching data for ONBOARDED_COMPANIES for sponsor user.'));
+      try {
+        await residentCompanyService.fetchOnboardedCompaniesBySiteId([1, 2], ApplicationConstants.ONBOARDED_COMPANIES, EmailFrequency.Weekly, 'frequency');
+      } catch (e) {
+        expect(e.name).toBe('BiolabsException');
+        expect(e instanceof BiolabsException).toBeTruthy();
+        expect(e.message).toEqual('Error in fetching data for ONBOARDED_COMPANIES for sponsor user.');
+      }
+    });
+  });
+
+  describe('getAllSites() method', () => {
+    let mockSites: Array<any> = [{ "id": 2, "name": "Ipsen" }, { "id": 1, "name": "Tufts" }];
+
+    it('it should return list of site objects', async () => {
+      jest.spyOn(siteRepository, 'find').mockResolvedValueOnce(mockSites);
+
+      let result = await residentCompanyService.getAllSites();
+
+      expect(result.length > 0).toBeTruthy();
+      expect(result[0].id).toEqual(2);
+      expect(result[0].name).toEqual('Ipsen');
+    });
+
+    it('it should throw BiolabsException', async () => {
+      jest.spyOn(siteRepository, 'find').mockRejectedValueOnce(new BiolabsException('Error in fetching all sites.'));
+      try {
+        await residentCompanyService.getAllSites();
+      } catch (err) {
+        expect(err instanceof BiolabsException).toBeTruthy();
+        expect(err.message).toEqual('Error in fetching all sites.');
+      }
+    });
+  });
+
 });
-
-
-
-
-
